@@ -17,14 +17,18 @@ wired into `checks:quick` and the pre-commit hook.
 | Layer | What | Where |
 | :--- | :--- | :--- |
 | Intent | `{subject, kind, claims, gate}` — the coordination key, work class, path radius, ending gate | `flake/intents.nix` `intentFields` |
-| Kind | one of six work classes (`chain-change`, `gate-change`, `flake-change`, `note-change`, `publish`, `drive`) | `kinds` |
-| Capability | `{provides, claims, floor, via}` keyed by the xs `source` string | `capabilities` |
-| Composition | `admit {intent, capability}` → `{ok, why}` — kind declared, lane provides it, every claim inside radius | `admit` |
+| Kind | one of six work classes (`chain-change`, `gate-change`, `flake-change`, `note-change`, `publish`, `drive`), each with a `place` | `kinds` |
+| Capability | `{provides, claims, floor, via, place}` keyed by the xs `source` string | `capabilities` |
+| Place | where work executes — `eval` (RAM only), `local-gate` (bounded check), `nix-tool` (cache-served, never a closure), `delphi` (prod API), `clanker` (offload for disk-IO spend) | `places` |
+| Composition | `admit {intent, capability}` → `{ok, why}` — kind declared, lane provides it, lane reaches the kind's place, every claim inside radius | `admit` |
 | Dedup | `classOf intent` — quotient hash of `kind | sorted claims`; subject does not participate | `keyOf`, `classOf` |
 
-The three refusal classes are the point: a `drive` lane admitting a
-`chain-change` is "route, do not execute" made a predicate; a claim outside the
-declared radius names the paths it would not cover.
+The refusal classes are the point: a `drive` lane admitting a `chain-change` is
+"route, do not execute" made a predicate; a claim outside the declared radius
+names the paths it would not cover; a lane providing a kind whose `place` it
+cannot reach is `capReachMisses` — refused at the gate and at `admit`.
+Placement is [[flake/policies.nix#work-places-where-it-costs]]: frieren's
+disk is not a build farm, so anything spending local disk IO goes to clanker.
 
 ## Reading it
 

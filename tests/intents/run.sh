@@ -9,6 +9,9 @@
 #   kind refuse    tmux-pane-steward cannot admit chain-change (route, do not execute)
 #   radius refuse  freebuff's claims sit inside modules/,hosts/,AGENTS.nix only
 #   undeclared     a capability name nobody declared refuses outright
+#   place          admit names the tier; a capability providing a kind it cannot
+#                  reach is the capReachMisses invariant — seeded, since declared
+#                  data cannot produce one
 #
 # classOf: two dispatches with the same kind over the same claims share one
 # quotient class — subject does not participate; kind does.
@@ -55,6 +58,19 @@ else
   fail=1
 fi
 
+cat >"$tmp/reach-miss.json" <<'EOF'
+{"ok":false,"failures":["freebuff provides chain-change but cannot reach place 'local-gate'"],"undeclaredSources":[],"undeclaredVerbs":[]}
+EOF
+if ! out=$(bash "$gate" "$tmp/reach-miss.json" 2>&1); then
+  echo "ok   reach-miss report fails the gate"
+  grep -q "cannot reach place" <<<"$out" \
+    && echo "ok   the failure names the unreachable place" \
+    || { echo "FAIL the failure does not name the place"; fail=1; }
+else
+  echo "FAIL gate accepted a report with a reach miss"
+  fail=1
+fi
+
 # --- 3. the verdict classes, through the live spec ----------------------------
 verdicts="$(nix eval --json .#intents --apply 'i: {
   admitted = i.admit { intent = { subject = "t"; kind = "chain-change"; claims = ["modules/"]; gate = "checks:drv-equality"; }; capability = "devin"; };
@@ -74,6 +90,7 @@ check() { # json  name  jq-expression  expected
 }
 
 check "$verdicts" "devin admits chain-change in radius"        '.admitted.ok'         'true'
+check "$verdicts" "admit names the place tier"                 '.admitted.why | test("at local-gate")' 'true'
 check "$verdicts" "steward refused chain-change"               '.kindRefused.ok'      'false'
 check "$verdicts" "kind refusal says route-not-execute"        '.kindRefused.why | test("route, do not execute")' 'true'
 check "$verdicts" "freebuff refused out-of-radius claim"       '.radiusRefused.ok'    'false'

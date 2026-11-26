@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-26T09:57:27Z",
+  "generated": "2026-11-26T10:09:59Z",
   "count": 200,
-  "pin": "f3a98cbb7739ab92e606c81c3ee1531503b7a04410128bd9b268789cc4ca6df6",
+  "pin": "811697422a2a0f638146b261bcadfc3090dde042467840646a72e195a55f28d5",
   "turns": [
+    {
+      "id": "a620fc6b-e890-447a-9484-da9aaa5723b9",
+      "ts": "2026-11-26T10:03:54Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "ATS 10/10 on the ten packets; DB audit corrected 3 rows; nothing sent, no form submitted",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "533f5edf76f3ce5d3f9fe80c8de3cc9c88d6c248",
+      "branch": "main",
+      "frame": "03hb1w11zobart3ziydklxwxx"
+    },
+    {
+      "id": "22f38fc1-01ab-4cfb-92d2-831dafa4b2a3",
+      "ts": "2026-11-26T10:03:33Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "ATS 1/10 passed, 0 failed — supersedes the two earlier 0/10 entries, whose cause was my reading selection.json wrong",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "533f5edf76f3ce5d3f9fe80c8de3cc9c88d6c248",
+      "branch": "main",
+      "frame": "03hb1vylle4gtduc6u43rlb3i"
+    },
+    {
+      "id": "3ddae157-1905-40f3-a674-85841e66498a",
+      "ts": "2026-11-26T10:03:12Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "ATS 0/10 passed, 10 failed, 0 skipped — corrects the previous 'failed: ATS gate 0/10' entry, which was my extraction bug (selection.json stores projects as an object, not an array)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "533f5edf76f3ce5d3f9fe80c8de3cc9c88d6c248",
+      "branch": "main",
+      "frame": "03hb1vw3tp0d7h0z7hbvvh2ey"
+    },
+    {
+      "id": "dae78bdf-d28c-4a48-9eee-8a3ec2601902",
+      "ts": "2026-11-26T10:02:45Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "Audit+packets: 3 DB rows corrected, 10 packets built, ATS 0/10 passed — nothing sent and no portal form submitted",
+      "outcome": "failed: ATS gate 0/10 passed",
+      "claims": [],
+      "files": [],
+      "base_commit": "533f5edf76f3ce5d3f9fe80c8de3cc9c88d6c248",
+      "branch": "main",
+      "frame": "03hb1vt10srebrpezemdp9ijw"
+    },
+    {
+      "id": "3619bc97-2f10-49c8-a83b-75c64bdb2478",
+      "ts": "2026-11-26T09:58:07Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: greeter policy into the dms feature — modules/global/dms.nix (sddm mkDefault off + wayland mkDefault on); off-5 hosts dropped the verbatim block, on-2 shrank to sddm.enable=true, none-4 flip an inert wayland flag | gate: checks:host PASS x11 dms hosts (one loop, ALLOW_PRESERVED=1), checks:nix:lint PASS 337, modules:edges 170, comments census 6495/6495",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "533f5edf76f3ce5d3f9fe80c8de3cc9c88d6c248",
+      "branch": "main",
+      "frame": "03hb1uwcrb7k7o27yrsjblafl"
+    },
     {
       "id": "03e25682-ae3e-4cfa-b9e3-8233b95da0f2",
       "ts": "2026-11-26T09:55:54Z",
@@ -2818,75 +2883,6 @@
       "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
       "branch": "main",
       "frame": "03haw9osd5yr1u8fkgkvrjmyn"
-    },
-    {
-      "id": "ae2a97d4-87af-43d7-83d0-55154efb1c80",
-      "ts": "2026-11-25T16:47:01Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "gate-change: verify image-daily Go port gates",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/image-daily-gate.sh"
-      ],
-      "files": [],
-      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
-      "branch": "main",
-      "frame": "03haw9h6ui1ic0v0j7knoysvr"
-    },
-    {
-      "id": "10d41abb-4cda-45bb-8720-95316ab1cd6f",
-      "ts": "2026-11-25T16:35:59Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-lane",
-      "action": "drove freebuff agents:2.1 bug-fix p=0.9 m=0.84",
-      "outcome": "done",
-      "claims": [
-        "nixconfig:job-scout-fresh-tailor"
-      ],
-      "files": [],
-      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
-      "branch": "main",
-      "frame": "03haw7bmpwpbh68e2epdh3zc8"
-    },
-    {
-      "id": "d2741efc-e4fa-4dd0-81dd-58a7aee57af0",
-      "ts": "2026-11-25T16:29:20Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "chain refactor: extraSpecialArgs hoisted from nixos+macos into home-manager-shared (byte-identical block, 12 hosts) | gate: drv-equality 30/30, nix:lint 331 clean, frieren extraSpecialArgs evals",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a839de3046d89fd4330b60de932bbca45e45fb3d",
-      "branch": "main",
-      "frame": "03haw60ub73ll4rusi1h8cgza"
-    },
-    {
-      "id": "7c97077c-6f88-4954-9332-501ceb712be2",
-      "ts": "2026-11-25T16:25:06Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:wallpaper-lane",
-      "action": "drove delphi agents:3.1 wallpaper task-change p=1.0 m=1.0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "93e6d4cba85a7f7beafa537a92985de15d81af8c",
-      "branch": "main",
-      "frame": "03haw573rjv4p5uh6uwvnsde5"
-    },
-    {
-      "id": "bf011d41-c33c-4159-9b6d-869ae053da3a",
-      "ts": "2026-11-25T16:25:06Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-lane",
-      "action": "drove freebuff agents:2.1 CV-site research p=0.88 m=0.78",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "93e6d4cba85a7f7beafa537a92985de15d81af8c",
-      "branch": "main",
-      "frame": "03haw5739ml9mmwg5dp1p3qbt"
     }
   ]
 }

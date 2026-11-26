@@ -815,6 +815,18 @@
       detail = "a rebuild path went back to spelling its own flags: the envelope lost its axes, its self-test, or one of the switch tasks stopped rendering from it";
     };
 
+    work-places-where-it-costs = {
+      rule = "Every intent kind and every capability declares where its work executes: `.#intents.places` is the closed vocabulary — `eval` reads the compiled surface for only RAM, `local-gate` is a bounded check on one host, `nix-tool` fetches cache-served through `nix run`/`nix shell --builders \"\"` and never lands in a NixOS closure, `delphi` is the prod API across the wire, and `clanker` is the Instabox offload that anything spending frieren's disk IO — new derivations, Go compiles, browser suites, experiments — takes instead. A kind places at one tier; a capability lists the tiers it can reach, and a lane that provides a kind it cannot reach is the capReachMisses invariant — refused at the gate and at `admit`. frieren's disk is not a build farm.";
+      proof = "flake/intents.nix (places, per-kind/capability place, admit's reach refusal) · scripts/task/nix-tool.sh (cache-served registry, --builders \"\") · taskfiles/instabox.yml (clanker:*, instabox:*)";
+      holds =
+        has "flake/intents.nix" "places = {"
+        && has "flake/intents.nix" "clanker = {"
+        && has "flake/intents.nix" "cannot reach place"
+        && has "scripts/task/nix-tool.sh" "--builders"
+        && has "taskfiles/instabox.yml" "clanker:";
+      detail = "the placement vocabulary, a kind's declared place, admit's reach refusal, or the clanker offload route moved";
+    };
+
     daemon-clears-kelly = let
       d = import ./daemons.nix {inherit lib;};
       report =

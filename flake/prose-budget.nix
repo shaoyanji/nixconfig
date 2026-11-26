@@ -36,6 +36,8 @@
     ".agents/skills/infra/SKILL.md" = 61;
     ".agents/skills/instabox/SKILL.md" = 106;
     ".agents/skills/iventoy/SKILL.md" = 110;
+    ".agents/skills/job-scout-lane/SKILL.md" = 64;
+    ".agents/skills/jobsearch-pipeline/SKILL.md" = 81;
     ".agents/skills/jevdecide/SKILL.md" = 156;
     ".agents/skills/knowledge-base/SKILL.md" = 197;
     ".agents/skills/mail-alias/SKILL.md" = 83;
@@ -53,6 +55,7 @@
     ".agents/skills/paste/SKILL.md" = 121;
     ".agents/skills/pdfvision/SKILL.md" = 39;
     ".agents/skills/philips-tv-cast/SKILL.md" = 135;
+    ".agents/skills/pipe-loop/SKILL.md" = 60;
     ".agents/skills/prove-it-works/SKILL.md" = 35;
     ".agents/skills/qmd/SKILL.md" = 155;
     ".agents/skills/reasonix/SKILL.md" = 68;

@@ -1,8 +1,147 @@
 {
-  "generated": "2026-11-26T12:19:02Z",
+  "generated": "2026-11-26T12:52:48Z",
   "count": 200,
-  "pin": "f17323f64623fe2b64cf4302df0df034dfb51e5582e92bc50e0bf60b51ccfffe",
+  "pin": "1487ee9ba02656d06110eb4cd42941b878993ab235e5f63695da2c8c9385cda8",
   "turns": [
+    {
+      "id": "5f6720b4-c39d-4517-8247-58452a03b0a7",
+      "ts": "2026-11-26T12:52:18Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-delphi-26f",
+      "action": "incident: verify delphi dup-services, :8449/:8450, dirty tree",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi"
+      ],
+      "files": [],
+      "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
+      "branch": "main",
+      "frame": "03hb2sxcegke1qaffp0bkt4gd"
+    },
+    {
+      "id": "701ca99e-daec-45fa-97aa-bdbd672a7a98",
+      "ts": "2026-11-26T12:52:18Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-freebuff-26e",
+      "action": "gate-change: audit apps-db.sh guards + tests, run checks:appflow",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "tests/appflow-resolve"
+      ],
+      "files": [],
+      "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
+      "branch": "main",
+      "frame": "03hb2sxalr0nawmu4h71k9k6b"
+    },
+    {
+      "id": "7604d820-9690-4688-bc43-86f88304226e",
+      "ts": "2026-11-26T12:52:17Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-26f",
+      "action": "bug-fix: fix fold_umlauts in jobsearch-sweep.py, push main, post done",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/jobsearch-sweep.py"
+      ],
+      "files": [],
+      "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
+      "branch": "main",
+      "frame": "03hb2sx8v0k4k23s9a8m0t9nh"
+    },
+    {
+      "id": "483a3218-abb8-4442-a012-9e1e7c6af05f",
+      "ts": "2026-11-26T12:47:20Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-freebuff-26e",
+      "action": "freebuff tmux input not submitting",
+      "outcome": "blocked: freebuff tmux input not submitting",
+      "claims": [
+        "scripts/task/apps-db.sh"
+      ],
+      "files": [],
+      "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
+      "branch": "main",
+      "frame": "03hb2ryfw0j9bj9f6ypkdb3fj"
+    },
+    {
+      "id": "739606c3-33f1-469e-b134-fc3eb9e6be08",
+      "ts": "2026-11-26T12:41:38Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-freebuff-26e",
+      "action": "note-change: appflow guard review",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh"
+      ],
+      "files": [],
+      "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
+      "branch": "main",
+      "frame": "03hb2qubw2g1gh2ytux5u5nyj"
+    },
+    {
+      "id": "0eee4a88-f89f-4186-b6d5-5b02911a91e9",
+      "ts": "2026-11-26T12:23:22Z",
+      "source": "agy",
+      "subject": "nixconfig:jobsearch-sweep-26e",
+      "action": "novel: run live-deduped 5-board job sweep + build tailored packets",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/jobsearch-pipeline.sh",
+        "scripts/task/apps-scout.sh"
+      ],
+      "files": [],
+      "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
+      "branch": "main",
+      "frame": "03hb2na548kijxqi0e88yvk05"
+    },
+    {
+      "id": "25de07e1-9aa1-4b74-a99b-af103a965574",
+      "ts": "2026-11-26T12:20:24Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-26: 0 plate(s) kept of 0 spent, 0 roster row(s) waiting, 779 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": null,
+      "branch": null,
+      "frame": "03hb2mp01h7qo2um8egptkhro"
+    },
+    {
+      "id": "4a078921-d2e9-4308-8b75-bc3c06888334",
+      "ts": "2026-11-26T12:19:43Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-settle-8",
+      "action": "checks:appflow green: all six tracker rules pass on 1670 rows. Last 8 settled with explicit markers, BridgingIT names both roles, sync.py write path guarded (+10 offline cases).",
+      "outcome": "done",
+      "claims": [
+        "modules/plugins/appflow/sync.py",
+        "scripts/task/appflow-check.sh",
+        "tests/appflow-triage"
+      ],
+      "files": [],
+      "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
+      "branch": "main",
+      "frame": "03hb2mk84xwp300we4reyaywc"
+    },
+    {
+      "id": "e5c01954-a167-4df6-8d0f-a9d7111a1846",
+      "ts": "2026-11-26T12:19:42Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-settle-8",
+      "action": "Settle the last 8 rows with what their threads actually prove, and guard the sync writer",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/plugins/appflow/sync.py",
+        "scripts/task/appflow-check.sh",
+        "tests/appflow-triage"
+      ],
+      "files": [],
+      "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
+      "branch": "main",
+      "frame": "03hb2mk54bzh4g4bbjz9cpg9r"
+    },
     {
       "id": "6783c2aa-7dc7-4d02-a984-81a948d9809d",
       "ts": "2026-11-26T12:15:49Z",
@@ -2842,140 +2981,6 @@
       "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
       "branch": "main",
       "frame": "03hay07df7o31rbsskm6p5d3s"
-    },
-    {
-      "id": "2fd23a62-3781-467e-a873-4f010897e294",
-      "ts": "2026-11-25T21:57:15Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-inventory-audit",
-      "action": "landed: inventory audit at e8c7865a (unchanged since run) — kind/system 30/30 single-sourced from inventory.toml (0 literals left, minyx aarch64), 0 globalModules aliases, feature-chains-only composition | gate: drv-equality 30/30 identical, nix:lint 331 clean — no drift remains",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
-      "branch": "main",
-      "frame": "03haxy2zkodwicobwrbhkaa1n"
-    },
-    {
-      "id": "82214445-027d-47a0-a81f-0ce01eb14ea8",
-      "ts": "2026-11-25T21:56:29Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-scope-trap",
-      "action": "drive delphi: gateway scope-trap (bug-fix)",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/user/ai"
-      ],
-      "files": [],
-      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
-      "branch": "main",
-      "frame": "03haxxxjsom1uz6181ja3dqkx"
-    },
-    {
-      "id": "efa6c9e6-6745-44b2-a5cf-789d912f4a25",
-      "ts": "2026-11-25T21:56:29Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-inventory-audit",
-      "action": "drive devin: inventory audit (flake-change)",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/",
-        "inventory.toml",
-        "flake.nix"
-      ],
-      "files": [],
-      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
-      "branch": "main",
-      "frame": "03haxxxiphrc11eokola7kph1"
-    },
-    {
-      "id": "84aa3dfa-be41-424f-99c0-466fb7ed8d52",
-      "ts": "2026-11-25T21:51:53Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "audit at e8c7865a: kind/system 30/30 single-sourced (0 literals, minyx aarch64), 0 globalModules aliases, lint 331 clean, drv-equality 30/30 — no drift remains",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
-      "branch": "main",
-      "frame": "03haxx16t64g4uolr7wh9s6z9"
-    },
-    {
-      "id": "deb4228a-9b2c-487b-a1a3-11a9061c765a",
-      "ts": "2026-11-25T21:50:43Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "incident closed: hermes-check.sh now resolves hermes-gateway at --user scope, names the scope in every line, and FAILS when the unit is loaded only at SYSTEM scope; a same-name system unit raises a NOTE. Proved with a systemctl stub: A user-running+system-unit -> ok+NOTE, B system-only -> rc=1 FAIL, C no unit -> rc=0 skip. Live run rc=0, surface clean, gateway active/running NRestarts=0.",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "scripts/task/hermes-check.sh"
-      ],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haxwsygkib9luu517z678wv"
-    },
-    {
-      "id": "c2e18b0e-7eef-4292-926e-3de204d684bc",
-      "ts": "2026-11-25T21:48:58Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-scope-trap",
-      "action": "drive delphi: gateway scope-trap fix (bug-fix)",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/user/ai"
-      ],
-      "files": [],
-      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
-      "branch": "main",
-      "frame": "03haxwgnv8r95z5xpo9xragcd"
-    },
-    {
-      "id": "25568b41-1030-449a-9342-c2fe05d541af",
-      "ts": "2026-11-25T21:48:58Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-inventory-audit",
-      "action": "drive devin: nixconfig inventory audit (flake-change)",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/",
-        "inventory.toml",
-        "flake.nix"
-      ],
-      "files": [],
-      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
-      "branch": "main",
-      "frame": "03haxwgnbssrbrpfaowiddvjp"
-    },
-    {
-      "id": "0d4e4f5c-08b7-4cdc-b170-16ccab6d8262",
-      "ts": "2026-11-25T21:34:30Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "incident: re-verified delphi gateway + xs endpoint on-site; followups: check steward mirror, fix scope trap (user-unit scope probe), record incident; no commit",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e8c7865a912d48692a80f48d46ecb615a3dd82e6",
-      "branch": "main",
-      "frame": "03haxtmwptw15ih8r9mad51qt"
-    },
-    {
-      "id": "06eb541b-3eb7-47cf-960d-cd4da0228a32",
-      "ts": "2026-11-25T21:33:15Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "incident: re-check — gateway active/running NRestarts=0, hermes-check rc=0, xs 401 unauth / 200 authed, listeners 127.0.0.1:8093 100.123.145.53%tailscale0:8449 [fd7a:115c:a1e0::d230:9136]%tailscale0:8449",
-      "outcome": "done",
-      "claims": [
-        "modules/user/ai",
-        "scripts/task/xs-turn-post.sh"
-      ],
-      "files": [],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haxte48bjmnphtna6qscko1"
     }
   ]
 }

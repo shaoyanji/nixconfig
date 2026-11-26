@@ -177,6 +177,19 @@ def fix_mojibake(text: str) -> str:
     return text
 
 
+def fold_umlauts(text: str) -> str:
+    """`für` and `fuer` must fold to one key.
+
+    Dropping the umlaut gives `fr`, which no board ever spells, so a record and
+    an advert for the same employer could never match — Bundesamt für Migration
+    und Flüchtlinge came back as a new lead on 2026-11-26 for exactly this.
+    """
+    if not text:
+        return ""
+    for bad, good in (("ä", "ae"), ("ö", "oe"), ("ü", "ue"), ("ß", "ss"),
+                      ("Ä", "Ae"), ("Ö", "Oe"), ("Ü", "Ue")):
+        text = text.replace(bad, good)
+    return text
 def norm(text: str) -> str:
     """Fold a company name to the token a duplicate check compares."""
     text = fix_mojibake(html.unescape(text or "")).lower()
@@ -187,6 +200,7 @@ def norm(text: str) -> str:
         " ",
         text,
     )
+    text = fold_umlauts(text)
     return re.sub(r"[^a-z0-9]+", "", text)
 
 
@@ -400,6 +414,9 @@ def self_test() -> int:
         [norm(strip_place_prefix(n)) for n in ("Berlin Upvest GmbH", "Porz plusserver gmbh", "Lohne Rosenxt Group")],
         [norm(n) for n in ("Upvest GmbH", "plusserver gmbh", "Rosenxt Group")],
     )
+    check("umlauts: Kältemaschinen folds onto Kaeltemaschinen",
+          norm("Kältemaschinen"), norm("Kaeltemaschinen"))
+    check("umlauts: für and fuer agree", norm("für"), norm("fuer"))
     print(f"{total - failures}/{total} passed")
     return 1 if failures else 0
 

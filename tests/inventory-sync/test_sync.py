@@ -197,5 +197,149 @@ class RunTest(unittest.TestCase):
         self.assertEqual(out.strip(), "run: inventory-sync")
 
 
+TOML = '''
+[hosts.delphi]
+hostname = "delphi"
+
+[hosts.delphi.software]
+services = [
+  { name = "link-vault", port = 8468 },
+  { name = "deepseek-harness", port = 8443 },
+  { name = "inventory-site", port = 8466 },
+  { name = "plex" },
+]
+
+[hosts.ghost]
+hostname = "ghost"
+
+[hosts.ghost.software]
+services = [{ name = "ntfy", port = 8458 }]
+'''
+
+
+def with_links(links):
+    return {**DELPHI, "network": {**DELPHI["network"], "links": links}}
+
+
+def write_toml(text=TOML):
+    handle = tempfile.NamedTemporaryFile("w", suffix=".toml", delete=False)
+    handle.write(text)
+    handle.close()
+    return handle.name
+
+
+class EndpointTest(unittest.TestCase):
+    def test_links_come_from_the_compiled_network(self):
+        host = with_links([{"label": "Stirling PDF", "port": 8445, "url": "https://x:8445"}])
+        self.assertEqual(sync.tailnet_links(host), [{"label": "Stirling PDF", "port": 8445, "url": "https://x:8445"}])
+
+    def test_a_link_without_a_port_or_as_a_string_still_reads(self):
+        host = with_links([{"label": "A"}, {"label": "B", "port": "8450"}, "junk"])
+        self.assertEqual([row["port"] for row in sync.tailnet_links(host)], [None, 8450])
+
+    def test_declared_services_come_from_the_toml(self):
+        table = sync.declared_services(write_toml())
+        self.assertEqual(table["delphi"][0], {"name": "link-vault", "port": 8468})
+        self.assertEqual(table["delphi"][-1], {"name": "plex", "port": None})
+        self.assertEqual(sorted(table), ["delphi", "ghost"])
+
+    def test_endpoint_notes_name_mounts_and_units(self):
+        text = sync.endpoint_notes(
+            [{"label": "Stirling PDF", "port": 8445}], [{"name": "stirling-pdf", "port": 8445}]
+        )
+        self.assertEqual(text, "Endpoints: Stirling PDF :8445\n\nDeclared: stirling-pdf :8445")
+
+    def test_no_endpoints_makes_no_notes(self):
+        self.assertEqual(sync.endpoint_notes([], []), "")
+
+    def test_two_mounts_on_one_port_conflict(self):
+        links = [{"label": "Free models", "port": 8443}, {"label": "System One", "port": 8443}]
+        self.assertEqual(
+            sync.port_conflicts("delphi", links, []),
+            ["delphi: port 8443 is two links: Free models, System One"],
+        )
+
+    def test_a_mount_and_its_unit_sharing_a_port_is_corroboration(self):
+        links = [{"label": "Free models", "port": 8443}]
+        services = [{"name": "deepseek-harness", "port": 8443}]
+        self.assertEqual(sync.port_conflicts("delphi", links, services), [])
+
+    def test_two_units_on_one_port_conflict(self):
+        services = [{"name": "ntfy", "port": 8458}, {"name": "ntfy-b", "port": 8458}]
+        self.assertEqual(sync.port_conflicts("delphi", [], services), ["delphi: port 8458 is two services: ntfy, ntfy-b"])
+
+    def test_the_same_name_twice_is_not_a_conflict(self):
+        services = [{"name": "ntfy", "port": 8458}, {"name": "ntfy", "port": 8458}]
+        self.assertEqual(sync.port_conflicts("delphi", [], services), [])
+
+    def test_the_item_notes_carry_the_endpoints(self):
+        item = sync.host_item(
+            "delphi",
+            with_links([{"label": "Stirling PDF", "port": 8445}]),
+            services=[{"name": "stirling-pdf", "port": 8445}],
+        )
+        self.assertIn("Endpoints: Stirling PDF :8445", item["notes"])
+        self.assertIn("Declared: stirling-pdf :8445", item["notes"])
+
+
+class TomlRunTest(unittest.TestCase):
+    def run_main(self, argv, payload=None):
+        out, err = io.StringIO(), io.StringIO()
+        stdin = io.StringIO(json.dumps(payload if payload is not None else HOSTS))
+        with mock.patch.object(sys, "argv", argv), mock.patch.object(
+            sys, "stdin", stdin
+        ), contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = sync.main()
+        return code, out.getvalue(), err.getvalue()
+
+    def test_a_clean_inventory_audits_and_posts(self):
+        hosts = {"delphi": with_links([{"label": "Inventory", "port": 8466}])}
+        with mock.patch.object(sync, "post_item", return_value={"created": True}):
+            code, out, _ = self.run_main(["inventory-sync", "--api", "http://x", "--toml", write_toml()], hosts)
+        summary = json.loads(out)
+        self.assertEqual(code, 0)
+        self.assertEqual(summary["endpoints"]["links"], 1)
+        # delphi's four plus ghost's one; the portless `plex` is declared, not
+        # counted as a port.
+        self.assertEqual(summary["endpoints"]["declared"], 5)
+        self.assertEqual(summary["endpoints"]["with_port"], 4)
+        self.assertEqual(summary["endpoints"]["conflicts"], [])
+
+    def test_a_conflict_fails_the_run_without_stopping_the_posts(self):
+        hosts = {
+            "delphi": with_links([{"label": "A", "port": 8443}, {"label": "B", "port": 8443}])
+        }
+        with mock.patch.object(sync, "post_item", return_value={"created": True}) as post:
+            code, out, _ = self.run_main(["inventory-sync", "--api", "http://x", "--toml", write_toml()], hosts)
+        summary = json.loads(out)
+        self.assertEqual(code, 1)
+        self.assertEqual(post.call_count, 1)
+        self.assertIn("two links", summary["endpoints"]["conflicts"][0])
+
+    def test_a_host_only_in_the_toml_is_named_as_drift(self):
+        with mock.patch.object(sync, "post_item", return_value={"created": True}):
+            code, out, _ = self.run_main(
+                ["inventory-sync", "--api", "http://x", "--dry-run", "--toml", write_toml()]
+            )
+        summary = json.loads(out)
+        self.assertEqual(code, 0)
+        self.assertEqual(summary["drift"]["only_in_toml"], ["ghost"])
+        self.assertTrue(any("ghost is declared in the TOML" in warning for warning in summary["warnings"]))
+
+    def test_a_broken_toml_exits_two(self):
+        path = write_toml("this is not = = toml")
+        code, out, _ = self.run_main(["inventory-sync", "--dry-run", "--toml", path])
+        self.assertEqual(code, 2)
+        self.assertIn("error", json.loads(out))
+
+    def test_without_the_flag_nothing_is_audited(self):
+        with mock.patch.object(sync, "post_item", return_value={"created": True}):
+            code, out, _ = self.run_main(["inventory-sync", "--api", "http://x"], {"delphi": DELPHI})
+        summary = json.loads(out)
+        self.assertEqual(code, 0)
+        self.assertNotIn("endpoints", summary)
+        self.assertNotIn("drift", summary)
+
+
 if __name__ == "__main__":
     unittest.main()

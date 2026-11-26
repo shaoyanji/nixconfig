@@ -446,6 +446,8 @@ tasks:
       instead of filing each host twice. Hardware lands in the notes, traits in tags.
       DRY=1 (the default) prints what would post; DRY=0 writes to API=. ONLY=
       narrows by host key, TOON=1 reads as TOON, IN=hosts.json skips the eval.
+      CLI_ARGS=--toml inventory.toml adds each host's declared services and
+      audits its tailnet mounts for two things on one port.
     cmds:
       - >-
         python3 scripts/task/inventory-sync.py

@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-26T15:45:35Z",
+  "generated": "2026-11-26T15:46:24Z",
   "count": 200,
-  "pin": "1072e8e7a3122f0e6479f180183652e6c763151b7d536b94cf349c7bfd0673fb",
+  "pin": "af92d4e8a3e044f31699655498f573a0304e50e8f30488529c4cbf54f725c97c",
   "turns": [
+    {
+      "id": "c97869d8-c440-4c98-b46f-0e0150b73694",
+      "ts": "2026-11-26T15:46:19Z",
+      "source": "devin",
+      "subject": "nixconfig:job-db-scraper-batch-scoring",
+      "action": "landed: batch upsert API, persisted deterministic role-match scoring/lane tags with legacy migration, score sorting and UI badges, deduped ntfy high-score alerts | gate: go test/vet PASS, node --check PASS, alejandra PASS, checks:host delphi rc=0, delphi toplevel nix build rc=0, live smoke batch 2+0/2+2/0 ntfy dedupe 1 PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "350cb31f9296147a8255601672c4a279d7e58340",
+      "branch": "main",
+      "frame": "03hb3qx2pdxdgjrxoi4hn9j39"
+    },
+    {
+      "id": "65c6b1c1-c419-4b76-9d10-ab7e6803d9a6",
+      "ts": "2026-11-26T15:45:46Z",
+      "source": "devin",
+      "subject": "nixconfig:delphi-config-verify",
+      "action": "resolved: checks:host HOST=delphi PASS on the current tree (2168 assertions, eval rc=0); buffy's missing services.job-db-scraper attr unreproducible — no reference in tree or git history, module now exists and is wired | gate: checks:host HOST=delphi PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "987ede66b5bb1b63abee3ec2283302673de93687",
+      "branch": "main",
+      "frame": "03hb3qt70lu26ci9kvh6i3nzg"
+    },
+    {
+      "id": "624fdff1-d085-4db0-aad6-d3d676778fdd",
+      "ts": "2026-11-26T15:45:45Z",
+      "source": "devin",
+      "subject": "nixconfig:job-db-scraper-batch-scoring",
+      "action": "landed: job-db-scraper — SQLite/FTS5 postings, batch upsert API+CLI with per-row errors, deterministic scoring ported from jobsearch-sweep (lane/out/agency/loc patterns, score+lane persisted at write), dedupe by normalized employer+title, score-sorted surface UI; loopback :8102, mount :8466 | gates: go test, sandbox build, checks:registry:compiled, checks:host HOST=delphi PASS (2168 assertions)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "987ede66b5bb1b63abee3ec2283302673de93687",
+      "branch": "main",
+      "frame": "03hb3qt4lkff4r2sc9ipo693e"
+    },
     {
       "id": "064c57ab-9c61-4fa7-98e8-b1455d1db83f",
       "ts": "2026-11-26T15:44:04Z",
@@ -3014,49 +3053,6 @@
       "base_commit": "e34a07bafd25c9866cc545d6fa9530e90107ca78",
       "branch": "main",
       "frame": "03hb1omb26kyekjnb48616eyx"
-    },
-    {
-      "id": "81eeddb8-b66c-4942-bd28-ae1f92093118",
-      "ts": "2026-11-26T09:20:56Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: fetch-oneshot single-sourced — modules/config/fetch-unit.nix covers llm-server/parakeet/qwen-image verbatim + deepseek-v4 fork (exec/requires args); frieren /export binds deduped to hardware-configuration.nix; fern/stark disko assessed-and-left | gate: checks:drv-equality PASS 30/30 vs fresh HEAD baseline, checks:host HOST=eisen PASS (2087 assertions), checks:units eisen PASS (0 problems), checks:nix:style PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e34a07bafd25c9866cc545d6fa9530e90107ca78",
-      "branch": "main",
-      "frame": "03hb1nmzajd6qgwvnlwppk14a"
-    },
-    {
-      "id": "68796194-391b-4ce9-b853-d41b90a9fb85",
-      "ts": "2026-11-26T09:10:56Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-drive-20261126-1009",
-      "action": "jev incident p=0.75 m=0.53: delphi uptime-kuma dup fix",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/delphi/configuration.nix",
-        "modules/services/fleet-monitors.nix",
-        "modules/services/home-assistant.nix"
-      ],
-      "files": [],
-      "base_commit": "043ddf04172dfe82f72f9c317fbafe0f4cdc8f04",
-      "branch": "main",
-      "frame": "03hb1losx9bnp6lpd4qmfcdug"
-    },
-    {
-      "id": "0f375f62-7ff8-48fa-a6ad-e4d2f01b4e26",
-      "ts": "2026-11-26T08:59:14Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-freebuff-drive-20261126-0855",
-      "action": "jev publish p=0.99 m=0.98: publish CV and static site",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "043ddf04172dfe82f72f9c317fbafe0f4cdc8f04",
-      "branch": "main",
-      "frame": "03hb1jebuefly27tb2fr6zubg"
     }
   ]
 }

@@ -47,6 +47,7 @@ no credentials on `delphi`:
 | `deals:page` | `scripts/task/deals-page-scrape.py` | agent-browser, Firecrawl, Context.dev, Tavily, plain GET | stdout JSON, one object per URL |
 | `deals:ingest` | `scripts/task/deals-ingest.py` | stdin or `--in` | `POST /api/deals` on private-deals |
 | `agents:web` | `scripts/task/web-research.py` | the three hosted providers at once, or agent-browser | stdout only |
+| `dev:inventory:site` | `scripts/task/inventory-sync.py` | `nix eval .#inventory.hosts`, or `--in` a JSON dump | `POST /api/items` on inventory-site |
 
 ```bash
 task apps:page -- --backend http https://boards.greenhouse.io/acme > jobs.json
@@ -57,6 +58,9 @@ task deals:ingest -- --api https://delphi.cloudforest-kardashev.ts.net:8465 --in
 
 task agents:web -- search "nix flake devshell" --max 5
 task agents:web -- health https://nixos.org/ --via clanker
+
+task dev:inventory:site DRY=1                        # what would be filed
+task dev:inventory:site DRY=0 ONLY=delphi,frieren    # write two hosts
 ```
 
 Every ingester prints a summary of what it filed, and exits 1 when the server
@@ -64,6 +68,14 @@ refused a record — one refusal does not stop the rest. Both are idempotent: th
 URL is the identity the server fingerprints, so a second run updates instead of
 duplicating. `deals:ingest` maps the scraper's `original_price` to the store's
 `list_price`.
+
+`dev:inventory:site` is the exception that proves the rule, because its identity
+is not derived — it writes inventory-site's own `source=inventory.toml` and
+`source_key=host/<name>`, exactly what `POST /api/import/inventory-toml` writes,
+so a sync and an import update one row per host rather than filing each twice.
+Hardware lands in the notes (so `q=ryzen` finds the Ryzen machines), traits in
+tags, and a `preserved` host stays unarchived. It reads the compiled registry,
+so it can only describe a host the flake already knows.
 
 ## Where the browser and the keys live
 
@@ -82,7 +94,7 @@ this page when they disagree:
 ```bash
 nix eval --json .#inventory.hosts.delphi | jq '.services'   # tailnet ports and names
 task docs:build   # docs/generated/modules-registry.md, fleet-inventory.md
-task --list-all --json | jq -r '.tasks[].name' | grep -E '^(apps|deals|agents:web)'
+task --list-all --json | jq -r '.tasks[].name' | grep -E '^(apps|deals|agents:web|dev:inventory:site)'
 ```
 
 The sibling surfaces are [`email-archive`](email-archive.md) on `:8450` (the

@@ -437,6 +437,25 @@ tasks:
       - task dev:inventory:home-agents
       - task docs:build
 
+  dev:inventory:site:
+    desc: Push compiled fleet hosts into inventory-site (DRY=1 prints, DRY=0 writes; ONLY=, TOON=1, IN=)
+    summary: >
+      One row per host from `nix eval .#inventory.hosts` into inventory-site's
+      `/api/items`, written under the service's own identity — `source=inventory.toml`,
+      `source_key=host/<name>` — so a sync and its TOML import update the same row
+      instead of filing each host twice. Hardware lands in the notes, traits in tags.
+      DRY=1 (the default) prints what would post; DRY=0 writes to API=. ONLY=
+      narrows by host key, TOON=1 reads as TOON, IN=hosts.json skips the eval.
+    cmds:
+      - >-
+        python3 scripts/task/inventory-sync.py
+        --api {{.API | default "https://delphi.cloudforest-kardashev.ts.net:8466"}}
+        {{if eq (.DRY | default "1") "1"}}--dry-run{{end}}
+        {{if .ONLY}}--only {{.ONLY}}{{end}}
+        {{if eq (.TOON | default "0") "1"}}--format toon{{end}}
+        {{if .IN}}--in {{.IN}}{{else}}--eval{{end}}
+        {{.CLI_ARGS}}
+
   dev:inventory:counts:
     desc: Recompute inventory.toml's derived [metadata] counts from .hosts
     summary: >

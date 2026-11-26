@@ -223,6 +223,8 @@ task deals:ingest -- --api https://delphi.cloudforest-kardashev.ts.net:8465 --in
 
 task agents:web -- search "nix flake devshell" --max 5
 task agents:web -- search "nix flake devshell" --max 4 --format markdown
+task agents:web -- search "nix flake devshell" --max 5 \
+  --link-vault http://127.0.0.1:8106 --collection reading --tags nix,devshell
 task agents:web -- health https://nixos.org/ --via clanker
 
 task dev:inventory:site DRY=1                        # what would be filed
@@ -232,6 +234,12 @@ task dev:inventory:site DRY=0 ONLY=delphi,frieren    # write two hosts
 `--format markdown` on `agents:web` renders the same answer as a report: linked
 titles, `[sN]` citations in the text, and those ids resolved again under
 `## Sources`, which is the half that gets pasted into a document.
+
+`--link-vault` files each merged hit through link-vault's `POST /api/links` as
+it is found, and reports `pushed`, `skipped` and `failed` with a reason per URL.
+The vault upserts on the canonical URL, so a page already filed is a skip and
+re-running the same search is safe; a refusal exits 1 without hiding the
+results and their sources.
 
 Every ingester prints a summary of what it filed, and exits 1 when the server
 refused a record. A refusal inside a batch is counted and named by index (25 per

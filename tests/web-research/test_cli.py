@@ -15,7 +15,9 @@ import io
 import json
 import sys
 import tempfile
+import threading
 import unittest
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from unittest import mock
 
@@ -435,6 +437,189 @@ class SearchModeTest(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertEqual(document["count"], 0)
         self.assertEqual(len(document["warnings"]), 3)
+
+
+class VaultStub:
+    """link-vault's `POST /api/links` over a real socket, canned by status code.
+
+    Statuses are consumed in order: 201 is a new link, 200 is the upsert of one
+    the vault already holds, and anything else is a refusal with a JSON reason.
+    """
+
+    def __init__(self, statuses=None):
+        self.requests = []
+        self.statuses = list(statuses or [])
+        stub = self
+
+        class Handler(BaseHTTPRequestHandler):
+            def do_POST(self):
+                length = int(self.headers.get("content-length") or 0)
+                body = json.loads(self.rfile.read(length) or b"{}")
+                stub.requests.append(
+                    {
+                        "path": self.path,
+                        "body": body,
+                        "auth": self.headers.get("Authorization"),
+                    }
+                )
+                status = stub.statuses.pop(0) if stub.statuses else 201
+                if status >= 400:
+                    payload = {"error": "the vault refused this one"}
+                else:
+                    payload = {"link": {"id": len(stub.requests), "url": body.get("url")}, "created": status == 201}
+                data = json.dumps(payload).encode()
+                self.send_response(status)
+                self.send_header("content-type", "application/json")
+                self.send_header("content-length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+
+            def log_message(self, *args):
+                pass
+
+        self.server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
+        self.thread.start()
+        self.base = f"http://127.0.0.1:{self.server.server_address[1]}"
+
+    def close(self):
+        self.server.shutdown()
+        self.server.server_close()
+
+
+def one_hit(*_args, **_kwargs):
+    found = research.from_tavily(TAVILY)
+    for item in found:
+        item["provider"] = "tavily"
+    return found, []
+
+
+class VaultPushTest(unittest.TestCase):
+    def setUp(self):
+        self.vault = VaultStub()
+        self.addCleanup(self.vault.close)
+
+    def search(self, argv, hits=None):
+        args = research.build_parser().parse_args(argv)
+        with mock.patch.object(research, "search_provider", side_effect=hits or one_hit):
+            return research.do_search(args, {"TAVILY_API_KEY": "k"})
+
+    def test_one_hit_is_one_post_with_the_research_fields(self):
+        document = self.search(
+            ["search", "nix flake", "--provider", "tavily", "--link-vault", self.vault.base]
+        )
+        self.assertEqual(len(self.vault.requests), 1)
+        request = self.vault.requests[0]
+        self.assertEqual(request["path"], "/api/links")
+        self.assertEqual(
+            request["body"],
+            {
+                "url": "https://discourse.nixos.org/t/devshell/67351",
+                "title": "Nix flake: devShell with python modules",
+                "description": document["results"][0]["snippet"],
+                "source": "web-research",
+            },
+        )
+        self.assertEqual(document["link_vault"]["pushed"], 1)
+        self.assertEqual(document["link_vault"]["skipped"], 0)
+        self.assertEqual(document["link_vault"]["failed"], 0)
+
+    def test_a_page_the_vault_already_holds_is_a_skip_not_a_failure(self):
+        self.vault.statuses = [201, 200]
+        two = [
+            {"title": "A", "url": "https://a.example/x", "snippet": "a", "provider": "tavily"},
+            {"title": "B", "url": "https://b.example/y", "snippet": "b", "provider": "tavily"},
+        ]
+        document = self.search(
+            ["search", "q", "--provider", "tavily", "--link-vault", self.vault.base],
+            hits=lambda *a, **k: ([dict(item) for item in two], []),
+        )
+        self.assertEqual(len(self.vault.requests), 2)
+        self.assertEqual([self.vault.requests[0]["body"]["url"], self.vault.requests[1]["body"]["url"]], ["https://a.example/x", "https://b.example/y"])
+        self.assertEqual(document["link_vault"]["pushed"], 1)
+        self.assertEqual(document["link_vault"]["skipped"], 1)
+        self.assertEqual(document["link_vault"]["failed"], 0)
+
+    def test_collection_and_tags_are_forwarded_deduped(self):
+        self.search(
+            [
+                "search",
+                "q",
+                "--provider",
+                "tavily",
+                "--link-vault",
+                self.vault.base,
+                "--collection",
+                "reading",
+                "--tags",
+                " nix, flake ,nix,,",
+            ]
+        )
+        body = self.vault.requests[0]["body"]
+        self.assertEqual(body["collection"], "reading")
+        self.assertEqual(body["tags"], ["nix", "flake"])
+
+    def test_no_flag_means_no_push_and_no_key(self):
+        document = self.search(["search", "q", "--provider", "tavily"])
+        self.assertNotIn("link_vault", document)
+        self.assertEqual(self.vault.requests, [])
+
+    def test_a_refusal_is_counted_with_the_vault_reason(self):
+        self.vault.statuses = [500]
+        document = self.search(
+            ["search", "q", "--provider", "tavily", "--link-vault", self.vault.base]
+        )
+        self.assertEqual(document["link_vault"]["failed"], 1)
+        self.assertEqual(document["link_vault"]["pushed"], 0)
+        self.assertIn("HTTP 500", document["link_vault"]["errors"][0]["error"])
+        self.assertIn("the vault refused this one", document["link_vault"]["errors"][0]["error"])
+
+    def test_an_unreachable_vault_fails_each_hit(self):
+        document = self.search(["search", "q", "--provider", "tavily", "--link-vault", "http://127.0.0.1:9"])
+        self.assertEqual(document["link_vault"]["failed"], 1)
+        self.assertIn("unreachable", document["link_vault"]["errors"][0]["error"])
+
+    def test_the_token_travels_as_a_bearer(self):
+        self.search(
+            ["search", "q", "--provider", "tavily", "--link-vault", self.vault.base, "--link-vault-token", "t0k"]
+        )
+        self.assertEqual(self.vault.requests[0]["auth"], "Bearer t0k")
+
+    def test_a_relative_base_is_refused_before_any_request(self):
+        with self.assertRaises(ValueError) as caught:
+            research.absolute_base("localhost:8106")
+        self.assertIn("absolute http(s) URL", str(caught.exception))
+        with mock.patch.object(sys, "argv", ["web-research", "search", "q", "--link-vault", "localhost:8106"]), contextlib.redirect_stdout(
+            io.StringIO()
+        ), contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(research.main(), 2)
+        self.assertIn("absolute http(s) URL", err.getvalue())
+        self.assertEqual(self.vault.requests, [])
+
+    def test_a_failed_push_sets_the_exit_code(self):
+        self.vault.statuses = [500]
+        out = io.StringIO()
+        with mock.patch.object(
+            sys, "argv", ["web-research", "search", "q", "--provider", "tavily", "--link-vault", self.vault.base]
+        ), mock.patch.object(research, "load_keys", return_value={"TAVILY_API_KEY": "k"}), mock.patch.object(
+            research, "search_provider", side_effect=one_hit
+        ), contextlib.redirect_stdout(out):
+            code = research.main()
+        self.assertEqual(code, 1)
+        self.assertEqual(json.loads(out.getvalue())["link_vault"]["failed"], 1)
+
+    def test_markdown_names_the_vault_and_its_counts(self):
+        document = self.search(["search", "q", "--provider", "tavily", "--link-vault", self.vault.base])
+        text = research.markdown_report(document)
+        self.assertIn("_Link vault http://127.0.0.1:", text)
+        self.assertIn("1 pushed, 0 skipped, 0 failed_", text)
+
+    def test_markdown_lists_what_the_vault_refused(self):
+        self.vault.statuses = [400]
+        document = self.search(["search", "q", "--provider", "tavily", "--link-vault", self.vault.base])
+        text = research.markdown_report(document)
+        self.assertIn("0 pushed, 0 skipped, 1 failed_", text)
+        self.assertIn("https://discourse.nixos.org/t/devshell/67351: HTTP 400", text)
 
 
 if __name__ == "__main__":

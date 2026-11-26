@@ -692,16 +692,17 @@ tasks:
         echo "resolved {{.ID}} ($n verdict(s))"
 
   agents:web:
-    desc: Search, extract or health-check the web (task agents:web -- search "query" [--max N] | extract <url> | health <url> [--via clanker] [--format toon])
+    desc: Search, extract or health-check the web (task agents:web -- search "query" [--max N] [--link-vault URL] | extract <url> | health <url> [--via clanker] [--format toon])
     summary: >
       `web-research.py`: search, extract and health-check the web. `search` asks
-      Tavily, Context and Firecrawl together and merges by canonical URL, so a
-      page two of them found is one source witnessed twice, numbered `s1`, `s2`
-      in a `sources` list. `extract` walks firecrawl → context → tavily →
-      browser → http and names every layer that refused. `health` opens a page
-      in agent-browser, locally or on clanker, and judges what was rendered: a
-      404, an unhydrated shell, or under 200 rendered characters fails with its
-      reason. Exit 1 when no provider answered or no page is healthy.
+      Tavily, Context and Firecrawl together and merges by canonical URL, so one
+      page is one source (`s1`, `s2`). `--link-vault BASE` pushes the hits into
+      link-vault as they are found and reports pushed, skipped and failed;
+      `--collection` and `--tags` label them, `LINK_VAULT_TOKEN` authenticates.
+      `extract` walks firecrawl → context → tavily → browser → http and names
+      every layer that refused. `health` opens a page in agent-browser, here or
+      on clanker, and fails a 404, an unhydrated shell, or under 200 rendered
+      characters.
     cmds:
       - python3 scripts/task/web-research.py {{.CLI_ARGS}}
 

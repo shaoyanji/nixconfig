@@ -17,6 +17,12 @@ URL, title and access time, and duplicates are collapsed by canonical URL so a
 page two providers found is one source with two witnesses. `--format markdown`
 renders that as a report: linked titles, `[sN]` citations in the text, and the
 same ids resolved again under `## Sources`.
+
+`search --link-vault <base>` pushes the merged hits into link-vault's
+`POST /api/links` as they are found, and reports `pushed` (created), `skipped`
+(already in the vault) and `failed` with a reason per URL. A link-vault instance
+on loopback needs no token; a remote one takes `--link-vault-token` or
+`LINK_VAULT_TOKEN`.
 """
 
 from __future__ import annotations
@@ -191,6 +197,84 @@ def post_json(url: str, body: dict, key: str = "", timeout: int = 60, auth: bool
         raise Unavailable(f"{host_of(url)} unreachable: {exc.reason}") from exc
     except json.JSONDecodeError as exc:
         raise Unavailable(f"{host_of(url)} answered unparsable JSON: {exc}") from exc
+
+
+# -- link-vault ------------------------------------------------------------
+
+
+def absolute_base(url: str) -> str:
+    """A vault base URL a request can actually reach, or a reason it is not."""
+    parts = urllib.parse.urlsplit((url or "").strip())
+    if parts.scheme not in {"http", "https"} or not parts.netloc:
+        raise ValueError(f"--link-vault takes an absolute http(s) URL, not {url!r}")
+    return url.strip().rstrip("/")
+
+
+def vault_tags(tags: str) -> list:
+    """The CSV a person typed, deduped, with blank entries gone."""
+    ordered = []
+    for tag in (tags or "").split(","):
+        tag = tag.strip()
+        if tag and tag not in ordered:
+            ordered.append(tag)
+    return ordered
+
+
+def post_vault_link(base: str, body: dict, token: str, timeout: int) -> dict:
+    """One `POST /api/links`; the answer carries `created` and the saved link."""
+    headers = {"Content-Type": "application/json", "User-Agent": UA}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    request = urllib.request.Request(
+        f"{base}/api/links", data=json.dumps(body).encode(), headers=headers, method="POST"
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            return json.load(response) or {}
+    except urllib.error.HTTPError as exc:
+        detail = exc.read()[:200].decode("utf-8", "replace")
+        raise Unavailable(f"HTTP {exc.code}: {detail}") from exc
+    except urllib.error.URLError as exc:
+        raise Unavailable(f"unreachable: {exc.reason}") from exc
+    except json.JSONDecodeError as exc:
+        raise Unavailable(f"unparsable answer: {exc}") from exc
+
+
+def push_to_vault(document: dict, base: str, collection: str, tags: str, token: str, timeout: int) -> dict:
+    """Every merged hit into the vault, one request each, counted honestly.
+
+    `created: false` is not a failure — link-vault upserts on the canonical URL,
+    so a page already saved is a skip, and re-running the same search is safe.
+    """
+    counts = {"base": base, "pushed": 0, "skipped": 0, "failed": 0, "errors": []}
+    tag_list = vault_tags(tags)
+    for entry in document.get("results") or []:
+        url = (entry.get("url") or "").strip()
+        if not url:
+            counts["failed"] += 1
+            counts["errors"].append({"url": "", "error": "the result has no URL"})
+            continue
+        body = {
+            "url": url,
+            "title": entry.get("title") or "",
+            "description": entry.get("snippet") or "",
+            "source": "web-research",
+        }
+        if collection:
+            body["collection"] = collection
+        if tag_list:
+            body["tags"] = tag_list
+        try:
+            answer = post_vault_link(base, body, token, timeout)
+        except Unavailable as exc:
+            counts["failed"] += 1
+            counts["errors"].append({"url": url, "error": str(exc)})
+            continue
+        if answer.get("created"):
+            counts["pushed"] += 1
+        else:
+            counts["skipped"] += 1
+    return counts
 
 
 def search_provider(provider: str, query: str, limit: int, keys: dict, timeout: int, depth: str = "basic") -> list:
@@ -480,6 +564,15 @@ def search_markdown(document: dict) -> list:
     lines.append("")
     lines += warnings_markdown(document.get("warnings") or [])
     lines += sources_markdown(document.get("sources") or [])
+    vault = document.get("link_vault")
+    if vault:
+        lines += [
+            "",
+            f"_Link vault {md_text(vault.get('base'), 160)}: {vault.get('pushed', 0)} pushed, "
+            f"{vault.get('skipped', 0)} skipped, {vault.get('failed', 0)} failed_",
+        ]
+        for error in vault.get("errors") or []:
+            lines.append(f"- {md_text(error.get('url') or '(no URL)', 120)}: {md_text(error.get('error'), 200)}")
     return lines
 
 
@@ -566,7 +659,7 @@ def do_search(args, keys: dict) -> dict:
             except Unavailable as exc:
                 warnings.append(f"excerpt of {entry['url']}: {exc}")
     entries, sources = cite(entries)
-    return {
+    document = {
         "mode": "search",
         "query": args.query,
         "providers": used,
@@ -575,6 +668,12 @@ def do_search(args, keys: dict) -> dict:
         "sources": sources,
         "warnings": warnings,
     }
+    if getattr(args, "link_vault", ""):
+        token = getattr(args, "link_vault_token", "") or os.environ.get("LINK_VAULT_TOKEN", "")
+        document["link_vault"] = push_to_vault(
+            document, args.link_vault, args.collection, args.tags, token, args.timeout
+        )
+    return document
 
 
 def do_extract(args, keys: dict) -> dict:
@@ -667,6 +766,10 @@ def build_parser() -> argparse.ArgumentParser:
     search.add_argument("--fetch", action="store_true", help="attach an excerpt of each hit")
     search.add_argument("--fetch-provider", choices=("firecrawl", "context", "tavily"), default="firecrawl")
     search.add_argument("--excerpt-chars", type=int, default=600)
+    search.add_argument("--link-vault", default="", metavar="BASE", help="push every hit into link-vault's POST /api/links")
+    search.add_argument("--collection", default="", help="vault collection for the pushed links")
+    search.add_argument("--tags", default="", help="comma-separated tags for the pushed links")
+    search.add_argument("--link-vault-token", default="", help="bearer token when the vault checks writes")
 
     extract = sub.add_parser("extract", parents=[common], help="page text, first provider that answers")
     extract.add_argument("urls", nargs="+")
@@ -680,10 +783,18 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> int:
     args = build_parser().parse_args()
+    if args.mode == "search" and getattr(args, "link_vault", ""):
+        try:
+            args.link_vault = absolute_base(args.link_vault)
+        except ValueError as exc:
+            print(f"web-research: {exc}", file=sys.stderr)
+            return 2
     keys = load_keys()
     if args.mode == "search":
         document = do_search(args, keys)
         code = 0 if document["results"] else 1
+        if (document.get("link_vault") or {}).get("failed"):
+            code = 1
     elif args.mode == "extract":
         document = do_extract(args, keys)
         code = 0 if document["results"] else 1

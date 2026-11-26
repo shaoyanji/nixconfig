@@ -45,6 +45,13 @@ const el = {
   actionBar: document.getElementById("action-bar"),
   more: document.getElementById("more"),
   hermesOpen: document.getElementById("hermes-open"),
+  sources: document.getElementById("sources"),
+  sourcesOpen: document.getElementById("sources-open"),
+  sourcesClose: document.getElementById("sources-close"),
+  sourcesQ: document.getElementById("sources-q"),
+  sourcesSort: document.getElementById("sources-sort"),
+  sourcesList: document.getElementById("sources-list"),
+  sourcesFoot: document.getElementById("sources-foot"),
   command: document.getElementById("command"),
   commandForm: document.getElementById("command-form"),
   commandText: document.getElementById("command-text"),
@@ -1925,6 +1932,13 @@ document.addEventListener("keydown", (event) => {
     openCommand();
     return;
   }
+  // `S` opens the sources drawer before any result exists: "who writes to me" is
+  // the question you have with an empty search box, not after one.
+  if (event.key === "S" && !typing) {
+    event.preventDefault();
+    openSources();
+    return;
+  }
   // Esc also disarms a half-pressed `x`, not just the marks: an armed bar that
   // survives the key that clears everything reads as a stuck state.
   if (event.key === "Escape" && (state.selected.size || Date.now() <= batchArmedUntil)) {
@@ -2040,6 +2054,112 @@ for (const button of el.actionBar.querySelectorAll(".ab-actions button")) {
     batch(button.dataset.kind);
   });
 }
+
+/* ------------------------------------------------------------------ */
+/* sources — who writes, by domain                                     */
+/* ------------------------------------------------------------------ */
+
+// The rail answers "what is in this answer"; this answers "who keeps sending
+// it". Volume alone would rank one noisy CI bot above a bank, so `untagged` sits
+// beside it and can become the sort: mail the taxonomy never placed is mail a
+// person still has to decide about.
+let sources = [];
+let sourcesSort = "volume";
+
+function renderSources() {
+  el.sourcesList.textContent = "";
+  const rows = [...sources].sort((a, b) =>
+    sourcesSort === "untagged"
+      ? b.untagged - a.untagged || b.letters - a.letters
+      : b.letters - a.letters
+  );
+  if (!rows.length) {
+    const none = document.createElement("li");
+    none.className = "src empty";
+    none.textContent = el.sourcesQ.value ? "no domain matches" : "no senders yet";
+    el.sourcesList.append(none);
+    return;
+  }
+  const top = rows[0].letters || 1;
+  for (const row of rows) {
+    const item = document.createElement("li");
+    item.className = "src";
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "src-row";
+    button.title = `${row.letters} letters from ${row.domain} — search them`;
+
+    const domain = document.createElement("span");
+    domain.className = "src-domain";
+    domain.textContent = row.domain;
+
+    // The bar is the share of the busiest shore, not of the whole archive: a
+    // mailbox's head is always one sender, and a bar scaled to 3500 letters
+    // would draw every other row as a hairline.
+    const bar = document.createElement("span");
+    bar.className = "src-bar";
+    bar.style.setProperty("--w", `${Math.max(2, Math.round((row.letters / top) * 100))}%`);
+
+    const counts = document.createElement("span");
+    counts.className = "src-counts";
+    counts.innerHTML = `<b>${row.letters}</b>${row.untagged ? `<i class="untagged" title="letters the taxonomy never placed">${row.untagged} untagged</i>` : ""}`;
+
+    const when = document.createElement("span");
+    when.className = "src-when mono-xs";
+    when.textContent = since(row.newest);
+
+    button.append(domain, bar, counts, when);
+    button.addEventListener("click", () => {
+      el.sources.close();
+      el.q.value = row.domain;
+      runSearch({ inhale: true });
+    });
+    item.append(button);
+    el.sourcesList.append(item);
+  }
+}
+
+async function loadSources() {
+  el.sourcesList.textContent = "";
+  const note = document.createElement("li");
+  note.className = "src loading";
+  note.textContent = "listening…";
+  el.sourcesList.append(note);
+  try {
+    const rows = await getJSON(
+      `${API}/atlas-senders?lim=40&q=${encodeURIComponent(el.sourcesQ.value.trim())}`
+    );
+    sources = toArray(rows);
+    const untagged = sources.reduce((sum, row) => sum + (row.untagged || 0), 0);
+    const letters = sources.reduce((sum, row) => sum + (row.letters || 0), 0);
+    el.sourcesFoot.textContent = `${sources.length} domains · ${letters} letters · ${untagged} untagged`;
+    renderSources();
+  } catch (error) {
+    console.error(error);
+    el.sourcesList.textContent = "";
+    const failed = document.createElement("li");
+    failed.className = "src empty";
+    failed.textContent = "the archive did not answer";
+    el.sourcesList.append(failed);
+    el.sourcesFoot.textContent = "";
+  }
+}
+
+function openSources() {
+  el.sources.showModal();
+  el.sourcesQ.focus();
+  loadSources();
+}
+
+el.sourcesOpen.addEventListener("click", openSources);
+el.sourcesClose.addEventListener("click", () => el.sources.close());
+el.sourcesSort.addEventListener("click", () => {
+  sourcesSort = sourcesSort === "volume" ? "untagged" : "volume";
+  el.sourcesSort.textContent = `sort: ${sourcesSort}`;
+  el.sourcesSort.setAttribute("aria-pressed", String(sourcesSort === "untagged"));
+  renderSources();
+});
+el.sourcesQ.addEventListener("input", debounce(loadSources, 220));
 
 function openCommand() {
   el.commandState.textContent = "";

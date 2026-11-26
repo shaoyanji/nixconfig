@@ -2090,3 +2090,162 @@ dialog#command::backdrop {
     min-width: 0;
   }
 }
+
+/* The senders' shore: the same dialog vocabulary as the reader, a list instead
+ * of a letter. Volume is a bar; the untagged count is gold because it is the
+ * only number here that asks the reader to do something. */
+dialog#sources {
+  width: min(680px, 94vw);
+  max-height: 84vh;
+  padding: 0;
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  background: linear-gradient(160deg, rgba(7, 26, 24, 0.99), rgba(3, 12, 12, 0.99));
+  color: var(--foam);
+  box-shadow: var(--shadow);
+}
+
+dialog#sources::backdrop {
+  background: rgba(1, 8, 8, 0.72);
+  backdrop-filter: blur(2px);
+}
+
+dialog#sources:not([open]) {
+  display: none;
+}
+
+.sources-inner {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1.2rem 1.3rem 1rem;
+}
+
+.sources-tools {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.sources-tools input {
+  flex: 1;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--foam);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+}
+
+.sources-tools input:focus {
+  outline: 1px solid rgba(62, 240, 221, 0.55);
+  outline-offset: 0;
+}
+
+.sources {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  max-height: 56vh;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.src-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(60px, 22%) auto auto;
+  gap: 0.7rem;
+  align-items: center;
+  width: 100%;
+  padding: 0.42rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.src-row:hover,
+.src-row:focus-visible {
+  border-color: var(--line-2);
+  background: var(--jade-ghost);
+  outline: none;
+}
+
+.src-domain {
+  overflow: hidden;
+  color: var(--foam);
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.src-bar {
+  position: relative;
+  height: 3px;
+  background: rgba(62, 240, 221, 0.1);
+}
+
+.src-bar::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--w, 0%);
+  background: linear-gradient(90deg, var(--jade-2), var(--jade));
+}
+
+.src-counts {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.src-counts b {
+  color: var(--foam);
+  font-weight: 500;
+}
+
+.src-counts .untagged {
+  color: var(--gold);
+  font-style: normal;
+}
+
+.src-when {
+  color: var(--faint);
+  justify-self: end;
+}
+
+.src.loading,
+.src.empty {
+  padding: 0.6rem 0.5rem;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+}
+
+.sources-foot {
+  margin: 0;
+  color: var(--faint);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  .src-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .src-bar,
+  .src-when {
+    display: none;
+  }
+}

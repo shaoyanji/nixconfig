@@ -31,6 +31,9 @@
         >
         <span class="stat" title="share of letters the taxonomy placed"><span class="num" id="stat-tagged">—</span><span class="dim">tagged</span></span>
         <span class="stat"><span class="num" id="stat-letters">—</span><span class="dim">letters</span></span>
+        <button type="button" class="ghost" id="sources-open" title="who writes to you, by domain — and what was never placed">
+          源 <span>sources</span> <kbd>S</kbd>
+        </button>
         <button type="button" class="ghost" id="hermes-open" title="a command about the mailbox, not one letter">
           使 <span>command Hermes</span> <kbd>H</kbd>
         </button>
@@ -189,6 +192,31 @@
           <button type="submit">queue <kbd>⌘↵</kbd></button>
         </div>
       </form>
+    </dialog>
+
+    <dialog id="sources">
+      <div class="reader-inner sources-inner">
+        <button class="reader-close" id="sources-close" type="button" aria-label="Close">×</button>
+        <div class="reader-head">
+          <p class="reader-kicker">where the mail comes from · not one letter</p>
+          <h2 class="subject">The senders' shore</h2>
+        </div>
+        <div class="sources-tools">
+          <label class="sr-only" for="sources-q">Filter domains</label>
+          <input
+            id="sources-q"
+            type="search"
+            placeholder="filter domains — git, ebay, greenhouse…"
+            spellcheck="false"
+            autocapitalize="off"
+          />
+          <button type="button" class="ghost tiny" id="sources-sort" aria-pressed="false">
+            sort: volume
+          </button>
+        </div>
+        <ol class="sources" id="sources-list"></ol>
+        <p class="sources-foot mono-xs" id="sources-foot"></p>
+      </div>
     </dialog>
 
     <script type="module" src="/app.js"></script>

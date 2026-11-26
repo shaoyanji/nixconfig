@@ -1,8 +1,50 @@
 {
-  "generated": "2026-11-26T16:40:07Z",
+  "generated": "2026-11-26T16:49:44Z",
   "count": 200,
-  "pin": "92dedcfd335583195a7fbffd905afbbafb5979bd333b11e5860460e5cd2908ee",
+  "pin": "c99fd0622e60b140d22e4dd40e32df616156224a20e87cea9d61aded3e059517",
   "turns": [
+    {
+      "id": "5d1903b3-0626-4fe4-badf-fb2f33b14c71",
+      "ts": "2026-11-26T16:43:44Z",
+      "source": "buffy",
+      "subject": "nixconfig:mail-atlas-analytics-ui",
+      "action": "claim: inspect endpoints/schema/site, add a top-senders/domains analytics endpoint plus a UI drawer and quick filter, verify wiring + node --check + a canned smoke, commit through a temp index",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/mail-atlas/endpoints",
+        "modules/services/mail-atlas/site"
+      ],
+      "files": [],
+      "base_commit": "ba30f1bb033ab0c25da98471ae9494c16766155e",
+      "branch": "main",
+      "frame": "03hb424w4xmlk8xlc3rr6y5zk"
+    },
+    {
+      "id": "737c88e4-9deb-4f46-97fb-21ae015f2d20",
+      "ts": "2026-11-26T16:41:58Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-endpoints-smoke",
+      "action": "checks:delphi:endpoints + scripts/task/endpoints-smoke.py: probes all 23 mounts from services.servicePortal.mounts; 5xx/refused/timeout fail, 4xx passes, EXPECT= narrows. Found one at once: dsh :8443 is 502 while dsh-free-models is active and its dashboard port 18900 has no listener - a portal card pointing at the retired dsh-web. 10 unit tests, documented beside the port table.| gate: checks:tasks 843 no hard violations, unittest 10 OK, ran live",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ba30f1bb033ab0c25da98471ae9494c16766155e",
+      "branch": "main",
+      "frame": "03hb41sgks4qzmmbrq4fpda3q"
+    },
+    {
+      "id": "55f063ca-3fd6-4fa2-a6ed-20f08189d729",
+      "ts": "2026-11-26T16:41:54Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-tree-reconcile",
+      "action": "Note landed after trimming: distilled devin-lane-refactoring-2026-11-25 (38->24 lines) and open-frieren-offload (35->26), which also cleared agents-notes-schema, and added delphi-host-clone-not-authority as kind=open P2 with refs host delphi + infra:deploy:host:delphi. AGENTS.nix now 522,958/524,288 bytes, agentsNotes.issues [] .| gate: issues clean, comments 6493/6495 (x86_64 schema build cannot run on this aarch64 host)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ba30f1bb033ab0c25da98471ae9494c16766155e",
+      "branch": "main",
+      "frame": "03hb41ryglw6vf07ikllltq1i"
+    },
     {
       "id": "04b76393-d994-46d1-a613-8ae2df9cf9a2",
       "ts": "2026-11-26T16:40:05Z",
@@ -3005,54 +3047,6 @@
       "base_commit": "dd5103be9c15cc172e8094284ab77722d540d3ed",
       "branch": "main",
       "frame": "03hb2j8st63zmtl8tw8qvuf0y"
-    },
-    {
-      "id": "dcf8c13a-139a-4e57-b929-176b2229de71",
-      "ts": "2026-11-26T12:01:20Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-db-bulk-guard",
-      "action": "Addendum: the unguarded refusal now reads the row and quotes --expect-stage <stage> --if-status <hash>, so the message is the recipe. Two commits, 14 fixture cases.",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "tests/appflow-resolve"
-      ],
-      "files": [],
-      "base_commit": "0b92af91d5ce01665b86060324b91e6124229f53",
-      "branch": "main",
-      "frame": "03hb2iywqzko2wze4wqjd4btn"
-    },
-    {
-      "id": "15f663e2-738e-40c6-992e-54bd417e824a",
-      "ts": "2026-11-26T12:00:07Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-db-bulk-guard",
-      "action": "apps-db.sh update now refuses an unguarded write (exit 2), a stale fingerprint (exit 4) and >50 writes in 10 min (exit 5); 13-case offline fixture wired into checks:appflow, checks:tasks pass.",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "tests/appflow-resolve"
-      ],
-      "files": [],
-      "base_commit": "f43af3e8b7e148e4138b00186b36a276201cd961",
-      "branch": "main",
-      "frame": "03hb2iqbg9j3ury6o03v6tdjz"
-    },
-    {
-      "id": "0f502c1d-e46e-432c-a3f6-c0524a6e8823",
-      "ts": "2026-11-26T12:00:06Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-db-bulk-guard",
-      "action": "Guard a bulk appflow write: name the expected stage or status fingerprint, refuse a runaway loop",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "tests/appflow-resolve"
-      ],
-      "files": [],
-      "base_commit": "f43af3e8b7e148e4138b00186b36a276201cd961",
-      "branch": "main",
-      "frame": "03hb2iq90rpvkv568q6s6b9ni"
     }
   ]
 }

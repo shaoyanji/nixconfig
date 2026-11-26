@@ -129,7 +129,12 @@ himalaya -a "$account" -c "$config" message send <"$work/raw.eml" ||
   die "himalaya refused the message; nothing left and nothing was recorded"
 
 follow=$(python3 -c 'import datetime, sys; print((datetime.date.fromisoformat(sys.argv[1]) + datetime.timedelta(days=14)).isoformat())' "$today")
-if ! FORMAT=json "$db" update "$id" \
+# The row was read at the top of this run and every gate above named it, so
+# `prep` is the stage this write expects. Without the expectation the write
+# guard refuses it *after* himalaya has already transmitted — the mail leaves
+# and the ledger keeps saying prep, which is the resend this file exists to
+# prevent.
+if ! FORMAT=json "$db" update "$id" --expect-stage prep \
   --status "applied: sent $today to $to with anschreiben.pdf and lebenslauf.pdf" \
   --next-action "Follow up $follow if no reply; the mail left on $today" >/dev/null; then
   die "the mail left but the ledger write failed — set $id to applied by hand, now"

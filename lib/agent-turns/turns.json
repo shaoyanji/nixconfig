@@ -1,8 +1,39 @@
 {
-  "generated": "2026-11-26T12:59:34Z",
+  "generated": "2026-11-26T13:01:31Z",
   "count": 200,
-  "pin": "9203146eb1afe215ee486ff45c0d8ba4bd1c853bcc6645a0f0f91e88ba78df9e",
+  "pin": "f9a2dede6f0ac8b1d48ce8dfde446510111c35f2b040fde2e0fd179a983fb787",
   "turns": [
+    {
+      "id": "b3eecb65-f071-4a2d-9e8d-9c994fb66454",
+      "ts": "2026-11-26T12:59:50Z",
+      "source": "devin",
+      "subject": "nixconfig:hosts-args-test-fix",
+      "action": "landed: hosts-args reads statix -o json (.name == \"empty_pattern\"), replacing the dead \"[10] Warning:\" grep that statix renamed to [empty_pattern] | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [
+        "taskfiles/checks.yml",
+        "scripts/task"
+      ],
+      "files": [
+        "scripts/task/hosts-args-check.sh"
+      ],
+      "base_commit": "2b0d2674b79b09412f9ae0b56a021d1318b376e7",
+      "branch": "main",
+      "frame": "03hb2ue98ftzzzcz9y9z86gkd"
+    },
+    {
+      "id": "64690752-3987-44ac-a849-06efb98f75f2",
+      "ts": "2026-11-26T12:59:42Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-colocated-audit",
+      "action": "landed: audit — :8450 exposes no /pg surface (NpgsqlRest: 53 /api/* routes, prefix /api); email_archive has only public and zero xs/turn relations, the xs store is cross-stream at /var/lib/xs-agent-turns (0700) behind the shim on :8449. sync — ff impossible (25+2 local commits), preserved archive/ci-closure-budget-target-2026-11-26 + archive/main-local-2026-11-26 + stash 7cc9d1b0, main now e4dd1d26 clean. gate: checks:host HOST=delphi MODE=eval PASS (2141 assertions)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
+      "branch": "main",
+      "frame": "03hb2udapq2nlh44vk6tmmxy6"
+    },
     {
       "id": "7670e6d1-5d3a-4c70-a276-a3bde01bcb22",
       "ts": "2026-11-26T12:57:58Z",
@@ -2962,36 +2993,6 @@
       "base_commit": "a77fe37e86f6fdb563e4957e5050fc7673830ed7",
       "branch": "main",
       "frame": "03hayinv8zw5zizww7tkujtho"
-    },
-    {
-      "id": "9968c71b-2e42-4cd9-96b8-2368c1826e56",
-      "ts": "2026-11-25T23:35:06Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-checks-quick",
-      "action": "gate-change: checks:quick hardening routed to devin agents:1.1; task text pasted and accepted, pane thinking",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
-      "branch": "HEAD",
-      "frame": "03hayh70rgnitr334zuc8ekdh"
-    },
-    {
-      "id": "944881b4-3e44-4653-ae99-f4836eb7a1fc",
-      "ts": "2026-11-25T23:34:45Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-lane",
-      "action": "start: harden checks:quick — audit gates vs fail-on-real-mistake fixtures",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/",
-        "scripts/task/",
-        "tests/"
-      ],
-      "files": [],
-      "base_commit": "1a8c28dd82db163bcc063dd385cacccc9f3bcf31",
-      "branch": "main",
-      "frame": "03hayh4llpycngw51sm6ebx7t"
     }
   ]
 }

@@ -1,8 +1,49 @@
 {
-  "generated": "2026-11-26T15:26:27Z",
+  "generated": "2026-11-26T15:28:12Z",
   "count": 200,
-  "pin": "61581bad1a9e93931fd337fb6b3f22d6e35dccac9839e646a480ee22e882e781",
+  "pin": "f30acf4bd1e4ed5c2dd61a40c44bbc3da5df68c72bf7e597e789cfe83263341b",
   "turns": [
+    {
+      "id": "a6ca4bb9-ecb7-4801-aefc-5cb135e72545",
+      "ts": "2026-11-26T15:27:21Z",
+      "source": "devin",
+      "subject": "nixconfig:delphi-toplevel-build-fix",
+      "action": "landed: email-archive maxPages now uses lib.types.ints.unsigned; no further blockers in job-db-scraper/private-deals/inventory-site/mail-atlas | gate: alejandra --check rc=0, checks:host HOST=delphi rc=0 (8.74s), post-commit nix build delphi toplevel --no-link rc=0 incl Go checkPhase job-db-scraper/private-deals/inventory-site; no switch/deploy",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e54d2272e2da577f72f0af111bc82ce5e9c052bb",
+      "branch": "main",
+      "frame": "03hb3n7p16z902px10o4r7oxk"
+    },
+    {
+      "id": "b1d58430-c928-4d07-8995-78809edb53f8",
+      "ts": "2026-11-26T15:26:45Z",
+      "source": "buffy",
+      "subject": "nixconfig:cv-site-publish",
+      "action": "wrote German letter for hisolutions-ag-senior-kubernetes-expert-devops-engineer and rebuilt its packet (1p letter, 2p CV, 11/39 highlights); closed discovered-nebius as the CloudGate duplicate that had failed checks:appflow",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f2eb9f3eae5463dc6170fc6c175e913c1980c994",
+      "branch": "main",
+      "frame": "03hb3n3ghnmddkw6tx3q63dih"
+    },
+    {
+      "id": "44901ce4-4842-48c2-a2ea-8448e54d3e6f",
+      "ts": "2026-11-26T15:26:33Z",
+      "source": "buffy",
+      "subject": "nixconfig:inventory-sync-cli",
+      "action": "claim: sync compiled inventory.hosts facts into inventory-site over /api/items, dry-run and json/toon output, verified against a local instance with an FTS query",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/inventory-sync.py tests/inventory-sync"
+      ],
+      "files": [],
+      "base_commit": "e54d2272e2da577f72f0af111bc82ce5e9c052bb",
+      "branch": "main",
+      "frame": "03hb3n20gdncflqqosa9kxvs2"
+    },
     {
       "id": "9a828a7d-20dd-439b-b248-9dc83b3b870b",
       "ts": "2026-11-26T15:24:49Z",
@@ -3013,47 +3054,6 @@
       "base_commit": "da5bc77f64952ae5df2ee641df68c9a3c2950d99",
       "branch": "main",
       "frame": "03hb181claj3jd25uzct09jak"
-    },
-    {
-      "id": "b7ecc68d-46a3-41cd-8593-ad30f59905ff",
-      "ts": "2026-11-26T07:57:42Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-drive-20261126-0801",
-      "action": "publish: write CV site content and push static site",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "1a1729cc01e314f22407e09d36a329bd910cbce2",
-      "branch": "main",
-      "frame": "03hb17djgg1kxuz5d2u0nxks6"
-    },
-    {
-      "id": "b499ae8c-1929-4f74-8f9e-b03f95985c58",
-      "ts": "2026-11-26T07:55:34Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "start: pipe loop pass — elemAt flip-lambdas (14 sites per note lib-pipe-elemat-lambdas) + resurvey",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/"
-      ],
-      "files": [],
-      "base_commit": "1a1729cc01e314f22407e09d36a329bd910cbce2",
-      "branch": "main",
-      "frame": "03hb16yj8zbt8fe7xutzq9stv"
-    },
-    {
-      "id": "16de7c23-7f6f-46a0-88cc-439c7e3d16a7",
-      "ts": "2026-11-26T07:54:02Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-epistemics",
-      "action": "landed v1.0.0rc: flake/intents.nix (6 kinds + 6 capabilities + admit + classOf via quotient-hash, first consumer); ontology +2 entities +serves; kg projects 6 caps/60 intents; checks:intents in quick; note intent-capability-spec carries the memo (dedup adopted, epoch+cassini deferred on kg-zeck Kelly fail) | gates: intents+ontology+kg(+test)+notes-schema+tasks831+verify157+lint334+shell80",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1a1729cc01e314f22407e09d36a329bd910cbce2",
-      "branch": "main",
-      "frame": "03hb16nstc7b9h107t26z1y2n"
     }
   ]
 }

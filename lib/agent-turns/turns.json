@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-26T15:00:28Z",
+  "generated": "2026-11-26T15:01:21Z",
   "count": 200,
-  "pin": "6c9452b9efdac15fa199f9fa7e5f7ac05003fbdf9afcd903d4519ce911f3f2c3",
+  "pin": "c6d7d36f8ce672a0864e0e85e9b2a4e5dcc055a3b5805f0c4bdb80dc5cd662a3",
   "turns": [
+    {
+      "id": "f77e1a67-42bc-4e76-b1f0-9b4608b96bb0",
+      "ts": "2026-11-26T15:01:16Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:publish-frieren-cv-site",
+      "action": "Drove idle freebuff pane agents:2.1 (publish); jev-decide selected publish p=0.93/m=0.90; task fed via load-buffer+paste-buffer, DeepThink started",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": null,
+      "branch": null,
+      "frame": "03hb3i49b1wkws7dtry1iorti"
+    },
     {
       "id": "36863132-8333-4a7f-839b-56146e2404cd",
       "ts": "2026-11-26T15:00:19Z",
@@ -3020,21 +3033,6 @@
       "base_commit": "404e3da57327397be9c341336a951a50c37ca407",
       "branch": "main",
       "frame": "03hb0s0kap50aahez96838vxd"
-    },
-    {
-      "id": "a6283290-f3eb-4965-9f34-2a03d67a6661",
-      "ts": "2026-11-26T06:37:29Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-20261126-0725",
-      "action": "start: appflow-board residual wiring cleanup",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/appflow-board.nix"
-      ],
-      "files": [],
-      "base_commit": "c70788c4b7c3dc724a38203bb44ddfae9718dfaa",
-      "branch": "main",
-      "frame": "03hb0rpfbgifkmau7wwjd6qqj"
     }
   ]
 }

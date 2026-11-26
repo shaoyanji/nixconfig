@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-26T11:43:38Z",
+  "generated": "2026-11-26T11:44:12Z",
   "count": 200,
-  "pin": "ba54b9145df4e4fb4af8b3c70f512098fba6e38a3abbe12ebc27038df4a980ec",
+  "pin": "fdc996f4c0172bafd2029b26f8f8c0edca422d426b48bae10e994ca250ae0e97",
   "turns": [
+    {
+      "id": "7c2c9c52-2498-4ccb-bf04-0545096eeca3",
+      "ts": "2026-11-26T11:43:41Z",
+      "source": "buffy",
+      "subject": "nixconfig:jobsearch-sweep-26d",
+      "action": "No local fallback exists: apps-db.sh caches nothing, and a 149-slug proxy reports 93 new where the record reports 1. That one is the tracked bamf-devops row. Nothing filed, nothing sent.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "daf799d9e8e4f7251d9c2ccd4cb0908e295d2d55",
+      "branch": "main",
+      "frame": "03hb2fiscxdtvs8g7o3bczua0"
+    },
     {
       "id": "b71c5b9b-7e26-4b0c-9dc7-93a97998d40a",
       "ts": "2026-11-26T11:43:27Z",
@@ -2923,21 +2936,6 @@
       "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
       "branch": "main",
       "frame": "03haxdbys2blo47u3ssbeeg94"
-    },
-    {
-      "id": "4864246a-7bf6-44aa-b24a-31a4991a06aa",
-      "ts": "2026-11-25T20:07:38Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "gate-change: check delphi hermes gateway + xs endpoint — detail on the ledger",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/user/ai/hermes-user.nix"
-      ],
-      "files": [],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haxco2pn1kuf0gm7xwszvqh"
     }
   ]
 }

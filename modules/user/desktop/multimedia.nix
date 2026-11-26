@@ -79,7 +79,6 @@ in {
 
       # Tier-differentiated mpv.conf settings
       config = lib.mkMerge [
-        # --- Baseline Common Configuration ---
         {
           keep-open = "yes";
           save-position-on-quit = "yes";

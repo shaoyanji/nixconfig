@@ -546,7 +546,6 @@ in {
       };
     };
 
-    # --- nightly prefill -----------------------------------------------------
     # The cache only fills on demand, so a title nothing has asked for yet is
     # empty when the first client wants it. Prefill fetches the selected apps
     # through this cache at 02:00, when the line is idle, instead of on the day

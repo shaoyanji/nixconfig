@@ -121,7 +121,6 @@
     };
   };
 
-  # --- Optional bearer auth ------------------------------------------------
   #
   # The runtime's server has no auth of its own. When apiKeyFile is set we
   # enforce `Authorization: Bearer <key>` in nginx: preStart renders a `map`
@@ -249,7 +248,6 @@ in {
     systemd.services."qwen-tts-models-talker" = mkFetch "qwen-tts-talker" talker "${modelUrl}/${cfg.model}";
     systemd.services."qwen-tts-models-codec" = mkFetch "qwen-tts-codec" codec "${modelUrl}/${cfg.codec}";
 
-    # --- The speech server ---------------------------------------------------
     systemd.services.qwen-tts = {
       unitConfig.X-Fleet-Role = "daemon";
       description = "Qwen3-TTS speech server (OpenAI-compatible)";
@@ -302,7 +300,6 @@ in {
           ++ cfg.extraArgs
         );
 
-        # --- Hardening ---
         NoNewPrivileges = true;
         ProtectSystem = "strict";
         ProtectHome = true;

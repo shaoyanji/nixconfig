@@ -51,7 +51,6 @@
       # SC2194, and writeShellApplication fails the build on any finding.
       IGNORE_UNITS="${IGNORE}"
 
-      # --- can this host answer systemd at all? -----------------------------
       # `absent` means "not installed on this host" and is neutral by design, so
       # a host with no systemd manager would answer `absent` for every watched
       # unit and its verdict would read `ok` — a blind host claiming clean jobs.
@@ -65,7 +64,6 @@
         REASONS+=("unit-status-unobservable")
       fi
 
-      # --- failed units ------------------------------------------------------
       while IFS= read -r line; do
         [ -n "$line" ] || continue
         # Column 1, not 2: `--plain --no-legend` prints `UNIT LOAD ACTIVE SUB
@@ -88,7 +86,6 @@
       done < <(systemctl list-units --state=failed --no-legend --plain --no-pager 2>/dev/null || true)
 
       ${lib.optionalString cfg.collectUserUnits ''
-        # --- failed user units -----------------------------------------------
         # The loop above runs in the SYSTEM manager, so it cannot see
         # `~/.config/systemd/user`. That gap is why a vdirsyncer unit could fail
         # every 15 minutes for three days, and a keepalive fail 104 times, while
@@ -115,7 +112,6 @@
         REASONS+=("failed-units:''${#FAILED_UNITS[@]}")
       fi
 
-      # --- oneshot job results ----------------------------------------------
       # `absent` stays reserved for "installed nowhere on this host". A host that
       # cannot see systemd gets `unobservable`, a value no consumer can read as
       # success; the single unit-status-unobservable reason already names why.
@@ -149,7 +145,6 @@
         WATCH_JSON="$(printf '%s' "$WATCH_JSON" | jq -c --arg k "$u" --arg v "$r" '. + {($k): $v}')"
       done
 
-      # --- generation age ----------------------------------------------------
       GEN_EPOCH=0
       if [ -L /nix/var/nix/profiles/system ]; then
         # The SYMLINK's mtime is the switch time. `stat -L` follows into the
@@ -165,7 +160,6 @@
         REASONS+=("generation-stale:''${GEN_AGE_H}h")
       fi
 
-      # --- disk + inodes -----------------------------------------------------
       disk_pct() {
         local p="$1"
         if [ -e "$p" ]; then
@@ -204,7 +198,6 @@
       [ -n "$IO_PSI" ] || IO_PSI="0.00"
       [ -n "$MEM_PSI" ] || MEM_PSI="0.00"
 
-      # --- last scheduled job that measures itself ---------------------------
       # The Steam prefill writes one JSON object per run with the cache bytes it
       # grew and the bytes it pulled from Valve. It is not copied into this
       # ledger: at a 15-minute cadence the fill's numbers would be interleaved
@@ -220,7 +213,6 @@
         fi
       ''}
 
-      # --- newest scheduled audit outcome ------------------------------------
       # The audit writes one TSV line per run (`ts`, `outcome`, `reason`). Its
       # unit Result is `success` even when every agent tier failed — the script
       # records the failure and exits 0 so the next run still happens — so the
@@ -314,7 +306,6 @@
         fi
       ''}
 
-      # --- assemble ----------------------------------------------------------
       if [ "''${#REASONS[@]}" -eq 0 ]; then
         STATE="ok"
         HEALTH_TEXT="ok"
@@ -382,7 +373,6 @@
       ''}
 
       ${lib.optionalString (cfg.notify.url != "") ''
-        # --- notify on a change ---------------------------------------------
         # The publisher is the one the appflow triage already proves: same URL,
         # topic, user and password file, so a second ntfy configuration never
         # exists on this fleet. A push every 15 minutes teaches a person to

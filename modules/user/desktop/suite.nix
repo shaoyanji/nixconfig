@@ -263,7 +263,6 @@ in {
 
   home.packages = with pkgs;
     [
-      # ── Moved from base (too heavy for servers) ──
       ffmpeg # Audio/video processing (~1 GB closure)
       viu
       mupdf

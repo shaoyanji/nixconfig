@@ -5,7 +5,6 @@
   config,
   ...
 }: let
-  # ── 1. AGY Mainframe Client ──────────────────────────────────────────────
   agy-terminal = pkgs.writeShellApplication {
     name = "agy-terminal";
     runtimeInputs = with pkgs; [
@@ -136,7 +135,6 @@
     '';
   };
 
-  # ── 2. Hermes Mainframe Client ───────────────────────────────────────────
   hermes-terminal = pkgs.writeShellApplication {
     name = "hermes-terminal";
     runtimeInputs = with pkgs; [

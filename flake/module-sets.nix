@@ -153,6 +153,7 @@ in rec {
       # Greeter lives in its own repo (duxlabs-dev/dux-greeter, ex-
       # AvengeMedia/dank-greeter): option is programs.dms-greeter.
       inputs.dank-greeter.nixosModules.default
+      moduleFiles."global.dms"
     ];
 
     impermanence = [

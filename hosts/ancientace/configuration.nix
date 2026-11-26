@@ -66,12 +66,7 @@
 
   hardware.graphics.extraPackages = [];
   services = {
-    displayManager = {
-      sddm = {
-        enable = true;
-        wayland.enable = true;
-      };
-    };
+    displayManager.sddm.enable = true;
 
     btrfs.autoScrub = {
       enable = true;

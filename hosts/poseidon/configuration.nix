@@ -125,10 +125,6 @@ in {
   # --- Desktop: Dux (DMS on niri, greetd) ---
   # Autologin into the niri session is what makes this a workstation rather than
   # a login screen; a logout lands on the DMS greeter.
-  services.displayManager.sddm = {
-    enable = false;
-    wayland.enable = true;
-  };
   services.displayManager.autoLogin = {
     enable = true;
     user = user.name;

@@ -86,11 +86,6 @@
 
   profiles.dnsClient.enable = true;
 
-  services.displayManager.sddm = {
-    enable = false;
-    wayland.enable = true;
-  };
-
   programs.dms-greeter = {
     enable = true;
     compositor.name = "niri";

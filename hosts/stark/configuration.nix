@@ -17,11 +17,6 @@
   # The xs-notify toaster was rewritten to a Telegram lane on delphi
   # (ea0e6766): this host's toast flag went with it.
 
-  services.displayManager.sddm = {
-    enable = false;
-    wayland.enable = true;
-  };
-
   # Autologin: boot straight into Steam Big Picture under
   # gamescope-session so the AIO behaves like a console with zero
   # interaction after power-on. The DMS greeter module runs the

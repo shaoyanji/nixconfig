@@ -18,13 +18,6 @@
     pkgs.mesa.opencl
   ];
   system.stateVersion = "24.05";
-  services = {
-    displayManager = {
-      sddm = {
-        enable = true;
-        wayland.enable = true;
-      };
-    };
-  };
+  services.displayManager.sddm.enable = true;
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 }

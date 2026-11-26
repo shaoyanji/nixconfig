@@ -37,14 +37,7 @@
   # to greetd, which relaunches the same session. There is no desktop shell and
   # no login screen: profile.steamos sets greetd's `default_session` to
   # `steam-gamescope`.
-  #
-  # sddm stays explicitly off. A desktop-chain module defaults it on in other
-  # tiers, and two display managers fighting for the one seat is exactly the
-  # failure mode the kiosk must not have.
-  services.displayManager.sddm = {
-    enable = false;
-    wayland.enable = true;
-  };
+
   # Kept because it is a validated value (nixpkgs asserts the name is a session
   # Steam provides at the priority it is set); greetd ignores it and autologins
   # from `default_session` instead.

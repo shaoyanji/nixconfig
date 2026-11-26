@@ -23,7 +23,7 @@ against the schema at startup.
 | Loopback (on delphi) | `http://127.0.0.1:8080` |
 | Tailnet (any fleet host) | `https://delphi.cloudforest-kardashev.ts.net:8450` |
 | Health (root, not under `/api`) | `curl -s localhost:8080/health` → `Healthy` |
-| Machine-readable contract | `curl -s localhost:8080/openapi.json` — 23 paths, live |
+| Machine-readable contract | `curl -s localhost:8080/openapi.json` — one path per route file, live (53 on 2026-11-26) |
 | The routes themselves | `modules/services/email-archive-endpoints/*.sql` (archive) and `modules/plugins/appflow/*.sql` (pipeline) |
 | Module / docs | `modules/services/email-archive.nix`, `docs/email-archive.md` |
 
@@ -171,7 +171,7 @@ Rules that keep this honest:
 
 ```bash
 curl -s localhost:8080/health                       # Healthy
-curl -s localhost:8080/openapi.json | jq '.paths|length'   # 52 (grows with a route)
+curl -s localhost:8080/openapi.json | jq '.paths|length'   # 53 on 2026-11-26: one per route file
 curl -s "$B/plugins" | jq '.[] | select(.open > 0)'  # nobody starved of work
 ```
 

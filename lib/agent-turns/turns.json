@@ -1,8 +1,75 @@
 {
-  "generated": "2026-11-26T15:46:24Z",
+  "generated": "2026-11-26T15:49:23Z",
   "count": 200,
-  "pin": "af92d4e8a3e044f31699655498f573a0304e50e8f30488529c4cbf54f725c97c",
+  "pin": "3bbc5798b111f2fde4a1428ffed9fc6eea7286214820c694f7de33bd398030cf",
   "turns": [
+    {
+      "id": "28254db2-cf8f-437a-bb76-c115173e5164",
+      "ts": "2026-11-26T15:49:01Z",
+      "source": "devin",
+      "subject": "nixconfig:hermes-free-fallback",
+      "action": "claim: cleanup — stale ollama-cloud narrative (removed 2026-11-22, still referenced 3x), dead commented lanes tokenrouter+cantrustai (paid, one uncomment from billing), fallback-chain comment describes pre-reorder first lane, infron-check.sh sail label $0 interpolation bug",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/user/ai/hermes-persona/config.yaml",
+        "tests/infron",
+        "scripts/task/infron-check.sh"
+      ],
+      "files": [],
+      "base_commit": "987ede66b5bb1b63abee3ec2283302673de93687",
+      "branch": "main",
+      "frame": "03hb3rg3tq1b89c8bhy3ex1dh"
+    },
+    {
+      "id": "c6856cac-e438-4ad8-8a52-4dbf699177b8",
+      "ts": "2026-11-26T15:48:09Z",
+      "source": "devin",
+      "subject": "nixconfig:clanker-runner-service",
+      "action": "claim: build clanker-runner tailnet VM/Nix job control plane",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/clanker-runner",
+        "modules/services/clanker-runner.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "files": [],
+      "base_commit": "5a8cc19ce829d9d5acffbfa0765a5bf93964b5f7",
+      "branch": "main",
+      "frame": "03hb3r9yrft61bqgcl3sry3ww"
+    },
+    {
+      "id": "e2a61a9f-0da6-4a58-9da0-2addbeb7c211",
+      "ts": "2026-11-26T15:47:37Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:hermes-free-fallback",
+      "action": "host-change|0.58|0.48: hermes_free_fallback_cleanup (take over)",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/user/ai/hermes-persona/config.yaml",
+        "tests/infron"
+      ],
+      "files": [],
+      "base_commit": "987ede66b5bb1b63abee3ec2283302673de93687",
+      "branch": "main",
+      "frame": "03hb3r66ykhjaob4he6pz20tg"
+    },
+    {
+      "id": "e3105acf-adc1-4f16-8a6c-a942eabd9208",
+      "ts": "2026-11-26T15:46:31Z",
+      "source": "buffy",
+      "subject": "nixconfig:inventory-sync-taskfile",
+      "action": "Landed dev:inventory:site in taskfiles/dev.yml (inventory namespace already existed, so no new shard): defaults to the delphi :8466 mount and DRY=1, TOON=1, ONLY=, IN=, --help via CLI_ARGS. docs/portfolio-services.md gains the verb, its table row and why its identity is source=inventory.toml + source_key=host/<name>.| gate: checks:tasks 841 parity PASS + -- --help PASS + DRY run 38 hosts 0 posts + tests 20/20 PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5a8cc19ce829d9d5acffbfa0765a5bf93964b5f7",
+      "branch": "main",
+      "frame": "03hb3qyieitc3sulg3osbec6k"
+    },
     {
       "id": "c97869d8-c440-4c98-b46f-0e0150b73694",
       "ts": "2026-11-26T15:46:19Z",
@@ -2994,65 +3061,6 @@
       "base_commit": "171d5545f070b6c2a2311f07d7df2f2cb1906fc0",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03hb1q96awye58biodteka390"
-    },
-    {
-      "id": "d9d6f6a9-3022-4fff-baaf-67cad4472495",
-      "ts": "2026-11-26T09:33:00Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-reply-poll",
-      "action": "reply poll on the 11 leads tailored for sweeps 2026-11-26a/b: zero responses — every row still prep with the send hold at 2026-12-07, Stepstone portal-only, so nothing was sent and no employer mail exists (archive 0 hits; All Mail newest matching message 2026-11-20 marketplace, none job mail); no row written",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e34a07bafd25c9866cc545d6fa9530e90107ca78",
-      "branch": "main",
-      "frame": "03hb1pzrpac7bka3015a2rh7j"
-    },
-    {
-      "id": "b2b4ae9c-f902-42c5-956b-74bbf78a876a",
-      "ts": "2026-11-26T09:30:27Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-pipeloop-dogfood",
-      "action": "start: dogfooding dev:review:pipe-loop end-to-end — run the packaged loop cold, verify task+skill self-explain, fix gaps",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/dev.yml",
-        "scripts/task/pipe-loop.sh",
-        ".agents/skills/pipe-loop"
-      ],
-      "files": [],
-      "base_commit": "e34a07bafd25c9866cc545d6fa9530e90107ca78",
-      "branch": "main",
-      "frame": "03hb1phtnqbq7kzz40kme00jh"
-    },
-    {
-      "id": "8302bd8c-e1aa-4c69-a4d8-36057f4db316",
-      "ts": "2026-11-26T09:28:45Z",
-      "source": "devji",
-      "subject": "nixconfig:delphi-sentinel",
-      "action": "Sentinel 404 fixed: push to frieren.lan (the vhost owning /sentinel/ingest) with the name pinned in /etc/hosts, and ha-stack's uptime-kuma default flipped to opt-in. Landed on main as 3fd4a347.",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "hosts/delphi/infra-stack.nix",
-        "modules/services/home-assistant.nix"
-      ],
-      "base_commit": "171d5545f070b6c2a2311f07d7df2f2cb1906fc0",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hb1p5u0g68s8zxtk534i3sp"
-    },
-    {
-      "id": "2fe5a0f7-1a3d-4a3e-a4b7-cf21635f8634",
-      "ts": "2026-11-26T09:25:58Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-1023",
-      "action": "jev chain-change: refactor module chain hosts into modules",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "e34a07bafd25c9866cc545d6fa9530e90107ca78",
-      "branch": "main",
-      "frame": "03hb1omb26kyekjnb48616eyx"
     }
   ]
 }

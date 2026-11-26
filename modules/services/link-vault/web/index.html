@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Link vault</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">delphi · tailnet research archive</p>
+      <h1>Link vault</h1>
+      <p class="lede">A searchable reading room for useful pages: extracted text, tags, collections, states and durable exports in one private archive.</p>
+    </div>
+    <div class="hero-actions">
+      <a class="button ghost" href="/api/export.json">JSON export</a>
+      <a class="button ghost" href="/api/export.md">Markdown export</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="metrics" id="metrics" aria-label="archive metrics"></section>
+
+    <section class="panel composer">
+      <div class="panel-title">
+        <div>
+          <p class="eyebrow">capture</p>
+          <h2>Save a link</h2>
+        </div>
+        <span id="provider-summary" class="pill">providers</span>
+      </div>
+      <form id="link-form" class="grid-form">
+        <label class="wide">URL <input id="url" type="url" required placeholder="https://example.com/research"></label>
+        <label>Title <input id="title" type="text" placeholder="Optional title"></label>
+        <label>Collection <input id="collection" type="text" list="collection-list" placeholder="research, fleet, jobs…"></label>
+        <label>Tags <input id="tags" type="text" placeholder="nixos, ai, reference"></label>
+        <label>Provider
+          <select id="provider">
+            <option value="auto">auto</option>
+            <option value="http">http</option>
+            <option value="firecrawl">firecrawl</option>
+            <option value="tavily">tavily</option>
+            <option value="context">context</option>
+          </select>
+        </label>
+        <label class="check"><input id="extract" type="checkbox" checked> Extract page text</label>
+        <button class="button primary" type="submit">Archive link</button>
+      </form>
+      <datalist id="collection-list"></datalist>
+      <p id="form-message" class="message" role="status"></p>
+    </section>
+
+    <section class="layout">
+      <aside class="panel filters">
+        <p class="eyebrow">filters</p>
+        <h2>Find the thread</h2>
+        <label>Search <input id="q" type="search" placeholder="title, content, tag…"></label>
+        <label>State
+          <select id="state">
+            <option value="all">all</option>
+            <option value="unread">unread</option>
+            <option value="read">read</option>
+            <option value="archived">archived</option>
+          </select>
+        </label>
+        <label>Collection <select id="collection-filter"><option value="">all</option></select></label>
+        <label>Tag <select id="tag-filter"><option value="">all</option></select></label>
+        <button id="refresh" class="button ghost" type="button">Refresh</button>
+        <div id="tag-cloud" class="tag-cloud"></div>
+      </aside>
+
+      <section class="panel results">
+        <div class="panel-title">
+          <div>
+            <p class="eyebrow">archive</p>
+            <h2 id="result-count">0 links</h2>
+          </div>
+          <span class="pill">SQLite FTS5</span>
+        </div>
+        <div id="links" class="cards"></div>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="detail">
+    <article>
+      <header>
+        <p class="eyebrow" id="detail-meta"></p>
+        <h2 id="detail-title"></h2>
+        <a id="detail-url" target="_blank" rel="noreferrer"></a>
+      </header>
+      <div id="detail-tags" class="tag-cloud"></div>
+      <p id="detail-description" class="description"></p>
+      <pre id="detail-content"></pre>
+      <footer>
+        <button class="button ghost" data-close type="button">Close</button>
+      </footer>
+    </article>
+  </dialog>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>

@@ -165,7 +165,7 @@
   };
 
   telemetryLocations = withGate: {
-    "= /api/telemetry" = {
+    "/api/telemetry" = {
       proxyPass = "http://127.0.0.1:${toString config.services.servicePortal.telemetry.port}";
       extraConfig =
         gate withGate
@@ -332,13 +332,15 @@ in {
     self.modules."services.dsh-web"
     self.modules."services.dsh-free-models"
     self.modules."services.fleet-monitors"
-    self.modules."services.inventory-site"
+    self.modules."services.clanker-runner"
     self.modules."services.job-db-scraper"
+    self.modules."services.private-deals"
+    self.modules."services.inventory-site"
+    self.modules."services.link-vault"
     self.modules."services.mataroa-console"
     self.modules."services.media-relay"
     self.modules."services.offload-bridge"
     self.modules."services.paperless-watchdog"
-    self.modules."services.private-deals"
     self.modules."services.service-portal"
     self.modules."services.systemone-decision"
     self.modules."services.turns-dashboard"
@@ -357,6 +359,31 @@ in {
   # Five reads plus the two write routes over the archive's tables; consumer of
   # the appflow-single-writer cutover.
   services.appflowBoard.enable = true;
+
+  # The searchable posting index beside it: boards and provider-backed search in,
+  # one deduplicated SQLite/FTS5 database out. Loopback only; the portal mount
+  # below is the exposure and supplies the origin a write is checked against.
+  services.clankerRunner = {
+    enable = true;
+    inherit tailnetHost;
+  };
+  services.jobDbScraper = {
+    enable = true;
+    inherit tailnetHost;
+  };
+  services.privateDeals = {
+    enable = true;
+    inherit tailnetHost;
+  };
+  services.inventorySite = {
+    enable = true;
+    inherit tailnetHost;
+    inventorySeedFile = ../../inventory.toml;
+  };
+  services.linkVault = {
+    enable = true;
+    inherit tailnetHost;
+  };
 
   # --- the free-model relay, durable ---
   # The clanker proof in a unit instead of a tmux: the plugin fronts free lanes
@@ -1163,10 +1190,6 @@ in {
   # is the entire exposed surface, and the bearer token comes from sops. The
   # endpoint is coordination state, not a chat relay and not a merge authority.
   services.agentTurns.enable = true;
-  # Loopback only; the servicePortal mount is the whole exposure.
-  services.private-deals.enable = true;
-  services.inventory-site.enable = true;
-  services.job-db-scraper.enable = true;
   # The outcome lane out of the log: a minutely watcher pushes changed turn
   # outcomes to the operator on Telegram (token is the `hermes` sops key,
   # aliased for this service — delphi's own bot keeps its `delphi-telegram`).
@@ -1360,6 +1383,23 @@ in {
             }
           ];
         };
+        link-vault = {
+          baseUrl = "http://127.0.0.1:${toString config.services.linkVault.port}";
+          metrics = [
+            {
+              key = "bookmarks";
+              label = "bookmarks";
+            }
+            {
+              key = "read";
+              label = "read";
+            }
+            {
+              key = "tags";
+              label = "tags";
+            }
+          ];
+        };
       };
     };
     mounts =
@@ -1492,6 +1532,41 @@ in {
           description = "Applications and their mail, read and written through the archive database.";
           requires = ["nginx.service"];
         };
+        job-db = {
+          port = config.services.jobDbScraper.tailnetPort;
+          upstream = "http://127.0.0.1:${toString config.services.jobDbScraper.port}";
+          title = "Job database";
+          description = "Scraped postings, deduplicated into SQLite FTS5: search, source health and a JSON API.";
+          requires = ["job-db-scraper.service"];
+        };
+        private-deals = {
+          port = config.services.privateDeals.tailnetPort;
+          upstream = "http://127.0.0.1:${toString config.services.privateDeals.port}";
+          title = "Private deals";
+          description = "Tracked products, deal watchlists and price history in SQLite FTS5, with search and a JSON API.";
+          requires = ["private-deals.service"];
+        };
+        inventory-site = {
+          port = config.services.inventorySite.tailnetPort;
+          upstream = "http://127.0.0.1:${toString config.services.inventorySite.port}";
+          title = "Inventory";
+          description = "Fleet hardware and personal assets: locations, tags, serials, warranties, value and FTS5 search.";
+          requires = ["inventory-site.service"];
+        };
+        clanker-runner = {
+          port = config.services.clankerRunner.tailnetPort;
+          upstream = "http://127.0.0.1:${toString config.services.clankerRunner.port}";
+          title = "Clanker runner";
+          description = "InstaBox VM state, wake and exec triggers, Nix/agent-browser jobs and FTS5 run history.";
+          requires = ["clanker-runner.service"];
+        };
+        link-vault = {
+          port = config.services.linkVault.tailnetPort;
+          upstream = "http://127.0.0.1:${toString config.services.linkVault.port}";
+          title = "Link vault";
+          description = "Bookmark and research archive with extracted page text, tags, collections, states and FTS5 search.";
+          requires = ["link-vault.service"];
+        };
         # The dsh dashboard, back on its retired port — hosts/delphi/dsh-web.shadow.nix
         # named 8443 the harness's home and nothing else has taken it.
         dsh = {
@@ -1536,30 +1611,6 @@ in {
           title = "Media relay";
           description = "Fetched media, range-served: fuzzy search over the library, YouTube search with thumbnails, and a field that queues a fetch.";
           requires = ["nginx.service"];
-        };
-      }
-      // {
-        # The port is the module's, so the mount and the module cannot disagree.
-        private-deals = {
-          port = config.services.private-deals.tailnetPort;
-          upstream = "http://127.0.0.1:${toString config.services.private-deals.port}";
-          title = "Private deals";
-          description = "Watched products, their price history, and the feeds that report them.";
-          requires = ["private-deals.service"];
-        };
-        inventory-site = {
-          port = config.services.inventory-site.tailnetPort;
-          upstream = "http://127.0.0.1:${toString config.services.inventory-site.port}";
-          title = "Inventory";
-          description = "Assets with locations, categories, tags, serials, warranties and value; the fleet seeded in.";
-          requires = ["inventory-site.service"];
-        };
-        job-db-scraper = {
-          port = config.services.job-db-scraper.tailnetPort;
-          upstream = "http://127.0.0.1:${toString config.services.job-db-scraper.port}";
-          title = "Job scraper";
-          description = "Postings with deterministic lane scores, batch-filed by the sweep, sorted by score.";
-          requires = ["job-db-scraper.service"];
         };
       };
     entries.gatus = {

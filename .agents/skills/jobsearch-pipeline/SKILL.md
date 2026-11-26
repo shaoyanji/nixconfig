@@ -31,8 +31,8 @@ task apps:sweep:pipeline DAYS=3 LIMIT=15 GH=1     # tighter window, GitHub attri
 ## What it runs, in order
 
 1. **Sweep** — `scripts/task/jobsearch-sweep.py` reads germantechjobs (`/rss`),
-   We Work Remotely, RemoteOK, Stepstone (card markup) and Berlin Startup Jobs
-   (`/feed/` — `/rss/` returns empty). It keeps postings matching the lane
+   We Work Remotely, RemoteOK, Stepstone (card markup), Berlin Startup Jobs
+   (`/feed/` — `/rss/` returns empty) and Arbeitnow. It keeps postings matching the lane
    (DevOps, SRE, platform, infrastructure, Kubernetes, cloud) and younger than
    `DAYS`, and drops the out-of-lane families (support, ERP/SAP, junior,
    embedded, sales) before any ranking happens.

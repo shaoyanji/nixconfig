@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Sweep five boards for in-lane leads, dedupe against the record, rank, emit JSON.
+"""Sweep six boards for in-lane leads, dedupe against the record, rank, emit JSON.
 
 Reads nothing from the repo and writes nothing to the archive: it is the fetch,
 filter and rank half of `apps:sweep:pipeline`, and the only network it touches is
-the five boards plus `gh api` when --gh is passed. The held list is an argument
+the boards plus `gh api` when --gh is passed. The held list is an argument
 because the record lives in Postgres on delphi, not here.
 
 Two rules are why this exists rather than an ad-hoc script per sweep:
@@ -47,7 +47,11 @@ OUT = re.compile(
     r"(duales studium|studium|hochschule|embedded|softwareentwickler|software developer"
     r"|backend|frontend|fullstack|support|kundensupport|sales|vertrieb|\berp\b|\bsap\b"
     r"|datev|windows|m365|sharepoint|citrix|helpdesk|first[ -]level|werkstudent"
-    r"|praktik|ausbildung|trainee|elektro|maschinenbau|mechanical|bauwesen|junior)",
+    r"|praktik|ausbildung|trainee|elektro|maschinenbau|mechanical|bauwesen|junior"
+    # `Intern` and `Internship` reached the record on sweep 2026-11-26d, and a
+    # cloud product-manager ad and a freelance mandate came with them: the board
+    # matched on `Platform` and `DevOps`, the lane is engineering employment.
+    r"|\bintern\b|\binternship\b|working student|product manager|freelance)",
     re.I,
 )
 AGENCY = re.compile(
@@ -291,6 +295,33 @@ def parse_boards(
                         item.findtext("link"), item.findtext("pubDate"))
         except Exception as exc:  # a board that refuses is unfetched, not empty
             print(f"jobsearch-sweep: bsj unavailable: {exc}", file=sys.stderr)
+    if "arbeitnow" in boards:
+        # 300 postings a page and the board is ordered by created_at, so page one
+        # is not the board: the loop walks pages until one is older than the
+        # window it is looking for, and a refusal is named rather than counted.
+        for page_number in range(1, 9):
+            try:
+                payload = json.loads(
+                    fetch(f"https://www.arbeitnow.com/api/job-board-api?page={page_number}", timeout=120)
+                )
+            except Exception as exc:
+                print(f"jobsearch-sweep: arbeitnow page {page_number}: {exc}", file=sys.stderr)
+                break
+            entries = payload.get("data") or []
+            if not entries:
+                break
+            oldest = None
+            for entry in entries:
+                created = entry.get("created_at")
+                stamp = ""
+                if isinstance(created, (int, float)):
+                    stamp = datetime.fromtimestamp(created, timezone.utc).isoformat()
+                    oldest = created if oldest is None else min(oldest, created)
+                add("arbeitnow", entry.get("company_name", ""), entry.get("title", ""),
+                    entry.get("location", ""), entry.get("url", ""), stamp)
+            if oldest and (time.time() - oldest) > 10 * 86400:
+                break
+            time.sleep(0.4)
     if "stepstone" in boards:
         seen: set[str] = set()
         for query, city in stepstone_pages:
@@ -428,7 +459,7 @@ def main() -> int:
     ap.add_argument("--out", help="write the ranked JSON here instead of stdout")
     ap.add_argument("--max-age", type=int, default=7, help="days a posting may be old")
     ap.add_argument("--limit", type=int, default=25, help="employers to report")
-    ap.add_argument("--boards", default="germantechjobs,weworkremotely,remoteok,berlinstartupjobs,stepstone")
+    ap.add_argument("--boards", default="germantechjobs,weworkremotely,remoteok,berlinstartupjobs,stepstone,arbeitnow")
     ap.add_argument("--stepstone-queries", default="devops,platform,sre,cloud,infrastructure,kubernetes")
     ap.add_argument("--stepstone-cities", default="Berlin,Muenchen,Hamburg,Koeln")
     ap.add_argument("--gh", action="store_true", help="attribute GitHub activity (bounded gh api calls)")
@@ -488,6 +519,9 @@ def main() -> int:
         if activity and activity["days"] is not None:
             gh_weight = 3 if activity["days"] <= 30 else 2 if activity["days"] <= 90 else 1 if activity["days"] <= 365 else 0
         newest = min(ages) if ages else None
+        # A lead without an advert URL cannot be applied to, so it is ranked
+        # below every lead that carries one: the lane files actionable rows.
+        link = any(row["url"] for row in rows_for)
         ranked.append(
             dict(
                 company=rows_for[0]["company"],
@@ -495,16 +529,18 @@ def main() -> int:
                 fresh=newest,
                 gh=activity,
                 agency=bool(AGENCY.search(rows_for[0]["company"])),
+                has_link=link,
                 score=round(len(rows_for) * 2 + gh_weight * 2, 1),
             )
         )
-    ranked.sort(key=lambda o: (-o["score"], -len(o["postings"]), o["company"]))
+    ranked.sort(key=lambda o: (not o["has_link"], -o["score"], -len(o["postings"]), o["company"]))
 
     payload = dict(
         parsed=len(rows),
         fresh_in_lane=len(fresh),
         held=len(held),
         new=sum(len(v) for v in candidates.values()),
+        linked=sum(1 for o in ranked if o["has_link"]),
         boards=dict(Counter(r["board"] for v in candidates.values() for r in v)),
         ranked=ranked[: args.limit],
         rejected=rejected[:40],

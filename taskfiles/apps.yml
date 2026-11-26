@@ -596,14 +596,15 @@ tasks:
   # The automated half of the sweep lane: apps:scout:sweep prints the read order,
   # this runs it. The write stays apps:scout, so the lane keeps one writer.
   apps:sweep:pipeline:
-    desc: "Run the sweep-to-upsert chain: five boards, lane filter, dedupe, rank, file via apps:scout, read mail, post the turn (SWEEP, DAYS, LIMIT, APPLY, MAIL, XS, GH)"
+    desc: "Run the sweep-to-upsert chain: six boards, lane filter, dedupe, rank, file via apps:scout, read mail, post the turn (SWEEP, DAYS, LIMIT, APPLY, MAIL, XS, GH)"
     summary: >
       `apps:scout:sweep` prints the read order; this runs it. germantechjobs, We
-      Work Remotely, RemoteOK, Stepstone and Berlin Startup Jobs are fetched,
-      kept to DevOps/SRE/Platform/Infrastructure postings younger than DAYS,
-      deduped against every employer the record holds, and validated — a
+      Work Remotely, RemoteOK, Stepstone, Berlin Startup Jobs and Arbeitnow are
+      fetched, kept to DevOps/SRE/Platform/Infrastructure postings younger than
+      DAYS, deduped against every employer the record holds, and validated — a
       truncated name is reported under "not filed", never guessed. Survivors
-      are ranked by postings and GitHub recency; APPLY=1 files each through
+      are ranked with an application link first, then postings and GitHub
+      recency; APPLY=1 files each linked lead through
       `apps:scout` at SWEEP, the lane's own writer. MAIL=1 reads the reply
       queue, XS=1 posts the turn. Exit 0 = ran, 1 = one step failed, 2 = bad
       usage. Next: `apps:lane`.

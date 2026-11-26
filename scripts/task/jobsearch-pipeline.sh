@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# The sweep-to-upsert chain as one run: fetch five boards, rank in-lane leads
+# The sweep-to-upsert chain as one run: fetch six boards, rank in-lane leads
 # against the record, file the survivors, read the mail loop, post the turn.
 #
 # Every step is a primitive that already exists — the sweep is
@@ -23,7 +23,7 @@ here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 root=$(cd "$here/../.." && pwd) || exit 1
 cd "$root" || exit 1
 
-boards="germantechjobs,weworkremotely,remoteok,berlinstartupjobs,stepstone"
+boards="germantechjobs,weworkremotely,remoteok,berlinstartupjobs,stepstone,arbeitnow"
 sweep="$(date +%F)"
 days=7
 limit=25
@@ -122,10 +122,11 @@ if [ "$apply" = 1 ]; then
         printf '  FAILED  %s — %s\n' "$company" "$(printf '%s' "$out" | tail -1 | cut -c1-120)"
         ;;
     esac
-  done < <(jq -r '.ranked[] | select(.agency | not) |
+  done < <(jq -r '.ranked[] | select(.agency | not) | select(.postings[0].url != "") |
     [.company, .postings[0].title, .postings[0].url,
      (.postings | length), (.fresh // "-")] | @tsv' "$ranked")
-  echo "  filed $filed, refused $refused, failed $failed at sweep $sweep"
+  nolink=$(jq -r '[.ranked[] | select(.agency | not) | select(.postings[0].url == "")] | length' "$ranked")
+  echo "  filed $filed, refused $refused, failed $failed, $nolink without an application link, at sweep $sweep"
 fi
 
 if [ "$mail" = 1 ]; then
@@ -145,7 +146,7 @@ if [ "$xs" = 1 ]; then
   task --silent agents:xs:post \
     SUBJECT="nixconfig:job-scout" \
     ACTION="Sweep $sweep: $(jq -r '.new' "$ranked") candidates, $filed filed, $refused refused" \
-    RATIONALE="apps:sweep:pipeline ran the chain: five boards, lane filter, dedupe against the whole record, name validation before any write, then apps:scout for the survivors — the lane's own writer, so there is still one." \
+    RATIONALE="apps:sweep:pipeline ran the chain: six boards, lane filter, dedupe against the whole record, name validation before any write, then apps:scout for the survivors — the lane's own writer, so there is still one." \
     OUTCOME="done" && echo "  turn posted" || failed=$((failed + 1))
 fi
 

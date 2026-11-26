@@ -1,8 +1,37 @@
 {
-  "generated": "2026-11-26T17:05:59Z",
+  "generated": "2026-11-26T17:13:35Z",
   "count": 200,
-  "pin": "79be9743e507b35932e043880f680d254db64c8fc9eabe44329266f4d3deabab",
+  "pin": "2bbd81c9201a9a7c92d62c64dea2e20ed7e60d0548791cbb19a7f59287a87aae",
   "turns": [
+    {
+      "id": "a536cacc-efdf-4ace-9e28-9bf8b4ee0948",
+      "ts": "2026-11-26T17:07:29Z",
+      "source": "buffy",
+      "subject": "nixconfig:analytics-browser-verify",
+      "action": "claim: drive both analytics UIs in agent-browser with seeded temp servers, capture console/page errors, then fix what the screenshots and probes disagree with",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/job-db-scraper/web",
+        "modules/services/private-deals/web"
+      ],
+      "files": [],
+      "base_commit": "6d467ef3175805edb1917cfa5b512e8b1b636ddc",
+      "branch": "main",
+      "frame": "03hb46rxoyt7tow69up166efy"
+    },
+    {
+      "id": "bcfad567-411d-4371-a2ed-6d4b13092147",
+      "ts": "2026-11-26T17:06:10Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-db-scraper-analytics",
+      "action": "GET /api/analytics?days=&limit=: hiring companies (postings, mean/max score, remote), locations, board counts, lane counts from one Go scan of the JSON lanes column (broken JSON loses a lane, not the report), five score bands summing to active. Postings gained lane= (json_each); company/lane rows filter the list with clearable chips. Tests: counts, lanes, band sum, clamps, lane filter.| gate: go vet, go test, node --check, live smoke, server stopped",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6d467ef3175805edb1917cfa5b512e8b1b636ddc",
+      "branch": "main",
+      "frame": "03hb46ikzdnqeyhjh4vlizn1q"
+    },
     {
       "id": "91539243-98d6-4168-b6a7-094d52d80fc5",
       "ts": "2026-11-26T17:02:34Z",
@@ -2998,40 +3027,6 @@
       "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
       "branch": "main",
       "frame": "03hb2mk84xwp300we4reyaywc"
-    },
-    {
-      "id": "e5c01954-a167-4df6-8d0f-a9d7111a1846",
-      "ts": "2026-11-26T12:19:42Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-settle-8",
-      "action": "Settle the last 8 rows with what their threads actually prove, and guard the sync writer",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/plugins/appflow/sync.py",
-        "scripts/task/appflow-check.sh",
-        "tests/appflow-triage"
-      ],
-      "files": [],
-      "base_commit": "037ff9cc6596f36fd8ff062ef2a76663255cc573",
-      "branch": "main",
-      "frame": "03hb2mk54bzh4g4bbjz9cpg9r"
-    },
-    {
-      "id": "6783c2aa-7dc7-4d02-a984-81a948d9809d",
-      "ts": "2026-11-26T12:15:49Z",
-      "source": "agy",
-      "subject": "nixconfig:appflow-settle-8",
-      "action": "bug-fix: settle last 8 appflow rows + BridgingIT, check appflow",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/plugins/appflow/sync.py",
-        "scripts/task/appflow-check.sh",
-        "tests/appflow-triage"
-      ],
-      "files": [],
-      "base_commit": "f484946fa069cc3027cfb135f2362ccb14dfddc3",
-      "branch": "main",
-      "frame": "03hb2lsus459z8vj1moisw53d"
     }
   ]
 }

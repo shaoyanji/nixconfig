@@ -21,10 +21,10 @@ async function refreshStats() {
     ['deals','Active deals'],['products','Tracked products'],['price_points','Price points'],['alerts_sent','Alerts sent']
   ].map(([key,label]) => `<div class="stat"><strong>${esc(stats[key] ?? 0)}</strong><span>${label}</span></div>`).join('');
 }
-function sparkline(days, currency) {
+function sparkline(days, currency, width = 240) {
   const points = (days || []).filter(day => day.min_price != null);
   if (points.length < 2) return '';
-  const width = 240, height = 46, pad = 4;
+  const height = 46, pad = 4;
   const values = points.map(day => day.min_price);
   const low = Math.min(...values), high = Math.max(...values), span = high - low || 1;
   const step = (width - pad * 2) / (points.length - 1);
@@ -42,21 +42,25 @@ async function loadAnalytics() {
   const currency = history.currency || 'EUR';
   const drop = (report.biggest_drops || [])[0];
   const figure = (value, label) => `<div><strong>${esc(value)}</strong><span>${esc(label)}</span></div>`;
+  const plural = (count, one, many) => `${count} ${count === 1 ? one : many}`;
   const figures = [
-    figure(`${history.points || 0}`, `price points · ${report.window_days || 30} d`),
-    figure(`${history.fell || 0}`, 'products falling'),
-    figure(`${history.rose || 0}`, 'products rising'),
+    figure(`${history.points || 0}`, `${history.points === 1 ? 'price point' : 'price points'} · ${report.window_days || 30} d`),
+    figure(plural(history.fell || 0, 'product', 'products'), 'falling'),
+    figure(plural(history.rose || 0, 'product', 'products'), 'rising'),
     figure(drop ? `−${drop.drop_pct}%` : '—', drop ? drop.name : 'no drop yet'),
   ].join('');
   const rows = (items, detail) => items.length ? items.map(item => `<div class="analytics-row"><b>${esc(item.name || item.title)}</b><span>${detail(item)}</span></div>`).join('') : '<p class="muted">nothing yet</p>';
   const lists = [
     ['Top discounts', rows(report.top_discounts || [], deal => `−${deal.discount_pct}%${deal.price != null ? ' · ' + money(deal.price, deal.currency) : ''}`)],
-    ['Merchants', rows(report.merchants || [], row => `${row.deals} deal(s) · ⌀−${row.avg_discount}%`)],
-    ['Categories', rows(report.categories || [], row => `${row.deals} deal(s) · max −${row.max_discount}%`)],
+    ['Merchants', rows(report.merchants || [], row => `${plural(row.deals, 'deal', 'deals')} · ⌀−${row.avg_discount}%`)],
+    ['Categories', rows(report.categories || [], row => `${plural(row.deals, 'deal', 'deals')} · max −${row.max_discount}%`)],
   ].map(([title, body]) => `<div><h4>${title}</h4>${body}</div>`).join('');
   $('#analyticsWindow').textContent = `last ${report.window_days || 30} days · avg ${history.avg_price != null ? money(history.avg_price, currency) : '—'}`;
-  $('#analytics').innerHTML = `<div class="analytics-figures">${figures}</div>${sparkline(history.daily, currency)}` +
-    (drop ? `<p class="muted">${esc(drop.name)} ${money(drop.from, drop.currency)} → ${money(drop.to, drop.currency)} over ${drop.points} point(s)</p>` : '') +
+  // The sparkline is drawn in the panel's own pixels: a fixed viewBox inside a
+  // wider box letterboxes the line into the middle third of the column.
+  const sparkWidth = Math.max(240, Math.round($('#analytics').clientWidth || 240));
+  $('#analytics').innerHTML = `<div class="analytics-figures">${figures}</div>${sparkline(history.daily, currency, sparkWidth)}` +
+    (drop ? `<p class="muted">${esc(drop.name)} ${money(drop.from, drop.currency)} → ${money(drop.to, drop.currency)} over ${plural(drop.points, 'point', 'points')}</p>` : '') +
     `<div class="analytics-lists">${lists}</div>`;
 }
 function filterParams() {

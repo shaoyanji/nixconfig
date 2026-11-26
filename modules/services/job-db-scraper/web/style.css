@@ -140,3 +140,7 @@ dialog::backdrop { background: rgba(2, 6, 23, 0.72); backdrop-filter: blur(8px);
 .active-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; font-size: 0.8rem; }
 .chip.clear { padding: 3px 10px; border: 0; border-radius: 999px; background: rgba(148, 163, 184, 0.18); color: var(--text); font: inherit; font-size: 0.78rem; cursor: pointer; }
 .chip.clear:hover { background: var(--accent); color: #05101c; }
+
+.analytics-panel > .panel-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+#analytics-scope { text-transform: none; letter-spacing: 0.01em; font-weight: 600; font-size: 0.74rem; }
+.band-row { grid-template-columns: 4.4rem 1fr 2.2rem; gap: 10px; }

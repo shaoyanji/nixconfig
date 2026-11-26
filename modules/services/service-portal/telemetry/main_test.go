@@ -103,3 +103,51 @@ func TestTelemetryHandlerShape(t *testing.T) {
 		t.Fatalf("payload %#v", payload)
 	}
 }
+
+func TestLinkVaultMetricsUsePortalOrder(t *testing.T) {
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.URL.Path {
+		case "/api/health":
+			_, _ = w.Write([]byte(`{"ok":true,"service":"link-vault"}`))
+		case "/api/stats":
+			_, _ = w.Write([]byte(`{"bookmarks":9,"unread":5,"read":4,"archived":1,"collections":2,"tags":7}`))
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	defer upstream.Close()
+	target := targetConfig{
+		Name:       "link-vault",
+		BaseURL:    upstream.URL,
+		HealthPath: "/api/health",
+		StatsPath:  "/api/stats",
+		Metrics: []metricSpec{
+			{Key: "bookmarks", Label: "bookmarks"},
+			{Key: "read", Label: "read"},
+			{Key: "tags", Label: "tags"},
+		},
+	}
+	agg := newAggregator(upstream.Client(), []targetConfig{target})
+	agg.pollOnce(context.Background())
+	state := agg.snapshot().Services["link-vault"]
+	if state.Status != "online" {
+		t.Fatalf("state %#v", state)
+	}
+	if len(state.Metrics) != 3 {
+		t.Fatalf("metrics %#v", state.Metrics)
+	}
+	want := []struct {
+		key   string
+		value float64
+	}{
+		{"bookmarks", 9},
+		{"read", 4},
+		{"tags", 7},
+	}
+	for i, row := range want {
+		if state.Metrics[i].Key != row.key || state.Metrics[i].Value.(float64) != row.value {
+			t.Fatalf("metric %d = %#v, want %s=%v in portal order; all %#v", i, state.Metrics[i], row.key, row.value, state.Metrics)
+		}
+	}
+}

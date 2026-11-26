@@ -128,6 +128,27 @@ class BuildPostingsTest(unittest.TestCase):
         self.assertEqual(postings, [])
         self.assertIn("no company", warnings[0])
 
+    def test_a_relative_url_is_skipped_and_named(self):
+        # `--company` overrides would otherwise file `/jobs/123` and let the
+        # server refuse it; the URL is the posting's identity, so it must be one.
+        postings, warnings = ingest.build_postings(
+            [{"title": "A", "url": "/jobs/123"}], company="acme"
+        )
+        self.assertEqual(postings, [])
+        self.assertIn("url is not http(s) (/jobs/123)", warnings[0])
+
+    def test_a_mailto_url_is_skipped(self):
+        postings, warnings = ingest.build_postings(
+            [{"title": "A", "url": "mailto:jobs@acme.example"}], company="acme"
+        )
+        self.assertEqual(postings, [])
+        self.assertIn("url is not http(s)", warnings[0])
+
+    def test_an_absolute_url_still_passes(self):
+        postings, warnings = ingest.build_postings([{"title": "A", "url": LEVER}])
+        self.assertEqual(len(postings), 1)
+        self.assertEqual(warnings, [])
+
     def test_missing_title_is_skipped(self):
         postings, warnings = ingest.build_postings([{"url": LEVER}])
         self.assertEqual(postings, [])

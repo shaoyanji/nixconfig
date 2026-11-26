@@ -40,6 +40,8 @@ EXPECTED=(
   "the owner rides the status line"
   "a summary is flattened to one line"
   "the next action lands with the row"
+  "a url that is not http(s) is refused"
+  "the url is trimmed before it is written"
   "a fit outside 1-5 is refused"
   "a sweep that is not a cycle is refused"
   "an unknown family is refused"
@@ -123,6 +125,20 @@ case="the next action lands with the row"
 run "$case" --family platform "${lead[@]}" --next-action "Read the ad, nothing sends before 2026-12-07"
 if [ "$code" != 0 ] || [ "$(field .nextAction)" != "Read the ad, nothing sends before 2026-12-07" ]; then
   fail "$case" "nextAction $(field .nextAction)"
+fi
+
+case="a url that is not http(s) is refused"
+for bad in "jobs/123" "mailto:jobs@example.com" "example.com/jobs/7"; do
+  run "$case" --family platform "${lead[@]}" --url "$bad"
+  if [ "$code" != 2 ] || ! printf '%s' "$err" | grep -q "absolute http(s)"; then
+    fail "$case" "url $bad gave exit $code, stderr $(printf '%s' "$err" | head -c 120)"
+  fi
+done
+
+case="the url is trimmed before it is written"
+run "$case" --family platform "${lead[@]}" --url "  https://example.com/jobs/7  "
+if [ "$code" != 0 ] || [ "$(field .applyUrl)" != "https://example.com/jobs/7" ]; then
+  fail "$case" "applyUrl [$(field .applyUrl)]"
 fi
 
 case="a fit outside 1-5 is refused"

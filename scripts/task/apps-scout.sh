@@ -85,6 +85,17 @@ done
 # and the tab the TOON reader splits on would corrupt the record.
 summary=$(printf '%s' "$summary" | tr '\n\t' '  ' | sed -E 's/  +/ /g; s/^ //; s/ $//')
 
+# A lead's apply URL is opened by a person or a packet build, so a relative path
+# or a mailto: is a dead row: trimmed first, then required to be absolute http(s).
+url=$(printf '%s' "$url" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')
+case "$url" in
+  "" | http://* | https://*) ;;
+  *)
+    echo "apps-scout: --url must be an absolute http(s) URL" >&2
+    exit 2
+    ;;
+esac
+
 if [ -n "$fit" ] && ! [[ "$fit" =~ ^[1-5]$ ]]; then
   echo "apps-scout: --fit must be 1-5" >&2
   exit 2

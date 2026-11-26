@@ -1,8 +1,79 @@
 {
-  "generated": "2026-11-26T18:26:11Z",
+  "generated": "2026-11-26T18:30:11Z",
   "count": 200,
-  "pin": "c6fb00e73dfd432c7558a4428e830810a2e70e6e375b0747672e3384d13ee91c",
+  "pin": "b7383a5bb29f368f739560ba5f54071be118ad2d8be896edfc28bd2cfaafc376",
   "turns": [
+    {
+      "id": "b051ebf1-cc76-4fad-8cc4-79becfce5182",
+      "ts": "2026-11-26T18:30:02Z",
+      "source": "devin",
+      "subject": "nixconfig:enhance-private-deals-price-alerts-and-scrapers",
+      "action": "claim: add private-deals watchlist polling, price-drop alert history, feed exports, and UI controls",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/private-deals",
+        "modules/services/private-deals.nix"
+      ],
+      "files": [],
+      "base_commit": "936ba60a4540cd715d9fe0978c450a7d3b26feb0",
+      "branch": "main",
+      "frame": "03hb4mwfzb29xtzldzvh5z71c"
+    },
+    {
+      "id": "74599a40-82a4-4cab-bc7f-09635a8fe629",
+      "ts": "2026-11-26T18:28:20Z",
+      "source": "devin",
+      "subject": "nixconfig:link-vault-feeds-analytics",
+      "action": "landed: link-vault RSS/Atom watchlists with deduped polling, feed state, background interval, analytics API, provider accounting migration, and feed/analytics web panels | gates: go test+vet PASS, node --check PASS, alejandra PASS, native nix build+checkPhase PASS, checks:host delphi rc=0, delphi toplevel rc=0, live feed poll/dedupe/analytics smoke PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/services/link-vault",
+        "modules/services/link-vault.nix"
+      ],
+      "files": [
+        "modules/services/link-vault",
+        "modules/services/link-vault.nix"
+      ],
+      "base_commit": "936ba60a4540cd715d9fe0978c450a7d3b26feb0",
+      "branch": "main",
+      "frame": "03hb4mkhmmdmr1kcb04stu18q"
+    },
+    {
+      "id": "3966b682-2fa6-440e-916a-9fc047091f75",
+      "ts": "2026-11-26T18:27:45Z",
+      "source": "buffy",
+      "subject": "nixconfig:add-apps-scout-dynamic-sweep-cycle-and-dedupe",
+      "action": "claim: dynamic UTC sweep default, URL/dedupe validation in the scout writer, offline fixtures",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/apps.yml",
+        "scripts/task/apps-scout.sh",
+        "scripts/task/jobs-ingest.py",
+        "tests/apps-scout",
+        "tests/jobs-ingest"
+      ],
+      "files": [],
+      "base_commit": "936ba60a4540cd715d9fe0978c450a7d3b26feb0",
+      "branch": "main",
+      "frame": "03hb4mgdn2yxa578d9xmoywq2"
+    },
+    {
+      "id": "86d27cea-7dc1-4094-b502-0f4228ee9780",
+      "ts": "2026-11-26T18:26:24Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout-pass-and-deals-ingest",
+      "action": "landed: arbeitnow pp.1-4 scout pass: 58 in-lane titles, 13 new companies, 1 filed — weflow Senior Platform Engineer (Berlin/EU remote, fit 4, scout-2026-11-25s); rest already held or London-only/no description. deals: 6/6 created via firecrawl mydealz/new into delphi:8465 (176 deals). Fixed: sweep text said stage scouted, writer stages lead; tests/apps-scout (11 cases) in checks:appflow | gate: checks:tasks, checks:prose, checks:appflow, deals-ingest 26, jobs-ingest 28",
+      "outcome": "done",
+      "claims": [
+        "tests/apps-scout",
+        "taskfiles/checks.yml",
+        "taskfiles/apps.yml"
+      ],
+      "files": [],
+      "base_commit": "7cb607b78ac3c9edea2a32278461dcd935191873",
+      "branch": "main",
+      "frame": "03hb4m6x1jroegxg1s55nq3qf"
+    },
     {
       "id": "a32d25fa-1b46-400a-a256-983336b28b1d",
       "ts": "2026-11-26T18:20:39Z",
@@ -2986,67 +3057,6 @@
       "base_commit": "5785b4608c096d0cd88aa5e75071234a6c2575a6",
       "branch": "main",
       "frame": "03hb33fexgxr6gfmfj24t74qu"
-    },
-    {
-      "id": "a0134c88-9ab7-4b90-8ce2-33ab3318c0ea",
-      "ts": "2026-11-26T13:42:18Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "claim: job-scout pass 2026-11-26g — retry the two throttled LinkedIn queries, widen its query and location list to Luxembourg and Kubernetes/cloud/systems, page jobs.ch deeper, file linked leads via apps:scout, fold into the is-a.dev CV page with framing distinct from 26d/26e/26f",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/jobsearch-sweep.py"
-      ],
-      "files": [],
-      "base_commit": "d1cd1e26e3a7b68bb0a6722e0284076f92334dae",
-      "branch": "main",
-      "frame": "03hb32ozrc53kuh67qylpztso"
-    },
-    {
-      "id": "340ab3ee-a129-4486-92a5-a7de520a52f1",
-      "ts": "2026-11-26T13:41:47Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: sweep 2026-11-26f — LinkedIn guest search added as a board (429 twice before, 200 now), jobs.ch paged to depth 3, date-only ages fixed (a 2-month-old ad passed every window). 3969 postings, 282 fresh, 9 new at 1688 held, 6 filed with live ads, 2 recruiters refused. Folded into the is-a.dev CV page (blog 5d8f781). Gate: self-test 22/22 + py_compile + bash -n; checks:quick unbuildable here (aarch64 vs x86_64 task-list).",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/jobsearch-sweep.py"
-      ],
-      "files": [],
-      "base_commit": "d1cd1e26e3a7b68bb0a6722e0284076f92334dae",
-      "branch": "main",
-      "frame": "03hb32l9qn7lce45eprtp3mxz"
-    },
-    {
-      "id": "bb3536d3-12c9-4d80-95c1-ab117a710ec4",
-      "ts": "2026-11-26T13:37:25Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "claim: job-scout pass 2026-11-26f — probe LinkedIn guest search and jobs.ch depth, file linked in-lane leads via apps:scout, fold into the is-a.dev CV page with framing distinct from the 26d and 26e passes",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/jobsearch-sweep.py"
-      ],
-      "files": [],
-      "base_commit": "a68dc8915b2abd6b23196c7769cee87cd4001a1c",
-      "branch": "main",
-      "frame": "03hb31qjlrmohl373jlay3jjy"
-    },
-    {
-      "id": "ddda12da-9821-4712-9a74-ace04068557b",
-      "ts": "2026-11-26T13:36:57Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: sweep 2026-11-26e — Stepstone paged to depth 2 with the city quoted (Frankfurt was being dropped), jobs.ch added as a board; 3733 postings, 220 fresh, 9 new at 1680 held, 7 filed (6 Swiss), 1 agency closed. 6 leads folded into the is-a.dev CV page (blog f0d93b6b). Gate: py_compile + self-test 20/20 + live pass; checks:quick cannot build task-list.json on this aarch64 host (x86_64 pin).",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/jobsearch-sweep.py",
-        ".agents/skills/jobsearch-pipeline"
-      ],
-      "files": [],
-      "base_commit": "a68dc8915b2abd6b23196c7769cee87cd4001a1c",
-      "branch": "main",
-      "frame": "03hb31nbxy8fss8u6zy9dl6b2"
     }
   ]
 }

@@ -133,6 +133,19 @@ def company_from_url(url: str) -> str:
     return "" if not label or label in STOP_SEGMENTS else label
 
 
+def is_absolute_http(url: str) -> bool:
+    """A posting's identity is its URL, so a relative one cannot be a row.
+
+    The scrape usually carries absolute links; a board that emits `/jobs/123`
+    does not, and `--company` would otherwise file it and let the server refuse.
+    """
+    try:
+        parts = urllib.parse.urlsplit((url or "").strip())
+    except ValueError:
+        return False
+    return parts.scheme in ("http", "https") and bool(parts.netloc)
+
+
 def page_jobs(document) -> list:
     """Every job in any of the shapes job-page-scrape can emit."""
     if isinstance(document, dict):
@@ -182,6 +195,9 @@ def build_postings(jobs, source="", company="", tags=(), warnings=None):
         posting = to_posting(job, source=source, company=company, tags=tags)
         if not posting["title"] or not posting["url"]:
             warnings.append(f"skipped: no title or url ({job.get('url') or job.get('title')})")
+            continue
+        if not is_absolute_http(posting["url"]):
+            warnings.append(f"skipped: url is not http(s) ({posting['url']})")
             continue
         if not posting["company"]:
             warnings.append(f"skipped: no company in {posting['url']}")

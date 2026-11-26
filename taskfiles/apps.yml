@@ -93,22 +93,24 @@ tasks:
   # Stepstone. This carries the next cycle's id and read order so a pass starts
   # where the last one ended instead of re-deriving it.
   apps:scout:sweep:
-    desc: The next scout sweep — id, the boards in read order and the write rules (SWEEP, FAMILY)
+    desc: The next scout sweep — id (today UTC by default), the boards in read order and the write rules (SWEEP, FAMILY)
     summary: >
-      Sweep id `2026-11-25s`, the pass after 25p. Prints the boards in read
-      order with the trap each one hides, then the lane's write rules. The 25s
-      read took Stepstone's six lane queries to two pages each: 256 unique
-      cards, 85 of them at employers the ledger already holds, six rows filed
-      and three parked on an expiry inside the hold. Read-only and network-free:
-      a sweep still dedupes through `apps:scout`/`apps:search` and files with
-      `apps:scout`, never a second writer. The 2026-12-07 send hold stands over
-      every row found, and no row is filed from a listing alone.
+      Sweep id defaults to today in UTC (`2026-11-26`); a second pass the same
+      day takes the next free letter, `SWEEP=2026-11-26j`. Prints the boards in
+      read order with the trap each one hides, then the lane's write rules. The
+      25s read took Stepstone's six queries two pages each: 256 cards, 85 at
+      employers the ledger holds, six filed and three parked on an expiry inside
+      the hold. Read-only and network-free: it dedupes through
+      `apps:scout`/`apps:search` and files with `apps:scout`, never a second
+      writer. The 2026-12-07 send hold stands over every row found, and no row is
+      filed from a listing alone.
     vars:
-      SWEEP: '{{.SWEEP | default "2026-11-25s"}}'
+      SWEEP: '{{.SWEEP | default (now | date "2006-01-02")}}'
       FAMILY: '{{.FAMILY | default "devops|sre|platform|infrastructure"}}'
     cmds:
       - |
         printf 'sweep %s\n' '{{.SWEEP}}'
+        printf 'cycle: %s — today UTC unless named; a second pass today takes the next free letter (SWEEP=<date><letter>)\n' '{{.SWEEP}}'
         printf 'families: %s\n\n' '{{.FAMILY}}'
         printf '%s\t%s\n' 'board' 'trap that makes it read wrong'
         printf '%s\t%s\n' \

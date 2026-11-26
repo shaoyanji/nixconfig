@@ -33,6 +33,7 @@ letter=""
 pages=""
 language=""
 example=0
+repair=0
 
 usage() { sed -n '4,12p' "$0" | sed 's/^# \{0,1\}//'; }
 
@@ -47,10 +48,58 @@ while [ $# -gt 0 ]; do
     --language) language="${2:-}"; shift 2 ;;
     --out) out="${2:-}"; shift 2 ;;
     --example) example=1; shift ;;
+    --repair) repair=1; shift ;;
     -h | --help) usage; exit 0 ;;
     *) echo "appflow-packet: unknown argument $1" >&2; exit 2 ;;
   esac
 done
+
+# Rows built before the copy change are still links. `--repair` materializes every
+# link that still resolves and names every one that does not, so a store that was
+# collected once cannot hide behind a link nobody checked. Files landed by hand
+# in a row (a PR draft, a note) are left alone: only links are touched.
+repair_packets() {
+  local dir src tmp dead=0 moved=0 tightened=0
+  # The glob matters: `for d in */` never yields a broken symlink, which is what a
+  # first survey counted as "no dangling rows" on 2026-11-26 while 139 rows were
+  # dead. Every entry is visited, link or not.
+  for dir in "$PACKETS"/*; do
+    [ -e "$dir" ] || [ -L "$dir" ] || continue
+    if [ ! -L "$dir" ] && [ -d "$dir" ]; then
+      # A row that is already a copy can still be world-readable: tighten it.
+      chmod 700 "$dir" 2>/dev/null || true
+      chmod 600 "$dir"/*.pdf "$dir"/*.json "$dir"/*.md 2>/dev/null || true
+      tightened=$((tightened + 1))
+      continue
+    fi
+    src=$(readlink -f "$dir" 2>/dev/null) || src=""
+    if [ -n "$src" ] && [ -r "$src/anschreiben.pdf" ] && [ -r "$src/lebenslauf.pdf" ]; then
+      tmp="$dir.materialize.$$"
+      if mkdir -p "$tmp" && cp -a "$src"/. "$tmp"/; then
+        chmod 700 "$tmp" 2>/dev/null || true
+        chmod 600 "$tmp"/* 2>/dev/null || true
+        rm -f "$dir" && mv "$tmp" "$dir"
+        moved=$((moved + 1))
+        echo "materialized $dir"
+      else
+        rm -rf "$tmp"
+        echo "unreadable   $dir -> $src" >&2
+        dead=$((dead + 1))
+      fi
+    else
+      echo "dangling     $dir -> $(readlink "$dir")" >&2
+      dead=$((dead + 1))
+    fi
+  done
+  printf 'repair    %s materialized, %s tightened, %s dangling\n' "$moved" "$tightened" "$dead"
+  [ "$dead" -eq 0 ]
+}
+
+if [ "$repair" = 1 ]; then
+  mkdir -p "$PACKETS"
+  repair_packets
+  exit $?
+fi
 
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
@@ -217,7 +266,21 @@ case "$(readlink -f "$(dirname "$target")" 2>/dev/null)/" in
   exit 2
   ;;
 esac
-# A symlink, not a copy: the artifact stays the store path, and the stable name is
-# how a human (or the application record) finds it.
-ln -sfn "$store_path" "$target"
-echo "linked    $target"
+# The stable name is a copy, not a symlink into the store: a packet has to outlive
+# the artifact it was built from. `ln -sfn "$store_path"` left every submission a
+# link, so a single `nix-collect-garbage` emptied them all at once — found
+# 2026-11-26, when the proofline packet was a dangling link and both PDFs were
+# gone. A packet is a few tens of kilobytes, and 600 keeps the street address and
+# phone number out of any other reader's reach.
+if [ -L "$target" ]; then
+  rm -f "$target"
+fi
+mkdir -p "$target"
+chmod 700 "$target" 2>/dev/null || true
+for part in anschreiben.pdf lebenslauf.pdf selection.json; do
+  [ -f "$store_path/$part" ] || continue
+  cp -f "$store_path/$part" "$target/.$part.tmp"
+  chmod 600 "$target/.$part.tmp"
+  mv -f "$target/.$part.tmp" "$target/$part"
+done
+echo "packet    $target ("$(find "$target" -maxdepth 1 -type f | wc -l)" files, "$(du -sk "$target" | cut -f1)" KB)"

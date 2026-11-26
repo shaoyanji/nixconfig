@@ -1140,20 +1140,17 @@ tasks:
       - bash tests/port-audit/run.sh
 
   checks:appflow:
-    desc: Appflow gates — the CV projector fixture, tracker hygiene, and the status-quality fixture
+    desc: Appflow gates — CV selector, tracker status, packet store
     summary: >
-      Two offline fixtures plus a read-only API pass. The selector, over a
-      fictional corpus: no role loses every line, caps hold, a German
-      description reaches the English corpus via glossary.json, two runs are
-      identical, a missing corpus exits 2, coverage asserted both ways. The
-      tracker, via the API: no (company, role) pair without a clue which row
-      is real, no `prep` row whose status says the requisition closed, no
-      mail on two moving rows, no bare or placeholder status, no active row
-      still `undiscovered`. tests/appflow-status proves each rule can fail.
-      ~5 s, offline.
+      Three offline fixtures plus a read-only API pass: the selector over a
+      fictional corpus (caps hold, German via glossary.json, identical
+      reruns, a missing corpus exits 2); the tracker via the API (no
+      ambiguous company/role pair, no `prep` row on a closed req, no shared
+      mail); the packet store (a row is a copy at 600, a dead link is refused).
     cmds:
       - bash tests/appflow-select/run.sh
       - bash tests/appflow-status/run.sh
+      - bash tests/appflow-packet/run.sh
       - bash scripts/task/appflow-check.sh
 
   checks:appflow:triage:

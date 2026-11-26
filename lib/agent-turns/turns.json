@@ -1,8 +1,53 @@
 {
-  "generated": "2026-11-26T17:48:20Z",
+  "generated": "2026-11-26T17:50:42Z",
   "count": 200,
-  "pin": "7aa0466f7a208c1c4d2f9d7d9e896a432ba5e2a3c29dc4a409c6952e04da566b",
+  "pin": "dc14bcef6240d0a0269f7c59a1a88078ea04a51e0a489e2144fcd692e729cd21",
   "turns": [
+    {
+      "id": "02af2d2b-e991-4c59-b4a4-edea0dee5de0",
+      "ts": "2026-11-26T17:50:33Z",
+      "source": "devin",
+      "subject": "nixconfig:link-vault-service",
+      "action": "landed: tailnet link-vault with SQLite FTS5, extraction providers, collections/states, exports, UI and portal telemetry | gates: go test+vet PASS, node --check PASS, alejandra PASS, registry PASS, checks:host delphi rc=0, delphi toplevel rc=0, live HTTP+env-file smoke PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "26186e27e73cc2984b30087bcae60046eed89632",
+      "branch": "main",
+      "frame": "03hb4f6q6vnm5t8e6kzxxyv1m"
+    },
+    {
+      "id": "a7d66e8d-b0d3-4c31-91d0-375ef9e7c768",
+      "ts": "2026-11-26T17:49:15Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-docs-seed",
+      "action": "claim: document task agents:portfolio:seed (scripts/task/portfolio-seed.py, --dry-run, --only, --format json|toon) in docs/portfolio-services.md",
+      "outcome": "in_progress",
+      "claims": [
+        "docs/portfolio-services.md"
+      ],
+      "files": [],
+      "base_commit": "f7a200ff555d8c0403547391267e9fe328fc9942",
+      "branch": "main",
+      "frame": "03hb4exnuqw03iyv15g3q99p2"
+    },
+    {
+      "id": "cf17a289-14da-45c0-9d6a-c554871db086",
+      "ts": "2026-11-26T17:48:34Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-batch-seed-cli",
+      "action": "landed: portfolio-seed.py + agents:portfolio:seed run three lanes (page scrape -> jobs/deals batch route, inventory-sync --eval) with --dry-run, --only, --jobs-from/--deals-from, --format json|toon; zero-hit page is a zero, refusal exits 1 naming the first error | gate: unittest 23 OK, py_compile, checks:tasks PASS (844 tasks), live run on temp jobs+deals servers exit 0 (dry 0 posted, real 2 postings + 1 deal read back from /api/stats)",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/portfolio-seed.py",
+        "tests/portfolio-seed",
+        "taskfiles/agents.yml"
+      ],
+      "files": [],
+      "base_commit": "f7a200ff555d8c0403547391267e9fe328fc9942",
+      "branch": "main",
+      "frame": "03hb4estckml7u5v13eig5s67"
+    },
     {
       "id": "99c41a5d-6647-459a-9c65-f9b7d39e5eec",
       "ts": "2026-11-26T17:44:48Z",
@@ -2986,52 +3031,6 @@
       "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
       "branch": "main",
       "frame": "03hb2tnflw07b8ul4l80dw4an"
-    },
-    {
-      "id": "31ac5040-2278-4c9e-8a10-72419aec796a",
-      "ts": "2026-11-26T12:55:47Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-26f",
-      "action": "landed: delphi dup-services verified live, closed 03hb2tewb/03hb2tfgl",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
-      "branch": "main",
-      "frame": "03hb2tlu4vr3pv4ii4q9tutn1"
-    },
-    {
-      "id": "c13e0a53-9c23-4217-a425-b760ad9b6ddf",
-      "ts": "2026-11-26T12:55:44Z",
-      "source": "freebuff",
-      "subject": "nixconfig:frieren-ops-health",
-      "action": "claim: take over from tmux-pane-steward — verify ops:health on frieren (restic-burgernas, downloads-sort) and close",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/frieren",
-        "modules/services"
-      ],
-      "files": [],
-      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
-      "branch": "main",
-      "frame": "03hb2tli0ohtn0futl4ewc1n4"
-    },
-    {
-      "id": "74352c93-f41d-4b46-a386-7a0125e7cffd",
-      "ts": "2026-11-26T12:55:25Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:frieren-ops-health",
-      "action": "incident|0.94|0.92: run ops:health on frieren, fix/verify, post done",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/frieren",
-        "modules/services",
-        "modules/profiles"
-      ],
-      "files": [],
-      "base_commit": "e4dd1d266a158418770d49dd691003990b6ff598",
-      "branch": "main",
-      "frame": "03hb2tj7w6eb10j6fnn86jpba"
     }
   ]
 }

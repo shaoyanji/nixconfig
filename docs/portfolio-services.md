@@ -144,6 +144,26 @@ no credentials on `delphi`:
 | `deals:ingest` | `scripts/task/deals-ingest.py` | stdin or `--in` | `POST /api/deals/batch` on private-deals |
 | `agents:web` | `scripts/task/web-research.py` | the three hosted providers at once, or agent-browser | stdout only |
 | `dev:inventory:site` | `scripts/task/inventory-sync.py` | `nix eval .#inventory.hosts`, or `--in` a JSON dump | `POST /api/items` on inventory-site |
+| `agents:portfolio:seed` | `scripts/task/portfolio-seed.py` | the scrapers and ingesters above, or `--jobs-from` / `--deals-from` | the batch routes and `POST /api/items`, one lane at a time |
+
+`agents:portfolio:seed` is those pairs as one run, for when three services need
+filling and nobody wants to remember which scraper feeds which ingester:
+
+```bash
+task agents:portfolio:seed -- --jobs https://boards.greenhouse.io/acme
+task agents:portfolio:seed -- --deals-from deals.json --only deals
+task agents:portfolio:seed -- --jobs-from jobs.json --only jobs --dry-run
+```
+
+It scrapes each page it is given, merges the pages into one document, and hands
+that to the batch route on the loopback defaults (`--api-jobs`, `--api-deals`,
+`--api-inventory` move them). `--jobs-from` and `--deals-from` reuse a saved
+scrape instead of fetching; inventory runs by `--eval` unless `--inventory-from`
+names a hosts JSON, and `--inventory-hosts` narrows it. `--only` picks lanes by
+name (`jobs`, `deals`, `inventory`), `--dry-run` shapes every payload and posts
+nothing, and `--format toon` renders the summary an agent reads. A page with no
+postings is a zero rather than a failure; a refused record exits 1 with the first
+error named, while the lanes that succeeded still report what landed.
 
 One verb proves all four services end to end, and is the one to run after a
 deploy or a schema change:

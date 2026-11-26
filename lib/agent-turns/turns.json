@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-26T15:08:36Z",
+  "generated": "2026-11-26T15:15:22Z",
   "count": 200,
-  "pin": "74c4bd9b2429a5430be45263e399b5b1b9caff56b633e28b813c774a1d00d9a8",
+  "pin": "2baeee1af02241c5fd6b8d3e069c3fc327ad1a7c09a814477c51713946cb26bd",
   "turns": [
+    {
+      "id": "4aa23cc2-0b1a-4fa0-a91b-3b7c87a72df6",
+      "ts": "2026-11-26T15:10:41Z",
+      "source": "buffy",
+      "subject": "nixconfig:mail-atlas-ui-graph-polish",
+      "action": "claim: keyboard nav, graph focus/filter, sender/tag quick filters and coverage polish in mail-atlas site, verified with node --check and a static server smoke test",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/mail-atlas"
+      ],
+      "files": [],
+      "base_commit": "31cb076baad769809adc44c793c4887e234af00d",
+      "branch": "main",
+      "frame": "03hb3jyiz8nvvd2dm34wtcfol"
+    },
+    {
+      "id": "9c4d6d60-05fc-4034-9902-5211a8013ff3",
+      "ts": "2026-11-26T15:08:51Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-services-doc",
+      "action": "docs/portfolio-services.md (91 lines): delphi job-db-scraper 8101/8464, private-deals 8102/8465, inventory-site 8103/8466 with options+modules, one search endpoint each, the five verbs (apps:page/ingest, deals:page/ingest, agents:web) and the clanker/keys split; ports point at nix eval .#inventory.hosts.delphi. docs:links PASS, prose PASS, services:ports PASS (32 records), checks:tasks exit 0.| gate: docs-links + prose + services:ports + checks:tasks PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "31cb076baad769809adc44c793c4887e234af00d",
+      "branch": "main",
+      "frame": "03hb3jlklmyhw700sibt32ofh"
+    },
     {
       "id": "a4f84314-616a-45e7-9091-f974271905ba",
       "ts": "2026-11-26T15:06:33Z",
@@ -3014,38 +3042,6 @@
       "base_commit": "80ff2372c16b30491a857442f2234c7bbd11df94",
       "branch": "main",
       "frame": "03hb0zidsr560eqhgpgrigxct"
-    },
-    {
-      "id": "b72477dc-8090-4893-ac2d-a5dbdd95a45e",
-      "ts": "2026-11-26T07:17:09Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-0801",
-      "action": "chain-change: refactor shared nixconfig module chain",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/",
-        "hosts/"
-      ],
-      "files": [],
-      "base_commit": "80ff2372c16b30491a857442f2234c7bbd11df94",
-      "branch": "main",
-      "frame": "03hb0zgh442t737fq4t66pdv1"
-    },
-    {
-      "id": "00a28483-84c7-4d5f-9a07-1d60be23a6d1",
-      "ts": "2026-11-26T07:08:43Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "start: resurvey hosts/ module chains for per-host duplication beyond import-set uniqueness",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/",
-        "flake/host-inventory.nix"
-      ],
-      "files": [],
-      "base_commit": "66d31972f0ac8f0c13e93a48e7e8b5a8b841337e",
-      "branch": "main",
-      "frame": "03hb0xt4z9qv24mdww9c6jw1x"
     }
   ]
 }

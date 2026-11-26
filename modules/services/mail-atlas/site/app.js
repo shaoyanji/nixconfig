@@ -37,6 +37,7 @@ const el = {
   batchState: document.getElementById("batch-state"),
   meta: document.getElementById("result-meta"),
   letters: document.getElementById("stat-letters"),
+  tagged: document.getElementById("stat-tagged"),
   inbox: document.getElementById("stat-inbox"),
   queuedStat: document.getElementById("stat-queued"),
   boxTabs: document.getElementById("box-tabs"),
@@ -243,6 +244,7 @@ const field = (() => {
   let openMail = null;
   let onTag = null;
   let onCategory = null;
+  let onClear = null;
   // One clock for the whole session. Resetting it on hover made the sweep and
   // every spark jump backwards under the pointer, which read as jitter.
   const start = performance.now();
@@ -878,6 +880,7 @@ const field = (() => {
     if (node.kind === "mail" && openMail) openMail(node.mailId);
     else if (node.kind === "tag" && onTag) onTag(node.label);
     else if (node.kind === "category" && onCategory) onCategory(node.cat);
+    else if (node.kind === "query" && onClear) onClear();
   });
 
   const observer = new ResizeObserver(debounce(resize, 90));
@@ -895,6 +898,9 @@ const field = (() => {
     onCategory(fn) {
       onCategory = fn;
     },
+    onClear(fn) {
+      onClear = fn;
+    },
   };
 })();
 
@@ -907,6 +913,9 @@ function normalize(row) {
     id: row.id,
     messageId: row.messageId,
     sender: plain(row.sender) || "",
+    // `plain()` reduces `<addr>` as if it were markup, so the address survives
+    // only here — and the address is what a sender filter needs.
+    senderRaw: String(row.sender ?? ""),
     subject: plain(row.subject) || "(no subject)",
     sentAt: row.sentAt,
     snippet: row.snippet || "",
@@ -1569,6 +1578,16 @@ function setBox(box) {
 function renderCounts() {
   el.inbox.textContent = String(state.counts.inbox ?? 0);
   el.queuedStat.textContent = String(state.counts.queued ?? 0);
+  // Coverage is honest, not total: mail no rule claims is searchable but not
+  // placed, and the header should say so rather than imply a complete map.
+  if (el.tagged) {
+    const total = state.total || 0;
+    const tagged = Number(state.counts.tagged ?? 0);
+    el.tagged.textContent = total ? `${Math.round((tagged / total) * 100)}%` : "—";
+    el.tagged.title = total
+      ? `${tagged} of ${total} letters carry a tag; the rest are searchable by body only`
+      : "";
+  }
   // A queue that stopped draining and an empty queue show the same count; the
   // age is the honest signal, so it rides in the tooltip.
   const mins = Number(state.counts.oldestQueuedMin ?? 0);
@@ -1757,13 +1776,46 @@ function renderBody(text) {
   }
 }
 
+// A sender arrives as `Name <addr>` or as a bare address. The address is the
+// part that names one correspondent, and it is what the search matches.
+function senderNeedle(sender) {
+  const text = String(sender ?? "");
+  const angled = text.match(/<([^<>\s]+@[^<>\s]+)>/);
+  if (angled) return angled[1].toLowerCase();
+  const bare = text.match(/[^\s<>",;]+@[^\s<>",;]+\.[^\s<>",;]+/);
+  return (bare ? bare[0] : text).trim().toLowerCase();
+}
+
+// Two quick filters, both of which are a query: `from this sender` and `this
+// tag`. The taxonomy ranks tags against the typed string, so a tag is already a
+// search — the page does not need a second parameter to say so.
+function filterQuery(needle) {
+  const value = String(needle ?? "").trim();
+  if (!value) return;
+  el.q.value = value;
+  runSearch({ inhale: true });
+}
+
+function filterBySender(sender) {
+  filterQuery(senderNeedle(sender));
+}
+
+function filterByTag(tag) {
+  filterQuery(tag);
+}
+
 async function openReader(id) {
   try {
     const rows = await getJSON(`${API}/atlas-message?id=${encodeURIComponent(id)}`);
     const mail = Array.isArray(rows) ? rows[0] : rows;
     if (!mail) return;
     const tags = toArray(mail.tags);
-    state.reader = { messageId: mail.messageId, actions: toArray(mail.actions) };
+    state.reader = {
+      messageId: mail.messageId,
+      actions: toArray(mail.actions),
+      sender: mail.sender || "",
+      tags,
+    };
     armedUntil = 0;
     el.act.delete.dataset.armed = "";
     el.instruct.hidden = true;
@@ -1779,8 +1831,15 @@ async function openReader(id) {
     el.readerSubject.textContent = plain(mail.subject) || "(no subject)";
     const trail = toArray(mail.boxHistory);
     el.readerMeta.innerHTML = [
-      `<span>from <b>${esc(mail.sender || "unknown")}</b></span>`,
-      tags.length ? `<span class="rtag">${tags.map((t) => `#${esc(t)}`).join(" ")}</span>` : "",
+      `<button type="button" class="meta-filter" data-needle="${esc(senderNeedle(mail.sender))}" title="every letter from this sender (f)">from <b>${esc(mail.sender || "unknown")}</b></button>`,
+      tags.length
+        ? `<span class="rtag">${tags
+            .map(
+              (t) =>
+                `<button type="button" class="meta-filter tag-filter" data-needle="${esc(t)}" title="every letter carrying this tag">#${esc(t)}</button>`,
+            )
+            .join(" ")}</span>`
+        : "",
       mail.attachmentPath ? "<span>attachment</span>" : "",
       trail.length
         ? `<span class="rtrail">${trail
@@ -1801,6 +1860,16 @@ async function openReader(id) {
 document.getElementById("reader-close").addEventListener("click", () => el.reader.close());
 el.reader.addEventListener("click", (event) => {
   if (event.target === el.reader) el.reader.close();
+});
+
+// The sender and the tags in the reader are filters: closing the letter is not a
+// loss, because the query that replaces it names the same correspondent.
+el.readerMeta.addEventListener("click", (event) => {
+  const target = event.target.closest("button[data-needle]");
+  if (!target) return;
+  event.preventDefault();
+  el.reader.close();
+  filterQuery(target.dataset.needle);
 });
 
 /* ------------------------------------------------------------------ */
@@ -1828,6 +1897,12 @@ document.addEventListener("keydown", (event) => {
   // dialog, which closes natively.
   if (el.reader.open) {
     if (document.activeElement === el.instruction) return;
+    if (event.key === "f") {
+      event.preventDefault();
+      el.reader.close();
+      filterBySender(state.reader.sender);
+      return;
+    }
     const kind = event.key === "a" ? "archive" : event.key === "x" ? "delete" : event.key === "h" ? "hermes" : null;
     if (kind) {
       event.preventDefault();
@@ -1864,6 +1939,26 @@ document.addEventListener("keydown", (event) => {
     return;
   }
   if (!state.results.length) return;
+
+  // Quick filters from the row you walked to: `f` asks who else wrote, `t` asks
+  // what else carries its first tag. Neither needs the reader.
+  const focusedMail = state.results[state.focus >= 0 ? state.focus : 0];
+  if (event.key === "f" && !typing && focusedMail) {
+    event.preventDefault();
+    filterBySender(focusedMail.senderRaw || focusedMail.sender);
+    return;
+  }
+  if (event.key === "t" && !typing && focusedMail?.tags?.length) {
+    event.preventDefault();
+    filterByTag(focusedMail.tags[0]);
+    return;
+  }
+  if ((event.key === "Home" || event.key === "End") && !typing) {
+    event.preventDefault();
+    state.focus = event.key === "Home" ? 0 : state.results.length - 1;
+    renderResults();
+    return;
+  }
 
   // The list is a workspace, not just an index: space marks, `a` archives,
   // `x` queues deletion (twice), and the marked set is what they apply to.
@@ -1996,6 +2091,12 @@ field.onTag((tag) => {
   runSearch({ inhale: true });
 });
 field.onCategory((cat) => setCategory(cat));
+// Clicking the query node is the way back to the whole sea: the node that names
+// the search is the node that clears it.
+field.onClear(() => {
+  el.q.value = "";
+  runSearch({ inhale: true });
+});
 
 (async function boot() {
   qi = await startQiField(document.getElementById("qi-field"));
@@ -2033,12 +2134,13 @@ field.onCategory((cat) => setCategory(cat));
     state.counts.inbox = Number(headline?.inbox ?? 0);
     state.counts.queued = Number(headline?.queued ?? 0);
     state.counts.commands = Number(headline?.commands ?? 0);
+    state.counts.tagged = Number(headline?.tagged ?? 0);
     state.counts.oldestQueuedMin = Number(headline?.oldest_queued_min ?? 0);
     renderCounts();
     renderBoxTabs();
     renderSelection();
     if (state.total) {
-      el.hint.textContent = `${state.counts.inbox} in · ${state.counts.queued} queued · ↑↓ walk · ↵ read`;
+      el.hint.textContent = `${state.counts.inbox} in · ${state.counts.queued} queued · ↑↓ walk · ↵ read · f sender · t tag`;
     }
     el.dot.className = "dot live";
     el.link.textContent = "linked";

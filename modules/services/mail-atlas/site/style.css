@@ -1298,6 +1298,29 @@ dialog#reader::backdrop {
   color: var(--gold);
 }
 
+/* The sender and the tags are filters, not labels: a button that looks like
+   text, with the underline only when it is reachable. */
+.reader-meta .meta-filter {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  border-bottom: 1px dotted rgba(240, 201, 135, 0.35);
+}
+
+.reader-meta .meta-filter:hover,
+.reader-meta .meta-filter:focus-visible {
+  border-bottom-color: var(--jade);
+  outline: none;
+}
+
+.reader-meta .tag-filter {
+  color: var(--gold);
+}
+
 .reader-body {
   flex: 1 1 auto;
   padding: 1.15rem 1.5rem 1.4rem;

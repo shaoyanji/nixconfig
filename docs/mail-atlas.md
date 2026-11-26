@@ -257,7 +257,10 @@ a sea, over the character for a chart.
   opens the reader — including with the caret still in the search box, as long as
   that box holds the query the list was built from, so `↵` after typing a new
   word searches instead of opening a stale result. Inside the reader `a` / `x` /
-  `h` are the decisions, `⌘↵` in the instruction box queues it, `Esc` closes.
+  `h` are the decisions, `f` filters to the sender, `⌘↵` in the instruction box
+  queues it, `Esc` closes. `Home`/`End` jump to the ends of the list, and with a
+  row focused `f` asks who else wrote and `t` what else carries its first tag —
+  the sender and the `#tags` in the reader are buttons that do the same.
   State lives in the URL (`?q=&cat=`), so a search is a link.
 - **The list is a workspace.** `space` (or a click on the row's box) marks a
   letter, `a` archives the marked set, `x` queues it for deletion — twice, the

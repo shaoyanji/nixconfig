@@ -72,7 +72,7 @@ in {
     # and the rendered map turns `Authorization: Bearer <key>` into a flag the
     # two write locations test. Reads stay open — the flag gates nothing else.
     sops.secrets."appflow-board-bearer" = {
-      sopsFile = ../../modules/secrets.yaml;
+      # sopsFile rides base-node's defaultSopsFile (modules/secrets.yaml).
       owner = "nginx";
       group = "nginx";
       mode = "0400";

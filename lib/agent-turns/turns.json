@@ -1,8 +1,49 @@
 {
-  "generated": "2026-11-26T06:24:39Z",
+  "generated": "2026-11-26T06:38:39Z",
   "count": 200,
-  "pin": "e5815417fb1efb072f613a95fce376321ebfb2328b08403a2a0c1e01f7095491",
+  "pin": "966ca607325fdb11ad5ef230eca8a117b54cbc1521abe94c553393c1be45233a",
   "turns": [
+    {
+      "id": "a6283290-f3eb-4965-9f34-2a03d67a6661",
+      "ts": "2026-11-26T06:37:29Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-drive-20261126-0725",
+      "action": "start: appflow-board residual wiring cleanup",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/appflow-board.nix"
+      ],
+      "files": [],
+      "base_commit": "c70788c4b7c3dc724a38203bb44ddfae9718dfaa",
+      "branch": "main",
+      "frame": "03hb0rpfbgifkmau7wwjd6qqj"
+    },
+    {
+      "id": "2e8d92bb-bf37-4509-9d73-3fbdbc8ed9a1",
+      "ts": "2026-11-26T06:36:22Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-drive-20261126-0725",
+      "action": "flake-change: appflow-board residual wiring cleanup",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "c70788c4b7c3dc724a38203bb44ddfae9718dfaa",
+      "branch": "main",
+      "frame": "03hb0rhmhbr23sd3jb0xya524"
+    },
+    {
+      "id": "7388576b-7a83-4101-9b51-a37c6878a007",
+      "ts": "2026-11-26T06:24:54Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-drive-20261126-0719",
+      "action": "landed: modules-edges fixture now locks the allowed shapes — seeded args-import, readFile, src path, overlay import all pass while seeded edge still refuses | gate: modules:edges:test 3/3 + check:verify clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c70788c4b7c3dc724a38203bb44ddfae9718dfaa",
+      "branch": "main",
+      "frame": "03hb0p8x5bpbqsog21548e797"
+    },
     {
       "id": "4c5d8eca-630a-433b-bff6-9f792d66439a",
       "ts": "2026-11-26T06:23:24Z",
@@ -2791,45 +2832,6 @@
       "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
       "branch": "HEAD",
       "frame": "03havak2i5tfqithwrm8y0os9"
-    },
-    {
-      "id": "37f159b4-51e2-4d1b-a622-c3bb2aac492d",
-      "ts": "2026-11-25T13:48:15Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:image-daily-gate-verify",
-      "action": "landed: devin verify_refactor — image-daily gate check ran; verdict structurally able to ship, no missing piece named, checks:images:publish:test green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
-      "branch": "HEAD",
-      "frame": "03havak1g6pmiq4p98aldkgzu"
-    },
-    {
-      "id": "e0ac6db2-6f7f-475a-b4fb-76acc2325973",
-      "ts": "2026-11-25T13:39:37Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-2026-11-25a",
-      "action": "corrected commit: page folded at 9b73fa3 (amend of 876893b, acronym casing only); 30 rows filed fit 5:17 4:4 3:9, table 99 rows, nothing sent | gate: jekyll production build + check-cv-links PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03hav8vcyysp2iify0jm1f1g9"
-    },
-    {
-      "id": "f1729f09-225e-4153-b8e1-16246621e405",
-      "ts": "2026-11-25T13:39:08Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-2026-11-25a",
-      "action": "landed: 30 new employers filed (sweep 25a: 6 LinkedIn role/city pages DE/NL/AT/CH 200, 1 429; 6 Stepstone pages 200; 48 cards, 18 already in ledger); CV job-search table 99 rows, fit 5:38 4:28 3:33 | gate: jekyll production build + check-cv-links PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03hav8ry69mwa7qrzd241m1bt"
     }
   ]
 }

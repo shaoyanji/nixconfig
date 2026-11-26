@@ -85,6 +85,12 @@ usage: apps-db.sh <verb> [args]
                            appearing over id, company, role, status, next action
   get <id>                 one record and the mail linked to it
   update <id> --status S [--next-action N]
+                           one of --expect-stage <stage> | --if-status <12 hex
+                           of sha256(current status)> | --force, plus [--dry].
+                           A write that names nothing it expects is refused, and
+                           more than APPS_DB_WRITE_MAX (50) writes in ten minutes
+                           is refused as a loop. APPFLOW_ROWS=<file> reads the
+                           current row from a fixture instead of the API.
   add --company C --role R [--id slug] [--apply-url U] [--status S] [--next-action N]
                              [--notes N] [--category C] [--language L] [--origin O] [--fit 0-100|1-5]
   upsert [file|-]          upsert an application record (JSON or TOON on stdin or in a file)
@@ -201,10 +207,18 @@ case "$verb" in
     shift
     status=""
     next=""
+    expect_stage=""
+    expect_hash=""
+    force=0
+    dry=0
     while [ "$#" -gt 0 ]; do
       case "$1" in
         --status) status=${2:-}; shift 2 ;;
         --next-action) next=${2:-}; shift 2 ;;
+        --expect-stage) expect_stage=${2:-}; shift 2 ;;
+        --if-status) expect_hash=${2:-}; shift 2 ;;
+        --force) force=1; shift ;;
+        --dry) dry=1; shift ;;
         *) echo "apps-db: unknown flag $1" >&2; exit 2 ;;
       esac
     done
@@ -212,10 +226,53 @@ case "$verb" in
       echo "apps-db: update needs --status" >&2
       exit 2
     fi
-    current=$(curl -fsS -G "$api/api/application-get" --data-urlencode "id=$id" | jq -c '.[0] // empty')
+    # A write is a claim about a row you have read. Naming what the row should be
+    # now — its stage, or a fingerprint of the status text — is what stops a loop
+    # built from the wrong filter from stamping every row it matched: on
+    # 2026-11-26 a loop meant for three dead requisitions rewrote 125 live ones,
+    # because nothing asked what each row currently said.
+    if [ "$force" = 0 ] && [ -z "$expect_stage" ] && [ -z "$expect_hash" ]; then
+      echo "apps-db: refusing update $id — name what the row is now: --expect-stage <stage>, --if-status <12 hex of sha256(status)>, or --force" >&2
+      exit 2
+    fi
+    # The runaway guard: more than APPS_DB_WRITE_MAX writes in ten minutes is a
+    # loop, not a decision. The log counts across invocations because each write
+    # is its own process.
+    write_log=${APPS_DB_WRITE_LOG:-$HOME/.local/state/appflow/apps-db-writes.log}
+    write_max=${APPS_DB_WRITE_MAX:-50}
+    recent=0
+    if [ "$force" = 0 ] && [ -r "$write_log" ]; then
+      recent=$(awk -v since="$(( $(date +%s) - 600 ))" '$1 >= since' "$write_log" | wc -l | tr -d ' ')
+    fi
+    if [ "$force" = 0 ] && [ "${recent:-0}" -ge "$write_max" ]; then
+      echo "apps-db: refusing update $id — ${recent} writes in ten minutes (ceiling ${write_max}): a loop, not a decision. Re-read the rows, then --force if it really is one." >&2
+      exit 5
+    fi
+    if [ -n "${APPFLOW_ROWS:-}" ] && [ -r "${APPFLOW_ROWS}" ]; then
+      current=$(jq -c --arg id "$id" '.[] | select(.id == $id)' "$APPFLOW_ROWS" | head -1)
+    else
+      current=$(curl -fsS -G "$api/api/application-get" --data-urlencode "id=$id" | jq -c '.[0] // empty')
+    fi
     if [ -z "$current" ]; then
       echo "apps-db: no application $id" >&2
       exit 1
+    fi
+    if [ "$force" = 0 ]; then
+      row_stage=$(printf '%s' "$current" | jq -r '.stage // ""')
+      if [ -n "$expect_stage" ] && [ "$row_stage" != "$expect_stage" ]; then
+        echo "apps-db: refusing update $id — the row is in '$row_stage', you asked to write only '$expect_stage'; read it with apps-db get" >&2
+        exit 4
+      fi
+      if [ -n "$expect_hash" ]; then
+        # Hash the text a caller gets from `apps-db get`, not jq's trailing
+        # newline: the two recipes must agree or every guard looks stale.
+        row_status=$(printf '%s' "$current" | jq -r '.status // ""')
+        row_hash=$(printf '%s' "$row_status" | sha256sum | cut -c1-12)
+        if [ "$row_hash" != "$expect_hash" ]; then
+          echo "apps-db: refusing update $id — the status changed since you read it (now $row_hash, you gave $expect_hash)" >&2
+          exit 4
+        fi
+      fi
     fi
     bucket=$(printf '%s' "$status" | jq -Rr "$stage"' stage')
     if [ -z "$next" ]; then
@@ -224,9 +281,16 @@ case "$verb" in
     fi
     payload=$(jq -cn --arg id "$id" --arg status "$status" --arg stage "$bucket" --arg next "$next" \
       '{id: $id, status: $status, stage: $stage, nextAction: $next}')
+    if [ "$dry" = 1 ]; then
+      printf '%s\n' "$payload" | jq .
+      exit 0
+    fi
     render() { jq -r '.[0] | "\(.id)\t\(.stage)\t\(.status)\t\(.nextAction)"' | rows; }
     curl -fsS -X POST -H 'content-type: application/json' -d "$payload" "$api/api/application-update" \
       | toon_emit render
+    # Count the write only once the archive accepted it.
+    mkdir -p "$(dirname "$write_log")" 2>/dev/null || true
+    printf '%s %s\n' "$(date +%s)" "$id" >>"$write_log" 2>/dev/null || true
     ;;
 
   overview)

@@ -1,8 +1,74 @@
 {
-  "generated": "2026-11-26T11:56:00Z",
+  "generated": "2026-11-26T12:00:04Z",
   "count": 200,
-  "pin": "d17d48cb80a15e1625bd3a62112ba12caf74d12a262c774e2bcf723a1e666965",
+  "pin": "a44e9e652563d65d0316b4b0482a5fa282da4dd8eea47e103b0672414652ec68",
   "turns": [
+    {
+      "id": "cf20291b-452a-4a11-bd99-9f0ba3c22a56",
+      "ts": "2026-11-26T11:57:31Z",
+      "source": "agy",
+      "subject": "nixconfig:apps-db-bulk-guard",
+      "action": "task-change: add bulk-write guard + offline test in scripts/task/apps…",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "tests/appflow-resolve"
+      ],
+      "files": [],
+      "base_commit": "a650c202a4f6c60d09e4ea2b4bfbbd324a403c12",
+      "branch": "main",
+      "frame": "03hb2i813m7jnmug0v5kg264m"
+    },
+    {
+      "id": "6dda5d4d-6093-4e7e-9efb-b7c1a85653fa",
+      "ts": "2026-11-26T11:57:29Z",
+      "source": "agy",
+      "subject": "nixconfig:appflow-board-reverify",
+      "action": "incident: verify delphi /api/applications + close refactoring note",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix",
+        "modules/services/appflow-board.nix",
+        "docs/appflow-board.md"
+      ],
+      "files": [],
+      "base_commit": "a650c202a4f6c60d09e4ea2b4bfbbd324a403c12",
+      "branch": "main",
+      "frame": "03hb2i7v7ll244dy7kpqfyfgs"
+    },
+    {
+      "id": "593f92e7-fc82-40e8-a99e-61c95a6b50b9",
+      "ts": "2026-11-26T11:57:26Z",
+      "source": "agy",
+      "subject": "nixconfig:image-go-tests",
+      "action": "landed: httptest coverage for publish/post + declared agy capability at a650c202 | gate: go test + checks:quick PASS",
+      "outcome": "done",
+      "claims": [
+        "tools/os/internal/image/main_test.go",
+        "tools/os/internal/image/publish.go",
+        "tools/os/internal/image/post.go"
+      ],
+      "files": [
+        "tools/os/internal/image/main_test.go",
+        "flake/intents.nix"
+      ],
+      "base_commit": "a650c202a4f6c60d09e4ea2b4bfbbd324a403c12",
+      "branch": "main",
+      "frame": "03hb2i7i89huebhfaoxnwz4v4"
+    },
+    {
+      "id": "6a879854-678d-4980-a94f-a14b90a468a5",
+      "ts": "2026-11-26T11:56:18Z",
+      "source": "devin",
+      "subject": "nixconfig:image-go-tests",
+      "action": "landed: 10 httptest/subprocess cases over publish.go (stagePublish dedupe+shifted/gone, blog ffmpeg crop, mergeServedURLs union + 3 skip paths, shrinkGuard pass + refuse-restore) and post.go (fmField/fmBody/verdictParts/no-SLUG die); also declared capability 'agy' — its own claim post made it an undeclared xs source and broke checks:intents | gate: go test 10/10 new PASS, checks:image-daily PASS, checks:images:publish:test PASS, checks:quick rc=0",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a650c202a4f6c60d09e4ea2b4bfbbd324a403c12",
+      "branch": "main",
+      "frame": "03hb2hzk2a1oe32qyqqbf1nt2"
+    },
     {
       "id": "f1efb47d-7a2c-46d5-8848-78a6cbaed956",
       "ts": "2026-11-26T11:55:30Z",
@@ -2892,67 +2958,6 @@
       "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
       "branch": "main",
       "frame": "03haxneczv6bl29igngri79a9"
-    },
-    {
-      "id": "e6a2781e-72d8-4dc4-854c-a446c310151a",
-      "ts": "2026-11-25T20:34:34Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-lane",
-      "action": "verified at a262147a: image-daily gate rc=0 (dispatch 19/19, judge fallback gen.go, both breakers, shrinkGuard); fixture 9/9 incl. 470c9034^ real-regression refusal; nothing red, nothing to fix",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
-      "branch": "main",
-      "frame": "03haxhxh0fc0pql8bidi3o5hy"
-    },
-    {
-      "id": "54b76f52-4763-4254-b52c-0486ac5e0049",
-      "ts": "2026-11-25T20:34:27Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "incident: check delphi gateway + xs endpoint — detail on the ledger",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/user/ai",
-        "scripts/task/xs-turn-post.sh"
-      ],
-      "files": [],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haxhwnf57w2o8b2edx65h61"
-    },
-    {
-      "id": "2d04f9e4-7af2-4cad-b9f4-d93fc7c65ed6",
-      "ts": "2026-11-25T20:34:25Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-lane",
-      "action": "start: verify image-daily Go port gates at a262147a; fix if red",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task",
-        "modules"
-      ],
-      "files": [],
-      "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
-      "branch": "main",
-      "frame": "03haxhwgag90sjjmfpg90tfxm"
-    },
-    {
-      "id": "974589b6-bddb-4fff-9757-e9af292bd019",
-      "ts": "2026-11-25T20:33:43Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "incident: check delphi gateway + xs endpoint",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/user/ai",
-        "scripts/task/xs-turn-post.sh"
-      ],
-      "files": [],
-      "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
-      "branch": "main",
-      "frame": "03haxhri3iuwy4n03skwn1w3z"
     }
   ]
 }

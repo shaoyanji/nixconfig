@@ -1151,6 +1151,7 @@ tasks:
       - bash tests/appflow-select/run.sh
       - bash tests/appflow-status/run.sh
       - bash tests/appflow-packet/run.sh
+      - bash tests/appflow-resolve/apps-db-guard.sh
       - bash scripts/task/appflow-check.sh
 
   checks:appflow:triage:

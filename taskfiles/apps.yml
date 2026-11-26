@@ -59,6 +59,20 @@ tasks:
     cmds:
       - FORMAT="{{.FORMAT | default "toon"}}" bash scripts/task/apps-scout.sh {{.CLI_ARGS}}
 
+  apps:page:
+    desc: Postings on a JS-rendered career page (task apps:page -- <url>… [--backend browser|firecrawl|tavily|http])
+    summary: >
+      `job-page-scrape.py` reads the page a person would open, through the
+      widest layer that can answer and falling back by cost: `browser` is
+      agent-browser on headless Chrome (install it where it runs — clanker takes
+      `nix profile install github:numtide/llm-agents.nix#agent-browser`),
+      `firecrawl` is a hosted browser, `http` is a plain GET plus JSON-LD. Keys
+      come from `~/.hermes/.env` by name only, never printed. One JSON object
+      per URL: the backend that answered, the postings, and every layer that
+      refused with its reason. Exit 1 when no page yielded a posting.
+    cmds:
+      - python3 scripts/task/job-page-scrape.py {{.CLI_ARGS}}
+
   # A sweep is a cycle, not a scan: the lane's durable state is the record, and
   # the boards move independently — a flat german feed says nothing about
   # Stepstone. This carries the next cycle's id and read order so a pass starts

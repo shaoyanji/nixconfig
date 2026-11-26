@@ -1,8 +1,103 @@
 {
-  "generated": "2026-11-26T12:02:30Z",
+  "generated": "2026-11-26T12:12:52Z",
   "count": 200,
-  "pin": "227994121e0c5da455f08ccbd170b5a62010f3162407bb21bef3d3d5522e71a1",
+  "pin": "0bb1fb6c465ca9be074ed55353fcb983a543f0793da2aac9fc06f58acb72dd09",
   "turns": [
+    {
+      "id": "76255add-5b45-4217-a5e0-24a010fc0420",
+      "ts": "2026-11-26T12:11:15Z",
+      "source": "agy",
+      "subject": "nixconfig:appflow-clear-13",
+      "action": "bug-fix: resolve last 13 mail + 6 unnamed rows, guard upsert",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "scripts/task/appflow-check.sh",
+        "tests/appflow-packet"
+      ],
+      "files": [],
+      "base_commit": "dd5103be9c15cc172e8094284ab77722d540d3ed",
+      "branch": "main",
+      "frame": "03hb2kwmoztq1t92a2rdila5m"
+    },
+    {
+      "id": "594922be-084f-4807-954b-df0e52ba50a7",
+      "ts": "2026-11-26T12:07:49Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-placeholder-resolve",
+      "action": "27 placeholder roles named from their own mail, the exposed duplicate pair declared, 2 mangled roles corrected. Unnamed 20->6, unresolved-mail 35->13. Nothing emailed.",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "scripts/task/appflow-check.sh"
+      ],
+      "files": [],
+      "base_commit": "dd5103be9c15cc172e8094284ab77722d540d3ed",
+      "branch": "main",
+      "frame": "03hb2k8k6c1r8p89jbkempkcq"
+    },
+    {
+      "id": "d4ef42ef-ad17-4641-bac1-3e761f4821d5",
+      "ts": "2026-11-26T12:07:32Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-placeholder-resolve",
+      "action": "Read the 44 threads and name the roles they prove; leave the ambiguous ones",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "scripts/task/appflow-check.sh"
+      ],
+      "files": [],
+      "base_commit": "dd5103be9c15cc172e8094284ab77722d540d3ed",
+      "branch": "main",
+      "frame": "03hb2k6iw33iawgasmhlmcapd"
+    },
+    {
+      "id": "90e8aba8-8bbe-4758-9cd0-b525719340f2",
+      "ts": "2026-11-26T12:04:27Z",
+      "source": "agy",
+      "subject": "nixconfig:appflow-placeholder-resolve",
+      "action": "novel: read email threads to resolve 55 placeholder appflow rows",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "scripts/task/appflow-check.sh"
+      ],
+      "files": [],
+      "base_commit": "dd5103be9c15cc172e8094284ab77722d540d3ed",
+      "branch": "main",
+      "frame": "03hb2jkvz0k6o4mch8bc89hvj"
+    },
+    {
+      "id": "78ea43b3-cacc-4a0e-934a-b4fa575341f9",
+      "ts": "2026-11-26T12:04:26Z",
+      "source": "agy",
+      "subject": "nixconfig:frieren-ops-health",
+      "action": "incident: fix frieren restic-burgernas & downloads-sort ops:health",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/frieren",
+        "modules/services",
+        "modules/profiles"
+      ],
+      "files": [],
+      "base_commit": "dd5103be9c15cc172e8094284ab77722d540d3ed",
+      "branch": "main",
+      "frame": "03hb2jkqn2l0ue684k91i4lel"
+    },
+    {
+      "id": "2b1d05a5-1057-4a90-99ea-165d0712fa83",
+      "ts": "2026-11-26T12:02:44Z",
+      "source": "devin",
+      "subject": "nixconfig:appflow-board-reverify",
+      "action": "landed: all 5 read routes verified 200 on delphi — applications?lim=5, applications-discovered?lim=5, application-pipeline, application-get?id=, application-mail?applicationId=; the bare-GET 404 that seeded the incident was npgsqlrest's param contract (unparametrized endpoint -> 404), not a missing .sql in the deployed tree; doc names the trap, devin-lane-refactoring-2026-11-25 CLOSED | gate: ops:notes parses, checks:prose PASS, checks:docs:links PASS, checks:nix:lint PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "dd5103be9c15cc172e8094284ab77722d540d3ed",
+      "branch": "main",
+      "frame": "03hb2j8st63zmtl8tw8qvuf0y"
+    },
     {
       "id": "dcf8c13a-139a-4e57-b929-176b2229de71",
       "ts": "2026-11-26T12:01:20Z",
@@ -2875,98 +2970,6 @@
       "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
       "branch": "fix/ci-closure-budget-target",
       "frame": "03haxsvm3nl5y0p2c6q4nb91h"
-    },
-    {
-      "id": "377406c5-fabd-4ce4-a863-154eda3c826a",
-      "ts": "2026-11-25T21:30:10Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "incident: check",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/user/ai",
-        "scripts/task/xs-turn-post.sh"
-      ],
-      "files": [],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haxssfniw5y1oq9rqng0irw"
-    },
-    {
-      "id": "f49e9554-8156-4f1e-8d9b-863f032c0d67",
-      "ts": "2026-11-25T21:29:30Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "incident: re-verify delphi gateway + xs endpoint; report route recovery",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
-      "branch": "main",
-      "frame": "03haxsnvs6adahrgmnefpdavs"
-    },
-    {
-      "id": "cdb32218-f816-41d5-a964-49f0e543683a",
-      "ts": "2026-11-25T21:19:25Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-flake-change",
-      "action": "start: survey module registry + inventory wiring for the next chain simplification",
-      "outcome": "in_progress",
-      "claims": [
-        "flake.nix",
-        "modules/",
-        "inventory.toml"
-      ],
-      "files": [],
-      "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
-      "branch": "main",
-      "frame": "03haxqoy4lcubgakldd8b6bm7"
-    },
-    {
-      "id": "f170c239-90d2-407e-97ac-c452f956f730",
-      "ts": "2026-11-25T21:18:35Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-flake-change",
-      "action": "flake-change: restructure module registry + inventory wiring",
-      "outcome": "in_progress",
-      "claims": [
-        "flake.nix",
-        "modules/",
-        "inventory.toml"
-      ],
-      "files": [],
-      "base_commit": "a262147a88b985c5e1786f1223a08c7e289ab205",
-      "branch": "main",
-      "frame": "03haxqiz4fzmf9012w4gecj3j"
-    },
-    {
-      "id": "bbf8c0e2-7080-4d30-b53e-411465fc628e",
-      "ts": "2026-11-25T21:08:14Z",
-      "source": "buffy",
-      "subject": "nixconfig:apps-scout-2026-11-25b",
-      "action": "SRE/platform/infra sweep on delphi: 230 cards, 76 new, 11 filed as lead with the 2026-12-07 hold as next action, ranked summary written to the outreach notes",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haxoi7gtrr2dq97fe5vlfy5"
-    },
-    {
-      "id": "94f9fa87-b63f-4eba-aff7-3e45a72d4dda",
-      "ts": "2026-11-25T21:04:08Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-delphi-incident",
-      "action": "incident: check delphi gateway + xs endpoint p=0.96 m=0.95 — detail on the ledger",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/user/ai",
-        "scripts/task/xs-turn-post.sh"
-      ],
-      "files": [],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03haxnpcmy3frt34llzzczj1z"
     }
   ]
 }

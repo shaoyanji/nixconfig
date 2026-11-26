@@ -93,7 +93,9 @@ usage: apps-db.sh <verb> [args]
                            current row from a fixture instead of the API.
   add --company C --role R [--id slug] [--apply-url U] [--status S] [--next-action N]
                              [--notes N] [--category C] [--language L] [--origin O] [--fit 0-100|1-5]
-  upsert [file|-]          upsert an application record (JSON or TOON on stdin or in a file)
+  upsert [file|-]          upsert an application record (JSON or TOON on stdin or in a file),
+                           guarded like `update`: --if-status <12 hex> for a row that
+                           exists, --expect-absent for one that does not, --force, --dry
   overview                 stage counts
   queue                    messages waiting for agent:apps (the sync drains them hourly)
   export [file|-]          applications.json from the database (snake_case)
@@ -367,7 +369,21 @@ case "$verb" in
 
   upsert | add)
     if [ "$verb" = upsert ]; then
-      src=${1:-}
+      src=""
+      upsert_hash=""
+      upsert_absent=0
+      upsert_force=0
+      upsert_dry=0
+      while [ "$#" -gt 0 ]; do
+        case "$1" in
+          --if-status) upsert_hash=${2:-}; shift 2 ;;
+          --expect-absent) upsert_absent=1; shift ;;
+          --force) upsert_force=1; shift ;;
+          --dry) upsert_dry=1; shift ;;
+          -*) echo "apps-db: unknown flag $1" >&2; exit 2 ;;
+          *) src=$1; shift ;;
+        esac
+      done
       if [ -n "$src" ] && [ "$src" != "-" ]; then
         [ -r "$src" ] || { echo "apps-db: cannot read $src" >&2; exit 2; }
         body=$(toon_ingest "$src")
@@ -480,13 +496,60 @@ case "$verb" in
       echo "apps-db: upsert needs an id" >&2
       exit 2
     fi
-    if [ "${dry:-0}" = "1" ]; then
+    # An upsert replaces the whole record, so it is the widest write this verb
+    # set has; it gets the same expectation as `update`. A row that exists must
+    # be named by the fingerprint of the status you read; a row that does not
+    # must be declared new. `apps:scout` reaches the table through `add`, which
+    # is intentionally not guarded — it creates one lead at a time.
+    if [ "$verb" = upsert ]; then
+      rid=$(printf '%s' "$payload" | jq -r '.id')
+      curb=""
+      if [ -n "${APPFLOW_ROWS:-}" ] && [ -r "${APPFLOW_ROWS}" ]; then
+        curb=$(jq -c --arg id "$rid" '.[] | select(.id == $id)' "$APPFLOW_ROWS" | head -1)
+      else
+        curb=$(curl -fsS -G "$api/api/application-get" --data-urlencode "id=$rid" 2>/dev/null | jq -c '.[0] // empty' || true)
+      fi
+      write_log=${APPS_DB_WRITE_LOG:-$HOME/.local/state/appflow/apps-db-writes.log}
+      write_max=${APPS_DB_WRITE_MAX:-50}
+      if [ "$upsert_force" = 0 ]; then
+        recent=0
+        if [ -r "$write_log" ]; then
+          recent=$(awk -v since="$(( $(date +%s) - 600 ))" '$1 >= since' "$write_log" | wc -l | tr -d ' ')
+        fi
+        if [ "${recent:-0}" -ge "$write_max" ]; then
+          echo "apps-db: refusing upsert $rid — ${recent} writes in ten minutes (ceiling ${write_max}): a loop, not a decision." >&2
+          exit 5
+        fi
+        if [ -z "$curb" ]; then
+          if [ "$upsert_absent" = 0 ]; then
+            echo "apps-db: refusing upsert $rid — no such row: pass --expect-absent if this is a new application, or --force" >&2
+            exit 2
+          fi
+        else
+          cur_status=$(printf '%s' "$curb" | jq -r '.status // ""')
+          cur_hash=$(printf '%s' "$cur_status" | sha256sum | cut -c1-12)
+          cur_stage=$(printf '%s' "$curb" | jq -r '.stage // ""')
+          if [ -n "$upsert_hash" ]; then
+            if [ "$upsert_hash" != "$cur_hash" ]; then
+              echo "apps-db: refusing upsert $rid — the status changed since you read it (now $cur_hash, you gave $upsert_hash)" >&2
+              exit 4
+            fi
+          else
+            echo "apps-db: refusing upsert $rid — the row exists: pass --if-status $cur_hash (stage $cur_stage) or --force" >&2
+            exit 2
+          fi
+        fi
+      fi
+    fi
+    if [ "${dry:-0}" = "1" ] || [ "${upsert_dry:-0}" = "1" ]; then
       printf '%s\n' "$payload" | jq .
       exit 0
     fi
     render() { jq -r '.[0] | "\(.id)\t\(.company)\t\(.stage)"' | rows; }
     curl -fsS -X POST -H 'content-type: application/json' -d "$payload" \
       "$api/api/application-upsert" | toon_emit render
+    mkdir -p "$(dirname "${write_log:-$HOME/.local/state/appflow/apps-db-writes.log}")" 2>/dev/null || true
+    printf '%s %s\n' "$(date +%s)" "$(printf '%s' "$payload" | jq -r '.id')" >>"${write_log:-$HOME/.local/state/appflow/apps-db-writes.log}" 2>/dev/null || true
     ;;
 
   query)

@@ -48,6 +48,28 @@ check "--force alone is accepted" "$rc" 0
 run nope --status "Closed" --force --dry
 check "an unknown row exits 1" "$rc" 1
 
+# --- upsert: the widest write gets the same expectation ---------------------
+upsert_run() { set +e; out=$("$db" upsert "$@" 2>&1); rc=$?; set -e; }
+: >"$APPS_DB_WRITE_LOG"
+cat >"$work/existing.json" <<'JSON'
+{"id":"open-row","company":"Acme","role":"SRE","status":"Closed 2026-11-24 (lead review): dead","stage":"other"}
+JSON
+upsert_run "$work/existing.json" --dry
+check "an upsert of an existing row without a guard is refused" "$rc" 2
+upsert_run "$work/existing.json" --if-status 000000000000 --dry
+check "an upsert with a stale fingerprint is refused" "$rc" 4
+upsert_run "$work/existing.json" --if-status "$hash" --dry
+check "an upsert with the right fingerprint passes" "$rc" 0
+cat >"$work/new.json" <<'JSON'
+{"id":"brand-new","company":"New Co","role":"SRE","status":"lead: scouted","stage":"lead"}
+JSON
+upsert_run "$work/new.json" --dry
+check "a new row needs --expect-absent" "$rc" 2
+upsert_run "$work/new.json" --expect-absent --dry
+check "--expect-absent allows a new row" "$rc" 0
+upsert_run "$work/new.json" --force --dry
+check "--force still allows a new row" "$rc" 0
+
 now=$(date +%s)
 for i in $(seq 1 51); do printf '%s id-%s\n' "$now" "$i"; done >"$APPS_DB_WRITE_LOG"
 run open-row --status "Closed" --expect-stage prep --dry

@@ -1,8 +1,24 @@
 {
-  "generated": "2026-11-26T16:11:50Z",
+  "generated": "2026-11-26T16:12:38Z",
   "count": 200,
-  "pin": "cb2e91970f9fa74ab8d77aeb4c84c1631edfbdaa8153b537eb597cab79906eb3",
+  "pin": "9a0b8a6a7e112254a9a12259dac12b216b025af704d0fc26d10db7bbc9784cf1",
   "turns": [
+    {
+      "id": "f25fb6eb-d250-4e09-8c5b-ddcf8a122f68",
+      "ts": "2026-11-26T16:11:53Z",
+      "source": "buffy",
+      "subject": "nixconfig:appflow-guard-followups",
+      "action": "landed: add is guarded when its id exists (a new id still needs nothing); 8 fixture cases added, naming the fingerprint flag, stale hash, --expect-absent refusal, --force, and no write on dry. Also named the 4 BFL roles the mail hub had discovered as one undiscovered row, which the live check was failing on | gate: checks:appflow PASS (1709 apps, 6/6 rules, both guard fixtures)",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/apps-db.sh",
+        "tests/appflow-resolve"
+      ],
+      "files": [],
+      "base_commit": "40b7d1226bf1cf6a44e869382925541cf47ab4b1",
+      "branch": "main",
+      "frame": "03hb3vwxl9ubpxm4d0697mm1j"
+    },
     {
       "id": "770d190e-60f3-4db2-8aff-c883174a4671",
       "ts": "2026-11-26T16:08:56Z",
@@ -3071,19 +3087,6 @@
       "base_commit": "49d9be9f0987680515f9fd7f3375d580f230a348",
       "branch": "main",
       "frame": "03hb2esltgg7nyi2rowtha8dj"
-    },
-    {
-      "id": "3f67e724-192e-45dc-86c6-365602f8da0c",
-      "ts": "2026-11-26T11:01:49Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-lane",
-      "action": "devin antigravity-cli.nix chain-change refactor started",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "49d9be9f0987680515f9fd7f3375d580f230a348",
-      "branch": "main",
-      "frame": "03hb2esl3saboasw4ozw7tjnl"
     }
   ]
 }

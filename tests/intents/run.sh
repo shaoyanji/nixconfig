@@ -12,6 +12,8 @@
 #   place          admit names the tier; a capability providing a kind it cannot
 #                  reach is the capReachMisses invariant — seeded, since declared
 #                  data cannot produce one
+#   route          .#intents.route answers kind -> {place,tier,io,gate,cmd} —
+#                  experiment proves clanker, a lane without clanker is refused
 #
 # classOf: two dispatches with the same kind over the same claims share one
 # quotient class — subject does not participate; kind does.
@@ -97,7 +99,24 @@ check "$verdicts" "freebuff refused out-of-radius claim"       '.radiusRefused.o
 check "$verdicts" "radius refusal names the claim"             '.radiusRefused.why | test("outside")' 'true'
 check "$verdicts" "undeclared capability refused"              '.undeclared.ok'       'false'
 
-# --- 4. classOf — the dedup key -----------------------------------------------
+# --- 4. the route — kind -> place, tier, gate, command --------------------------
+routes="$(nix eval --json .#intents --apply 'i: {
+  exp = i.route.experiment;
+  expAdmit = i.admit { intent = { subject = "t"; kind = "experiment"; claims = ["modules/"]; gate = "clanker:jobs"; }; capability = "devin"; };
+  expRefused = i.admit { intent = { subject = "t"; kind = "experiment"; claims = ["modules/"]; gate = "clanker:jobs"; }; capability = "freebuff"; };
+  flakeChange = i.route."flake-change";
+  drive = i.route.drive;
+}' 2>/dev/null)"
+
+check "$routes" "experiment routes to clanker (never local disk)" '.exp.place'   'clanker'
+check "$routes" "clanker is the offload tier"                    '.exp.tier'     '3'
+check "$routes" "the route names a clanker command"              '.exp.cmd | test("clanker")' 'true'
+check "$routes" "devin admits experiment at clanker"             '.expAdmit.why | test("at clanker")' 'true'
+check "$routes" "a lane without clanker reach is refused"        '.expRefused.ok' 'false'
+check "$routes" "flake-change stays eval"                        '.flakeChange.place' 'eval'
+check "$routes" "drive stays delphi"                             '.drive.place'  'delphi'
+
+# --- 5. classOf — the dedup key -----------------------------------------------
 classes="$(nix eval --json .#intents --apply 'i: let
   a = i.classOf { subject = "s-1"; kind = "chain-change"; claims = ["modules/" "hosts/"]; gate = "g"; };
   b = i.classOf { subject = "s-2"; kind = "chain-change"; claims = ["hosts/" "modules/"]; gate = "g"; };

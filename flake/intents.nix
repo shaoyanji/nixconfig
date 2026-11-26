@@ -105,6 +105,13 @@
       place = "delphi";
       persists = "the turn log; a drive intent that lands code has mislabelled itself";
     };
+    "experiment" = {
+      what = "a measured run heavier than a gate: builds, Go compiles, browser suites, candidate benchmarks";
+      gate = "clanker:jobs";
+      floor = "resolved";
+      place = "clanker";
+      persists = "the recorded job and its measurement — the offload is the run";
+    };
   };
   kindIds = builtins.attrNames kinds;
 
@@ -139,7 +146,7 @@
     };
     devin = {
       what = "the refactor/engineering lane in this checkout";
-      provides = ["chain-change" "gate-change" "flake-change" "note-change"];
+      provides = ["chain-change" "gate-change" "flake-change" "note-change" "experiment"];
       claims = ["modules/" "flake/" "lib/" "hosts/" "taskfiles/" "scripts/" "tests/" "docs/" "AGENTS.nix" ".agents/"];
       floor = "resolved";
       via = "the devin pane; this session";
@@ -222,6 +229,28 @@
   # steward can ask "have I already sent this" about before it re-dispatches.
   keyOf = intent: "${intent.kind}|${lib.concatStringsSep "," (builtins.sort builtins.lessThan intent.claims)}";
   classOf = intent: (qh.quotientHash {key = keyOf intent;}).quotient;
+
+  # kind -> the command that runs it — `nix eval --json .#intents.route` is the
+  # Tier-0 query an agent asks before choosing eval, nix-tool, delphi or clanker.
+  runCmd = {
+    eval = "nix eval --json .#<attr>";
+    "local-gate" = "task checks:host HOST=<host>";
+    "nix-tool" = "bash scripts/task/nix-tool.sh run <name>";
+    delphi = "task agents:xs:list SUBJECT=<s>";
+    clanker = "task clanker:nix|clanker:devshell|instabox:exec -- clanker";
+  };
+  planOf = kind: let
+    k = kinds.${kind} or null;
+  in
+    if k == null
+    then null
+    else {
+      inherit (k) gate;
+      inherit (k) place;
+      inherit (places.${k.place}) tier io;
+      cmd = runCmd.${k.place};
+    };
+  route = lib.mapAttrs (n: _: planOf n) kinds;
 
   # --- the ledger projection --------------------------------------------------
   # Observed turn sources and ACTION prefixes from the committed snapshot. A
@@ -325,6 +354,6 @@
   };
 in {
   inherit intentFields kinds kindIds verbs verbIds capabilities capabilityIds;
-  inherit places placeIds admit keyOf classOf gateReport;
+  inherit places placeIds admit keyOf classOf gateReport runCmd planOf route;
   inherit observedSources undeclaredSources observedVerbs undeclaredVerbs;
 }

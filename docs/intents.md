@@ -17,10 +17,11 @@ wired into `checks:quick` and the pre-commit hook.
 | Layer | What | Where |
 | :--- | :--- | :--- |
 | Intent | `{subject, kind, claims, gate}` — the coordination key, work class, path radius, ending gate | `flake/intents.nix` `intentFields` |
-| Kind | one of six work classes (`chain-change`, `gate-change`, `flake-change`, `note-change`, `publish`, `drive`), each with a `place` | `kinds` |
+| Kind | one of seven work classes (`chain-change`, `gate-change`, `flake-change`, `note-change`, `publish`, `drive`, `experiment`), each with a `place` | `kinds` |
 | Capability | `{provides, claims, floor, via, place}` keyed by the xs `source` string | `capabilities` |
 | Place | where work executes — `eval` (RAM only), `local-gate` (bounded check), `nix-tool` (cache-served, never a closure), `delphi` (prod API), `clanker` (offload for disk-IO spend) | `places` |
 | Composition | `admit {intent, capability}` → `{ok, why}` — kind declared, lane provides it, lane reaches the kind's place, every claim inside radius | `admit` |
+| Route | `route.<kind>` → `{place, tier, io, gate, cmd}` — the Tier-0 query an agent asks before choosing eval, nix-tool, delphi or clanker | `route`, `planOf` |
 | Dedup | `classOf intent` — quotient hash of `kind | sorted claims`; subject does not participate | `keyOf`, `classOf` |
 
 The refusal classes are the point: a `drive` lane admitting a `chain-change` is
@@ -34,6 +35,7 @@ disk is not a build farm, so anything spending local disk IO goes to clanker.
 
 ```bash
 nix eval --json .#intents | toon -e            # the whole spec
+nix eval --json .#intents.route | toon -e      # kind -> place, tier, gate, command
 nix eval --json .#intents.gateReport | toon -e # the gate's evidence
 task checks:intents                            # the gate
 task ops:kg                                    # the projected nodes/edges

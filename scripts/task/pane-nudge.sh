@@ -11,9 +11,12 @@
 #          CLAIM=<path> ACTION=<one-line>
 # Exit: 0 sent · 1 tmux/target problem · 2 bad input.
 #
-# Mechanics follow tmux-pane-driving: Escape + C-u clears a half-typed input
-# (load-buffer pastes ON TOP of existing text), then load-buffer +
-# paste-buffer + one Enter — never send-keys for the text itself.
+# Mechanics follow tmux-pane-driving: C-u clears a half-typed input, then a
+# named buffer + paste-buffer + one Enter — never send-keys for the text itself.
+# No Escape: it aborts a worker's running turn in a TUI, and in a readline pane
+# it leaves a pending meta prefix that swallows the paste's first character.
+# The buffer is named, not the default one, so a nudge does not overwrite the
+# operator's own paste buffer.
 set -euo pipefail
 
 die() { printf 'pane-nudge: %s\n' "$*" >&2; exit "${2:-2}"; }
@@ -32,17 +35,18 @@ tmux list-windows -a -F '#{session_name}:#{window_index}' 2>/dev/null |
   grep -qx "$target" || die "no window $target (agents-tmux.sh list to see them)" 1
 
 line="xs $subject CLAIM=${claim:-none} ACTION=$action — detail on the ledger"
-tmp=$(mktemp)
-trap 'rm -f "$tmp"' EXIT
-printf '%s\n' "$line" >"$tmp"
+
+# load-buffer's -t is a target *client*, not a pane; the pane belongs on
+# paste-buffer. A leftover buffer would shadow the next nudge, so delete it.
+buf="pane-nudge-$$"
+trap 'tmux delete-buffer -b "$buf" 2>/dev/null || true' EXIT
 
 # Clear any half-typed input so the nudge doesn't paste over it, then the
 # three-step send: load, paste, Enter.
-tmux send-keys -t "$target" Escape
-sleep 0.2
 tmux send-keys -t "$target" C-u
-tmux load-buffer -t "$target" "$tmp"
-tmux paste-buffer -t "$target"
+sleep 0.2
+printf '%s\n' "$line" | tmux load-buffer -b "$buf" -
+tmux paste-buffer -b "$buf" -t "$target"
 tmux send-keys -t "$target" Enter
 
 printf 'pane-nudge: sent to %s — %s\n' "$target" "$line"

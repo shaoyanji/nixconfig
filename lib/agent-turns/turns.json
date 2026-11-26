@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-26T08:55:10Z",
+  "generated": "2026-11-26T08:56:01Z",
   "count": 200,
-  "pin": "13f7b02360d286f806ee756fefa1568c7259d40a5a9cb137673005d50cc440a5",
+  "pin": "9957759dc16f8fd90af621fd5a2b424d93c6dbeeec40f91eb14f2fb6dde5e4b0",
   "turns": [
+    {
+      "id": "8f0c6749-b38e-4403-82a3-26e0e9ee8e9a",
+      "ts": "2026-11-26T08:55:48Z",
+      "source": "freebuff",
+      "subject": "nixconfig:apps-lane-tool",
+      "action": "landed: apps:lane (STAGE=plan|sweep|file|jd|tailor|packet|send|replies|cv) + skill job-scout-lane, commit ec49a76b; jd refuses a page under 40 lines as a JS gate, send stays dry without SEND=1 and still answers to the row's hold and recipient | gate: checks:tasks exit 0 (833 tasks, exact name parity), checks:prose exit 0, ops:skills:check clean on this skill (it is red only on another lane's staged pipe-loop)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ec49a76bc26f17c102958305e2254b1d98bc9764",
+      "branch": "main",
+      "frame": "03hb1iq3y3hthhuz0oz64y7e5"
+    },
     {
       "id": "8935ea71-a77d-43f3-bf1b-7d74b9c54015",
       "ts": "2026-11-26T08:54:46Z",
@@ -2857,19 +2870,6 @@
       "base_commit": "710ee0349a72c79ac68626a26c4f51888fa14af0",
       "branch": "main",
       "frame": "03havtau82fq3adkkqhfh9pgv"
-    },
-    {
-      "id": "53ada18b-fc84-411a-b7db-342890da4c2a",
-      "ts": "2026-11-25T15:18:46Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-sweep-2026-11-25j-note",
-      "action": "no new note: the 25j freebuff record already exists as job-scout-sweep-2026-11-25j-freebuff (AGENTS.nix:8097, ACCEPTED/P2, commit 8bb4d61c) and carries the boards, dedupe, ranked leads and the 2026-12-07 hold; 6 leads filed at origin scout-2026-11-25w. The cited id job-scout-boards-not-drained-2026-11-25 does not exist; 'Boards are not drained' is this note. A second note on a closed cycle would duplicate it.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "710ee0349a72c79ac68626a26c4f51888fa14af0",
-      "branch": "main",
-      "frame": "03havs8pq4dxt9tsv3cytu2im"
     }
   ]
 }

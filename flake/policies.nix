@@ -279,8 +279,8 @@
       else
         (
           let
-            key = m |> (xs: builtins.elemAt xs 0);
-            value = m |> (xs: builtins.elemAt xs 1) |> lib.trim;
+            key = builtins.head m;
+            value = lib.trim (builtins.elemAt m 1);
           in
             if !(value |> lib.hasPrefix "ENC[") && !(suffix != null && lib.hasSuffix suffix key)
             then key

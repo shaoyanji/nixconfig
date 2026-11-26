@@ -969,3 +969,17 @@ tasks:
       - gh workflow run nixcachix.yml -f host={{.HOST}}
       - echo "Dispatched CI build for {{.HOST}}"
 
+  dev:review:pipe-loop:
+    desc: "[loop] Pipe-operator review over lib/*.nix — locked tier + candidate survey in one command"
+    summary: >
+      The standing lib/*.nix pipe-operator review loop packaged for any
+      agent to run verbatim. The locked tier is checks:nix:style itself —
+      converted classes (alias mixing, filter|>length, map (x: x.f)) stay
+      zero or the gate refuses. The survey tier lists unlocked candidate
+      classes — attrValues|>map, map|>concatLists, elemAt flip-lambdas,
+      head-of-filter — for judgment, since index predicates and tuple
+      destructuring are honest uses. Ends with the blast-radius recipe:
+      lib/ edits prove on checks:host HOST=<h>, scripts/tests/taskfiles
+      on checks:tasks + check:verify; stage by name.
+    cmds:
+      - bash scripts/task/pipe-loop.sh

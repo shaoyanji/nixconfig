@@ -78,6 +78,8 @@ in {
             budget = letterPages;
             doc = "anschreiben.pdf";
           }}
+          bash ${../../../scripts/task/letter-pdf-check.sh} \
+            --letter work/letter.json "$out/anschreiben.pdf"
         ''
       }
     '';

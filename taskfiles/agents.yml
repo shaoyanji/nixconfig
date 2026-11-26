@@ -663,6 +663,20 @@ tasks:
         [ "$n" -gt 0 ] || { echo "agents:mail:resolve: nothing open for {{.ID}}" >&2; exit 1; }
         echo "resolved {{.ID}} ($n verdict(s))"
 
+  agents:web:
+    desc: Search, extract or health-check the web (task agents:web -- search "query" [--max N] | extract <url> | health <url> [--via clanker] [--format toon])
+    summary: >
+      `web-research.py`: search, extract and health-check the web. `search` asks
+      Tavily, Context and Firecrawl together and merges by canonical URL, so a
+      page two of them found is one source witnessed twice, numbered `s1`, `s2`
+      in a `sources` list. `extract` walks firecrawl → context → tavily →
+      browser → http and names every layer that refused. `health` opens a page
+      in agent-browser, locally or on clanker, and judges what was rendered: a
+      404, an unhydrated shell, or under 200 rendered characters fails with its
+      reason. Exit 1 when no provider answered or no page is healthy.
+    cmds:
+      - python3 scripts/task/web-research.py {{.CLI_ARGS}}
+
   agents:mail:sweep:
     desc: "Resolve a block of the open queue by selector (SENDER= DOMAIN= SUBJECT= TIER= OWNER= OLDER= NEWER=; dry run unless DRY=0)"
     summary: >

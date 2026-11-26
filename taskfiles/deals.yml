@@ -1,0 +1,34 @@
+version: "3"
+
+# Deals are read off pages that build their price tiles in JavaScript and filed
+# into private-deals, which owns the index. Two verbs, one per half of that:
+# read a board, then pipe what was read.
+
+tasks:
+  deals:page:
+    desc: Deals on a rendered shop or board (task deals:page -- <url>… [--backend browser|firecrawl|context|tavily|http|auto])
+    summary: >
+      `deals-page-scrape.py` reads the deal cards a person would see, through the
+      cheapest layer that answers: browser (agent-browser on clanker), firecrawl
+      or context (hosted browsers), or a plain GET. It reads the card container,
+      not the link, because the price is the anchor's sibling. Two amounts are a
+      deal, one amount with `-62%` computes the original, one amount alone is a
+      retail price and is dropped. The merchant is resolved through click
+      trackers to the shop. JSON per URL names every layer that refused. Exit 1
+      when no page yielded a deal.
+    cmds:
+      - python3 scripts/task/deals-page-scrape.py {{.CLI_ARGS}}
+
+  deals:ingest:
+    desc: Feed deals-page-scrape JSON into private-deals (task deals:ingest -- --api http://127.0.0.1:8102 --in deals.json [--dry-run])
+    summary: >
+      `deals-ingest.py` pipes `deals:page` output into `/api/deals`: the
+      scraper's `original_price` becomes the store's `list_price` (the mapping a
+      `jq` pipe would lose), the source is the board's host rather than the
+      redirect link's, and URLs are canonicalised the way the server
+      fingerprints them, so a re-run updates instead of duplicating. A card with
+      no price is refused. `--min-discount`, `--source`, `--merchant` and
+      `--tag` narrow the run; `--dry-run` posts nothing. Exit 1 when the server
+      refused one; one refusal never stops the rest.
+    cmds:
+      - python3 scripts/task/deals-ingest.py {{.CLI_ARGS}}

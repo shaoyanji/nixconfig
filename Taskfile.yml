@@ -92,6 +92,10 @@ includes:
         taskfile: taskfiles/data.yml
         dir: .
         flatten: true
+    deals:
+        taskfile: taskfiles/deals.yml
+        dir: .
+        flatten: true
     dev:
         taskfile: taskfiles/dev.yml
         dir: .

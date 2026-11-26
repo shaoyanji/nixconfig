@@ -12,6 +12,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
   row per gate and its kind; `check:verify` keeps the two in step).
 - `taskfiles/checks.yml` contains validation and health checks (host evals, Nix lint/format, sops drift, flake transitive-input sweep).
 - `taskfiles/codespace.yml` owns GitHub Codespaces as a mode (`codespace:*`) for work that runs in someone else's remote devcontainer: the file transport `gh codespace cp` cannot do, a push that happens on the host holding the git auth, a reset for the post-rewrite clone, and a stop that waits for `Shutdown`.
+- `taskfiles/deals.yml` owns price watching (`deals:*`): `deals:page` reads deal cards off a rendered board and `deals:ingest` pipes them into private-deals, which owns the index.
 - `taskfiles/dev.yml` contains git/flake/local helper workflows, including site build/preview/deploy tasks.
 - `taskfiles/instabox.yml` owns InstaBox machines (`instabox:*`) as a dependency-free surface: the HTTP API with the sops key, an SSH token minted through it for a plain `ssh`, and `exec` when no shell is needed. Skill: `.agents/skills/instabox`.
 - `taskfiles/services-core.yml` holds the canonical `services:*` wrappers (`services:validate:*`, `services:record:*`, `services:rollback:*`, `services:evidence:*`) that route to `infra:*`; `taskfiles/services-legacy.yml` is the deprecated wildcard-alias layer (`switch:*`, `boot:*` — a Task `aliases:` entry cannot carry `*`).
@@ -51,6 +52,7 @@ Quick reference to who owns each taskfile and where to go for lifecycle, deploym
 - `taskfiles/burgernas.yml` – Synology DS220j cold vault (BurgerNAS): WoL power, restic backup target, leech-only Transmission, aria2/AriaNg, and Gum menu
 - `taskfiles/apps.yml` – Job application workflow via `bin/appflow` (status updates, email radar, Typst builds, three-way sync, GitHub push/pull)
 - `taskfiles/bitlockerpremium.yml` – Windows 11 Pro (HP EliteBook 830 G7) over Tailscale OpenSSH, Scoop/Nushell shells, file transfers, and Gum menu
+- `taskfiles/deals.yml` – deal cards off a rendered board (`deals:page`) and their pipe into private-deals (`deals:ingest`)
 - `taskfiles/data.yml` – NAS storage taxonomy and hygiene, permissions, media unindexing, portable tool library (`data:*`)
 - `taskfiles/lifecycle.yml` – commissioning a new host, decommission audit and cleanup (`lifecycle:*`)
 - `taskfiles/mail.yml` – ImprovMX forwarding aliases: temporary per-service addresses, expiry pruning, registry drift (`mail:*`), implemented by `scripts/task/mail-alias.sh`

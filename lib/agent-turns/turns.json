@@ -1,8 +1,49 @@
 {
-  "generated": "2026-11-26T14:54:02Z",
+  "generated": "2026-11-26T14:56:04Z",
   "count": 200,
-  "pin": "e298de0f958a6b6c19a5ac09b55b925864bedc2396b934b4cba4778f7982fbc9",
+  "pin": "fbbde2ce4efaea5913803bd12ad8ae921ce7e0bfcdcf4ae96c3c99898810f8ce",
   "turns": [
+    {
+      "id": "ed500ae2-25b3-49d4-97c0-aadd8e7e4e7a",
+      "ts": "2026-11-26T14:56:00Z",
+      "source": "buffy",
+      "subject": "nixconfig:deals-research-taskfile-wiring",
+      "action": "claim: expose deals:page, deals:ingest and agents:web as visible tasks with descriptions, no internal:true",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/deals.yml Taskfile.yml taskfiles/agents.yml"
+      ],
+      "files": [],
+      "base_commit": "4f6485846f63b8613dd958c7afc1e4c94495a0d4",
+      "branch": "main",
+      "frame": "03hb3h36ry8tvpshhav72n77b"
+    },
+    {
+      "id": "aacd067e-4c4b-45e7-aa21-5e8ca5c7d753",
+      "ts": "2026-11-26T14:55:46Z",
+      "source": "devin",
+      "subject": "nixconfig:inventory-site-service",
+      "action": "landed: inventory-site tailnet service — SQLite/FTS5 assets with locations/categories/tags/serials/warranties/value, JSON+CSV import-export, facet UI, fleet hosts seeded from the eval-time inventory projection; loopback :8101, mount :8465; also fixed private-deals port collisions (8099->8100 off turns-dashboard, 8462->8464 off appflow vhost) | gates: go test, sandbox build, checks:registry:compiled, checks:host HOST=delphi PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f2eb9f3eae5463dc6170fc6c175e913c1980c994",
+      "branch": "main",
+      "frame": "03hb3h1ne9t83zzbqys5zs0ol"
+    },
+    {
+      "id": "a9c25d11-d9c9-4cea-b3ff-8e14697fb0ea",
+      "ts": "2026-11-26T14:54:13Z",
+      "source": "buffy",
+      "subject": "nixconfig:clanker-web-research-cli",
+      "action": "web-research.py: search (tavily+context+firecrawl merged by canonical URL, s1..sN sources with accessed), extract (firecrawl/context/tavily/browser/http), health (agent-browser local|clanker, rendered-chars/ready/app-shell verdict), --format json|toon. Live: 3-provider search 8 hits, 3 witnessed twice; extract firecrawl 'Nix 2.34.9 Reference Manual' 7731 chars; browser on clanker 917 chars; health clanker 200 ok / 404 fail. 28 tests.| gate: unittest discover tests/web-research PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4f6485846f63b8613dd958c7afc1e4c94495a0d4",
+      "branch": "main",
+      "frame": "03hb3gqq0b6r9cgev7jdb9ktq"
+    },
     {
       "id": "c27c377e-8044-4e58-af3d-019361bdf30f",
       "ts": "2026-11-26T14:49:54Z",
@@ -2992,53 +3033,6 @@
       "base_commit": "c70788c4b7c3dc724a38203bb44ddfae9718dfaa",
       "branch": "main",
       "frame": "03hb0p8x5bpbqsog21548e797"
-    },
-    {
-      "id": "4c5d8eca-630a-433b-bff6-9f792d66439a",
-      "ts": "2026-11-26T06:23:24Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-20261126-0719",
-      "action": "start: extend modules-edges fixture with allowed-case lock",
-      "outcome": "in_progress",
-      "claims": [
-        "tests/modules-edges/run.sh",
-        "scripts/task/modules-edges.sh"
-      ],
-      "files": [],
-      "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
-      "branch": "main",
-      "frame": "03hb0oydugvxxzthlcb9cb8pi"
-    },
-    {
-      "id": "91b3dd00-98fa-4ea7-880a-6e372a1b94bc",
-      "ts": "2026-11-26T06:22:54Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-0719",
-      "action": "gate-change: extend modules-edges fixture with allowed-case lock",
-      "outcome": "in_progress",
-      "claims": [
-        "tests/modules-edges/run.sh",
-        "scripts/task/modules-edges.sh"
-      ],
-      "files": [],
-      "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
-      "branch": "main",
-      "frame": "03hb0ouvnlcel6b7tesjz6ynz"
-    },
-    {
-      "id": "19d9853d-7e03-4f26-bc2b-6f3fadb7a894",
-      "ts": "2026-11-26T06:17:04Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-0657-done",
-      "action": "devin verified image-daily Go port gates: nothing red, no fix needed, nothing committed (gate-change)",
-      "outcome": "done",
-      "claims": [
-        "modules/"
-      ],
-      "files": [],
-      "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
-      "branch": "main",
-      "frame": "03hb0npxvcpr386qnrvh0fwh7"
     }
   ]
 }

@@ -1,8 +1,99 @@
 {
-  "generated": "2026-11-26T13:41:38Z",
+  "generated": "2026-11-26T13:49:23Z",
   "count": 200,
-  "pin": "f17f8d6e54be36c37245f15778e6023bef19c3834d2e543d2725bb69205e805f",
+  "pin": "2b60261de0962b68857c47d5614dc2370e17cd4c02ae62279cf553c87f316a57",
   "turns": [
+    {
+      "id": "172a7d14-2423-4882-82e4-51da7ad8b0fb",
+      "ts": "2026-11-26T13:48:40Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: sweep 2026-11-26g — LinkedIn retries a 429 three times instead of dropping the query; widened to Luxembourg/Kubernetes/cloud/systems at depth 2. 4158 postings, 333 fresh, 29 new at 1694 held; 8 filed (LU grid operator, 2 banks, LIST, CMS, Deloitte, NSI, Uni Zurich), staffing firms refused. Page: is-a.dev (blog 8 leads). Gate: self-test 22/22, py_compile, bash -n; checks:quick unbuildable here (aarch64 vs x86_64).",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/jobsearch-sweep.py"
+      ],
+      "files": [],
+      "base_commit": "d1cd1e26e3a7b68bb0a6722e0284076f92334dae",
+      "branch": "main",
+      "frame": "03hb33xo4zro770pyihf1me9a"
+    },
+    {
+      "id": "477ac8d0-4f0d-4e55-b8d5-9fb8d9b4c8b6",
+      "ts": "2026-11-26T13:47:25Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-site-publish",
+      "action": "publish | rebuilt .#sites.matt-site, deployed to Pages project matt. gates: checks:site:links PASS (91 links, 6 PDFs, 16 anchors), matt:cv:check PASS (14 ok 0 failed, live bytes == artifact), site:check PASS (35/47/17 ok). Live ce3d0fab, 28 assets already current",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "lib/matt"
+      ],
+      "base_commit": "5785b4608c096d0cd88aa5e75071234a6c2575a6",
+      "branch": "main",
+      "frame": "03hb33ow5o8knc4lws1upvs26"
+    },
+    {
+      "id": "f2132a73-e2b6-42ef-b16a-09d888dac002",
+      "ts": "2026-11-26T13:46:05Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-freebuff-drive-20261126-1436",
+      "action": "drive freebuff: publish CV and static site (publish)",
+      "outcome": "in_progress",
+      "claims": [
+        "site",
+        "cv"
+      ],
+      "files": [],
+      "base_commit": "5785b4608c096d0cd88aa5e75071234a6c2575a6",
+      "branch": "main",
+      "frame": "03hb33fhk98f56dqrsxe2fp88"
+    },
+    {
+      "id": "34745aeb-2c68-4ff2-a547-ddd75a94ec01",
+      "ts": "2026-11-26T13:46:04Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-drive-20261126-1436",
+      "action": "drive devin: refactor shared host module chain (chain-change)",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/hosts"
+      ],
+      "files": [],
+      "base_commit": "5785b4608c096d0cd88aa5e75071234a6c2575a6",
+      "branch": "main",
+      "frame": "03hb33fexgxr6gfmfj24t74qu"
+    },
+    {
+      "id": "a0134c88-9ab7-4b90-8ce2-33ab3318c0ea",
+      "ts": "2026-11-26T13:42:18Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "claim: job-scout pass 2026-11-26g — retry the two throttled LinkedIn queries, widen its query and location list to Luxembourg and Kubernetes/cloud/systems, page jobs.ch deeper, file linked leads via apps:scout, fold into the is-a.dev CV page with framing distinct from 26d/26e/26f",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/jobsearch-sweep.py"
+      ],
+      "files": [],
+      "base_commit": "d1cd1e26e3a7b68bb0a6722e0284076f92334dae",
+      "branch": "main",
+      "frame": "03hb32ozrc53kuh67qylpztso"
+    },
+    {
+      "id": "340ab3ee-a129-4486-92a5-a7de520a52f1",
+      "ts": "2026-11-26T13:41:47Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: sweep 2026-11-26f — LinkedIn guest search added as a board (429 twice before, 200 now), jobs.ch paged to depth 3, date-only ages fixed (a 2-month-old ad passed every window). 3969 postings, 282 fresh, 9 new at 1688 held, 6 filed with live ads, 2 recruiters refused. Folded into the is-a.dev CV page (blog 5d8f781). Gate: self-test 22/22 + py_compile + bash -n; checks:quick unbuildable here (aarch64 vs x86_64 task-list).",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/jobsearch-sweep.py"
+      ],
+      "files": [],
+      "base_commit": "d1cd1e26e3a7b68bb0a6722e0284076f92334dae",
+      "branch": "main",
+      "frame": "03hb32l9qn7lce45eprtp3mxz"
+    },
     {
       "id": "bb3536d3-12c9-4d80-95c1-ab117a710ec4",
       "ts": "2026-11-26T13:37:25Z",
@@ -2910,102 +3001,6 @@
       "base_commit": "bed96105caac18aefe1a174edf71c9d5cee175f1",
       "branch": "main",
       "frame": "03hayztyp33rfnz2ewcfc6w0k"
-    },
-    {
-      "id": "6212508f-69e9-441f-842c-5a3e39d7ad63",
-      "ts": "2026-11-26T01:10:29Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-2026-11-26",
-      "action": "note-change continue nixconfig refactoring + image-daily gates",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "bed96105caac18aefe1a174edf71c9d5cee175f1",
-      "branch": "main",
-      "frame": "03hayztvomnejw1fbnjv03zmk"
-    },
-    {
-      "id": "10d5034a-b5e5-4ab7-aaf7-d8e82e47d25c",
-      "ts": "2026-11-26T01:04:15Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-refactor-tail-2026-11-26",
-      "action": "landed: nix-comments extractRefs consolidation (census byte-identical outside file) + nginx-static-ui.nix location pair shared by appflow-board/media-relay | gate: drv-equality delphi identical + nix:lint 333 + nix:comments 0 rules",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "bed96105caac18aefe1a174edf71c9d5cee175f1",
-      "branch": "main",
-      "frame": "03hayylzwalipmsl84iec0jm5"
-    },
-    {
-      "id": "39ec6de0-1574-4720-b4cd-5f8973ddbf74",
-      "ts": "2026-11-26T00:58:53Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-refactor-tail-2026-11-26",
-      "action": "start: refactor pass on appflow-board + nix-comments lib",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/appflow-board.nix",
-        "lib/nix-comments.nix"
-      ],
-      "files": [],
-      "base_commit": "290a0ecbc0d67450f4b338616233f7abeae638e1",
-      "branch": "main",
-      "frame": "03hayxk8br0zgfaz5z7usqj7j"
-    },
-    {
-      "id": "00ae5e42-a2b5-40b5-a39b-3858bf6b82aa",
-      "ts": "2026-11-26T00:56:38Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-refactor-tail-2026-11-26",
-      "action": "flake-change: refactor lane tail + gate",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "290a0ecbc0d67450f4b338616233f7abeae638e1",
-      "branch": "main",
-      "frame": "03hayx4hnfhfxgl2o6vbscshr"
-    },
-    {
-      "id": "b6d7bdf7-aea3-4c64-be58-75c06ec647aa",
-      "ts": "2026-11-26T00:43:44Z",
-      "source": "buffy",
-      "subject": "nixconfig:steward-delphi-dup-services",
-      "action": "Re-confirm the dup-services retirement on live delphi, fix the ha-stack default that would hand out a second monitor backend, gate and commit",
-      "outcome": "done",
-      "claims": [
-        "hosts/delphi/configuration.nix",
-        "modules/services/fleet-monitors.nix",
-        "modules/services/home-assistant.nix"
-      ],
-      "files": [
-        "modules/services/home-assistant.nix",
-        "MANUAL.md",
-        "modules/services/fleet-monitors.nix",
-        "hosts/delphi/configuration.nix",
-        "hosts/delphi/infra-stack.nix",
-        "modules/zen.nix",
-        "inventory.toml",
-        "docs/service-offload.md",
-        "docs/delphi-runtime.md",
-        "AGENTS.nix"
-      ],
-      "base_commit": "e2e1f3d3",
-      "branch": "retire-dup-monitors",
-      "frame": "03hayulnv4bjoltagvq4zg8ua"
-    },
-    {
-      "id": "a2404f10-613c-4034-a241-6948902ae1aa",
-      "ts": "2026-11-26T00:41:51Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-delphi-drive-2026-11-26",
-      "action": "drove idle delphi freebuff pane over ssh; dup-services migration task classified deploy by margin 0.50; pane working 14s",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "290a0ecbc0d67450f4b338616233f7abeae638e1",
-      "branch": "main",
-      "frame": "03hayu8jgrkz79jo6a0lfqvyn"
     }
   ]
 }

@@ -343,17 +343,25 @@ def parse_boards(
         # is printed and ends that query, never counted as an empty market.
         for query, location in linkedin_searches or []:
             for start in range(0, 25 * linkedin_depth, 25):
-                try:
-                    listing = fetch(
-                        "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search"
-                        f"?keywords={quote(query)}&location={quote(location)}&start={start}"
-                    ).decode("utf-8", "replace")
-                except Exception as exc:
-                    print(
-                        f"jobsearch-sweep: linkedin {query}/{location} start {start}: {exc}",
-                        file=sys.stderr,
-                    )
-                    time.sleep(10)
+                listing = None
+                for attempt in range(3):
+                    try:
+                        listing = fetch(
+                            "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search"
+                            f"?keywords={quote(query)}&location={quote(location)}&start={start}"
+                        ).decode("utf-8", "replace")
+                        break
+                    except Exception as exc:
+                        print(
+                            f"jobsearch-sweep: linkedin {query}/{location} start {start}"
+                            f" attempt {attempt + 1}: {exc}",
+                            file=sys.stderr,
+                        )
+                        # A 429 is a burst limit, not a verdict on the query: the
+                        # pause grows until the third try, and only then does the
+                        # gap get reported.
+                        time.sleep(15 * (attempt + 1))
+                if listing is None:
                     break
                 cards = listing.split("<li>")[1:]
                 if not cards:

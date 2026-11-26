@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-26T17:01:07Z",
+  "generated": "2026-11-26T17:05:59Z",
   "count": 200,
-  "pin": "bf64dcc7545f76152b11ada129f868ed736f83ec99fea6bca8633642c692cfdf",
+  "pin": "79be9743e507b35932e043880f680d254db64c8fc9eabe44329266f4d3deabab",
   "turns": [
+    {
+      "id": "91539243-98d6-4168-b6a7-094d52d80fc5",
+      "ts": "2026-11-26T17:02:34Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-db-scraper-analytics",
+      "action": "claim: an analytics read over the postings table (companies, locations, lanes, boards, score bands), a panel whose company and lane rows re-run the list, and tests against a temp SQLite before a live smoke",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/job-db-scraper"
+      ],
+      "files": [],
+      "base_commit": "2229785f4fed3459b2043ee67ee276342ead69bc",
+      "branch": "main",
+      "frame": "03hb45tbp17608dpwlig1exe4"
+    },
+    {
+      "id": "29d1b982-df1a-4324-8303-43307dfdcfe4",
+      "ts": "2026-11-26T17:01:20Z",
+      "source": "buffy",
+      "subject": "nixconfig:private-deals-analytics-sparklines",
+      "action": "GET /api/analytics?window=&limit=: top discounts, biggest drops (first/last price per product in one window-function pass, feeding fell/rose/flat too), merchant + category buckets, window history with daily buckets; clamps 365/50, defaults 30/5, empty arrays not nulls. UI: analytics panel + inline SVG sparkline of the daily low. Tests: ranking, tiebreak, buckets, movement, empty index.| gate: go vet, go test, node --check, live smoke of analytics + / + assets, server stopped",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2229785f4fed3459b2043ee67ee276342ead69bc",
+      "branch": "main",
+      "frame": "03hb45kkmnda67ahoxj5jwz21"
+    },
     {
       "id": "96fa230a-1c36-42fa-a13b-07c63f8fc44e",
       "ts": "2026-11-26T16:57:41Z",
@@ -3004,40 +3032,6 @@
       "base_commit": "f484946fa069cc3027cfb135f2362ccb14dfddc3",
       "branch": "main",
       "frame": "03hb2lsus459z8vj1moisw53d"
-    },
-    {
-      "id": "433e63d8-5def-4e0f-be2e-4fe6f5710a52",
-      "ts": "2026-11-26T12:13:56Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-clear-13",
-      "action": "4 roles named, GitLab stub declared duplicate of its canonical row, upsert guarded (+6 offline cases). Flagged rows 13 -> 8; those threads name no requisition.",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "scripts/task/appflow-check.sh",
-        "tests/appflow-packet"
-      ],
-      "files": [],
-      "base_commit": "f484946fa069cc3027cfb135f2362ccb14dfddc3",
-      "branch": "main",
-      "frame": "03hb2lfiitjoec30qfrq9ogxb"
-    },
-    {
-      "id": "7d93a52b-0d7e-4f0e-82e5-e39a30ecb00b",
-      "ts": "2026-11-26T12:13:41Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-clear-13",
-      "action": "Clear the last placeholders from their threads and guard upsert the way update is guarded",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "scripts/task/appflow-check.sh",
-        "tests/appflow-packet"
-      ],
-      "files": [],
-      "base_commit": "f484946fa069cc3027cfb135f2362ccb14dfddc3",
-      "branch": "main",
-      "frame": "03hb2ldru5utvf39scrj3a6ba"
     }
   ]
 }

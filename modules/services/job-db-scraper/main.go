@@ -103,6 +103,7 @@ func main() {
 	mux.HandleFunc("GET /favicon.svg", s.static("web/favicon.svg", "image/svg+xml"))
 	mux.HandleFunc("GET /api/health", s.health)
 	mux.HandleFunc("GET /api/stats", s.stats)
+	mux.HandleFunc("GET /api/analytics", s.analytics)
 	mux.HandleFunc("GET /api/sources", s.sources)
 	mux.HandleFunc("GET /api/postings", s.postings)
 	mux.HandleFunc("GET /api/postings/{id}", s.posting)
@@ -259,7 +260,7 @@ func (s *server) postings(w http.ResponseWriter, r *http.Request) {
 	offset, _ := strconv.Atoi(q.Get("offset"))
 	days, _ := strconv.Atoi(q.Get("days"))
 	page, err := s.store.QueryPostings(r.Context(), queryOptions{
-		Q: q.Get("q"), Source: q.Get("source"), Company: q.Get("company"), Location: q.Get("location"),
+		Q: q.Get("q"), Source: q.Get("source"), Company: q.Get("company"), Location: q.Get("location"), Lane: q.Get("lane"),
 		Remote: q.Get("remote") == "1" || q.Get("remote") == "true", Active: q.Get("active") != "0",
 		Days: days, Limit: limit, Offset: offset, Sort: q.Get("sort"),
 	})
@@ -268,6 +269,17 @@ func (s *server) postings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, page)
+}
+
+func (s *server) analytics(w http.ResponseWriter, r *http.Request) {
+	days, _ := strconv.Atoi(r.URL.Query().Get("days"))
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+	report, err := s.store.Analytics(r.Context(), days, limit)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, report)
 }
 
 func (s *server) posting(w http.ResponseWriter, r *http.Request) {

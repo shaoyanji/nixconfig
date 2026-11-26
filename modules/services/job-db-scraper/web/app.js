@@ -1,4 +1,4 @@
-const state = { q: '', source: '', location: '', days: 7, remote: false, sort: 'latest', offset: 0, limit: 20, total: 0 };
+const state = { q: '', source: '', location: '', company: '', companyLabel: '', lane: '', days: 7, remote: false, sort: 'latest', offset: 0, limit: 20, total: 0 };
 const $ = (sel) => document.querySelector(sel);
 
 function esc(value) {
@@ -32,6 +32,8 @@ function params() {
   if (state.q) p.set('q', state.q);
   if (state.source) p.set('source', state.source);
   if (state.location) p.set('location', state.location);
+  if (state.company) p.set('company', state.company);
+  if (state.lane) p.set('lane', state.lane);
   if (state.days) p.set('days', state.days);
   if (state.remote) p.set('remote', '1');
   if (state.sort === 'score') p.set('sort', 'score');
@@ -45,11 +47,36 @@ async function loadStats() {
   $('#metric-companies').textContent = stats.companies ?? 0;
   $('#metric-remote').textContent = stats.remote ?? 0;
   $('#metric-fresh').textContent = stats.last_7_days ?? 0;
-  const companies = stats.top_companies || [];
-  const max = Math.max(1, ...companies.map((x) => x.count));
-  $('#companies').innerHTML = companies.map((row) => `
-    <div class="bar-row"><span><b>${esc(row.name)}</b><em>${row.count}</em></span><div class="bar"><i style="width:${Math.max(4, row.count / max * 100)}%"></i></div></div>
-  `).join('') || '<div class="empty">No companies indexed yet.</div>';
+}
+function barRows(rows, value, detail, attribute) {
+  if (!rows.length) return '<div class="empty">nothing indexed</div>';
+  const max = Math.max(1, ...rows.map(value));
+  return rows.map((row) => {
+    const selected = attribute === 'data-company' ? state.company === row.key : attribute === 'data-lane' ? state.lane === row.name : false;
+    const attrs = attribute === 'data-company'
+      ? `data-company="${esc(row.key)}" data-label="${esc(row.name)}"`
+      : attribute === 'data-lane' ? `data-lane="${esc(row.name)}"` : '';
+    const tag = attribute ? 'button' : 'div';
+    return `<${tag} class="bar-row${attribute ? ' clickable' : ''}${selected ? ' active' : ''}" ${attrs} type="button"><span><b>${esc(row.name)}</b><em>${esc(detail(row))}</em></span><span class="bar"><i style="width:${Math.max(4, value(row) / max * 100)}%"></i></span></${tag}>`;
+  }).join('');
+}
+function bandRows(bands) {
+  const max = Math.max(1, ...bands.map((band) => band.count));
+  return bands.map((band) => `<div class="band-row"><span class="band-label">${band.band}</span><span class="bar"><i style="width:${Math.max(2, band.count / max * 100)}%"></i></span><em>${band.count}</em></div>`).join('');
+}
+async function loadAnalytics() {
+  const report = await api('/api/analytics?limit=8');
+  $('#analytics-scope').textContent = `${report.active} active · ⌀ score ${report.avg_score} · ${report.remote} remote · ${report.unscored} unscored`;
+  $('#analytics-companies').innerHTML = barRows(report.companies || [], (row) => row.postings, (row) => `${row.postings} · ⌀ ${row.avg_score}`, 'data-company');
+  $('#analytics-lanes').innerHTML = barRows(report.lanes || [], (row) => row.postings, (row) => `${row.postings} active · max ${row.max_score}`, 'data-lane');
+  $('#analytics-locations').innerHTML = barRows(report.locations || [], (row) => row.count, (row) => `${row.count}`);
+  $('#analytics-sources').innerHTML = barRows(report.sources || [], (row) => row.count, (row) => `${row.count}`);
+  $('#analytics-bands').innerHTML = bandRows(report.score_bands || []);
+  const chips = [
+    state.company && `<button class="chip clear" type="button" data-clear="company">company: ${esc(state.companyLabel || state.company)} ✕</button>`,
+    state.lane && `<button class="chip clear" type="button" data-clear="lane">lane: ${esc(state.lane)} ✕</button>`,
+  ].filter(Boolean).join('');
+  $('#analytics-filters').innerHTML = chips || '<span class="muted">click a company or a lane to filter the list</span>';
 }
 async function loadSources() {
   const payload = await api('/api/sources');
@@ -100,7 +127,12 @@ async function loadJobs() {
   const page = await api('/api/postings?' + params());
   state.total = page.total || 0;
   $('#result-count').textContent = state.total;
-  $('#query-echo').textContent = state.q ? `FTS5: “${state.q}”` : (state.sort === 'score' ? 'best role match first' : 'latest first');
+  const scoped = [
+    state.q ? `FTS5: “${state.q}”` : (state.sort === 'score' ? 'best role match first' : 'latest first'),
+    state.company && `company: ${state.companyLabel || state.company}`,
+    state.lane && `lane: ${state.lane}`,
+  ].filter(Boolean);
+  $('#query-echo').textContent = scoped.join(' · ');
   renderJobs(page.items || []);
   const pageNo = Math.floor(state.offset / state.limit) + 1;
   $('#page-label').textContent = `page ${pageNo}`;
@@ -130,8 +162,28 @@ async function loadScrapeState() {
   $('#scrape-state').textContent = status.running ? `running — ${status.message || 'working'}` : (status.message || 'idle');
   $('#scrape-button').disabled = !!status.running;
 }
+$('#analytics').addEventListener('click', (event) => {
+  const button = event.target.closest('button');
+  if (!button) return;
+  if (button.dataset.company !== undefined) {
+    state.company = button.dataset.company;
+    state.companyLabel = button.dataset.label || '';
+  } else if (button.dataset.lane !== undefined) {
+    state.lane = button.dataset.lane;
+  } else if (button.dataset.clear === 'company') {
+    state.company = '';
+    state.companyLabel = '';
+  } else if (button.dataset.clear === 'lane') {
+    state.lane = '';
+  } else {
+    return;
+  }
+  state.offset = 0;
+  loadJobs();
+  loadAnalytics();
+});
 async function refreshAll() {
-  await Promise.allSettled([loadStats(), loadSources(), loadJobs(), loadRuns(), loadScrapeState()]);
+  await Promise.allSettled([loadStats(), loadAnalytics(), loadSources(), loadJobs(), loadRuns(), loadScrapeState()]);
 }
 $('#search-form').addEventListener('submit', (ev) => {
   ev.preventDefault();
@@ -145,9 +197,10 @@ $('#days').addEventListener('change', () => { state.days = Number($('#days').val
 $('#remote').addEventListener('change', () => { state.remote = $('#remote').checked; state.offset = 0; loadJobs(); });
 $('#sort').addEventListener('change', (event) => { state.sort = event.target.value; state.offset = 0; loadJobs(); });
 $('#reset').addEventListener('click', () => {
-  state.q = ''; state.source = ''; state.location = ''; state.days = 7; state.remote = false; state.sort = 'latest'; state.offset = 0;
+  state.q = ''; state.source = ''; state.location = ''; state.company = ''; state.companyLabel = ''; state.lane = ''; state.days = 7; state.remote = false; state.sort = 'latest'; state.offset = 0;
   $('#q').value = ''; $('#source').value = ''; $('#location').value = ''; $('#days').value = '7'; $('#remote').checked = false; $('#sort').value = 'latest';
   loadJobs();
+  loadAnalytics();
 });
 $('#prev').addEventListener('click', () => { state.offset = Math.max(0, state.offset - state.limit); loadJobs(); });
 $('#next').addEventListener('click', () => { state.offset += state.limit; loadJobs(); });

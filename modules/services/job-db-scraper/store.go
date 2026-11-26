@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"regexp"
 	"slices"
+	"sort"
 	"strings"
 	"time"
 
@@ -23,6 +25,7 @@ type queryOptions struct {
 	Source   string
 	Company  string
 	Location string
+	Lane     string
 	Remote   bool
 	Active   bool
 	Days     int
@@ -64,6 +67,44 @@ type sourceState struct {
 type countRow struct {
 	Name  string `json:"name"`
 	Count int    `json:"count"`
+}
+
+type companyRow struct {
+	Name     string    `json:"name"`
+	Key      string    `json:"key"`
+	Postings int       `json:"postings"`
+	AvgScore float64   `json:"avg_score"`
+	MaxScore int       `json:"max_score"`
+	Remote   int       `json:"remote"`
+	Newest   time.Time `json:"newest"`
+}
+
+type laneRow struct {
+	Name     string  `json:"name"`
+	Postings int     `json:"postings"`
+	AvgScore float64 `json:"avg_score"`
+	MaxScore int     `json:"max_score"`
+}
+
+type scoreBand struct {
+	Band  string `json:"band"`
+	Min   int    `json:"min"`
+	Max   int    `json:"max"`
+	Count int    `json:"count"`
+}
+
+type jobAnalytics struct {
+	GeneratedAt time.Time    `json:"generated_at"`
+	Days        int          `json:"days"`
+	Active      int          `json:"active"`
+	Remote      int          `json:"remote"`
+	AvgScore    float64      `json:"avg_score"`
+	Unscored    int          `json:"unscored"`
+	Companies   []companyRow `json:"companies"`
+	Locations   []countRow   `json:"locations"`
+	Lanes       []laneRow    `json:"lanes"`
+	Sources     []countRow   `json:"sources"`
+	ScoreBands  []scoreBand  `json:"score_bands"`
 }
 
 type statsPayload struct {
@@ -470,6 +511,10 @@ func (s *Store) QueryPostings(ctx context.Context, opt queryOptions) (postingsPa
 		where = append(where, "lower(p.location) LIKE ?")
 		args = append(args, "%"+strings.ToLower(opt.Location)+"%")
 	}
+	if opt.Lane != "" {
+		where = append(where, "EXISTS (SELECT 1 FROM json_each(p.lanes) WHERE json_each.value = ?)")
+		args = append(args, opt.Lane)
+	}
 	if opt.Remote {
 		where = append(where, "p.remote = 1")
 	}
@@ -822,6 +867,182 @@ func (s *Store) Stats(ctx context.Context) (statsPayload, error) {
 		st.LatestRun = &latest
 	}
 	return st, nil
+}
+
+// Analytics reads the board rather than one row: who hires, where, which lanes
+// the index covers, where the postings come from, and how the role-match scores
+// are distributed. Lanes are a JSON column, so they are counted in Go from one
+// scan — a JSON aggregate would hide rows whose lanes cannot be parsed.
+func (s *Store) Analytics(ctx context.Context, days, limit int) (jobAnalytics, error) {
+	if limit <= 0 {
+		limit = 8
+	}
+	if limit > 50 {
+		limit = 50
+	}
+	if days < 0 {
+		days = 0
+	}
+	if days > 365 {
+		days = 365
+	}
+	scope := "active=1"
+	args := []any{}
+	if days > 0 {
+		scope += " AND last_seen >= ?"
+		args = append(args, time.Now().UTC().Add(-time.Duration(days)*24*time.Hour).Format(time.RFC3339))
+	}
+	report := jobAnalytics{
+		GeneratedAt: time.Now().UTC(), Days: days,
+		Companies: []companyRow{}, Locations: []countRow{}, Lanes: []laneRow{},
+		Sources: []countRow{}, ScoreBands: []scoreBand{},
+	}
+
+	var remote sql.NullInt64
+	if err := s.db.QueryRowContext(ctx, `SELECT count(*), COALESCE(sum(remote),0), COALESCE(round(avg(score),1),0),
+		COALESCE(sum(CASE WHEN score=0 THEN 1 ELSE 0 END),0) FROM postings WHERE `+scope, args...).
+		Scan(&report.Active, &remote, &report.AvgScore, &report.Unscored); err != nil {
+		return report, err
+	}
+	report.Remote = int(remote.Int64)
+
+	companies, err := s.db.QueryContext(ctx, `SELECT company, company_key, count(*), COALESCE(round(avg(score),1),0),
+		COALESCE(max(score),0), COALESCE(sum(remote),0), max(last_seen)
+		FROM postings WHERE `+scope+`
+		GROUP BY company_key
+		ORDER BY count(*) DESC, max(score) DESC, company_key ASC LIMIT ?`, append(args, limit)...)
+	if err != nil {
+		return report, err
+	}
+	for companies.Next() {
+		var row companyRow
+		var newest string
+		if err := companies.Scan(&row.Name, &row.Key, &row.Postings, &row.AvgScore, &row.MaxScore, &row.Remote, &newest); err != nil {
+			companies.Close()
+			return report, err
+		}
+		row.Newest, _ = time.Parse(time.RFC3339, newest)
+		report.Companies = append(report.Companies, row)
+	}
+	if err := companies.Err(); err != nil {
+		companies.Close()
+		return report, err
+	}
+	companies.Close()
+
+	counts := func(field string) ([]countRow, error) {
+		rows, err := s.db.QueryContext(ctx, `SELECT `+field+`, count(*) FROM postings WHERE `+scope+`
+			GROUP BY `+field+` ORDER BY count(*) DESC, `+field+` ASC LIMIT ?`, append(args, limit)...)
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+		out := []countRow{}
+		for rows.Next() {
+			var row countRow
+			if err := rows.Scan(&row.Name, &row.Count); err != nil {
+				return nil, err
+			}
+			out = append(out, row)
+		}
+		return out, rows.Err()
+	}
+	if report.Locations, err = counts(`CASE WHEN location='' THEN 'unspecified' ELSE location END`); err != nil {
+		return report, err
+	}
+	if report.Sources, err = counts(`source`); err != nil {
+		return report, err
+	}
+
+	type laneTotal struct {
+		count int
+		score int
+		max   int
+	}
+	lanes := map[string]*laneTotal{}
+	rows, err := s.db.QueryContext(ctx, `SELECT lanes, score FROM postings WHERE `+scope, args...)
+	if err != nil {
+		return report, err
+	}
+	for rows.Next() {
+		var raw string
+		var score int
+		if err := rows.Scan(&raw, &score); err != nil {
+			rows.Close()
+			return report, err
+		}
+		for _, lane := range parseLanes(raw) {
+			total, ok := lanes[lane]
+			if !ok {
+				total = &laneTotal{}
+				lanes[lane] = total
+			}
+			total.count++
+			total.score += score
+			if score > total.max {
+				total.max = score
+			}
+		}
+	}
+	if err := rows.Err(); err != nil {
+		rows.Close()
+		return report, err
+	}
+	rows.Close()
+	for name, total := range lanes {
+		report.Lanes = append(report.Lanes, laneRow{
+			Name: name, Postings: total.count,
+			AvgScore: float64(total.score) / float64(total.count), MaxScore: total.max,
+		})
+	}
+	sort.Slice(report.Lanes, func(i, j int) bool {
+		if report.Lanes[i].Postings != report.Lanes[j].Postings {
+			return report.Lanes[i].Postings > report.Lanes[j].Postings
+		}
+		if report.Lanes[i].AvgScore != report.Lanes[j].AvgScore {
+			return report.Lanes[i].AvgScore > report.Lanes[j].AvgScore
+		}
+		return report.Lanes[i].Name < report.Lanes[j].Name
+	})
+	if len(report.Lanes) > limit {
+		report.Lanes = report.Lanes[:limit]
+	}
+
+	bands := make([]scoreBand, 5)
+	for i := range bands {
+		bands[i] = scoreBand{Min: i * 20, Max: i*20 + 19, Band: fmt.Sprintf("%d-%d", i*20, i*20+19)}
+	}
+	bands[4].Max = 100
+	bands[4].Band = "80-100"
+	histogram, err := s.db.QueryContext(ctx, `SELECT min(score/20,4) AS band, count(*) FROM postings WHERE `+scope+` GROUP BY band`, args...)
+	if err != nil {
+		return report, err
+	}
+	for histogram.Next() {
+		var band, count int
+		if err := histogram.Scan(&band, &count); err != nil {
+			histogram.Close()
+			return report, err
+		}
+		if band >= 0 && band < len(bands) {
+			bands[band].Count = count
+		}
+	}
+	if err := histogram.Err(); err != nil {
+		histogram.Close()
+		return report, err
+	}
+	histogram.Close()
+	report.ScoreBands = bands
+	return report, nil
+}
+
+func parseLanes(raw string) []string {
+	var lanes []string
+	if raw == "" || json.Unmarshal([]byte(raw), &lanes) != nil {
+		return nil
+	}
+	return lanes
 }
 
 func (s *Store) counts(ctx context.Context, query string) ([]countRow, error) {

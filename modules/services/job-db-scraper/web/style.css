@@ -86,7 +86,7 @@ mark { color: #06111d; background: var(--accent-2); border-radius: 3px; padding:
 .age { color: var(--muted); font-size: 0.82rem; white-space: nowrap; }
 .open { color: var(--accent-2); font-weight: 750; }
 .pager { display: flex; justify-content: center; align-items: center; gap: 16px; padding: 16px; }
-.lower-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 18px; margin-top: 18px; }
+.lower-grid { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 18px; }
 .panel { padding: 18px; }
 .bars { display: grid; gap: 10px; margin-top: 14px; }
 .bar-row { display: grid; gap: 6px; color: var(--muted); font-size: 0.86rem; }
@@ -122,3 +122,21 @@ dialog::backdrop { background: rgba(2, 6, 23, 0.72); backdrop-filter: blur(8px);
   .job-actions { justify-items: start; }
   .run-row { grid-template-columns: 1fr; }
 }
+
+.analytics-panel { margin-top: 18px; }
+.analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px; margin-top: 14px; }
+.panel-heading.sub { margin-bottom: 4px; font-size: 0.68rem; letter-spacing: 0.1em; }
+.analytics-panel .bars { margin-top: 8px; }
+.analytics-panel button.bar-row { width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.analytics-panel .bar-row { padding-bottom: 4px; border-bottom: 1px dashed var(--line); }
+.analytics-panel .bar-row:hover b, .analytics-panel .bar-row.active b { color: var(--accent); }
+.analytics-panel .bar-row.active { border-color: var(--accent); }
+.analytics-panel .bar-row em { margin-left: auto; color: var(--muted); font-style: normal; white-space: nowrap; }
+.analytics-panel .bar { display: block; }
+.histogram { display: grid; gap: 6px; margin-top: 8px; }
+.band-row { display: grid; grid-template-columns: 3.6rem 1fr 2.2rem; align-items: center; gap: 8px; font-size: 0.76rem; color: var(--muted); }
+.band-row .bar { display: block; height: 6px; }
+.band-row em { font-style: normal; text-align: right; }
+.active-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; font-size: 0.8rem; }
+.chip.clear { padding: 3px 10px; border: 0; border-radius: 999px; background: rgba(148, 163, 184, 0.18); color: var(--text); font: inherit; font-size: 0.78rem; cursor: pointer; }
+.chip.clear:hover { background: var(--accent); color: #05101c; }

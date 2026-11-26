@@ -41,6 +41,18 @@
         <article><span id="metric-fresh">—</span><small>seen this week</small></article>
       </section>
 
+      <section class="panel analytics-panel" aria-label="Board analytics">
+        <div class="panel-heading"><span>Board analytics</span><span id="analytics-scope" class="muted"></span></div>
+        <div class="analytics-grid">
+          <div><div class="panel-heading sub">Hiring companies</div><div id="analytics-companies" class="bars"></div></div>
+          <div><div class="panel-heading sub">Lanes</div><div id="analytics-lanes" class="bars"></div></div>
+          <div><div class="panel-heading sub">Locations</div><div id="analytics-locations" class="bars"></div></div>
+          <div><div class="panel-heading sub">Boards</div><div id="analytics-sources" class="bars"></div></div>
+          <div><div class="panel-heading sub">Role-match bands</div><div id="analytics-bands" class="histogram"></div></div>
+        </div>
+        <div id="analytics-filters" class="active-filters"></div>
+      </section>
+
       <section class="workspace">
         <aside class="filters">
           <div class="panel-heading">Refine</div>
@@ -86,10 +98,6 @@
       </section>
 
       <section class="lower-grid">
-        <article class="panel">
-          <div class="panel-heading">Top companies</div>
-          <div id="companies" class="bars"></div>
-        </article>
         <article class="panel">
           <div class="panel-heading">Run ledger</div>
           <div id="runs" class="runs"></div>

@@ -364,3 +364,178 @@ func TestStoreMigratesLegacySchemaAndBackfillsScores(t *testing.T) {
 		t.Fatalf("fts after migrated update: page=%+v err=%v", page, err)
 	}
 }
+
+func analyticsSeed(t *testing.T, store *Store) {
+	t.Helper()
+	ctx := context.Background()
+	for _, in := range []postingInput{
+		{Source: "rss", URL: "https://example.com/a", Company: "Example GmbH", Title: "Senior DevOps Engineer", Location: "Berlin", Description: "Kubernetes and NixOS on Linux"},
+		{Source: "rss", URL: "https://example.com/b", Company: "Example GmbH", Title: "SRE", Location: "Berlin", Description: "site reliability engineer"},
+		{Source: "greenhouse", URL: "https://example.com/c", Company: "Other AG", Title: "Platform Engineer", Location: "Munich", Remote: true, Description: "AWS platform"},
+		{Source: "greenhouse", URL: "https://example.com/d", Company: "Other AG", Title: "Office Manager", Location: "", Description: "Administration"},
+	} {
+		if _, _, err := store.UpsertPosting(ctx, in); err != nil {
+			t.Fatalf("UpsertPosting %s: %v", in.URL, err)
+		}
+	}
+}
+
+func countOf(rows []countRow, name string) int {
+	for _, row := range rows {
+		if row.Name == name {
+			return row.Count
+		}
+	}
+	return 0
+}
+
+func TestAnalyticsCountsCompaniesLanesBoardsAndBands(t *testing.T) {
+	store, err := OpenStore(filepath.Join(t.TempDir(), "jobs.sqlite"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	analyticsSeed(t, store)
+
+	report, err := store.Analytics(context.Background(), 0, 8)
+	if err != nil {
+		t.Fatalf("Analytics: %v", err)
+	}
+	if report.Active != 4 || report.Remote != 1 {
+		t.Fatalf("totals %#v, want 4 active and 1 remote", report)
+	}
+	if report.Unscored != 1 || report.AvgScore <= 0 {
+		t.Fatalf("scores %#v, want one unscored posting and a positive mean", report)
+	}
+
+	if len(report.Companies) != 2 {
+		t.Fatalf("companies %#v, want both", report.Companies)
+	}
+	for _, name := range []string{"Example GmbH", "Other AG"} {
+		found := false
+		for _, company := range report.Companies {
+			if company.Name == name && company.Postings == 2 {
+				found = true
+			}
+		}
+		if !found {
+			t.Fatalf("company %s missing from %#v", name, report.Companies)
+		}
+	}
+	if report.Companies[0].Key == "" || report.Companies[0].Newest.IsZero() {
+		t.Fatalf("company row %#v, want a key and a newest timestamp", report.Companies[0])
+	}
+
+	if countOf(report.Locations, "Berlin") != 2 || countOf(report.Locations, "Munich") != 1 || countOf(report.Locations, "unspecified") != 1 {
+		t.Fatalf("locations %#v", report.Locations)
+	}
+	if countOf(report.Sources, "rss") != 2 || countOf(report.Sources, "greenhouse") != 2 {
+		t.Fatalf("sources %#v", report.Sources)
+	}
+
+	if len(report.Lanes) != 7 {
+		t.Fatalf("lanes %#v, want the seven matched lanes", report.Lanes)
+	}
+	for _, lane := range []string{"DevOps", "SRE", "Platform", "Cloud", "Kubernetes", "NixOS", "Linux"} {
+		found := false
+		for _, row := range report.Lanes {
+			if row.Name == lane && row.Postings == 1 && row.MaxScore > 0 {
+				found = true
+			}
+		}
+		if !found {
+			t.Fatalf("lane %s missing or miscounted in %#v", lane, report.Lanes)
+		}
+	}
+
+	if len(report.ScoreBands) != 5 {
+		t.Fatalf("bands %#v, want five", report.ScoreBands)
+	}
+	total := 0
+	for _, band := range report.ScoreBands {
+		total += band.Count
+	}
+	if total != report.Active {
+		t.Fatalf("bands sum to %d, want %d", total, report.Active)
+	}
+	if report.ScoreBands[0].Band != "0-19" || report.ScoreBands[0].Count != 1 {
+		t.Fatalf("first band %#v, want the unscored posting", report.ScoreBands[0])
+	}
+	if report.ScoreBands[4].Max != 100 || report.ScoreBands[4].Band != "80-100" {
+		t.Fatalf("last band %#v, want 80-100", report.ScoreBands[4])
+	}
+}
+
+func TestPostingsFilterByCompanyAndLane(t *testing.T) {
+	store, err := OpenStore(filepath.Join(t.TempDir(), "jobs.sqlite"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	analyticsSeed(t, store)
+	ctx := context.Background()
+
+	cases := []struct {
+		name string
+		opt  queryOptions
+		want int
+	}{
+		{"company", queryOptions{Company: "Example GmbH"}, 2},
+		{"lane DevOps", queryOptions{Lane: "DevOps"}, 1},
+		{"lane Platform", queryOptions{Lane: "Platform"}, 1},
+		{"lane without rows", queryOptions{Lane: "Rust"}, 0},
+	}
+	for _, tc := range cases {
+		opt := tc.opt
+		opt.Active = true
+		opt.Limit = 20
+		page, err := store.QueryPostings(ctx, opt)
+		if err != nil {
+			t.Fatalf("%s: %v", tc.name, err)
+		}
+		if page.Total != tc.want {
+			t.Fatalf("%s: total %d, want %d (%#v)", tc.name, page.Total, tc.want, page.Items)
+		}
+	}
+}
+
+func TestAnalyticsWindowClampsAndHandlerAnswers(t *testing.T) {
+	store, err := OpenStore(filepath.Join(t.TempDir(), "jobs.sqlite"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	analyticsSeed(t, store)
+
+	wide, err := store.Analytics(context.Background(), 9999, 9999)
+	if err != nil {
+		t.Fatalf("Analytics wide: %v", err)
+	}
+	if wide.Days != 365 {
+		t.Fatalf("days %d, want 365", wide.Days)
+	}
+	negative, err := store.Analytics(context.Background(), -5, 0)
+	if err != nil {
+		t.Fatalf("Analytics negative: %v", err)
+	}
+	if negative.Days != 0 || negative.Active != 4 {
+		t.Fatalf("negative window %#v, want every active posting", negative)
+	}
+
+	s := &server{store: store}
+	rec := httptest.NewRecorder()
+	s.analytics(rec, httptest.NewRequest(http.MethodGet, "/api/analytics?limit=1", nil))
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status %d: %s", rec.Code, rec.Body.String())
+	}
+	var report jobAnalytics
+	if err := json.Unmarshal(rec.Body.Bytes(), &report); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if len(report.Companies) != 1 || len(report.Lanes) != 1 {
+		t.Fatalf("limit not applied: %#v", report)
+	}
+	if len(report.ScoreBands) != 5 || report.Active != 4 {
+		t.Fatalf("report %#v, want five bands over four postings", report)
+	}
+}

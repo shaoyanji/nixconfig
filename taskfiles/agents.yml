@@ -372,11 +372,11 @@ tasks:
     summary: >
       scripts/task/portfolio-smoke.py — one run over job-db-scraper,
       private-deals, inventory-site, clanker-runner and link-vault: health answers
-      `ok` with its own name, stats a non-empty object, `/api/analytics` a windowed
-      report, `/` the element its JS fills, search rows for `q=`, a QR label for
-      one asset (skipped when empty), clanker's machines/presets/schedules,
-      link-vault's `/api/tags`. Empty answers pass; `--expect-hit` fails them.
-      `--format toon`, `--browser` (DOM half, missing binary = skip),
+      `ok` naming itself, stats a non-empty object, `/api/analytics` a report, `/`
+      the element its JS fills, search `q=` rows, a QR label (skipped when empty),
+      clanker's machines/presets/schedules, link-vault's `/api/tags`. Empty answers
+      pass; `--expect-hit` fails them. `--format toon`, `--browser` (DOM half;
+      `--clanker-browser` runs it on clanker, no local binary),
       `--jobs/--deals/--inventory/--clanker/--link-vault` for the mounts. Exit 1
       names the failure.
     cmds:

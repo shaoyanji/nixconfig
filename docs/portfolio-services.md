@@ -209,6 +209,11 @@ overridable — `--jobs`, `--deals`, `--inventory`, `--clanker`, `--link-vault` 
 the same verb can point at the tailnet mounts. Exit 1 names the service that
 failed.
 
+`--browser` opens each page and re-reads the element its JS fills. This host has
+no `agent-browser`, so `--clanker-browser` runs that half on InstaBox `clanker`
+through `scripts/task/clanker-browser.sh`; the page then has to be one `clanker`
+can reach, which a tailnet-only service is not.
+
 ```bash
 task apps:page -- --backend http https://boards.greenhouse.io/acme > jobs.json
 task apps:ingest -- --api https://delphi.cloudforest-kardashev.ts.net:8464 --in jobs.json

@@ -19,7 +19,9 @@ search into a check with content. The QR label is the one check that cannot run
 against an empty register; it says so in its detail rather than pretending it
 looked. `--browser` adds the DOM half — it opens each page in agent-browser and
 asserts the element the JS fills is really there, which is the difference between
-an HTML file and a page that works.
+an HTML file and a page that works. `--clanker-browser` runs that half on InstaBox
+`clanker`, for a host with no local browser; the page then has to be reachable
+from `clanker`, which a tailnet-only service is not.
 """
 
 from __future__ import annotations
@@ -27,6 +29,7 @@ from __future__ import annotations
 import argparse
 import datetime
 import json
+import pathlib
 import shutil
 import time
 import subprocess
@@ -35,6 +38,7 @@ import urllib.error
 import urllib.request
 
 UA = "nixconfig-portfolio-smoke/1.0"
+ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 SERVICES = {
     "jobs": {
@@ -349,8 +353,16 @@ def smoke_service(key, spec, args, fetch=fetch, run=subprocess.run):
     }
 
 
+def apply_browser_flags(args):
+    """`--clanker-browser` is `--browser` with the binary on another machine."""
+    if getattr(args, "clanker_browser", False):
+        args.browser = True
+        args.browser_cmd = str(ROOT / "scripts/task/clanker-browser.sh")
+    return args
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Smoke the four portfolio services end to end.")
+    parser = argparse.ArgumentParser(description="Smoke the five portfolio services end to end.")
     for key, spec in SERVICES.items():
         parser.add_argument(
             f"--{spec.get('flag', key)}", dest=key, default=spec["api"], help=f"{spec['label']} base URL"
@@ -360,8 +372,13 @@ def main() -> int:
     parser.add_argument("--expect-hit", action="store_true", help="a search with no rows fails")
     parser.add_argument("--browser", action="store_true", help="also check the rendered DOM")
     parser.add_argument("--browser-cmd", default="agent-browser")
+    parser.add_argument(
+        "--clanker-browser",
+        action="store_true",
+        help="run the DOM check on InstaBox clanker; the page must be reachable from there",
+    )
     parser.add_argument("--format", choices=("json", "toon"), default="json")
-    args = parser.parse_args()
+    args = apply_browser_flags(parser.parse_args())
 
     services = {
         key: smoke_service(key, spec, args, fetch, subprocess.run) for key, spec in SERVICES.items()

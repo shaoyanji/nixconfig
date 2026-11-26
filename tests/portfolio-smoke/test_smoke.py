@@ -14,6 +14,8 @@ import contextlib
 import importlib.util
 import io
 import json
+import pathlib
+import shlex
 import subprocess
 import sys
 import unittest
@@ -430,6 +432,34 @@ class ServiceTest(unittest.TestCase):
         self.assertEqual(dom["check"], "dom")
         self.assertFalse(dom["ok"])
         self.assertIn("skipped", dom["detail"])
+
+
+class ClankerBrowserTest(unittest.TestCase):
+    def test_the_flag_turns_on_the_browser_and_points_at_the_wrapper(self):
+        args = smoke.apply_browser_flags(
+            SimpleNamespace(browser=False, browser_cmd="agent-browser", clanker_browser=True)
+        )
+        self.assertTrue(args.browser)
+        self.assertTrue(args.browser_cmd.endswith("scripts/task/clanker-browser.sh"))
+        self.assertTrue(pathlib.Path(args.browser_cmd).is_file())
+
+    def test_without_the_flag_nothing_moves(self):
+        args = smoke.apply_browser_flags(
+            SimpleNamespace(browser=False, browser_cmd="agent-browser", clanker_browser=False)
+        )
+        self.assertEqual((args.browser, args.browser_cmd), (False, "agent-browser"))
+
+    def test_the_wrapper_escapes_an_eval_script_so_it_survives_the_hop(self):
+        """`instabox.sh exec` joins its argv, so the script must arrive quoted."""
+        wrapper = pathlib.Path(smoke.ROOT) / "scripts/task/clanker-browser.sh"
+        script = "(() => { const el = document.querySelector('#metrics'); return el ? el.textContent : ''; })()"
+        printed = subprocess.run(
+            [str(wrapper), "--print-command", "eval", script],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        self.assertEqual(shlex.split(printed), ["agent-browser", "eval", script])
+        self.assertTrue(printed.startswith("agent-browser "))  # named once, not twice
+        self.assertNotEqual(printed.split("eval", 1)[1].strip(), script)  # quoting happened
 
 
 class MainTest(unittest.TestCase):

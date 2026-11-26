@@ -1,8 +1,44 @@
 {
-  "generated": "2026-11-26T18:07:08Z",
+  "generated": "2026-11-26T18:19:14Z",
   "count": 200,
-  "pin": "73a78feaadb96e804a29f1ebddf16bc24d6e48148807ea0ff0bca905148d97b6",
+  "pin": "106f9bed6300e76111d552a4ae38b541c19f75edf5131f81a2e819262f704cf2",
   "turns": [
+    {
+      "id": "a2c4f41f-acbb-4103-93d0-999493df603a",
+      "ts": "2026-11-26T18:08:50Z",
+      "source": "buffy",
+      "subject": "nixconfig:clanker-hygiene-and-remote-browser-smoke",
+      "action": "claim: wake clanker, measure disk/nix/process hygiene, prove agent-browser there, then a --clanker-browser lane in portfolio-smoke with tests and docs",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/portfolio-smoke.py",
+        "tests/portfolio-smoke",
+        "docs/portfolio-services.md",
+        "taskfiles/agents.yml"
+      ],
+      "files": [],
+      "base_commit": "2b0a2bbc3dca7a3661bf61535c3797d5471fb929",
+      "branch": "main",
+      "frame": "03hb4iraggxmt2e225tetgyg6"
+    },
+    {
+      "id": "0608cd2b-0e86-4427-b1cd-cf12ba1c9a7f",
+      "ts": "2026-11-26T18:07:18Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-smoke-link-vault",
+      "action": "landed: link-vault lane (health/stats/page #metrics/search /api/links//api/tags), --link-vault via dest mapping, rows_of+check_endpoint count links/tags wrappers as rows, tests 49 OK, summary+docs say five | gate: unittest 49 OK, py_compile, checks:tasks, checks:prose, budget 270/400, checks:docs:links; live run on 5 temp servers (InstaBox stub) json exit 0 all ok, toon exit 0, --expect-hit passes link-vault; servers stopped, /tmp cleaned",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/portfolio-smoke.py",
+        "tests/portfolio-smoke/test_smoke.py",
+        "taskfiles/agents.yml",
+        "docs/portfolio-services.md"
+      ],
+      "files": [],
+      "base_commit": "2b0a2bbc3dca7a3661bf61535c3797d5471fb929",
+      "branch": "main",
+      "frame": "03hb4iglg1fxyzkg9deby40h1"
+    },
     {
       "id": "04aa4a75-01ce-4d4e-88af-e63d4095338f",
       "ts": "2026-11-26T18:02:23Z",
@@ -3004,32 +3040,6 @@
       "base_commit": "f89886c42b7fab8653daabecacf57f0a8ca60be3",
       "branch": "main",
       "frame": "03hb2yvjlfocr5ulwya9rwn00"
-    },
-    {
-      "id": "23383d81-8d1b-486a-8c26-10e8c796d035",
-      "ts": "2026-11-26T13:20:30Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-2026-11-26-4",
-      "action": "verified green on a650c202 — same evidence as nixconfig:steward-devin-drive-20261126-0657 | gate: checks:image-daily PASS | gate: CGO_ENABLED=0 go build ./... PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5785b4608c096d0cd88aa5e75071234a6c2575a6",
-      "branch": "main",
-      "frame": "03hb2yfnjoanl9ibg5lxli5ko"
-    },
-    {
-      "id": "b271dc05-ad84-4e4c-b728-5b332345f3ae",
-      "ts": "2026-11-26T13:20:24Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-20261126-0657",
-      "action": "verified: image-daily Go port already green, no fix needed | gate: checks:image-daily PASS (dispatch, judge fallback, breakers, shrink guard all present) | gate: CGO_ENABLED=0 go build ./... PASS in tools/os",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5785b4608c096d0cd88aa5e75071234a6c2575a6",
-      "branch": "main",
-      "frame": "03hb2yeyevhpuripmm7u48bj0"
     }
   ]
 }

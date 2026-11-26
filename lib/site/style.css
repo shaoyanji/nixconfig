@@ -87,6 +87,21 @@ nav {
 }
 @media (max-width: 800px) {
   .layout-grid { grid-template-columns: 1fr; }
+  /* The distribution table is the widest fixed content; scroll it, not the page. */
+  main { overflow-x: auto; }
+}
+/* Every control here is a real button, so the keyboard needs to see which one has focus. */
+.tab-btn:focus-visible,
+.side-btn:focus-visible {
+  outline: 2px solid var(--heading);
+  outline-offset: 2px;
+}
+/* Transitions are decoration; a reader who asks for less motion gets none. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 aside {
   background: var(--card-bg);

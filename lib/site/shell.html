@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#1a1b26">
+  <meta name="description" content="Fleet control plane: {{devices}} registered devices, {{nixHosts}} NixOS hosts and {{nodes}} knowledge-graph nodes, every figure evaluated from inventory.toml at build time.">
+  <!-- Inline mark, so a first visit does not 404 on /favicon.ico and the build ships no binary. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231a1b26'/%3E%3Cpath d='M8 21l4-10 4 10M9.6 17.6h4.8' stroke='%237dcfff' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='23' cy='11' r='2.6' fill='%239ece6a'/%3E%3Cpath d='M23 14.2v6.4' stroke='%23bb9af7' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
   <title>Fleet Control Plane &mdash; {{devices}} devices</title>
   <link rel="stylesheet" href="{{cssFile}}">
   <script src="{{akiJsFile}}" defer></script>
@@ -20,11 +25,11 @@
   </header>
 
   <nav>
-    <button class="tab-btn nav-active" url="data/overview.json">Overview</button>
-    <button class="tab-btn" url="data/inventory.json">Fleet Inventory</button>
-    <button class="tab-btn" url="data/kg.json">Knowledge Graph</button>
-    <button class="tab-btn" url="data/notes.json">Notes</button>
-    <button class="tab-btn" url="data/closures.json">Closure Budgets</button>
+    <button type="button" class="tab-btn nav-active" url="data/overview.json">Overview</button>
+    <button type="button" class="tab-btn" url="data/inventory.json">Fleet Inventory</button>
+    <button type="button" class="tab-btn" url="data/kg.json">Knowledge Graph</button>
+    <button type="button" class="tab-btn" url="data/notes.json">Notes</button>
+    <button type="button" class="tab-btn" url="data/closures.json">Closure Budgets</button>
   </nav>
 
   <div id="breadcrumbs">fleet / overview</div>

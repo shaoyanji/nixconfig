@@ -1,8 +1,107 @@
 {
-  "generated": "2026-11-26T07:22:41Z",
+  "generated": "2026-11-26T07:52:01Z",
   "count": 200,
-  "pin": "bbe2abe2f0e1a1d2a8ef6459f09f98d68f07213bd719916d5649b7d103171f3d",
+  "pin": "146ed416e0af3b4d06e19ace3472f0f9c3cc0d1fd7e195e59e43a1eeb0f804b6",
   "turns": [
+    {
+      "id": "295d3893-3568-4a74-87ee-c74fda5b5828",
+      "ts": "2026-11-26T07:42:41Z",
+      "source": "freebuff",
+      "subject": "nixconfig:steward-freebuff-drive-20261126-0801",
+      "action": "freebuff: publish CV site (jev publish p=0.97 m=0.95) — claim lib/site, build both sites, polish, deploy",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/site"
+      ],
+      "files": [],
+      "base_commit": "fd468c31f255239c8b51015562cefa7e3a49c1c1",
+      "branch": "main",
+      "frame": "03hb14fz75lo24381lbhhuc8v"
+    },
+    {
+      "id": "bfa56eb5-8bee-40b0-bd9f-bfbd74924810",
+      "ts": "2026-11-26T07:41:47Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-freebuff-drive-20261126-0801",
+      "action": "freebuff: publish CV site via lib/site (jev publish)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd468c31f255239c8b51015562cefa7e3a49c1c1",
+      "branch": "main",
+      "frame": "03hb149mofzaxdy9zg2m8inge"
+    },
+    {
+      "id": "8a75a95d-859e-4a93-9f97-8a832cd6087b",
+      "ts": "2026-11-26T07:37:13Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-epistemics",
+      "action": "start: epistemics/ontology v0.0.1->v1.0.0rc — reading SCHEMA, notes, predesign doc, kg surface",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/agents-notes.nix",
+        "lib/knowledge-graph.nix",
+        "flake/epistemics.nix",
+        "AGENTS.nix",
+        "docs/"
+      ],
+      "files": [],
+      "base_commit": "fd468c31f255239c8b51015562cefa7e3a49c1c1",
+      "branch": "main",
+      "frame": "03hb13dhuqfqlsn419pfjpnlk"
+    },
+    {
+      "id": "38ce6e56-862f-47b7-9c82-25659c5e3a1d",
+      "ts": "2026-11-26T07:32:43Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: sweep 2026-11-26a — five boards read (germantechjobs 586 feed items, Stepstone 6 lane queries/136 cards, BSJ 12, WWR 87, RemoteOK 101 US-only); 108 employers held a core role, 75 already tracked, 7 new leads filed at origin scout-2026-11-26a, nothing sent (2026-12-07 hold)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd468c31f255239c8b51015562cefa7e3a49c1c1",
+      "branch": "main",
+      "frame": "03hb12hu3gcwsbfhmbw7oohmu"
+    },
+    {
+      "id": "3e22e368-1a17-46c8-834e-24316ff503b0",
+      "ts": "2026-11-26T07:31:58Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-drive-20261126-0823",
+      "action": "chain-change: refactor shared module chain — hosts/ into modules/",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd468c31f255239c8b51015562cefa7e3a49c1c1",
+      "branch": "main",
+      "frame": "03hb12clizlpu136vzh8n80tb"
+    },
+    {
+      "id": "52385e5d-7aaa-4e74-ab7c-e5c8d75274ea",
+      "ts": "2026-11-26T07:23:29Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "claim: sweep 2026-11-26a — read germantechjobs, WWR, RemoteOK, Stepstone, BSJ; rank by GitHub activity + live postings; file leads only",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd468c31f255239c8b51015562cefa7e3a49c1c1",
+      "branch": "main",
+      "frame": "03hb10oy41awt4sv8gisejzld"
+    },
+    {
+      "id": "0bb44ca5-d6c9-4240-b716-2d4fbcfccad0",
+      "ts": "2026-11-26T07:23:20Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: hmModules/hmFeatures now derived from features in the mapAttrs projection (containers->floor, dms->desktop); 8+10 restated lines cut, divergences (fern/cassini/home/demo) stay explicit — change rode the flake-update lane's commit fd468c31 | gate: drv-equality 30/30 x2, nix:lint 333, eval: delphi floor / frieren desktop / fern fork",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fd468c31f255239c8b51015562cefa7e3a49c1c1",
+      "branch": "main",
+      "frame": "03hb10nyrpwyzae760ycid12d"
+    },
     {
       "id": "6745b082-7029-4934-bf26-b54ba2d7e1e7",
       "ts": "2026-11-26T07:17:26Z",
@@ -2751,97 +2850,6 @@
       "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
       "branch": "main",
       "frame": "03havklsitv57thtfz69cc2pe"
-    },
-    {
-      "id": "56ce712f-2494-4fcb-bc44-8ee6f6f80581",
-      "ts": "2026-11-25T14:21:59Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-freebuff-publish-2026-11-25",
-      "action": "landed: drove freebuff pane agents:2.1 with CV-site publish task; jev-decide classify exit 0 selected publish p=0.94 margin=0.91; load-buffer + paste-buffer + Enter accepted, fresh working... 7s counter confirmed start; devin gate-change p=0.57 and delphi novel p=0.48 left idle (jev needs_review exit 2, no label invented); agents:4.1 BUSY; agents:5.1 nushell not an agent; tmux server alive",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03havh5br2cpkypavp1094dtp"
-    },
-    {
-      "id": "5e132307-8df8-4a94-893a-7d891653fe6b",
-      "ts": "2026-11-25T14:21:23Z",
-      "source": "freebuff",
-      "subject": "nixconfig:isadev-cv-publish-check-2",
-      "action": "no publish (re-check): 6/6 CVs byte-identical src=assets/files vs _site vs live, changed_count=0; HEAD=origin=be17747, tree clean; nothing staged, unchanged output not republished, no push | gate: jekyll production build + check-cv-links PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03havh13pt6k0p8o4yxrh0sxc"
-    },
-    {
-      "id": "25b98dba-601d-49a0-99e3-5d0a57f69b46",
-      "ts": "2026-11-25T14:12:38Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-freebuff-publish-2026-11-25",
-      "action": "landed: drove freebuff pane agents:2.1 with prepare-and-stage publish task; jev-decide classify exit 0 selected publish p=0.94 margin=0.90; text rephrased vs the 14:04 turn (diff CV sources vs _site, jekyll gate first, stage changed CVs only, skip push when unchanged) to avoid the re-paste block; load-buffer+paste-buffer+Enter accepted, fresh thinking counter confirmed start",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03havfbhbvdmd2zbmzotgf3l4"
-    },
-    {
-      "id": "90ee05ce-0bbb-46e2-ad51-8d65416f89c6",
-      "ts": "2026-11-25T14:12:32Z",
-      "source": "freebuff",
-      "subject": "nixconfig:isadev-cv-publish-check",
-      "action": "no publish: six CVs (cv, cv-de, cv-energy, cv-energy-de, cv-software, cv-software-de) byte-identical repo=assets/files vs _site vs live; tree clean, EA28D81..BE17747 already deployed; unchanged output not republished, nothing pushed | gate: jekyll production build + check-cv-links PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03havfautbsa4srjhw4p1748r"
-    },
-    {
-      "id": "a6e0b01f-e4a9-4018-9a14-a24f6251789a",
-      "ts": "2026-11-25T14:04:19Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-freebuff-publish-2026-11-25",
-      "action": "landed: drove freebuff pane agents:2.1 (CV/site lane) with publish-verification task (jev-decide selected publish p=0.92 margin=0.87); HEAD jekyll build gated the push, gh Pages deploy watched to completion, deploy diff was _tabs/cv.md only, unchanged output not republished; pane back at idle prompt, followups suggested: rank fit-5 leads, add new boards, add breakdown to page",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03havdp2p3w4fucga8k62ulgx"
-    },
-    {
-      "id": "a63fe970-1e99-4122-b7c6-fce695e577d8",
-      "ts": "2026-11-25T14:02:48Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-2026-11-25l",
-      "action": "published: pushed be17747 (ea28d81..be17747, 1 file _tabs/cv.md), Pages run 45629626849 build+deploy success; live /cv/ moved 119 tr/117 links -> 141 tr/139 links incl. sweep-l leads; 6 PDFs 200 | gate: jekyll production build + check-cv-links PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03havdegg49ugg1p4b7r8mtt9"
-    },
-    {
-      "id": "7551fb45-3c11-452d-9e11-ace83d8e9fbd",
-      "ts": "2026-11-25T14:00:40Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-2026-11-25l",
-      "action": "landed: sweep l — 6 LinkedIn seniority pages (lead/principal/head-of, DE/NL/AT/BE/CH) 200/200, 8 Stepstone metro pages (München, Essen, Dortmund, Mannheim, Karlsruhe, Münster, Freiburg, Augsburg) 200/200; 60 cards, 58 unique, 26 already in ledger, 10 dropped (8 IT-director/head-of-IT off-lane, SQUER + Trust In SODA duplicate companies), 22 filed fit 5:16 3:6; CV table 139 rows fit 5:61 4:28 3:50, nothing sent | gate: jekyll production build + check-cv-links PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0b0a3f446a3f1c42b4e2a2fa5155f00c7950f9c0",
-      "branch": "main",
-      "frame": "03havczf6xzwe0zq9a1l600eu"
     }
   ]
 }

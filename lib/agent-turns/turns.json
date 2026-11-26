@@ -1,8 +1,114 @@
 {
-  "generated": "2026-11-26T16:12:38Z",
+  "generated": "2026-11-26T16:17:45Z",
   "count": 200,
-  "pin": "9a0b8a6a7e112254a9a12259dac12b216b025af704d0fc26d10db7bbc9784cf1",
+  "pin": "d005521005f615c26b11669bedcb16bfd0e5310f56a9533d8b4df66cdf6a6853",
   "turns": [
+    {
+      "id": "bbbec9cf-299e-483a-915b-886678539dc8",
+      "ts": "2026-11-26T16:15:41Z",
+      "source": "devin",
+      "subject": "nixconfig:inventory-site-audit-qr",
+      "action": "claim: add inventory asset event audit history, warranty-expiry alerts with deduped ntfy delivery, printable SVG QR labels, UI surfacing, and full Go/Nix/live verification",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/inventory-site",
+        "modules/services/inventory-site.nix"
+      ],
+      "files": [],
+      "base_commit": "59bf181dfd8f34359d138c6b46137e5c28654244",
+      "branch": "main",
+      "frame": "03hb3wnjwkozhvr2nx78a79py"
+    },
+    {
+      "id": "5bc79c8a-b7a2-4e41-b52d-1c157624aef4",
+      "ts": "2026-11-26T16:13:34Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-gdrive-sync-fix",
+      "action": "claim: taking over from tmux-pane-steward; bug-fix|0.37: delphi archive gdrive mirror — the unit skips on a missing rclone.conf and reports success, so the mirror has never run and nothing says so",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/email-archive.nix",
+        "hosts/delphi"
+      ],
+      "files": [],
+      "base_commit": "59bf181dfd8f34359d138c6b46137e5c28654244",
+      "branch": "main",
+      "frame": "03hb3w8oel6vgecwxft07fq8d"
+    },
+    {
+      "id": "6cd57bc5-0b8f-4061-9d6f-0734ca0ffe8f",
+      "ts": "2026-11-26T16:13:21Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-gdrive-sync-fix",
+      "action": "bug-fix|0.37|0.020000000000000018: delphi_archive_gdrive_fix (take over)",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/email-archive.nix",
+        "hosts/delphi"
+      ],
+      "files": [],
+      "base_commit": "40b7d1226bf1cf6a44e869382925541cf47ab4b1",
+      "branch": "main",
+      "frame": "03hb3w77x9fb8shryiu9537ir"
+    },
+    {
+      "id": "de815ad9-32c3-46c6-a604-e41ceccb2d17",
+      "ts": "2026-11-26T16:13:18Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:cv-packet-pdf-audit",
+      "action": "bug-fix|0.26|0.03: cv_packet_pdf_audit (take over)",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/plugins/appflow",
+        "lib/site"
+      ],
+      "files": [],
+      "base_commit": "40b7d1226bf1cf6a44e869382925541cf47ab4b1",
+      "branch": "main",
+      "frame": "03hb3w6vjh5hpmobd5rwwx05k"
+    },
+    {
+      "id": "f047d979-18fa-4b58-b4bf-fa085eb64318",
+      "ts": "2026-11-26T16:12:55Z",
+      "source": "devin",
+      "subject": "nixconfig:clanker-runner-service",
+      "action": "landed: clanker-runner tailnet control plane with InstaBox machine state/wake/exec, detached remote jobs, SQLite FTS5 history, web UI and delphi wiring | gate: go test/vet/node/alejandra PASS, checks:host rc=0, delphi toplevel build rc=0, live HTTP smoke PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/services/clanker-runner",
+        "modules/services/clanker-runner.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "files": [
+        "modules/services/clanker-runner",
+        "modules/services/clanker-runner.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "base_commit": "59bf181dfd8f34359d138c6b46137e5c28654244",
+      "branch": "main",
+      "frame": "03hb3w46ql4p4k5letqj20mra"
+    },
+    {
+      "id": "b3f8d9d2-2047-4b05-b0d1-e3bb58874c95",
+      "ts": "2026-11-26T16:12:47Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-ui-smoke-suite",
+      "action": "portfolio-smoke.py: health (names the service), stats, / as HTML with the JS-filled id, search via q=; empty answer passes, --expect-hit needs rows, --format toon, --browser DOM check (missing binary = skip). Live on three local binaries seeded one record each: 12/12 checks exit 0; scraper stopped -> exit 1 naming jobs; Chrome read #metric-jobs=1, #stats=1Active deals/1Assets. 31 tests.| gate: unittest 31 + py_compile + live smoke (servers stopped, /tmp clean)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "59bf181dfd8f34359d138c6b46137e5c28654244",
+      "branch": "main",
+      "frame": "03hb3w37lqxu2jnpnft6td101"
+    },
     {
       "id": "f25fb6eb-d250-4e09-8c5b-ddcf8a122f68",
       "ts": "2026-11-26T16:11:53Z",
@@ -2982,111 +3088,6 @@
       "base_commit": "08e5e2b91e4f0c41a6c20547bd8c1ae03a60d0c9",
       "branch": "main",
       "frame": "03hb2esp3uxxkgjw5uyi9xngh"
-    },
-    {
-      "id": "4026c256-d5cd-4311-aef1-db76a925f4d7",
-      "ts": "2026-11-26T11:16:41Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:cv-scout-1126",
-      "action": "CV lane: scout 7d DevOps/SRE leads, publish CV surface",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/matt",
-        "scripts/task/jobsearch-pipeline.sh"
-      ],
-      "files": [],
-      "base_commit": "08e5e2b91e4f0c41a6c20547bd8c1ae03a60d0c9",
-      "branch": "main",
-      "frame": "03hb2esolk53bj5cvnoj5utmg"
-    },
-    {
-      "id": "9331bc6a-4755-4e6e-b15f-31115e56934d",
-      "ts": "2026-11-26T11:07:57Z",
-      "source": "agy",
-      "subject": "nixconfig:appflow-packets-gc",
-      "action": "bug-fix: stop appflow submission symlinks dangling after GC",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/plugins/appflow",
-        "scripts/task/apps-scout.sh",
-        "tests/appflow-triage"
-      ],
-      "files": [],
-      "base_commit": "bc05770c093626cbaec6067c82fd122b5eb55c12",
-      "branch": "main",
-      "frame": "03hb2eso6z67xvvmevr8le63t"
-    },
-    {
-      "id": "7417f36c-e099-4c42-9849-82ef978dca28",
-      "ts": "2026-11-26T11:06:35Z",
-      "source": "agy",
-      "subject": "nixconfig:hermes-fallback",
-      "action": "commented out 403 tokenrouter and 405 cantrustai in hermes config; switched default to infron qwen3.8-27b:free at bc05770c | gate: checks:infron+test+hermes PASS",
-      "outcome": "done",
-      "claims": [
-        "modules/user/ai/hermes-persona/config.yaml",
-        "scripts/task/infron-check.sh",
-        "tests/infron/run.sh"
-      ],
-      "files": [
-        "modules/user/ai/hermes-persona/config.yaml",
-        "scripts/task/infron-check.sh",
-        "tests/infron/run.sh"
-      ],
-      "base_commit": "bc05770c093626cbaec6067c82fd122b5eb55c12",
-      "branch": "main",
-      "frame": "03hb2esnnu5g985xmc2hai410"
-    },
-    {
-      "id": "c3833c27-0cc9-4456-b36f-9a2c22518808",
-      "ts": "2026-11-26T11:06:30Z",
-      "source": "buffy",
-      "subject": "nixconfig:proofline-packet",
-      "action": "proofline packet rebuilt with the yek#270 fix in the letter; ATS PASS; 4 files in the packet dir. Nothing sent.",
-      "outcome": "done",
-      "claims": [
-        "modules/plugins/appflow",
-        "scripts/task/apps-scout.sh",
-        "scripts/task/cv-ats-check.sh"
-      ],
-      "files": [],
-      "base_commit": "bc05770c093626cbaec6067c82fd122b5eb55c12",
-      "branch": "main",
-      "frame": "03hb2esn2vibncr6mfg3r5iuw"
-    },
-    {
-      "id": "3c5f65ea-c0f7-4a21-a10c-9af59c66ac61",
-      "ts": "2026-11-26T11:04:06Z",
-      "source": "buffy",
-      "subject": "nixconfig:proofline-packet",
-      "action": "novel: rebuild proofline CV packet with yek#270 + ATS check",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/plugins/appflow",
-        "scripts/task/apps-scout.sh",
-        "scripts/task/cv-ats-check.sh"
-      ],
-      "files": [],
-      "base_commit": "49d9be9f0987680515f9fd7f3375d580f230a348",
-      "branch": "main",
-      "frame": "03hb2esmdt7vyrcg3bffbn1g1"
-    },
-    {
-      "id": "2f15b167-11c6-4840-b339-5d5c0c47e520",
-      "ts": "2026-11-26T11:02:27Z",
-      "source": "agy",
-      "subject": "nixconfig:proofline-packet",
-      "action": "novel: rebuild proofline CV packet with yek#270 + ATS check",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/plugins/appflow",
-        "scripts/task/apps-scout.sh",
-        "scripts/task/cv-ats-check.sh"
-      ],
-      "files": [],
-      "base_commit": "49d9be9f0987680515f9fd7f3375d580f230a348",
-      "branch": "main",
-      "frame": "03hb2esltgg7nyi2rowtha8dj"
     }
   ]
 }

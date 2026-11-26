@@ -11,6 +11,9 @@
 
   services.offloadBridge.sets.delphi-postgres.path = "/var/backup/postgresql";
 
+  # 241 messages carry a 25 MB tree; Drive, the copy it was promised, never ran.
+  services.offloadBridge.sets.email-attachments.path = "/var/lib/npgsqlrest/attachments";
+
   services.postgresBackupDrill = {
     enable = true;
     backupDir = "/var/backup/postgresql";

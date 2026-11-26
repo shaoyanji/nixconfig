@@ -352,13 +352,10 @@ systemctl list-timers email-archive-import     # next elapse
 curl -s 'http://127.0.0.1:8080/api/list-emails?lim=5' | jq
 ```
 
-## Google drive mirror (skipped until a remote exists)
+## Attachments off-site: the bridge, not Drive
 
-The sync is one-way — Drive holds a mirror, never the source of truth. The timer
-runs from first boot and the unit carries `ConditionPathExists` on
-`/var/lib/npgsqlrest/rclone.conf`: **skipped, not failed**, until that file
-exists. That is the calendar's rule — the OAuth client is declared, the **token is
-state** — and the same `googleDrive/clientId` + `clientSecret` pair drives both.
+A Drive token only a browser consent mints; sops holds the client pair, never the
+token — so delphi's mirror ran hourly, condition unmet, reporting success 55×.
 
 ```bash
 rclone authorize drive                  # 1. on a browser machine: prints a token blob
@@ -367,8 +364,10 @@ sudo -u npgsqlrest rclone --config /var/lib/npgsqlrest/rclone.conf \
   client_id="$(sops -d modules/secrets.yaml | yq -r '.["googleDrive"]["clientId"]')" \
   client_secret="$(sops -d modules/secrets.yaml | yq -r '.["googleDrive"]["clientSecret"]')" \
   token="$(cat token.json)"             # 2. the blob from step 1
-sudo systemctl start email-archive-gdrive-sync   # 3. no rebuild; the next tick keeps it
 ```
+
+`gdrive.enable = true` plus a rebuild turns it back on; meanwhile the 25 MB tree
+rides the offload bridge (`hosts/delphi/backups.nix`) into frieren's restic.
 
 ## Where a guest lives
 

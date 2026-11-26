@@ -774,9 +774,9 @@ in {
       };
     };
 
-    # One-way by design: Drive holds a mirror, never the source of truth. The
-    # unit is skipped — not failed — on a host with no remote yet, so the timer
-    # ticks from the first boot and the mirror starts the moment a token exists.
+    # One-way by design: Drive holds a mirror, never the source of truth. A skip
+    # reports success, so never enable this without a token, and the offload bridge
+    # is the alternative when one cannot be minted (docs/email-archive.md).
     systemd.services.email-archive-gdrive-sync = lib.mkIf cfg.gdrive.enable archiveJobs.gdrive.service;
     systemd.timers.email-archive-gdrive-sync = lib.mkIf cfg.gdrive.enable archiveJobs.gdrive.timer;
 

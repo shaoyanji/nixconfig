@@ -208,7 +208,15 @@ elif [ "$example" != 1 ]; then
 fi
 
 letter_clause=""
-letter_src="${letter:-$CONFIG/letter.json}"
+letter_src="${letter:-}"
+# A tailored letter sits with the application's other material (`letters/<id>.json`,
+# and there are 82 of them), so that file is the default rather than the one generic
+# `letter.json`. Defaulting to the generic path, which does not exist, built every
+# packet CV-only and `appflow-send` then refused it as incomplete (2026-11-26).
+if [ -z "$letter_src" ] && [ -n "$id" ] && [ -f "$CONFIG/letters/$id.json" ]; then
+  letter_src="$CONFIG/letters/$id.json"
+fi
+letter_src="${letter_src:-$CONFIG/letter.json}"
 if [ -f "$letter_src" ]; then
   cp "$letter_src" "$work/letter.json"
   letter_clause="letter = $work/letter.json;"

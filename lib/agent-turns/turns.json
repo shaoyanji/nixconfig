@@ -1,8 +1,84 @@
 {
-  "generated": "2026-11-26T14:35:33Z",
+  "generated": "2026-11-26T14:40:20Z",
   "count": 200,
-  "pin": "5129414a8d4adef53ed7482feeadca6175d1f40ec12228303d5caf71e4691546",
+  "pin": "1632c5e1fdfed08f2057a24d3dc0b6872b71905d77692367791c7533c5ea756e",
   "turns": [
+    {
+      "id": "6545a181-d542-4838-b85d-e4bf84ab4751",
+      "ts": "2026-11-26T14:38:28Z",
+      "source": "devin",
+      "subject": "nixconfig:inventory-site-service",
+      "action": "claim: build inventory-site tailnet service: SQLite/FTS5 asset inventory with locations/categories/tags/serials/warranties/value, JSON+CSV import/export, optional inventory.toml host seed, API+UI, delphi loopback+tailnet wiring",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/inventory-site",
+        "modules/services/inventory-site.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "files": [],
+      "base_commit": "0f4f3d3443243819e23f5557707e39db11688fbb",
+      "branch": "main",
+      "frame": "03hb3dnvjffx9wvt7j32xl6g7"
+    },
+    {
+      "id": "0b0378e9-b379-493c-89b2-54b75ce0d0e7",
+      "ts": "2026-11-26T14:37:19Z",
+      "source": "devin",
+      "subject": "nixconfig:private-deals-service",
+      "action": "landed private-deals: Go SQLite/FTS5 deals/products/watchlists/price-history service, RSS+JSON+manual+provider ingestion, API+UI, delphi mount 8465 -> 127.0.0.1:8102 | gates: go test/vet PASS, aarch64 nix build PASS, checks:host HOST=delphi PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/services/private-deals",
+        "modules/services/private-deals.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "files": [
+        "modules/services/private-deals",
+        "modules/services/private-deals.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "base_commit": "e958d546",
+      "branch": "main",
+      "frame": "03hb3dfsi6hsnvlxd09v5zkpt"
+    },
+    {
+      "id": "3f82f9e9-5f4c-4a00-bd9b-b3c9592e443f",
+      "ts": "2026-11-26T14:36:43Z",
+      "source": "devin",
+      "subject": "nixconfig:private-deals-service",
+      "action": "landed: same evidence as nixconfig:steward-devin-drive-20261126-1512 — service, module, delphi wiring and inventory live on origin/main at c9187bfd | gates: go test PASS, checks:host HOST=delphi PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c9187bfdfe3c0f9c03d3833a856645c6f5805211",
+      "branch": "main",
+      "frame": "03hb3dboxb6n8wailksxjd94d"
+    },
+    {
+      "id": "5b4886a7-17c5-4a43-a5f2-776e817cdaab",
+      "ts": "2026-11-26T14:36:28Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-drive-20261126-1512",
+      "action": "landed: private-deals service — Go SQLite/FTS5 deals+watchlists+price history, RSS ingest timer, JSON API + one-page UI; loopback :8099, tailnet mount :8462 via servicePortal; kebab services.private-deals registered in modules.toml + inventory (link/services/key_services) | gates: go test PASS, nix sandbox build+checkPhase PASS, checks:registry:compiled PASS, checks:host HOST=delphi PASS (2150 assertions)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c9187bfdfe3c0f9c03d3833a856645c6f5805211",
+      "branch": "main",
+      "frame": "03hb3d9ysaqa3h8t4rxwkcd5c"
+    },
     {
       "id": "00fe4c24-ccec-43e1-b638-f3d6ddd6f7dd",
       "ts": "2026-11-26T14:34:35Z",
@@ -2960,64 +3036,6 @@
       "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
       "branch": "main",
       "frame": "03hb0d5824gnmx0yla4sld9vy"
-    },
-    {
-      "id": "c0266549-0b2f-4f54-bbac-ba7c98f8deba",
-      "ts": "2026-11-26T05:22:56Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-gates",
-      "action": "done: boundaries verified (all in internal/image; main.go dispatch-only), checks:image-daily rc=0, drv-equality 30/30 identical post-window | gate: checks:image-daily + drv-equality green on 3346ea27",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb0d560lqufl95ky6rjumwl"
-    },
-    {
-      "id": "21b3105c-513c-43c4-864c-49fae4dd2b21",
-      "ts": "2026-11-26T05:22:25Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-20261126-0617",
-      "action": "start: chain-change — survey hosts/ for remaining repeated module surface",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/",
-        "hosts/"
-      ],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb0d1lgw5fb76eu0hfk1kjq"
-    },
-    {
-      "id": "00a730e5-8551-4ec3-bbd5-2becf8182066",
-      "ts": "2026-11-26T05:21:05Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-0617",
-      "action": "devin refactor: chain-change via jev-decide, task sent",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/",
-        "hosts/"
-      ],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb0cs8wbxx6rhbqeqkm9knr"
-    },
-    {
-      "id": "89121d95-7280-41ae-9397-07adb53000d8",
-      "ts": "2026-11-26T04:46:25Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:image-daily-gates",
-      "action": "gate-change: image-daily gates green on 3346ea27",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb060e8rngeie2ix5w0jav4"
     }
   ]
 }

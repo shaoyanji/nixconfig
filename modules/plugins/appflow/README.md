@@ -272,8 +272,10 @@ apps:queue:resolve -- --restore <id>` puts it back. The ledger is
 The repository is public. The base file is `~/.config/appflow/resume.json` — a
 [JSON Resume](https://jsonresume.org) with the contact block, work and education;
 it is never committed, and `templates/example/resume.json` is the fictional stand-in
-that lets the build be tested. A per-application `letter.json` is passed with
-`--letter` and stays where the operator keeps it.
+that lets the build be tested. A per-application letter lives in
+`~/.config/appflow/letters/<application>.json`, which the builder takes by default
+when `--letter` is not given (the one generic `letter.json` is the fallback), and it
+stays where the operator keeps it.
 
 Language is a second corpus, not a second template. The record picks `de` or
 `en`; the headings, section titles and month names come from `strings.json`, and

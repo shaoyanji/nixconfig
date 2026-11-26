@@ -2,254 +2,216 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
 
-func testDB(t *testing.T) string {
+func testStore(t *testing.T) *Store {
 	t.Helper()
-	return filepath.Join(t.TempDir(), "test.db")
+	store, err := OpenStore(filepath.Join(t.TempDir(), "inventory.sqlite"))
+	if err != nil {
+		t.Fatalf("OpenStore: %v", err)
+	}
+	t.Cleanup(func() { _ = store.Close() })
+	return store
 }
 
-func TestUpsertAndSearch(t *testing.T) {
-	db, err := openStore(testDB(t))
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer db.Close()
-	id, fresh, err := upsertItem(db, Item{Name: "ThinkPad T480", Category: "laptop", Serial: "SN123", Tags: []string{"Fleet-Host", "work"}})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !fresh {
-		t.Fatal("first insert must be new")
-	}
-	// Upsert again: same (name, serial) updates in place.
-	id2, fresh2, err := upsertItem(db, Item{Name: "ThinkPad T480", Category: "laptop", Serial: "SN123", Location: "office"})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if fresh2 || id2 != id {
-		t.Fatalf("upsert must update in place: id %d vs %d, fresh %v", id, id2, fresh2)
-	}
-	it, err := getItem(db, id)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if it.Location != "office" {
-		t.Fatalf("location update lost: %q", it.Location)
-	}
-	// FTS finds by name token and by tag.
-	for _, q := range []string{"thinkpad", "fleet-host", "fleet"} {
-		got, err := searchItems(db, q, 10)
-		if err != nil {
-			t.Fatalf("search %q: %v", q, err)
-		}
-		if len(got) != 1 {
-			t.Fatalf("search %q: want 1 hit, got %d", q, len(got))
-		}
-	}
-	// FTS finds by serial.
-	got, err := searchItems(db, "SN123", 10)
-	if err != nil || len(got) != 1 {
-		t.Fatalf("serial search: %v %d", err, len(got))
+func sampleInput() itemInput {
+	return itemInput{
+		Source: "manual", SourceKey: "asset/x1", Name: "ThinkPad X1 Carbon", Category: "computing", Location: "office",
+		Description: "Primary laptop", Manufacturer: "Lenovo", Model: "X1 Carbon Gen 10", Serial: "PF-TEST-01",
+		PurchaseDate: "2024-01-15", WarrantyUntil: "2027-01-15", ValueCents: 145000, Currency: "EUR", Quantity: 1,
+		Tags: []string{"fleet", "Laptop", "fleet"}, Notes: "32 GB RAM",
 	}
 }
 
-func TestTagsNormalizedAndFaceted(t *testing.T) {
-	db, err := openStore(testDB(t))
-	if err != nil {
-		t.Fatal(err)
+func TestValidateNormalizesItem(t *testing.T) {
+	input := sampleInput()
+	input.Name = "  ThinkPad   X1   Carbon  "
+	input.Currency = "eur"
+	input.Tags = []string{"Fleet, laptop", "fleet", "bad tag!"}
+	if err := validateItem(&input); err != nil {
+		t.Fatalf("validateItem: %v", err)
 	}
-	defer db.Close()
-	if _, _, err := upsertItem(db, Item{Name: "a", Tags: []string{"  Foo ", "foo", "BAR"}}); err != nil {
-		t.Fatal(err)
+	if input.Name != "ThinkPad X1 Carbon" || input.Currency != "EUR" || input.Quantity != 1 {
+		t.Fatalf("unexpected normalization: %#v", input)
 	}
-	_, _, tags, err := facets(db)
-	if err != nil {
-		t.Fatal(err)
-	}
-	joined := strings.Join(tags, ",")
-	if joined != "bar,foo" {
-		t.Fatalf("tags want bar,foo got %q", joined)
-	}
-	// Filter by tag (case-insensitive).
-	got, err := filterItems(db, "", "", "FOO", 10)
-	if err != nil || len(got) != 1 {
-		t.Fatalf("tag filter: %v len=%d", err, len(got))
+	want := []string{"badtag", "fleet", "laptop"}
+	if strings.Join(input.Tags, ",") != strings.Join(want, ",") {
+		t.Fatalf("tags %#v want %#v", input.Tags, want)
 	}
 }
 
-func TestJSONRoundTrip(t *testing.T) {
-	db, err := openStore(testDB(t))
+func TestStoreCRUDFTSMetaStatsAndCSV(t *testing.T) {
+	ctx := context.Background()
+	store := testStore(t)
+	id, created, err := store.UpsertItem(ctx, sampleInput())
+	if err != nil || !created {
+		t.Fatalf("UpsertItem created=%v err=%v", created, err)
+	}
+	page, err := store.ListItems(ctx, itemQueryOptions{Q: "lenovo laptop", Limit: 10})
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("ListItems fts: %v", err)
 	}
-	if _, _, err := upsertItem(db, Item{Name: "nas", Location: "cellar", ValueCents: 39900, Tags: []string{"storage"}}); err != nil {
-		t.Fatal(err)
+	if page.Total != 1 || len(page.Items) != 1 || !strings.Contains(page.Items[0].Snippet, "<mark>") {
+		t.Fatalf("fts page %#v", page)
 	}
-	var buf bytes.Buffer
-	if err := exportJSON(db, &buf); err != nil {
-		t.Fatal(err)
-	}
-	db.Close()
-	// Import into a fresh store.
-	db2, err := openStore(testDB(t))
+	item, err := store.GetItem(ctx, id)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("GetItem: %v", err)
 	}
-	defer db2.Close()
-	n, err := importJSON(db2, &buf)
+	if len(item.Tags) != 2 || item.Category != "computing" || item.Location != "office" {
+		t.Fatalf("item %#v", item)
+	}
+	input := sampleInput()
+	input.Notes = "32 GB RAM; docked"
+	input.ValueCents = 139000
+	updatedID, created, err := store.UpsertItem(ctx, input)
+	if err != nil || created || updatedID != id {
+		t.Fatalf("upsert update id=%d created=%v err=%v", updatedID, created, err)
+	}
+	item, err = store.GetItem(ctx, id)
+	if err != nil || item.ValueCents != 139000 {
+		t.Fatalf("updated item %#v err=%v", item, err)
+	}
+
+	categories, err := store.ListMeta(ctx, "categories")
+	if err != nil || len(categories) != 1 || categories[0].ItemCount != 1 {
+		t.Fatalf("categories %#v err=%v", categories, err)
+	}
+	locations, err := store.ListMeta(ctx, "locations")
+	if err != nil || len(locations) != 1 || locations[0].ItemCount != 1 {
+		t.Fatalf("locations %#v err=%v", locations, err)
+	}
+	tags, err := store.ListMeta(ctx, "tags")
+	if err != nil || len(tags) != 2 {
+		t.Fatalf("tags %#v err=%v", tags, err)
+	}
+	stats, err := store.Stats(ctx)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("Stats: %v", err)
 	}
-	if n != 1 {
-		t.Fatalf("imported %d, want 1", n)
+	if stats["items"] != 1 || stats["value_cents"] != 139000 || stats["with_serial"] != 1 {
+		t.Fatalf("stats %#v", stats)
 	}
-	items, err := listItems(db2, 10)
-	if err != nil || len(items) != 1 {
-		t.Fatalf("list: %v len=%d", err, len(items))
+
+	bundle, err := store.ExportBundle(ctx)
+	if err != nil || len(bundle.Items) != 1 || len(bundle.Categories) != 1 {
+		t.Fatalf("export %#v err=%v", bundle, err)
 	}
-	if items[0].ValueCents != 39900 || len(items[0].Tags) != 1 || items[0].Tags[0] != "storage" {
-		t.Fatalf("round trip lost data: %+v", items[0])
+	var csvOut bytes.Buffer
+	if err := writeItemsCSV(&csvOut, bundle.Items); err != nil {
+		t.Fatalf("writeItemsCSV: %v", err)
+	}
+	imported, warnings, err := itemsFromCSV(strings.NewReader(csvOut.String()))
+	if err != nil || len(imported) != 1 || len(warnings) != 0 {
+		t.Fatalf("itemsFromCSV len=%d warnings=%v err=%v", len(imported), warnings, err)
+	}
+	if imported[0].Name != item.Name || imported[0].ValueCents != item.ValueCents {
+		t.Fatalf("csv roundtrip %#v", imported[0])
 	}
 }
 
-func TestCSVRoundTrip(t *testing.T) {
-	db, err := openStore(testDB(t))
+func TestFleetTOMLSeedIsIdempotent(t *testing.T) {
+	raw := []byte(`
+[hosts.frieren]
+hostname = "frieren"
+status = "active"
+status_detail = "NAS host"
+kind = "nixos"
+arch = "x86_64-linux"
+role = "Central NAS"
+category = "server"
+[hosts.frieren.hardware]
+model = "Lenovo ideapad 320"
+cpu = "Intel i5"
+ram = "12 GiB"
+[hosts.frieren.network]
+lan_ip = "192.168.3.25"
+tailscale_hostname = "frieren"
+[hosts.frieren.software]
+module_chain = "globalModulesNixos"
+traits = ["nas-server", "agent-backend"]
+key_services = ["Jellyfin"]
+`)
+	inputs, err := itemsFromFleetTOML(raw)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("itemsFromFleetTOML: %v", err)
 	}
-	if _, _, err := upsertItem(db, Item{Name: "monitor, curved", Location: "desk", Serial: "M1", ValueCents: 19999, Tags: []string{"a", "b"}}); err != nil {
-		t.Fatal(err)
+	if len(inputs) != 1 || inputs[0].Name != "frieren" || inputs[0].SourceKey != "host/frieren" || inputs[0].Manufacturer != "Lenovo" {
+		t.Fatalf("seed input %#v", inputs)
 	}
-	var buf bytes.Buffer
-	if err := exportCSV(db, &buf); err != nil {
-		t.Fatal(err)
+	store := testStore(t)
+	first, err := store.ImportItems(context.Background(), inputs)
+	if err != nil || first.Inserted != 1 || first.Updated != 0 {
+		t.Fatalf("first import %#v err=%v", first, err)
 	}
-	db.Close()
-	db2, err := openStore(testDB(t))
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer db2.Close()
-	n, err := importCSV(db2, &buf)
-	if err != nil {
-		t.Fatalf("import: %v\ncsv:\n%s", err, buf.String())
-	}
-	if n != 1 {
-		t.Fatalf("imported %d, want 1", n)
-	}
-	items, _ := listItems(db2, 10)
-	if items[0].Name != "monitor, curved" || len(items[0].Tags) != 2 || items[0].ValueCents != 19999 {
-		t.Fatalf("csv round trip: %+v", items[0])
+	second, err := store.ImportItems(context.Background(), inputs)
+	if err != nil || second.Inserted != 0 || second.Updated != 1 {
+		t.Fatalf("second import %#v err=%v", second, err)
 	}
 }
 
-func TestSeedHosts(t *testing.T) {
-	db, err := openStore(testDB(t))
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer db.Close()
-	seed := filepath.Join(t.TempDir(), "seed.json")
-	os.WriteFile(seed, []byte(`[
-	 {"name":"delphi","description":"OCI Ampere A1","tags":["fleet-host","aarch64-linux"],"notes":"tailnet resolver"},
-	 {"name":"frieren","description":"MINISFORUM","tags":["fleet-host","x86_64-linux"],"notes":""}
-	]`), 0o644)
-	n, err := seedHosts(db, seed)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if n != 2 {
-		t.Fatalf("seeded %d, want 2", n)
-	}
-	// Idempotent: a second seed updates in place.
-	if n2, err := seedHosts(db, seed); err != nil || n2 != 2 {
-		t.Fatalf("reseed: %v %d", err, n2)
-	}
-	items, _ := listItems(db, 10)
-	if len(items) != 2 {
-		t.Fatalf("reseed duplicated: len=%d", len(items))
-	}
-	got, err := filterItems(db, "fleet", "host", "", 10)
-	if err != nil || len(got) != 2 {
-		t.Fatalf("filter fleet/host: %v len=%d", err, len(got))
-	}
-}
+func TestHTTPWriteOriginAndImportExport(t *testing.T) {
+	store := testStore(t)
+	s := &server{store: store, expectedOrigin: "https://delphi.example:8466"}
+	mux := http.NewServeMux()
+	mux.HandleFunc("POST /api/items", s.createItem)
+	mux.HandleFunc("GET /api/items", s.items)
+	mux.HandleFunc("POST /api/import/inventory-toml", s.importFleetTOML)
 
-func TestHTTPAPI(t *testing.T) {
-	db, err := openStore(testDB(t))
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer db.Close()
-	srv := httptest.NewServer((&server{db: db}).mux())
-	defer srv.Close()
-
-	// POST an item.
-	body := `{"name":"camera","category":"photo","serial":"C77","tags":["kit"]}`
-	resp, err := http.Post(srv.URL+"/api/items", "application/json", strings.NewReader(body))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if resp.StatusCode != 200 {
-		t.Fatalf("post status %d", resp.StatusCode)
-	}
-	resp.Body.Close()
-
-	// GET list with FTS query.
-	r, err := http.Get(srv.URL + "/api/items?q=camera")
-	if err != nil {
-		t.Fatal(err)
-	}
-	var out struct {
-		Count int `json:"count"`
-	}
-	json.NewDecoder(r.Body).Decode(&out)
-	r.Body.Close()
-	if out.Count != 1 {
-		t.Fatalf("fts via api: count %d", out.Count)
+	body := strings.NewReader(`{"name":"NAS backup disk","category":"storage","location":"basement","value_cents":8900,"tags":["backup"]}`)
+	req := httptest.NewRequest("POST", "/api/items", body)
+	req.Header.Set("content-type", "application/json")
+	req.Header.Set("origin", "https://evil.example")
+	recorder := httptest.NewRecorder()
+	mux.ServeHTTP(recorder, req)
+	if recorder.Code != http.StatusForbidden {
+		t.Fatalf("wrong origin status %d body %s", recorder.Code, recorder.Body.String())
 	}
 
-	// CSV import endpoint.
-	csvBody := "name,location,tags\nkettle,kitchen,appliance\n"
-	r2, err := http.Post(srv.URL+"/api/import/csv", "text/csv", strings.NewReader(csvBody))
-	if err != nil {
-		t.Fatal(err)
-	}
-	var imp struct {
-		Imported int `json:"imported"`
-	}
-	json.NewDecoder(r2.Body).Decode(&imp)
-	r2.Body.Close()
-	if imp.Imported != 1 {
-		t.Fatalf("csv import via api: %d", imp.Imported)
+	req = httptest.NewRequest("POST", "/api/items", strings.NewReader(`{"name":"NAS backup disk","category":"storage","location":"basement","value_cents":8900,"tags":["backup"]}`))
+	req.Header.Set("content-type", "application/json")
+	req.Header.Set("origin", "https://delphi.example:8466")
+	recorder = httptest.NewRecorder()
+	mux.ServeHTTP(recorder, req)
+	if recorder.Code != http.StatusCreated {
+		t.Fatalf("create status %d body %s", recorder.Code, recorder.Body.String())
 	}
 
-	// Delete.
-	req, _ := http.NewRequest("DELETE", srv.URL+"/api/items/1", nil)
-	dr, err := http.DefaultClient.Do(req)
-	if err != nil {
-		t.Fatal(err)
-	}
-	dr.Body.Close()
-	if dr.StatusCode != 200 {
-		t.Fatalf("delete status %d", dr.StatusCode)
+	req = httptest.NewRequest("GET", "/api/items?q=backup", nil)
+	recorder = httptest.NewRecorder()
+	mux.ServeHTTP(recorder, req)
+	if recorder.Code != http.StatusOK || !strings.Contains(recorder.Body.String(), "NAS backup disk") {
+		t.Fatalf("search status %d body %s", recorder.Code, recorder.Body.String())
 	}
 
-	// Health.
-	hr, err := http.Get(srv.URL + "/healthz")
-	if err != nil {
-		t.Fatal(err)
+	seed := `[hosts.testbox]
+hostname = "testbox"
+status = "active"
+kind = "nixos"
+arch = "x86_64-linux"
+category = "server"
+[hosts.testbox.hardware]
+model = "Test Machine"
+`
+	req = httptest.NewRequest("POST", "/api/import/inventory-toml", strings.NewReader(seed))
+	req.Header.Set("origin", "https://delphi.example:8466")
+	recorder = httptest.NewRecorder()
+	mux.ServeHTTP(recorder, req)
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("toml import status %d body %s", recorder.Code, recorder.Body.String())
 	}
-	hr.Body.Close()
-	if hr.StatusCode != 200 {
-		t.Fatalf("healthz %d", hr.StatusCode)
+	var result importResult
+	if err := json.Unmarshal(recorder.Body.Bytes(), &result); err != nil {
+		t.Fatalf("decode import result: %v", err)
+	}
+	if result.Inserted != 1 {
+		t.Fatalf("import result %#v", result)
 	}
 }

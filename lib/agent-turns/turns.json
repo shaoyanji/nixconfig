@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-26T14:56:04Z",
+  "generated": "2026-11-26T15:00:28Z",
   "count": 200,
-  "pin": "fbbde2ce4efaea5913803bd12ad8ae921ce7e0bfcdcf4ae96c3c99898810f8ce",
+  "pin": "6c9452b9efdac15fa199f9fa7e5f7ac05003fbdf9afcd903d4519ce911f3f2c3",
   "turns": [
+    {
+      "id": "36863132-8333-4a7f-839b-56146e2404cd",
+      "ts": "2026-11-26T15:00:19Z",
+      "source": "buffy",
+      "subject": "nixconfig:checks-tasks-apps-summary",
+      "action": "claim: trim apps:sweep:pipeline summary under the 600-char budget so checks:tasks exits 0, then read fleet health",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/apps.yml"
+      ],
+      "files": [],
+      "base_commit": "0a7e59956b0a908a9b17ec5aedbd1b78a801d6fc",
+      "branch": "main",
+      "frame": "03hb3hxjrjdcaghlklmnv9544"
+    },
+    {
+      "id": "8b6422b3-795d-4e52-a10a-74129e1dac52",
+      "ts": "2026-11-26T14:58:58Z",
+      "source": "buffy",
+      "subject": "nixconfig:deals-research-taskfile-wiring",
+      "action": "taskfiles/deals.yml (deals:page, deals:ingest) included in Taskfile.yml; agents:web in agents.yml; README map updated; no internal:true. task --list-all shows 3 (desc 116-148), task <name> -- --help reaches argparse, live: deals:page firecrawl 2 deals amazon, deals:ingest dry-run 5, agents:web search 3 providers 2 hits. checks:tasks clean for my files (pre-existing longSummary apps:sweep:pipeline at e958d546). 40+17+28 tests OK.| gate: checks:tasks + 3 unittest suites PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0a7e59956b0a908a9b17ec5aedbd1b78a801d6fc",
+      "branch": "main",
+      "frame": "03hb3ho28of3w8zfv8e1255h0"
+    },
     {
       "id": "ed500ae2-25b3-49d4-97c0-aadd8e7e4e7a",
       "ts": "2026-11-26T14:56:00Z",
@@ -3007,32 +3035,6 @@
       "base_commit": "c70788c4b7c3dc724a38203bb44ddfae9718dfaa",
       "branch": "main",
       "frame": "03hb0rpfbgifkmau7wwjd6qqj"
-    },
-    {
-      "id": "2e8d92bb-bf37-4509-9d73-3fbdbc8ed9a1",
-      "ts": "2026-11-26T06:36:22Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-0725",
-      "action": "flake-change: appflow-board residual wiring cleanup",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "c70788c4b7c3dc724a38203bb44ddfae9718dfaa",
-      "branch": "main",
-      "frame": "03hb0rhmhbr23sd3jb0xya524"
-    },
-    {
-      "id": "7388576b-7a83-4101-9b51-a37c6878a007",
-      "ts": "2026-11-26T06:24:54Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-20261126-0719",
-      "action": "landed: modules-edges fixture now locks the allowed shapes — seeded args-import, readFile, src path, overlay import all pass while seeded edge still refuses | gate: modules:edges:test 3/3 + check:verify clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c70788c4b7c3dc724a38203bb44ddfae9718dfaa",
-      "branch": "main",
-      "frame": "03hb0p8x5bpbqsog21548e797"
     }
   ]
 }

@@ -9,6 +9,7 @@
     "services.mataroaConsole.enable"
     "services.jobDbScraper.enable"
     "services.privateDeals.enable"
+    "services.inventorySite.enable"
   ];
   umbrellaFamilies = ["checks:appflow"];
   sopsAnchorExceptions = ["garnix"];

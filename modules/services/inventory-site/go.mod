@@ -2,7 +2,10 @@ module inventory-site
 
 go 1.26.0
 
-require modernc.org/sqlite v1.62.0
+require (
+	github.com/BurntSushi/toml v1.4.0
+	modernc.org/sqlite v1.62.0
+)
 
 require (
 	github.com/dustin/go-humanize v1.1.0 // indirect

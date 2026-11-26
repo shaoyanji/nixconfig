@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Inventory Site</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="shell hero">
+    <nav class="topline" aria-label="service">
+      <div class="brand"><span class="mark">▣</span><span>Inventory Site</span></div>
+      <div class="navactions">
+        <a class="ghost" href="/api/export.csv">CSV</a>
+        <a class="ghost" href="/api/export.json">JSON</a>
+        <button id="newItemButton" class="primary">Add asset</button>
+      </div>
+    </nav>
+    <section class="hero-grid">
+      <div>
+        <p class="eyebrow">private asset register</p>
+        <h1>Everything you own, findable in one breath.</h1>
+        <p class="lede">Fleet hardware and personal assets with locations, categories, tags, serials, warranties, value and a SQLite/FTS5 memory.</p>
+      </div>
+      <div class="stats" id="stats" aria-live="polite"></div>
+    </section>
+  </header>
+
+  <main class="shell layout">
+    <section class="workspace">
+      <form id="filters" class="filters inventory-filters">
+        <label class="search"><span>Search</span><input name="q" type="search" placeholder="serial, model, room, machine…" autocomplete="off"></label>
+        <label><span>Category</span><select name="category" data-meta="categories"><option value="">All</option></select></label>
+        <label><span>Location</span><select name="location" data-meta="locations"><option value="">All</option></select></label>
+        <label><span>Tag</span><select name="tag" data-meta="tags"><option value="">All</option></select></label>
+        <label><span>Warranty</span><select name="warranty_within"><option value="">Any</option><option value="30">30 days</option><option value="90">90 days</option><option value="365">1 year</option></select></label>
+        <label class="checkrow"><input name="include_archived" type="checkbox" value="1"><span>Archived</span></label>
+        <button class="secondary" type="submit">Filter</button>
+      </form>
+
+      <div class="sectionbar">
+        <div><p class="eyebrow">live register</p><h2>Assets</h2></div>
+        <p id="assetCount" class="muted"></p>
+      </div>
+      <div id="items" class="dealgrid inventory-grid" aria-live="polite"></div>
+    </section>
+
+    <aside class="sidebar">
+      <details class="panel" id="editorPanel">
+        <summary><span id="editorTitle">Add an asset</span></summary>
+        <form id="itemForm" class="stack">
+          <input type="hidden" name="id"><input type="hidden" name="source"><input type="hidden" name="source_key">
+          <input name="name" required placeholder="Name">
+          <div class="tworow"><input name="category" list="categoryList" placeholder="Category"><input name="location" list="locationList" placeholder="Location"></div>
+          <div class="tworow"><input name="manufacturer" placeholder="Manufacturer"><input name="model" placeholder="Model"></div>
+          <input name="serial" placeholder="Serial number">
+          <div class="tworow"><input name="purchase_date" type="date" title="Purchase date"><input name="warranty_until" type="date" title="Warranty until"></div>
+          <div class="tworow"><input name="value" type="number" min="0" step="0.01" placeholder="Value"><input name="quantity" type="number" min="1" step="1" placeholder="Qty"></div>
+          <input name="url" placeholder="Receipt, manual or product URL">
+          <input name="tags" placeholder="tags, comma separated">
+          <textarea name="description" rows="2" placeholder="Description"></textarea>
+          <textarea name="notes" rows="3" placeholder="Notes, specs, service history…"></textarea>
+          <label class="checkrow formcheck"><input name="archived" type="checkbox"><span>Archived</span></label>
+          <div class="tworow"><button class="primary" type="submit">Save asset</button><button class="ghost" type="button" id="resetEditor">Reset</button></div>
+        </form>
+        <datalist id="categoryList"></datalist><datalist id="locationList"></datalist>
+      </details>
+
+      <details class="panel">
+        <summary>Import and seed</summary>
+        <div class="stack importbox">
+          <label class="fileline"><span>JSON export/import</span><input id="jsonImport" type="file" accept="application/json,.json"></label>
+          <label class="fileline"><span>CSV import</span><input id="csvImport" type="file" accept="text/csv,.csv"></label>
+          <label class="fileline"><span>inventory.toml host seed</span><input id="tomlImport" type="file" accept=".toml,text/plain"></label>
+          <p class="small muted">Fleet host seeds are idempotent: <code>inventory.toml</code> + <code>host/&lt;name&gt;</code> update in place.</p>
+          <div id="importResult" class="small"></div>
+        </div>
+      </details>
+
+      <section class="panel">
+        <div class="panelhead"><h3>Categories</h3><span id="categoryCount" class="muted"></span></div>
+        <div id="categories" class="chiplist"></div>
+      </section>
+      <section class="panel">
+        <div class="panelhead"><h3>Locations</h3><span id="locationCount" class="muted"></span></div>
+        <div id="locations" class="chiplist"></div>
+      </section>
+      <section class="panel">
+        <div class="panelhead"><h3>Tags</h3><span id="tagCount" class="muted"></span></div>
+        <div id="tags" class="chiplist tags"></div>
+      </section>
+    </aside>
+  </main>
+
+  <dialog id="detailDialog">
+    <article id="detail"></article>
+    <form method="dialog"><button class="ghost close">Close</button></form>
+  </dialog>
+
+  <div id="toast" role="status"></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>

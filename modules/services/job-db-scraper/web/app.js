@@ -1,4 +1,4 @@
-const state = { q: '', source: '', location: '', days: 7, remote: false, offset: 0, limit: 20, total: 0 };
+const state = { q: '', source: '', location: '', days: 7, remote: false, sort: 'latest', offset: 0, limit: 20, total: 0 };
 const $ = (sel) => document.querySelector(sel);
 
 function esc(value) {
@@ -34,6 +34,7 @@ function params() {
   if (state.location) p.set('location', state.location);
   if (state.days) p.set('days', state.days);
   if (state.remote) p.set('remote', '1');
+  if (state.sort === 'score') p.set('sort', 'score');
   p.set('limit', state.limit);
   p.set('offset', state.offset);
   return p;
@@ -79,7 +80,9 @@ function renderJobs(items) {
         <div class="meta">
           <strong>${esc(job.company)}</strong>
           <span>${esc(job.location || 'unspecified')}</span>
+          ${job.score ? `<span class="badge score">score ${job.score}</span>` : ''}
           ${job.remote ? '<span class="badge">remote</span>' : ''}
+          ${(job.lanes || []).slice(0, 5).map((lane) => `<span class="badge lane">${esc(lane)}</span>`).join('')}
           <span class="badge source">${esc(job.source)}</span>
           ${(job.tags || []).slice(0, 4).map((t) => `<span class="badge">${esc(t)}</span>`).join('')}
         </div>
@@ -97,7 +100,7 @@ async function loadJobs() {
   const page = await api('/api/postings?' + params());
   state.total = page.total || 0;
   $('#result-count').textContent = state.total;
-  $('#query-echo').textContent = state.q ? `FTS5: “${state.q}”` : 'latest first';
+  $('#query-echo').textContent = state.q ? `FTS5: “${state.q}”` : (state.sort === 'score' ? 'best role match first' : 'latest first');
   renderJobs(page.items || []);
   const pageNo = Math.floor(state.offset / state.limit) + 1;
   $('#page-label').textContent = `page ${pageNo}`;
@@ -111,7 +114,10 @@ async function showDetail(id) {
     <h2>${esc(job.title)}</h2>
     <div class="detail-meta">
       <span class="badge source">${esc(job.source)}</span><strong>${esc(job.company)}</strong><span>${esc(job.location || 'unspecified')}</span>
-      ${job.remote ? '<span class="badge">remote</span>' : ''}<span class="badge">seen ${job.seen_count}×</span><span>${fmtDate(job.posted_at)}</span>
+      ${job.score ? `<span class="badge score">role-match ${job.score}/100</span>` : ''}
+      ${job.remote ? '<span class="badge">remote</span>' : ''}
+      ${(job.lanes || []).map((lane) => `<span class="badge lane">${esc(lane)}</span>`).join('')}
+      <span class="badge">seen ${job.seen_count}×</span><span>${fmtDate(job.posted_at)}</span>
     </div>
     <a class="open" href="${esc(job.url)}" target="_blank" rel="noreferrer">Open original posting ↗</a>
     <div class="description">${esc(job.description || 'No description captured yet.')}</div>
@@ -137,9 +143,10 @@ $('#source').addEventListener('change', () => { state.source = $('#source').valu
 $('#location').addEventListener('input', () => { state.location = $('#location').value.trim(); state.offset = 0; clearTimeout(window.locTimer); window.locTimer = setTimeout(loadJobs, 250); });
 $('#days').addEventListener('change', () => { state.days = Number($('#days').value); state.offset = 0; loadJobs(); });
 $('#remote').addEventListener('change', () => { state.remote = $('#remote').checked; state.offset = 0; loadJobs(); });
+$('#sort').addEventListener('change', (event) => { state.sort = event.target.value; state.offset = 0; loadJobs(); });
 $('#reset').addEventListener('click', () => {
-  state.q = ''; state.source = ''; state.location = ''; state.days = 7; state.remote = false; state.offset = 0;
-  $('#q').value = ''; $('#source').value = ''; $('#location').value = ''; $('#days').value = '7'; $('#remote').checked = false;
+  state.q = ''; state.source = ''; state.location = ''; state.days = 7; state.remote = false; state.sort = 'latest'; state.offset = 0;
+  $('#q').value = ''; $('#source').value = ''; $('#location').value = ''; $('#days').value = '7'; $('#remote').checked = false; $('#sort').value = 'latest';
   loadJobs();
 });
 $('#prev').addEventListener('click', () => { state.offset = Math.max(0, state.offset - state.limit); loadJobs(); });

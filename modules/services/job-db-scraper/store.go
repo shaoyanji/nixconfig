@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -18,6 +19,7 @@ type Store struct {
 
 type queryOptions struct {
 	Q        string
+	Sort     string
 	Source   string
 	Company  string
 	Location string
@@ -117,7 +119,9 @@ func (s *Store) migrate() error {
 			last_seen TEXT NOT NULL,
 			seen_count INTEGER NOT NULL DEFAULT 1,
 			active INTEGER NOT NULL DEFAULT 1,
-			salary TEXT NOT NULL DEFAULT ''
+			salary TEXT NOT NULL DEFAULT '',
+			score INTEGER NOT NULL DEFAULT 0,
+			lanes TEXT NOT NULL DEFAULT '[]'
 		)`,
 		`CREATE INDEX IF NOT EXISTS postings_source_idx ON postings(source)`,
 		`CREATE INDEX IF NOT EXISTS postings_company_idx ON postings(company_key)`,
@@ -142,6 +146,22 @@ func (s *Store) migrate() error {
 			INSERT INTO postings_fts(rowid, title, company, location, description, tags)
 			VALUES (new.id, new.title, new.company, new.location, new.description, new.tags);
 		END`,
+		`CREATE TABLE IF NOT EXISTS job_score_alerts (
+			id INTEGER PRIMARY KEY,
+			fingerprint TEXT NOT NULL UNIQUE,
+			posting_id INTEGER NOT NULL REFERENCES postings(id) ON DELETE CASCADE,
+			company TEXT NOT NULL,
+			title TEXT NOT NULL,
+			url TEXT NOT NULL,
+			score INTEGER NOT NULL,
+			status TEXT NOT NULL DEFAULT 'pending',
+			attempts INTEGER NOT NULL DEFAULT 0,
+			notify_error TEXT NOT NULL DEFAULT '',
+			first_seen TEXT NOT NULL,
+			last_seen TEXT NOT NULL,
+			notified_at TEXT
+		)`,
+		`CREATE INDEX IF NOT EXISTS job_score_alerts_status_idx ON job_score_alerts(status,last_seen DESC)`,
 		`CREATE TABLE IF NOT EXISTS scrape_runs (
 			id INTEGER PRIMARY KEY,
 			started_at TEXT NOT NULL,
@@ -169,12 +189,149 @@ func (s *Store) migrate() error {
 			return fmt.Errorf("migrate: %w", err)
 		}
 	}
-	var ftsRows, postingRows int
-	_ = s.db.QueryRow(`SELECT count(*) FROM postings_fts`).Scan(&ftsRows)
-	_ = s.db.QueryRow(`SELECT count(*) FROM postings`).Scan(&postingRows)
-	if postingRows > 0 && ftsRows == 0 {
+	columns := []struct {
+		name string
+		ddl  string
+	}{
+		{"score", `ALTER TABLE postings ADD COLUMN score INTEGER NOT NULL DEFAULT 0`},
+		{"lanes", `ALTER TABLE postings ADD COLUMN lanes TEXT NOT NULL DEFAULT '[]'`},
+	}
+	missing := []string{}
+	for _, column := range columns {
+		exists, err := s.hasColumn("postings", column.name)
+		if err != nil {
+			return err
+		}
+		if !exists {
+			missing = append(missing, column.name)
+		}
+	}
+	if len(missing) > 0 {
+		for _, trigger := range []string{"postings_ai", "postings_ad", "postings_au"} {
+			if _, err := s.db.Exec(`DROP TRIGGER IF EXISTS ` + trigger); err != nil {
+				return fmt.Errorf("drop %s: %w", trigger, err)
+			}
+		}
+		if _, err := s.db.Exec(`DROP TABLE IF EXISTS postings_fts`); err != nil {
+			return fmt.Errorf("drop postings fts: %w", err)
+		}
+		for _, column := range columns {
+			if !slices.Contains(missing, column.name) {
+				continue
+			}
+			if _, err := s.db.Exec(column.ddl); err != nil {
+				return fmt.Errorf("add postings.%s: %w", column.name, err)
+			}
+		}
+		_, err := s.db.Exec(`CREATE VIRTUAL TABLE postings_fts USING fts5(
+			title, company, location, description, tags,
+			content='postings', content_rowid='id'
+		)`)
+		if err != nil {
+			return fmt.Errorf("recreate postings fts: %w", err)
+		}
+		for _, trigger := range []string{
+			`CREATE TRIGGER postings_ai AFTER INSERT ON postings BEGIN
+				INSERT INTO postings_fts(rowid, title, company, location, description, tags)
+				VALUES (new.id, new.title, new.company, new.location, new.description, new.tags);
+			END`,
+			`CREATE TRIGGER postings_ad AFTER DELETE ON postings BEGIN
+				INSERT INTO postings_fts(postings_fts, rowid, title, company, location, description, tags)
+				VALUES('delete', old.id, old.title, old.company, old.location, old.description, old.tags);
+			END`,
+			`CREATE TRIGGER postings_au AFTER UPDATE ON postings BEGIN
+				INSERT INTO postings_fts(postings_fts, rowid, title, company, location, description, tags)
+				VALUES('delete', old.id, old.title, old.company, old.location, old.description, old.tags);
+				INSERT INTO postings_fts(rowid, title, company, location, description, tags)
+				VALUES (new.id, new.title, new.company, new.location, new.description, new.tags);
+			END`,
+		} {
+			if _, err := s.db.Exec(trigger); err != nil {
+				return fmt.Errorf("recreate postings fts trigger: %w", err)
+			}
+		}
 		if _, err := s.db.Exec(`INSERT INTO postings_fts(postings_fts) VALUES('rebuild')`); err != nil {
-			return fmt.Errorf("rebuild fts: %w", err)
+			return fmt.Errorf("rebuild recreated fts: %w", err)
+		}
+	} else {
+		var ftsRows, postingRows int
+		if err := s.db.QueryRow(`SELECT count(*) FROM postings_fts`).Scan(&ftsRows); err != nil {
+			return fmt.Errorf("count fts rows: %w", err)
+		}
+		if err := s.db.QueryRow(`SELECT count(*) FROM postings`).Scan(&postingRows); err != nil {
+			return fmt.Errorf("count postings rows: %w", err)
+		}
+		if postingRows > 0 && ftsRows == 0 {
+			if _, err := s.db.Exec(`INSERT INTO postings_fts(postings_fts) VALUES('rebuild')`); err != nil {
+				return fmt.Errorf("rebuild fts: %w", err)
+			}
+		}
+	}
+	if _, err := s.db.Exec(`CREATE INDEX IF NOT EXISTS postings_score_idx ON postings(score DESC,last_seen DESC)`); err != nil {
+		return fmt.Errorf("postings score index: %w", err)
+	}
+	if err := s.rescorePostings(); err != nil {
+		return fmt.Errorf("rescore postings: %w", err)
+	}
+	return nil
+}
+
+func (s *Store) hasColumn(table, column string) (bool, error) {
+	rows, err := s.db.Query(`PRAGMA table_info(` + table + `)`)
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var cid int
+		var name, kind string
+		var notNull int
+		var defaultValue any
+		var pk int
+		if err := rows.Scan(&cid, &name, &kind, &notNull, &defaultValue, &pk); err != nil {
+			return false, err
+		}
+		if name == column {
+			return true, rows.Err()
+		}
+	}
+	return false, rows.Err()
+}
+
+func (s *Store) rescorePostings() error {
+	rows, err := s.db.Query(`SELECT id,title,location,remote,description,tags,score,lanes FROM postings`)
+	if err != nil {
+		return fmt.Errorf("select postings: %w", err)
+	}
+	type row struct {
+		id    int64
+		score int
+		lanes []string
+	}
+	pending := []row{}
+	for rows.Next() {
+		var id, remote int64
+		var title, location, description, tags, currentLanes string
+		var currentScore int
+		if err := rows.Scan(&id, &title, &location, &remote, &description, &tags, &currentScore, &currentLanes); err != nil {
+			rows.Close()
+			return err
+		}
+		posting := Posting{Title: title, Location: location, Remote: remote == 1, Description: description, Tags: parseTagsJSON(tags)}
+		score, lanes := scorePosting(posting)
+		if score != currentScore || tagsJSON(lanes) != currentLanes {
+			pending = append(pending, row{id: id, score: score, lanes: lanes})
+		}
+	}
+	if err := rows.Close(); err != nil {
+		return err
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	for _, item := range pending {
+		if _, err := s.db.Exec(`UPDATE postings SET score=?,lanes=? WHERE id=?`, item.score, tagsJSON(item.lanes), item.id); err != nil {
+			return fmt.Errorf("update posting %d: %w", item.id, err)
 		}
 	}
 	return nil
@@ -206,11 +363,11 @@ func (s *Store) UpsertPosting(ctx context.Context, in postingInput) (int64, bool
 	if errors.Is(err, sql.ErrNoRows) {
 		res, err := tx.ExecContext(ctx, `
 			INSERT INTO postings (fingerprint, canonical_url, url, source, company, company_key, title, location,
-				remote, employment, description, tags, posted_at, first_seen, last_seen, seen_count, active, salary)
-			VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+				remote, employment, description, tags, posted_at, first_seen, last_seen, seen_count, active, salary, score, lanes)
+			VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
 			p.Fingerprint, p.CanonicalURL, p.URL, p.Source, p.Company, p.CompanyKey, p.Title, p.Location,
 			boolInt(p.Remote), p.Employment, p.Description, tagsJSON(p.Tags), p.PostedAt,
-			now.Format(time.RFC3339), now.Format(time.RFC3339), 1, 1, p.Salary)
+			now.Format(time.RFC3339), now.Format(time.RFC3339), 1, 1, p.Salary, p.Score, tagsJSON(p.Lanes))
 		if err != nil {
 			return 0, false, err
 		}
@@ -225,14 +382,17 @@ func (s *Store) UpsertPosting(ctx context.Context, in postingInput) (int64, bool
 	if len(existingDescription) > len(description) {
 		description = existingDescription
 	}
+	scored := p
+	scored.Description = description
+	scored.Score, scored.Lanes = scorePosting(scored)
 	_, err = tx.ExecContext(ctx, `
 		UPDATE postings SET canonical_url=?, url=?, source=?, company=?, company_key=?, title=?, location=?,
 			remote=?, employment=?, description=?, tags=?, posted_at=COALESCE(NULLIF(?, ''), posted_at),
-			last_seen=?, seen_count=?, active=1, salary=COALESCE(NULLIF(?, ''), salary)
+			last_seen=?, seen_count=?, active=1, salary=COALESCE(NULLIF(?, ''), salary), score=?, lanes=?
 		WHERE id=?`,
 		p.CanonicalURL, p.URL, p.Source, p.Company, p.CompanyKey, p.Title, p.Location,
 		boolInt(p.Remote), p.Employment, description, tagsJSON(p.Tags), p.PostedAt,
-		now.Format(time.RFC3339), seen+1, p.Salary, id)
+		now.Format(time.RFC3339), seen+1, p.Salary, scored.Score, tagsJSON(scored.Lanes), id)
 	if err != nil {
 		return 0, false, err
 	}
@@ -251,7 +411,13 @@ func (s *Store) UpdateDescription(ctx context.Context, id int64, description str
 	if len(description) < 80 {
 		return errors.New("enrichment too short")
 	}
-	_, err := s.db.ExecContext(ctx, `UPDATE postings SET description=? WHERE id=? AND length(description) < length(?)`, description, id, description)
+	posting, _, err := s.GetPosting(ctx, id)
+	if err != nil {
+		return err
+	}
+	posting.Description = description
+	posting.Score, posting.Lanes = scorePosting(posting)
+	_, err = s.db.ExecContext(ctx, `UPDATE postings SET description=?,score=?,lanes=? WHERE id=? AND length(description) < length(?)`, description, posting.Score, tagsJSON(posting.Lanes), id, description)
 	return err
 }
 
@@ -289,6 +455,9 @@ func (s *Store) QueryPostings(ctx context.Context, opt queryOptions) (postingsPa
 		args = append(args, match)
 		order = "bm25(postings_fts), p.last_seen DESC"
 	}
+	if opt.Sort == "score" {
+		order = "p.score DESC, p.last_seen DESC"
+	}
 	if opt.Source != "" {
 		where = append(where, "p.source = ?")
 		args = append(args, opt.Source)
@@ -321,13 +490,13 @@ func (s *Store) QueryPostings(ctx context.Context, opt queryOptions) (postingsPa
 		return postingsPage{}, err
 	}
 
-	selectSnippet := "'' AS snippet, 0.0 AS score"
+	selectSnippet := "'' AS snippet, 0.0 AS search_score"
 	if match != "" {
-		selectSnippet = "snippet(postings_fts, 3, '<mark>', '</mark>', '…', 18) AS snippet, bm25(postings_fts) AS score"
+		selectSnippet = "snippet(postings_fts, 3, '<mark>', '</mark>', '…', 18) AS snippet, bm25(postings_fts) AS search_score"
 	}
 	query := `
 		SELECT p.id, p.fingerprint, p.canonical_url, p.url, p.source, p.company, p.company_key, p.title, p.location,
-			p.remote, p.employment, p.description, p.tags, p.posted_at, p.first_seen, p.last_seen, p.seen_count, p.active, p.salary,
+			p.remote, p.employment, p.description, p.tags, p.posted_at, p.first_seen, p.last_seen, p.seen_count, p.active, p.salary, p.score, p.lanes,
 			` + selectSnippet + `
 		FROM postings p` + join + predicate + `
 		ORDER BY ` + order + `
@@ -357,22 +526,24 @@ func scanPosting(row rowScanner) (Posting, error) {
 	var p Posting
 	var remote, active int
 	var tags, first, last string
-	var score sql.NullFloat64
+	var lanes string
+	var searchScore sql.NullFloat64
 	var snippet sql.NullString
 	err := row.Scan(&p.ID, &p.Fingerprint, &p.CanonicalURL, &p.URL, &p.Source, &p.Company, &p.CompanyKey,
 		&p.Title, &p.Location, &remote, &p.Employment, &p.Description, &tags, &p.PostedAt,
-		&first, &last, &p.SeenCount, &active, &p.Salary, &snippet, &score)
+		&first, &last, &p.SeenCount, &active, &p.Salary, &p.Score, &lanes, &snippet, &searchScore)
 	if err != nil {
 		return p, err
 	}
 	p.Remote = remote == 1
 	p.Active = active == 1
 	p.Tags = parseTagsJSON(tags)
+	p.Lanes = parseTagsJSON(lanes)
 	p.FirstSeen, _ = time.Parse(time.RFC3339, first)
 	p.LastSeen, _ = time.Parse(time.RFC3339, last)
 	p.Snippet = snippet.String
-	if score.Valid {
-		p.Score = score.Float64
+	if searchScore.Valid {
+		p.SearchScore = searchScore.Float64
 	}
 	return p, nil
 }
@@ -380,8 +551,8 @@ func scanPosting(row rowScanner) (Posting, error) {
 func (s *Store) GetPosting(ctx context.Context, id int64) (Posting, []Posting, error) {
 	row := s.db.QueryRowContext(ctx, `
 		SELECT id, fingerprint, canonical_url, url, source, company, company_key, title, location,
-			remote, employment, description, tags, posted_at, first_seen, last_seen, seen_count, active, salary,
-			'' AS snippet, 0.0 AS score
+			remote, employment, description, tags, posted_at, first_seen, last_seen, seen_count, active, salary, score, lanes,
+			'' AS snippet, 0.0 AS search_score
 		FROM postings WHERE id=?`, id)
 	p, err := scanPosting(row)
 	if err != nil {
@@ -389,8 +560,8 @@ func (s *Store) GetPosting(ctx context.Context, id int64) (Posting, []Posting, e
 	}
 	rows, err := s.db.QueryContext(ctx, `
 		SELECT id, fingerprint, canonical_url, url, source, company, company_key, title, location,
-			remote, employment, description, tags, posted_at, first_seen, last_seen, seen_count, active, salary,
-			'' AS snippet, 0.0 AS score
+			remote, employment, description, tags, posted_at, first_seen, last_seen, seen_count, active, salary, score, lanes,
+			'' AS snippet, 0.0 AS search_score
 		FROM postings WHERE id != ? AND active = 1 AND (company_key = ? OR lower(title) LIKE ?)
 		ORDER BY last_seen DESC LIMIT 6`, id, p.CompanyKey, "%"+strings.ToLower(firstWords(p.Title, 3))+"%")
 	if err != nil {
@@ -501,6 +672,114 @@ func (s *Store) SourceStates(ctx context.Context) ([]sourceState, error) {
 		out = append(out, st)
 	}
 	return out, rows.Err()
+}
+
+func jobAlertFingerprint(postingID int64, score int) string {
+	return fmt.Sprintf("%d:%d", postingID, score)
+}
+
+func (s *Store) EvaluateHighScoreAlerts(ctx context.Context, minScore, limit int) (alertEvaluation, error) {
+	if minScore <= 0 {
+		minScore = 80
+	}
+	if minScore > 100 {
+		minScore = 100
+	}
+	if limit <= 0 || limit > 200 {
+		limit = 100
+	}
+	rows, err := s.db.QueryContext(ctx, `SELECT id,company,title,url,score FROM postings WHERE active=1 AND score>=? ORDER BY score DESC,last_seen DESC LIMIT ?`, minScore, limit)
+	if err != nil {
+		return alertEvaluation{}, err
+	}
+	candidates := []JobAlert{}
+	for rows.Next() {
+		var alert JobAlert
+		if err := rows.Scan(&alert.PostingID, &alert.Company, &alert.Title, &alert.URL, &alert.Score); err != nil {
+			rows.Close()
+			return alertEvaluation{}, err
+		}
+		candidates = append(candidates, alert)
+	}
+	if err := rows.Close(); err != nil {
+		return alertEvaluation{}, err
+	}
+	if err := rows.Err(); err != nil {
+		return alertEvaluation{}, err
+	}
+	result := alertEvaluation{Alerts: []JobAlert{}}
+	for _, alert := range candidates {
+		fingerprint := jobAlertFingerprint(alert.PostingID, alert.Score)
+		now := time.Now().UTC().Format(time.RFC3339)
+		res, err := s.db.ExecContext(ctx, `INSERT OR IGNORE INTO job_score_alerts (fingerprint,posting_id,company,title,url,score,status,first_seen,last_seen) VALUES (?,?,?,?,?,?,'pending',?,?)`, fingerprint, alert.PostingID, alert.Company, alert.Title, alert.URL, alert.Score, now, now)
+		if err != nil {
+			return result, err
+		}
+		if n, _ := res.RowsAffected(); n > 0 {
+			result.Created++
+			alert.ID, _ = res.LastInsertId()
+			alert.Status = "pending"
+			alert.FirstSeen, _ = time.Parse(time.RFC3339, now)
+			alert.LastSeen = alert.FirstSeen
+		} else {
+			result.Existing++
+			if _, err := s.db.ExecContext(ctx, `UPDATE job_score_alerts SET company=?,title=?,url=?,last_seen=? WHERE fingerprint=?`, alert.Company, alert.Title, alert.URL, now, fingerprint); err != nil {
+				return result, err
+			}
+			var firstSeen, lastSeen string
+			var notified sql.NullString
+			if err := s.db.QueryRowContext(ctx, `SELECT id,status,attempts,notify_error,first_seen,last_seen,notified_at FROM job_score_alerts WHERE fingerprint=?`, fingerprint).Scan(&alert.ID, &alert.Status, &alert.Attempts, &alert.NotifyError, &firstSeen, &lastSeen, &notified); err != nil {
+				return result, err
+			}
+			alert.FirstSeen, _ = time.Parse(time.RFC3339, firstSeen)
+			alert.LastSeen, _ = time.Parse(time.RFC3339, lastSeen)
+			if notified.Valid && notified.String != "" {
+				t, _ := time.Parse(time.RFC3339, notified.String)
+				alert.NotifiedAt = &t
+			}
+		}
+		result.Matched++
+		result.Alerts = append(result.Alerts, alert)
+	}
+	return result, nil
+}
+
+func (s *Store) MarkJobAlertNotification(ctx context.Context, id int64, sent bool, notifyError string) error {
+	status := "failed"
+	notified := ""
+	if sent {
+		status = "sent"
+		notified = time.Now().UTC().Format(time.RFC3339)
+	}
+	_, err := s.db.ExecContext(ctx, `UPDATE job_score_alerts SET status=?,attempts=attempts+1,notify_error=?,notified_at=?,last_seen=? WHERE id=?`, status, notifyError, notified, time.Now().UTC().Format(time.RFC3339), id)
+	return err
+}
+
+func (s *Store) ListJobAlerts(ctx context.Context, limit int) ([]JobAlert, error) {
+	if limit <= 0 || limit > 200 {
+		limit = 50
+	}
+	rows, err := s.db.QueryContext(ctx, `SELECT id,posting_id,company,title,url,score,status,attempts,notify_error,first_seen,last_seen,COALESCE(notified_at,'') FROM job_score_alerts ORDER BY score DESC,last_seen DESC LIMIT ?`, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	alerts := []JobAlert{}
+	for rows.Next() {
+		var alert JobAlert
+		var firstSeen, lastSeen, notified string
+		if err := rows.Scan(&alert.ID, &alert.PostingID, &alert.Company, &alert.Title, &alert.URL, &alert.Score, &alert.Status, &alert.Attempts, &alert.NotifyError, &firstSeen, &lastSeen, &notified); err != nil {
+			return nil, err
+		}
+		alert.FirstSeen, _ = time.Parse(time.RFC3339, firstSeen)
+		alert.LastSeen, _ = time.Parse(time.RFC3339, lastSeen)
+		if notified != "" {
+			t, _ := time.Parse(time.RFC3339, notified)
+			alert.NotifiedAt = &t
+		}
+		alerts = append(alerts, alert)
+	}
+	return alerts, rows.Err()
 }
 
 func (s *Store) Stats(ctx context.Context) (statsPayload, error) {

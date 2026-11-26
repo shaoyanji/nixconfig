@@ -32,7 +32,9 @@ type Posting struct {
 	SeenCount    int       `json:"seen_count"`
 	Active       bool      `json:"active"`
 	Salary       string    `json:"salary,omitempty"`
-	Score        float64   `json:"score,omitempty"`
+	Score        int       `json:"score"`
+	SearchScore  float64   `json:"search_score,omitempty"`
+	Lanes        []string  `json:"lanes"`
 	Snippet      string    `json:"snippet,omitempty"`
 }
 
@@ -48,6 +50,51 @@ type postingInput struct {
 	Tags        []string `json:"tags"`
 	PostedAt    string   `json:"posted_at"`
 	Salary      string   `json:"salary"`
+}
+
+type JobAlert struct {
+	ID          int64      `json:"id"`
+	PostingID   int64      `json:"posting_id"`
+	Company     string     `json:"company"`
+	Title       string     `json:"title"`
+	URL         string     `json:"url"`
+	Score       int        `json:"score"`
+	Status      string     `json:"status"`
+	Attempts    int        `json:"attempts"`
+	NotifyError string     `json:"notify_error,omitempty"`
+	FirstSeen   time.Time  `json:"first_seen"`
+	LastSeen    time.Time  `json:"last_seen"`
+	NotifiedAt  *time.Time `json:"notified_at,omitempty"`
+}
+
+type alertEvaluation struct {
+	Matched  int        `json:"matched"`
+	Created  int        `json:"created"`
+	Existing int        `json:"existing"`
+	Alerts   []JobAlert `json:"alerts,omitempty"`
+}
+
+type notifySummary struct {
+	Matched  int `json:"matched"`
+	Created  int `json:"created"`
+	Existing int `json:"existing"`
+	Notified int `json:"notified"`
+	Failed   int `json:"failed"`
+}
+
+type batchPostingsResponse struct {
+	Created int                 `json:"created"`
+	Updated int                 `json:"updated"`
+	Skipped int                 `json:"skipped"`
+	Failed  int                 `json:"failed"`
+	Total   int                 `json:"total"`
+	Errors  []batchPostingError `json:"errors,omitempty"`
+	Alerts  *notifySummary      `json:"alerts,omitempty"`
+}
+
+type batchPostingError struct {
+	Index int    `json:"index"`
+	Error string `json:"error"`
 }
 
 type sourceResult struct {
@@ -156,6 +203,51 @@ func postingFingerprint(company, title, location string) string {
 	return hex.EncodeToString(sum[:])
 }
 
+func scorePosting(p Posting) (int, []string) {
+	text := strings.ToLower(p.Title + " " + p.Location + " " + p.Description + " " + strings.Join(p.Tags, " "))
+	type laneRule struct {
+		name   string
+		weight int
+		re     *regexp.Regexp
+	}
+	rules := []laneRule{
+		{"DevOps", 18, regexp.MustCompile(`\bdevops\b`)},
+		{"SRE", 18, regexp.MustCompile(`\b(?:sre|site reliability engineer)\b`)},
+		{"Platform", 16, regexp.MustCompile(`\bplatform\b`)},
+		{"Cloud", 12, regexp.MustCompile(`\b(?:cloud|aws|azure|gcp)\b`)},
+		{"Kubernetes", 14, regexp.MustCompile(`\b(?:kubernetes|k8s)\b`)},
+		{"NixOS", 18, regexp.MustCompile(`\b(?:nixos|nix)\b`)},
+		{"Linux", 10, regexp.MustCompile(`\blinux\b`)},
+		{"Go", 10, regexp.MustCompile(`\b(?:go|golang)\b`)},
+		{"Python", 8, regexp.MustCompile(`\bpython\b`)},
+	}
+	lanes := []string{}
+	score := 0
+	for _, rule := range rules {
+		if rule.re.MatchString(text) {
+			lanes = append(lanes, rule.name)
+			score += rule.weight
+		}
+	}
+	if len(lanes) == 0 {
+		return 0, lanes
+	}
+	if score > 85 {
+		score = 85
+	}
+	geo := regexp.MustCompile(`\b(?:dach|germany|deutschland|austria|switzerland|luxembourg|luxemburg|berlin|munich|münchen|hamburg|cologne|köln|frankfurt|zurich|zürich|vienna|wien)\b`).MatchString(text)
+	if geo {
+		score += 8
+	}
+	if p.Remote {
+		score += 7
+	}
+	if score > 100 {
+		score = 100
+	}
+	return score, lanes
+}
+
 func newPosting(in postingInput) Posting {
 	in.Title = cleanText(in.Title)
 	in.Company = cleanText(in.Company)
@@ -168,7 +260,7 @@ func newPosting(in postingInput) Posting {
 		in.PostedAt = normalizeDate(in.PostedAt)
 	}
 	remote := in.Remote || strings.Contains(strings.ToLower(in.Location+" "+in.Title), "remote")
-	return Posting{
+	posting := Posting{
 		Fingerprint:  postingFingerprint(in.Company, in.Title, in.Location),
 		CanonicalURL: canonicalURL(in.URL),
 		URL:          in.URL,
@@ -185,6 +277,8 @@ func newPosting(in postingInput) Posting {
 		Active:       true,
 		Salary:       strings.TrimSpace(in.Salary),
 	}
+	posting.Score, posting.Lanes = scorePosting(posting)
+	return posting
 }
 
 func normalizeDate(s string) string {

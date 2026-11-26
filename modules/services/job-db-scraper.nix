@@ -34,12 +34,18 @@
     cfg.interval
     "-sources"
     (lib.concatStringsSep "," cfg.sources)
-    "-scrape-on-start"
-    (bool cfg.scrapeOnStart)
-    "-enrich"
-    (bool cfg.enrich)
+    "-scrape-on-start=${bool cfg.scrapeOnStart}"
+    "-enrich=${bool cfg.enrich}"
     "-max-enrich"
     (toString cfg.maxEnrich)
+    "-ntfy-url"
+    (
+      if cfg.ntfyUrl == null
+      then ""
+      else cfg.ntfyUrl
+    )
+    "-min-alert-score"
+    (toString cfg.minAlertScore)
     "-origin"
     "https://${cfg.tailnetHost}:${toString cfg.tailnetPort}"
   ];
@@ -109,10 +115,22 @@ in {
       description = "Maximum enrichment calls per source run.";
     };
 
+    ntfyUrl = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Optional ntfy/webhook URL notified once for each high-score posting at a given score. Keep this null or point at a secret-rendered endpoint; the URL is not a secret itself.";
+    };
+
+    minAlertScore = lib.mkOption {
+      type = lib.types.int;
+      default = 80;
+      description = "Minimum deterministic role-match score, 1 through 100, that causes a posting to enter the alert ledger.";
+    };
+
     environmentFile = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       default = null;
-      description = "Optional systemd EnvironmentFile containing FIRECRAWL_API_KEY, TAVILY_API_KEY, CONTEXT_API_KEY and JOB_DB_ADMIN_TOKEN. Render it from sops; never put keys in the Nix store.";
+      description = "Optional systemd EnvironmentFile containing FIRECRAWL_API_KEY, TAVILY_API_KEY, CONTEXT_API_KEY, JOB_DB_ADMIN_TOKEN and JOB_DB_NTFY_URL. Render it from sops; never put keys in the Nix store.";
     };
   };
 
@@ -121,6 +139,10 @@ in {
       {
         assertion = cfg.tailnetHost != null;
         message = "services.jobDbScraper.tailnetHost is required: POST writes are limited to the configured tailnet origin.";
+      }
+      {
+        assertion = cfg.minAlertScore >= 1 && cfg.minAlertScore <= 100;
+        message = "services.jobDbScraper.minAlertScore must be between 1 and 100.";
       }
     ];
 

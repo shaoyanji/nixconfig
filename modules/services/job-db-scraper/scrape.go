@@ -35,6 +35,7 @@ type scraper struct {
 	store  *Store
 	client *http.Client
 	cfg    providerConfig
+	alerts *alertManager
 
 	mu      sync.Mutex
 	running bool
@@ -197,6 +198,11 @@ func (s *scraper) run(ctx context.Context, sources []string) {
 	}
 	_ = s.store.MarkInactiveMissing(ctx, direct, started)
 	message := fmt.Sprintf("fetched %d, inserted %d, updated %d", totalFetched, totalInserted, totalUpdated)
+	if s.alerts != nil {
+		if alerts, alertErr := s.alerts.evaluate(ctx, true); alertErr == nil && alerts.Matched > 0 {
+			message += fmt.Sprintf(", alerts %d new/%d sent/%d failed", alerts.Created, alerts.Notified, alerts.Failed)
+		}
+	}
 	if len(errorsOut) > 0 {
 		message += "; " + strings.Join(errorsOut, " | ")
 	}

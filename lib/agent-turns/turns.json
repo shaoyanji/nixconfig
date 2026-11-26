@@ -1,8 +1,85 @@
 {
-  "generated": "2026-11-26T15:42:26Z",
+  "generated": "2026-11-26T15:45:35Z",
   "count": 200,
-  "pin": "455572f4deca33f39bb9813c8670818241122e59f921ad4e57e676070c45001f",
+  "pin": "1072e8e7a3122f0e6479f180183652e6c763151b7d536b94cf349c7bfd0673fb",
   "turns": [
+    {
+      "id": "064c57ab-9c61-4fa7-98e8-b1455d1db83f",
+      "ts": "2026-11-26T15:44:04Z",
+      "source": "buffy",
+      "subject": "nixconfig:inventory-sync-taskfile",
+      "action": "claim: wire inventory-sync.py as a task verb in taskfiles/, document it in docs/portfolio-services.md, gate on checks:tasks + verb --help + tests/inventory-sync",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles",
+        "docs/portfolio-services.md"
+      ],
+      "files": [],
+      "base_commit": "fe222c84a627ba510c18d516398cc9f86fc29b52",
+      "branch": "main",
+      "frame": "03hb3qh9438oitu3a2z8jcuyo"
+    },
+    {
+      "id": "bdf8e37e-7a61-46d3-a9cc-091e22f60356",
+      "ts": "2026-11-26T15:44:03Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-mail-archive-audit",
+      "action": "claim: taking over from tmux-pane-steward per operator; incident|0.8|0.65: delphi_mail_and_archive_audit (take over) — detail on the ledger",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/plugins/appflow",
+        "hosts/delphi"
+      ],
+      "files": [],
+      "base_commit": "fe222c84a627ba510c18d516398cc9f86fc29b52",
+      "branch": "main",
+      "frame": "03hb3qh5oqvq3vnue3o5waknz"
+    },
+    {
+      "id": "9a0cdf18-230a-463b-9e6a-814a44c03cd9",
+      "ts": "2026-11-26T15:43:37Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-mail-archive-audit",
+      "action": "incident|0.8|0.65: delphi_mail_and_archive_audit (take over)",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/plugins/appflow",
+        "hosts/delphi"
+      ],
+      "files": [],
+      "base_commit": "d0720272c3b44e3878415f1a19cf9cb02856e37e",
+      "branch": "main",
+      "frame": "03hb3qe5xanfryc9xkelmczp6"
+    },
+    {
+      "id": "7ad80b14-99a9-4610-83aa-ce9da6e9ffba",
+      "ts": "2026-11-26T15:42:51Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:frieren-ops-health",
+      "action": "incident|0.45|0.08000000000000002: verify ops:health, hermes-check, c…",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/frieren",
+        "scripts/task/hermes-check.sh"
+      ],
+      "files": [],
+      "base_commit": "d0720272c3b44e3878415f1a19cf9cb02856e37e",
+      "branch": "main",
+      "frame": "03hb3q8reeghzua8mk2hijsai"
+    },
+    {
+      "id": "e6276ed2-5e32-4c04-80c9-03f587613d16",
+      "ts": "2026-11-26T15:42:50Z",
+      "source": "buffy",
+      "subject": "nixconfig:service-portal-portfolio-cards",
+      "action": "supersedes my earlier done post: it cited 954332df, but that commit was blocked by checks:nix:comments. Landed fe222c84: portal cards carry data-search + inline filter (title/desc/group/address/name, AND), group chips toggle to all, counts, / focus, Escape, empty state, kind pill in json. Verified: 19 cards build, alejandra clean, comments 6494/6495, browser run 18 of 19.| gate: nix build + alejandra + checks:nix:comments PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fe222c84a627ba510c18d516398cc9f86fc29b52",
+      "branch": "main",
+      "frame": "03hb3q8l3iaj7cxonx7tlqj6q"
+    },
     {
       "id": "a1e3f424-edd7-40e3-9f0b-634cc2bf338e",
       "ts": "2026-11-26T15:41:48Z",
@@ -2980,76 +3057,6 @@
       "base_commit": "043ddf04172dfe82f72f9c317fbafe0f4cdc8f04",
       "branch": "main",
       "frame": "03hb1jebuefly27tb2fr6zubg"
-    },
-    {
-      "id": "2f9b058c-23ab-4d6d-b934-f1be0e18b029",
-      "ts": "2026-11-26T08:59:13Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-0855",
-      "action": "jev chain-change p=0.97 m=0.95: refactor shared module chain",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "043ddf04172dfe82f72f9c317fbafe0f4cdc8f04",
-      "branch": "main",
-      "frame": "03hb1je9msz9o24853ryczfyw"
-    },
-    {
-      "id": "e76dd41a-4f27-480d-85af-e7d41ada8e65",
-      "ts": "2026-11-26T08:56:57Z",
-      "source": "devji",
-      "subject": "nixconfig:job-scout",
-      "action": "Landed apps:sweep:pipeline (ff89ed19): sweep, dedupe, validate, rank, gated file, mail read, turn post as one task",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "taskfiles/apps.yml",
-        "scripts/task/jobsearch-sweep.py",
-        "scripts/task/jobsearch-pipeline.sh",
-        ".agents/skills/jobsearch-pipeline/SKILL.md"
-      ],
-      "base_commit": "ff89ed195d540cfd8cfff75a6f85df2051199285",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03hb1iy6utuqvalle687hjfjp"
-    },
-    {
-      "id": "a8dc16b3-4070-492d-81fd-de85948097f8",
-      "ts": "2026-11-26T08:56:12Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: pipe-loop packaged — dev:review:pipe-loop runs locked tier (gate verbatim) + survey tier (attrValues|>map, map|>concatLists, elemAt flips, head-of-filter, listToAttrs census); first run caught policies.nix elemAt flips, converted to head/elemAt direct; pipe-loop skill mirrors the task and carries the PCRE/anchor traps | gate: checks:nix:style PASS, checks:policies:fixtures PASS, checks:skills:mirror PASS (65), checks:tasks PASS (834)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "043ddf04172dfe82f72f9c317fbafe0f4cdc8f04",
-      "branch": "main",
-      "frame": "03hb1isxe2gg2pt5l9gixstcd"
-    },
-    {
-      "id": "8f0c6749-b38e-4403-82a3-26e0e9ee8e9a",
-      "ts": "2026-11-26T08:55:48Z",
-      "source": "freebuff",
-      "subject": "nixconfig:apps-lane-tool",
-      "action": "landed: apps:lane (STAGE=plan|sweep|file|jd|tailor|packet|send|replies|cv) + skill job-scout-lane, commit ec49a76b; jd refuses a page under 40 lines as a JS gate, send stays dry without SEND=1 and still answers to the row's hold and recipient | gate: checks:tasks exit 0 (833 tasks, exact name parity), checks:prose exit 0, ops:skills:check clean on this skill (it is red only on another lane's staged pipe-loop)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ec49a76bc26f17c102958305e2254b1d98bc9764",
-      "branch": "main",
-      "frame": "03hb1iq3y3hthhuz0oz64y7e5"
-    },
-    {
-      "id": "8935ea71-a77d-43f3-bf1b-7d74b9c54015",
-      "ts": "2026-11-26T08:54:46Z",
-      "source": "freebuff",
-      "subject": "nixconfig:apps-lane-tool",
-      "action": "landed apps:lane + skill job-scout-lane: one STAGE entry point over the scout-to-send chain (sweep, file, jd with a 40-line stub gate, tailor projection, packet, dry send, reply poll, cv check), delegating each stage to its own verb; the task graph, prose gate and skill schema are the checks",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "523a855d3f67e785c3b3cb4dffbec8563996c35e",
-      "branch": "main",
-      "frame": "03hb1iiv5inqbkzvt9ad6qafi"
     }
   ]
 }

@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -194,5 +196,171 @@ func TestProviderClientsAgainstMockAPIs(t *testing.T) {
 	text, err = sc.contextScrape(context.Background(), "https://example.com/job/123")
 	if err != nil || !strings.Contains(text, "Context markdown") {
 		t.Fatalf("context text %q err %v", text, err)
+	}
+}
+
+func TestRoleMatchScoringAndScoreSort(t *testing.T) {
+	store, err := OpenStore(filepath.Join(t.TempDir(), "jobs.sqlite"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	ctx := context.Background()
+	high := postingInput{Source: "test", URL: "https://example.com/high", Company: "Acme", Title: "Senior DevOps Platform Engineer", Location: "Berlin, Germany", Remote: true, Description: "Kubernetes cloud platform on Linux with Go and NixOS"}
+	low := postingInput{Source: "test", URL: "https://example.com/low", Company: "Acme", Title: "Office Manager", Location: "Berlin", Description: "Administration"}
+	highID, _, err := store.UpsertPosting(ctx, high)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := store.UpsertPosting(ctx, low); err != nil {
+		t.Fatal(err)
+	}
+	page, err := store.QueryPostings(ctx, queryOptions{Active: true, Limit: 10, Sort: "score"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(page.Items) != 2 || page.Items[0].ID != highID || page.Items[0].Score < 80 {
+		t.Fatalf("score sorted page: %+v", page.Items)
+	}
+	wantLanes := []string{"DevOps", "Platform", "Cloud", "Kubernetes", "NixOS", "Linux", "Go"}
+	for _, lane := range wantLanes {
+		found := false
+		for _, got := range page.Items[0].Lanes {
+			if got == lane {
+				found = true
+			}
+		}
+		if !found {
+			t.Fatalf("lane %s missing in %#v", lane, page.Items[0].Lanes)
+		}
+	}
+}
+
+func TestHighScoreAlertsAreDedupedAndNotifyNtfy(t *testing.T) {
+	store, err := OpenStore(filepath.Join(t.TempDir(), "jobs.sqlite"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	ctx := context.Background()
+	if _, _, err := store.UpsertPosting(ctx, postingInput{Source: "test", URL: "https://example.com/high", Company: "Acme", Title: "Senior Platform Engineer", Location: "Remote Germany", Remote: true, Description: "Kubernetes cloud platform on Linux with Go and NixOS"}); err != nil {
+		t.Fatal(err)
+	}
+	posts := 0
+	ntfy := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		posts++
+		if !strings.Contains(r.Header.Get("Title"), "high-score") {
+			t.Errorf("unexpected ntfy title %q", r.Header.Get("Title"))
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer ntfy.Close()
+	manager := newAlertManager(store, ntfy.URL, 80)
+	first, err := manager.evaluate(ctx, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if first.Matched != 1 || first.Created != 1 || first.Notified != 1 || first.Failed != 0 {
+		t.Fatalf("first alert summary %#v", first)
+	}
+	second, err := manager.evaluate(ctx, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if second.Matched != 1 || second.Created != 0 || second.Existing != 1 || second.Notified != 0 {
+		t.Fatalf("second alert summary %#v", second)
+	}
+	if posts != 1 {
+		t.Fatalf("ntfy posts %d, want deduped single post", posts)
+	}
+	alerts, err := store.ListJobAlerts(ctx, 10)
+	if err != nil || len(alerts) != 1 || alerts[0].Status != "sent" || alerts[0].Score < 80 {
+		t.Fatalf("alerts %#v err=%v", alerts, err)
+	}
+}
+
+func TestBatchPostingsEndpointAccountsForOutcomes(t *testing.T) {
+	store, err := OpenStore(filepath.Join(t.TempDir(), "jobs.sqlite"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	s := &server{store: store, alerts: newAlertManager(store, "", 90)}
+	body := `{"postings":[
+		{"title":"Platform Engineer","company":"Acme","source":"manual","url":"https://example.com/1","description":"Kubernetes cloud platform"},
+		{"title":"Platform Engineer","company":"Acme","source":"manual","url":"https://example.com/1","description":"Kubernetes cloud platform"},
+		{"title":"Platform Engineer","company":"Acme","source":"manual","url":"https://example.com/1","description":"Kubernetes cloud platform with NixOS"},
+		{}
+	]}`
+	req := httptest.NewRequest(http.MethodPost, "/api/postings/batch", strings.NewReader(body))
+	recorder := httptest.NewRecorder()
+	s.batchPostings(recorder, req)
+	if recorder.Code != http.StatusCreated {
+		t.Fatalf("status %d body %s", recorder.Code, recorder.Body.String())
+	}
+	var response batchPostingsResponse
+	if err := json.NewDecoder(recorder.Body).Decode(&response); err != nil {
+		t.Fatal(err)
+	}
+	if response.Created != 1 || response.Updated != 1 || response.Skipped != 2 || response.Failed != 0 || response.Total != 4 {
+		t.Fatalf("batch response %#v", response)
+	}
+}
+
+func TestStoreMigratesLegacySchemaAndBackfillsScores(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "legacy.sqlite")
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = db.Exec(`CREATE TABLE postings (
+		id INTEGER PRIMARY KEY,
+		fingerprint TEXT NOT NULL UNIQUE,
+		canonical_url TEXT NOT NULL,
+		url TEXT NOT NULL,
+		source TEXT NOT NULL,
+		company TEXT NOT NULL,
+		company_key TEXT NOT NULL,
+		title TEXT NOT NULL,
+		location TEXT NOT NULL,
+		remote INTEGER NOT NULL DEFAULT 0,
+		employment TEXT NOT NULL DEFAULT '',
+		description TEXT NOT NULL DEFAULT '',
+		tags TEXT NOT NULL DEFAULT '[]',
+		posted_at TEXT NOT NULL DEFAULT '',
+		first_seen TEXT NOT NULL,
+		last_seen TEXT NOT NULL,
+		seen_count INTEGER NOT NULL DEFAULT 1,
+		active INTEGER NOT NULL DEFAULT 1,
+		salary TEXT NOT NULL DEFAULT ''
+	)`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = db.Exec(`INSERT INTO postings (fingerprint,canonical_url,url,source,company,company_key,title,location,remote,description,tags,first_seen,last_seen) VALUES ('legacy','https://example.com/legacy','https://example.com/legacy','test','Acme','acme','DevOps Engineer','Germany',1,'Kubernetes cloud Linux Go NixOS','[]','2026-01-01T00:00:00Z','2026-01-01T00:00:00Z')`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Close(); err != nil {
+		t.Fatal(err)
+	}
+	store, err := OpenStore(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	posting, _, err := store.GetPosting(context.Background(), 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if posting.Score < 80 || len(posting.Lanes) == 0 {
+		t.Fatalf("legacy row was not backfilled: %+v", posting)
+	}
+	if _, _, err := store.UpsertPosting(context.Background(), postingInput{Source: "test", URL: "https://example.com/legacy", Company: "Acme", Title: "DevOps Engineer", Location: "Germany", Remote: true, Description: "Kubernetes cloud Linux Go NixOS with platform ownership"}); err != nil {
+		t.Fatalf("update migrated row: %v", err)
+	}
+	page, err := store.QueryPostings(context.Background(), queryOptions{Q: "platform", Active: true, Limit: 10})
+	if err != nil || len(page.Items) != 1 {
+		t.Fatalf("fts after migrated update: page=%+v err=%v", page, err)
 	}
 }

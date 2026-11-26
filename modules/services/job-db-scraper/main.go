@@ -25,6 +25,7 @@ var webFiles embed.FS
 type server struct {
 	store          *Store
 	scraper        *scraper
+	alerts         *alertManager
 	adminToken     string
 	expectedOrigin string
 	started        time.Time
@@ -43,6 +44,8 @@ func main() {
 	sourcesFlag := flag.String("sources", strings.Join(defaultSources, ","), "comma-separated scraper sources")
 	enrich := flag.Bool("enrich", false, "enrich thin descriptions through Tavily, Firecrawl or Context when credentials exist")
 	maxEnrich := flag.Int("max-enrich", 4, "maximum enriched postings per source run; provider calls cost credits")
+	ntfyURL := flag.String("ntfy-url", "", "ntfy/webhook URL for high-score posting alerts; JOB_DB_NTFY_URL is the fallback")
+	minAlertScore := flag.Int("min-alert-score", 80, "minimum deterministic role-match score that triggers an ntfy alert")
 	adminToken := flag.String("admin-token-env", "JOB_DB_ADMIN_TOKEN", "environment variable naming the optional write bearer token")
 	expectedOrigin := flag.String("origin", "", "expected browser Origin for state-changing requests; empty disables the check")
 	flag.Parse()
@@ -72,9 +75,21 @@ func main() {
 		AllowKeyless:  os.Getenv("JOB_DB_ALLOW_KEYLESS") == "1",
 	}
 	sc := newScraper(store, cfg)
+	alertURL := *ntfyURL
+	if alertURL == "" {
+		alertURL = os.Getenv("JOB_DB_NTFY_URL")
+	}
+	if raw := os.Getenv("JOB_DB_MIN_ALERT_SCORE"); raw != "" && *minAlertScore == 80 {
+		if parsed, err := strconv.Atoi(raw); err == nil {
+			*minAlertScore = parsed
+		}
+	}
+	alerts := newAlertManager(store, alertURL, *minAlertScore)
+	sc.alerts = alerts
 	s := &server{
 		store:          store,
 		scraper:        sc,
+		alerts:         alerts,
 		adminToken:     strings.TrimSpace(os.Getenv(*adminToken)),
 		expectedOrigin: strings.TrimRight(*expectedOrigin, "/"),
 		started:        time.Now().UTC(),
@@ -92,10 +107,13 @@ func main() {
 	mux.HandleFunc("GET /api/postings", s.postings)
 	mux.HandleFunc("GET /api/postings/{id}", s.posting)
 	mux.HandleFunc("POST /api/postings", s.createPosting)
+	mux.HandleFunc("POST /api/postings/batch", s.batchPostings)
 	mux.HandleFunc("GET /api/scrape", s.scrapeStatus)
 	mux.HandleFunc("POST /api/scrape", s.triggerScrape)
 	mux.HandleFunc("GET /api/runs", s.runs)
 	mux.HandleFunc("GET /api/export.csv", s.exportCSV)
+	mux.HandleFunc("GET /api/alerts", s.alertList)
+	mux.HandleFunc("POST /api/alerts/evaluate", s.evaluateAlerts)
 
 	sources := splitCSV(*sourcesFlag)
 	if *scrapeOnStart {
@@ -112,7 +130,7 @@ func main() {
 	}
 
 	log.Printf("job-db-scraper: listening on %s, db %s, sources %s", *addr, *dbPath, strings.Join(sources, ","))
-	log.Printf("job-db-scraper: providers firecrawl=%t tavily=%t context=%t enrichment=%t", cfg.FirecrawlKey != "", cfg.TavilyKey != "", cfg.ContextKey != "", cfg.Enrich)
+	log.Printf("job-db-scraper: providers firecrawl=%t tavily=%t context=%t enrichment=%t alerts=%t min_score=%d", cfg.FirecrawlKey != "", cfg.TavilyKey != "", cfg.ContextKey != "", cfg.Enrich, alerts.enabled(), alerts.minScore)
 	if err := http.ListenAndServe(*addr, mux); err != nil {
 		log.Fatalf("job-db-scraper: %v", err)
 	}
@@ -243,7 +261,7 @@ func (s *server) postings(w http.ResponseWriter, r *http.Request) {
 	page, err := s.store.QueryPostings(r.Context(), queryOptions{
 		Q: q.Get("q"), Source: q.Get("source"), Company: q.Get("company"), Location: q.Get("location"),
 		Remote: q.Get("remote") == "1" || q.Get("remote") == "true", Active: q.Get("active") != "0",
-		Days: days, Limit: limit, Offset: offset,
+		Days: days, Limit: limit, Offset: offset, Sort: q.Get("sort"),
 	})
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, err)
@@ -315,7 +333,99 @@ func (s *server) createPosting(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, err)
 		return
 	}
+	if s.alerts != nil {
+		go s.alerts.evaluate(context.Background(), true)
+	}
 	writeJSON(w, map[bool]int{true: http.StatusCreated, false: http.StatusOK}[created], map[string]any{"id": id, "created": created})
+}
+
+func (s *server) batchPostings(w http.ResponseWriter, r *http.Request) {
+	if !s.writeAllowed(w, r) {
+		return
+	}
+	var payload struct {
+		Postings []postingInput `json:"postings"`
+		Items    []postingInput `json:"items"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	inputs := payload.Postings
+	if len(inputs) == 0 {
+		inputs = payload.Items
+	}
+	if len(inputs) == 0 {
+		writeError(w, http.StatusBadRequest, errors.New("batch must contain at least one posting"))
+		return
+	}
+	if len(inputs) > 500 {
+		writeError(w, http.StatusBadRequest, errors.New("batch is limited to 500 postings"))
+		return
+	}
+	response := batchPostingsResponse{Total: len(inputs)}
+	seen := map[string]bool{}
+	for index, input := range inputs {
+		if input.Source == "" {
+			input.Source = "manual"
+		}
+		normalized := newPosting(input)
+		if strings.TrimSpace(input.Title) == "" && strings.TrimSpace(input.Company) == "" && strings.TrimSpace(input.URL) == "" && strings.TrimSpace(input.Description) == "" {
+			response.Skipped++
+			continue
+		}
+		dedupeKey := fmt.Sprintf("%s|%s|%s|%s", normalized.Fingerprint, normalized.CanonicalURL, normalized.PostedAt, normalized.Description)
+		if seen[dedupeKey] {
+			response.Skipped++
+			continue
+		}
+		seen[dedupeKey] = true
+		_, created, err := s.store.UpsertPosting(r.Context(), input)
+		if err != nil {
+			response.Failed++
+			if len(response.Errors) < 25 {
+				response.Errors = append(response.Errors, batchPostingError{Index: index, Error: err.Error()})
+			}
+			continue
+		}
+		if created {
+			response.Created++
+		} else {
+			response.Updated++
+		}
+	}
+	if response.Created+response.Updated > 0 && s.alerts != nil {
+		if summary, err := s.alerts.evaluate(r.Context(), true); err == nil {
+			response.Alerts = &summary
+		}
+	}
+	status := http.StatusOK
+	if response.Created > 0 {
+		status = http.StatusCreated
+	}
+	writeJSON(w, status, response)
+}
+
+func (s *server) alertList(w http.ResponseWriter, r *http.Request) {
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+	items, err := s.store.ListJobAlerts(r.Context(), limit)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"items": items, "total": len(items), "enabled": s.alerts.enabled(), "min_score": s.alerts.minScore})
+}
+
+func (s *server) evaluateAlerts(w http.ResponseWriter, r *http.Request) {
+	if !s.writeAllowed(w, r) {
+		return
+	}
+	summary, err := s.alerts.evaluate(r.Context(), true)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, summary)
 }
 
 func (s *server) writeAllowed(w http.ResponseWriter, r *http.Request) bool {

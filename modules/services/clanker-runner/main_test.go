@@ -243,3 +243,158 @@ func TestWriteGateRejectsWrongOriginAndMissingBearer(t *testing.T) {
 		t.Fatalf("bearer status %d", recorder.Code)
 	}
 }
+
+func TestPresetValidationAndBuilders(t *testing.T) {
+	if len(jobPresets) != 4 {
+		t.Fatalf("presets %#v", jobPresets)
+	}
+	for _, id := range []string{"agent-browser-dom-check", "nix-profile-status", "clanker-disk-hygiene", "nix-run-tool"} {
+		if _, ok := presetByID(id); !ok {
+			t.Fatalf("missing preset %s", id)
+		}
+	}
+	if _, err := buildPresetJob("agent-browser-dom-check", presetInput{URL: "javascript:alert(1)"}); err == nil {
+		t.Fatal("non-http URL accepted")
+	}
+	browserJob, err := buildPresetJob("agent-browser-dom-check", presetInput{URL: "https://example.com/inventory", Selector: "main h1"})
+	if err != nil {
+		t.Fatalf("browser preset: %v", err)
+	}
+	if browserJob.Kind != "agent-browser" || !strings.Contains(browserJob.Args, "https://example.com/inventory") || !strings.Contains(browserJob.Args, "selector_found") {
+		t.Fatalf("browser job %#v", browserJob)
+	}
+	if _, err := buildPresetJob("nix-run-tool", presetInput{Package: "jq", Args: "--help; rm -rf /"}); err == nil {
+		t.Fatal("shell metacharacter args accepted")
+	}
+	toolJob, err := buildPresetJob("nix-run-tool", presetInput{Package: "jq", Args: "--version"})
+	if err != nil {
+		t.Fatalf("nix-run-tool: %v", err)
+	}
+	if !strings.Contains(toolJob.Command, "nix run nixpkgs#jq -- --version") {
+		t.Fatalf("tool command %q", toolJob.Command)
+	}
+	diskJob, err := buildPresetJob("clanker-disk-hygiene", presetInput{})
+	if err != nil || !strings.Contains(diskJob.Command, "--dry-run") {
+		t.Fatalf("disk job %#v err=%v", diskJob, err)
+	}
+}
+
+func testMachineAPI(t *testing.T, execCode int) *httptest.Server {
+	t.Helper()
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.URL.Path == "/v1/machines":
+			w.Write([]byte(machinePayload("running")))
+		case r.URL.Path == "/v1/machines/m_clanker":
+			w.Write([]byte(`{"id":"m_clanker","name":"clanker","state":"running","spec":{"vcpus":4,"memMiB":8192,"persistentDiskGiB":20}}`))
+		case r.URL.Path == "/v1/machines/m_clanker/exec":
+			writeExec(w, "", "mock exec stops the remote job", execCode)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+}
+
+func TestPresetRunEndpointQueuesValidatedJob(t *testing.T) {
+	store := openTestStore(t)
+	api := testMachineAPI(t, 1)
+	defer api.Close()
+	s := &server{store: store, client: newInstaboxClient(api.URL, "ibk_test"), jobs: make(chan struct{}, 1), pollInterval: time.Millisecond}
+	req := httptest.NewRequest(http.MethodPost, "/api/presets/nix-run-tool/run", strings.NewReader(`{"package":"jq","args":"--version"}`))
+	req.SetPathValue("id", "nix-run-tool")
+	recorder := httptest.NewRecorder()
+	s.runPreset(recorder, req)
+	if recorder.Code != http.StatusAccepted {
+		t.Fatalf("run preset status %d body %s", recorder.Code, recorder.Body.String())
+	}
+	var job Job
+	if err := json.NewDecoder(recorder.Body).Decode(&job); err != nil {
+		t.Fatal(err)
+	}
+	if job.Kind != "shell" || !strings.Contains(job.Command, "nixpkgs#jq") {
+		t.Fatalf("job %#v", job)
+	}
+	req = httptest.NewRequest(http.MethodPost, "/api/presets/nix-run-tool/run", strings.NewReader(`{"package":"jq","args":"--help;touch /tmp/x"}`))
+	req.SetPathValue("id", "nix-run-tool")
+	recorder = httptest.NewRecorder()
+	s.runPreset(recorder, req)
+	if recorder.Code != http.StatusBadRequest {
+		t.Fatalf("invalid preset status %d body %s", recorder.Code, recorder.Body.String())
+	}
+}
+
+func waitForJobTerminal(t *testing.T, store *Store, id string) Job {
+	t.Helper()
+	deadline := time.Now().Add(2 * time.Second)
+	for time.Now().Before(deadline) {
+		job, _, err := store.GetJob(context.Background(), id)
+		if err == nil && (job.Status == "finished" || job.Status == "failed") {
+			return job
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	t.Fatalf("job %s did not finish", id)
+	return Job{}
+}
+
+func TestScheduleCRUDValidationAndDueRun(t *testing.T) {
+	store := openTestStore(t)
+	api := testMachineAPI(t, 1)
+	defer api.Close()
+	s := &server{store: store, client: newInstaboxClient(api.URL, "ibk_test"), jobs: make(chan struct{}, 1), pollInterval: time.Millisecond}
+	body := `{"name":"disk check","preset_id":"clanker-disk-hygiene","interval_seconds":15,"start_immediately":true}`
+	req := httptest.NewRequest(http.MethodPost, "/api/schedules", strings.NewReader(body))
+	recorder := httptest.NewRecorder()
+	s.createSchedule(recorder, req)
+	if recorder.Code != http.StatusCreated {
+		t.Fatalf("create schedule status %d body %s", recorder.Code, recorder.Body.String())
+	}
+	var schedule Schedule
+	if err := json.NewDecoder(recorder.Body).Decode(&schedule); err != nil {
+		t.Fatal(err)
+	}
+	if schedule.ID == 0 || !schedule.Enabled || schedule.NextRunAt.After(time.Now().UTC().Add(time.Second)) {
+		t.Fatalf("schedule %#v", schedule)
+	}
+	ran, err := s.runDueSchedules(context.Background(), time.Now().UTC())
+	if err != nil || ran != 1 {
+		t.Fatalf("runDue ran=%d err=%v", ran, err)
+	}
+	updated, err := store.GetSchedule(context.Background(), schedule.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if updated.LastJobID == "" || updated.LastRunAt == nil || !updated.NextRunAt.After(time.Now().UTC().Add(10*time.Second)) {
+		t.Fatalf("updated schedule %#v", updated)
+	}
+	job := waitForJobTerminal(t, store, updated.LastJobID)
+	if !strings.Contains(job.Command, "nix store gc --dry-run") {
+		t.Fatalf("scheduled job %#v", job)
+	}
+	items, err := store.ListSchedules(context.Background())
+	if err != nil || len(items) != 1 {
+		t.Fatalf("schedules %#v err=%v", items, err)
+	}
+	req = httptest.NewRequest(http.MethodDelete, "/api/schedules/1", nil)
+	req.SetPathValue("id", "1")
+	recorder = httptest.NewRecorder()
+	s.deleteSchedule(recorder, req)
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("delete status %d body %s", recorder.Code, recorder.Body.String())
+	}
+	items, err = store.ListSchedules(context.Background())
+	if err != nil || len(items) != 0 {
+		t.Fatalf("after delete %#v err=%v", items, err)
+	}
+}
+
+func TestScheduleRejectsInvalidPresetParams(t *testing.T) {
+	input := scheduleInput{PresetID: "nix-run-tool", IntervalSeconds: 60, Params: json.RawMessage(`{"package":"jq","args":"--help|cat"}`)}
+	if err := validateScheduleInput(&input); err == nil {
+		t.Fatal("invalid schedule params accepted")
+	}
+	input = scheduleInput{PresetID: "agent-browser-dom-check", IntervalSeconds: 60, Params: json.RawMessage(`{"url":"https://example.com"}`)}
+	if err := validateScheduleInput(&input); err != nil {
+		t.Fatalf("valid schedule rejected: %v", err)
+	}
+}

@@ -9,6 +9,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -81,6 +82,13 @@ func main() {
 	mux.HandleFunc("GET /api/jobs", s.jobList)
 	mux.HandleFunc("POST /api/jobs", s.createJob)
 	mux.HandleFunc("GET /api/jobs/{id}", s.jobDetail)
+	mux.HandleFunc("GET /api/presets", s.presetList)
+	mux.HandleFunc("POST /api/presets/{id}/run", s.runPreset)
+	mux.HandleFunc("GET /api/schedules", s.scheduleList)
+	mux.HandleFunc("POST /api/schedules", s.createSchedule)
+	mux.HandleFunc("DELETE /api/schedules/{id}", s.deleteSchedule)
+
+	go s.scheduleLoop()
 
 	log.Printf("clanker-runner: listening on %s, db %s, instabox_configured=%t", *addr, *dbPath, s.client.configured())
 	if err := http.ListenAndServe(*addr, mux); err != nil {
@@ -149,7 +157,7 @@ func (s *server) static(path, contentType string) http.HandlerFunc {
 
 func (s *server) health(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{
-		"ok": true, "service": "clanker-runner", "version": "0.1.0", "instabox_configured": s.client.configured(),
+		"ok": true, "service": "clanker-runner", "version": "0.2.0", "instabox_configured": s.client.configured(),
 		"uptime_seconds": int(time.Since(s.started).Seconds()), "time": time.Now().UTC().Format(time.RFC3339),
 	})
 }
@@ -315,12 +323,26 @@ func (s *server) createJob(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadGateway, err)
 		return
 	}
-	id := newJobID()
-	if err := s.store.CreateJob(r.Context(), id, machine.Name, machine.ID, kind, command); err != nil {
-		writeError(w, http.StatusInternalServerError, err)
+	job, err := s.queuePreparedJob(r.Context(), machine, kind, command, machineName)
+	if err != nil {
+		if errors.Is(err, errRunnerBusy) {
+			writeError(w, http.StatusTooManyRequests, err)
+		} else {
+			writeError(w, http.StatusInternalServerError, err)
+		}
 		return
 	}
-	_ = s.store.AppendJobLog(r.Context(), id, "control", "job accepted for "+machine.Name+" ("+machine.ID+")")
+	writeJSON(w, http.StatusAccepted, job)
+}
+
+var errRunnerBusy = errors.New("runner concurrency limit reached")
+
+func (s *server) queuePreparedJob(ctx context.Context, machine Machine, kind, command, machineName string) (Job, error) {
+	id := newJobID()
+	if err := s.store.CreateJob(ctx, id, machine.Name, machine.ID, kind, command); err != nil {
+		return Job{}, err
+	}
+	_ = s.store.AppendJobLog(ctx, id, "control", "job accepted for "+machine.Name+" ("+machine.ID+")")
 	select {
 	case s.jobs <- struct{}{}:
 		go func() {
@@ -328,13 +350,11 @@ func (s *server) createJob(w http.ResponseWriter, r *http.Request) {
 			s.runJob(id, machineName)
 		}()
 	default:
-		runErr := "runner concurrency limit reached"
-		_ = s.store.FinishJob(r.Context(), id, "failed", nil, "", "", runErr)
-		writeError(w, http.StatusTooManyRequests, errors.New(runErr))
-		return
+		_ = s.store.FinishJob(ctx, id, "failed", nil, "", "", errRunnerBusy.Error())
+		return Job{}, errRunnerBusy
 	}
-	job, _, _ := s.store.GetJob(r.Context(), id)
-	writeJSON(w, http.StatusAccepted, job)
+	job, _, err := s.store.GetJob(ctx, id)
+	return job, err
 }
 
 func (s *server) runJob(id, machineName string) {
@@ -398,6 +418,109 @@ func (s *server) jobDetail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"job": job, "logs": logs})
+}
+
+func (s *server) scheduleLoop() {
+	ticker := time.NewTicker(15 * time.Second)
+	defer ticker.Stop()
+	for range ticker.C {
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+		if _, err := s.runDueSchedules(ctx, time.Now().UTC()); err != nil {
+			log.Printf("clanker-runner: schedule tick: %v", err)
+		}
+		cancel()
+	}
+}
+
+func (s *server) presetList(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, map[string]any{"items": jobPresets, "total": len(jobPresets)})
+}
+
+func (s *server) runPreset(w http.ResponseWriter, r *http.Request) {
+	if !s.writeAllowed(w, r) {
+		return
+	}
+	var input presetInput
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&input); err != nil && !errors.Is(err, io.EOF) {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	presetID := r.PathValue("id")
+	jobInputValue, err := buildPresetJob(presetID, input)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	kind, command, err := buildJobCommand(jobInputValue)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	machine, err := s.client.ResolveMachine(r.Context(), jobInputValue.Machine)
+	if err != nil {
+		writeError(w, http.StatusBadGateway, err)
+		return
+	}
+	job, err := s.queuePreparedJob(r.Context(), machine, kind, command, jobInputValue.Machine)
+	if err != nil {
+		if errors.Is(err, errRunnerBusy) {
+			writeError(w, http.StatusTooManyRequests, err)
+		} else {
+			writeError(w, http.StatusInternalServerError, err)
+		}
+		return
+	}
+	writeJSON(w, http.StatusAccepted, job)
+}
+
+func (s *server) scheduleList(w http.ResponseWriter, r *http.Request) {
+	items, err := s.store.ListSchedules(r.Context())
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"items": items, "total": len(items)})
+}
+
+func (s *server) createSchedule(w http.ResponseWriter, r *http.Request) {
+	if !s.writeAllowed(w, r) {
+		return
+	}
+	var input scheduleInput
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&input); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	if err := validateScheduleInput(&input); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	schedule, err := s.store.CreateSchedule(r.Context(), input)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusCreated, schedule)
+}
+
+func (s *server) deleteSchedule(w http.ResponseWriter, r *http.Request) {
+	if !s.writeAllowed(w, r) {
+		return
+	}
+	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, errors.New("schedule id must be numeric"))
+		return
+	}
+	if err := s.store.DeleteSchedule(r.Context(), id); err != nil {
+		writeError(w, http.StatusNotFound, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
 }
 
 func (s *server) writeAllowed(w http.ResponseWriter, r *http.Request) bool {

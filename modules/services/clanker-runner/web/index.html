@@ -50,7 +50,24 @@
 
       <section class="workspace">
         <aside class="side">
-          <div class="panel-heading">Machines</div>
+          <div class="panel-heading">Validated presets</div>
+          <div class="preset-params">
+            <input id="preset-url" placeholder="https://page for DOM check">
+            <input id="preset-selector" placeholder="CSS selector (default body)">
+            <input id="preset-package" placeholder="nixpkgs package">
+            <input id="preset-args" placeholder="plain tool args">
+          </div>
+          <div id="presets" class="presets"></div>
+          <div class="panel-heading filter-heading">Recurring schedules</div>
+          <form id="schedule-form" class="schedule-form">
+            <select id="schedule-preset"></select>
+            <input id="schedule-machine" value="clanker" aria-label="machine">
+            <input id="schedule-interval" type="number" min="15" max="604800" value="3600" aria-label="interval seconds">
+            <label class="checkline"><input id="schedule-start" type="checkbox"> start now</label>
+            <button type="submit">Add schedule</button>
+          </form>
+          <div id="schedules" class="schedules"></div>
+          <div class="panel-heading filter-heading">Machines</div>
           <div id="machines" class="machines"></div>
           <div class="panel-heading filter-heading">Filter jobs</div>
           <label>Search<input id="q" placeholder="command, output, machine…"></label>

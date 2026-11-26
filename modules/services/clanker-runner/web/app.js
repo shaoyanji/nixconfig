@@ -115,7 +115,71 @@ function syncKindInputs() {
   $('#attr-label').classList.toggle('hidden', kind !== 'nix');
   $('#args-label').classList.toggle('hidden', kind === 'shell');
 }
-async function refreshAll() { await Promise.allSettled([loadStats(), loadMachines(), loadJobs()]); }
+function presetParams() {
+  return {
+    url: $('#preset-url').value.trim(),
+    selector: $('#preset-selector').value.trim(),
+    package: $('#preset-package').value.trim(),
+    args: $('#preset-args').value.trim()
+  };
+}
+async function runPreset(id) {
+  try {
+    await api(`/api/presets/${encodeURIComponent(id)}/run`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({machine:'clanker',...presetParams()})});
+    await refreshAll();
+  } catch (err) { alert(err.message); }
+}
+async function loadPresets() {
+  const payload = await api('/api/presets');
+  const items = payload.items || [];
+  $('#presets').innerHTML = items.map((preset) => `<article class="preset"><strong>${esc(preset.name)}</strong><p>${esc(preset.description)}</p><p><code>${esc(preset.id)}</code></p><div class="preset-actions"><button data-preset="${esc(preset.id)}">Run</button>${preset.required?.length?`<small>needs ${esc(preset.required.join(', '))}</small>`:''}</div></article>`).join('');
+  const select = $('#schedule-preset');
+  const current = select.value;
+  select.innerHTML = items.map((preset) => `<option value="${esc(preset.id)}">${esc(preset.name)}</option>`).join('');
+  select.value = current || items[0]?.id || '';
+  document.querySelectorAll('[data-preset]').forEach((button) => button.addEventListener('click', () => runPreset(button.dataset.preset)));
+}
+function scheduleParamsFor(presetID) {
+  const params = {};
+  const values = presetParams();
+  if (presetID === 'agent-browser-dom-check') {
+    params.url = values.url;
+    if (values.selector) params.selector = values.selector;
+  }
+  if (presetID === 'nix-run-tool') {
+    params.package = values.package;
+    if (values.args) params.args = values.args;
+  }
+  return params;
+}
+async function loadSchedules() {
+  const payload = await api('/api/schedules');
+  const items = payload.items || [];
+  $('#schedules').innerHTML = items.map((schedule) => `<article class="schedule"><strong>${esc(schedule.name)}</strong><p><code>${esc(schedule.preset_id)}</code> on ${esc(schedule.machine)} every ${schedule.interval_seconds}s</p><small>next ${new Date(schedule.next_run_at).toLocaleString()}${schedule.last_job_id?` · last ${esc(schedule.last_job_id)}`:''}</small>${schedule.last_error?`<small class="error-text">${esc(schedule.last_error)}</small>`:''}<div class="schedule-actions"><button class="ghost" data-delete-schedule="${schedule.id}">Delete</button><span class="badge ${schedule.enabled?'finished':'failed'}">${schedule.enabled?'enabled':'disabled'}</span></div></article>`).join('') || '<div class="empty small">No recurring schedules yet.</div>';
+  document.querySelectorAll('[data-delete-schedule]').forEach((button) => button.addEventListener('click', () => deleteSchedule(button.dataset.deleteSchedule)));
+}
+async function deleteSchedule(id) {
+  try {
+    await api(`/api/schedules/${encodeURIComponent(id)}`, {method:'DELETE'});
+    await loadSchedules();
+  } catch (err) { alert(err.message); }
+}
+async function createSchedule(event) {
+  event.preventDefault();
+  const presetID = $('#schedule-preset').value;
+  const body = {
+    preset_id: presetID,
+    machine: $('#schedule-machine').value.trim() || 'clanker',
+    interval_seconds: Number($('#schedule-interval').value || 3600),
+    start_immediately: $('#schedule-start').checked,
+    params: scheduleParamsFor(presetID)
+  };
+  try {
+    await api('/api/schedules', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    await loadSchedules();
+  } catch (err) { alert(err.message); }
+}
+async function refreshAll() { await Promise.allSettled([loadStats(), loadMachines(), loadJobs(), loadPresets(), loadSchedules()]); }
 $('#job-form').addEventListener('submit', async (event) => {
   event.preventDefault();
   const kind = $('#kind').value;
@@ -140,6 +204,7 @@ $('#reset').addEventListener('click', () => {
 });
 $('#prev').addEventListener('click', () => { state.offset = Math.max(0, state.offset - state.limit); loadJobs(); });
 $('#next').addEventListener('click', () => { state.offset += state.limit; loadJobs(); });
+$('#schedule-form').addEventListener('submit', createSchedule);
 $('#close-detail').addEventListener('click', () => $('#detail').close());
 (async function boot() {
   syncKindInputs();

@@ -70,6 +70,22 @@ func (s *Store) migrate() error {
 			created_at TEXT NOT NULL,
 			PRIMARY KEY(job_rowid,seq)
 		)`,
+		`CREATE TABLE IF NOT EXISTS schedules (
+			id INTEGER PRIMARY KEY,
+			name TEXT NOT NULL,
+			preset_id TEXT NOT NULL,
+			machine TEXT NOT NULL DEFAULT 'clanker',
+			params_json TEXT NOT NULL DEFAULT '{}',
+			interval_seconds INTEGER NOT NULL,
+			enabled INTEGER NOT NULL DEFAULT 1,
+			next_run_at TEXT NOT NULL,
+			last_run_at TEXT NOT NULL DEFAULT '',
+			last_job_id TEXT NOT NULL DEFAULT '',
+			last_error TEXT NOT NULL DEFAULT '',
+			created_at TEXT NOT NULL,
+			updated_at TEXT NOT NULL
+		)`,
+		`CREATE INDEX IF NOT EXISTS schedules_due_idx ON schedules(enabled,next_run_at)`,
 		`CREATE VIRTUAL TABLE IF NOT EXISTS jobs_fts USING fts5(
 			public_id UNINDEXED, machine, kind, command, stdout, stderr, error,
 			content='jobs', content_rowid='id'

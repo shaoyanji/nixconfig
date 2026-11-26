@@ -61,6 +61,7 @@ tasks:
       - task: checks:prose:test
       - task: checks:infron
       - task: checks:infron:test
+      - task: checks:pane-nudge:test
       - task: checks:yaml:lint
       - task: checks:yaml:lint:test
       - task: checks:toon
@@ -968,6 +969,18 @@ tasks:
       then a marker-less id. Both must refuse, id named; HEAD stays clean.
     cmds:
       - bash tests/infron/run.sh
+
+  checks:pane-nudge:test:
+    desc: "Regression fixture for pane-nudge (tmux-driving contract, line shape, input validation)"
+    summary: >
+      Pins the one-line pane nudge against a stub tmux: C-u clears before the
+      paste, the text travels in a named buffer and never through send-keys,
+      one Enter after, no Escape anywhere (it aborts a worker's running turn),
+      the buffer is deleted after. The line carries subject, CLAIM (empty
+      degrades to none), ACTION and the ledger pointer; missing input exits 2,
+      an unknown window exits 1.
+    cmds:
+      - bash tests/pane-nudge/run.sh
 
   checks:kg:test:
     desc: "Regression fixture for checks:kg (mutated graph via KG_GRAPH)"

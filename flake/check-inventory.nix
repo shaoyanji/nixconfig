@@ -101,6 +101,7 @@
     "checks:nixcache:probe" = "cache";
     "checks:ntfy" = "leaf";
     "checks:ontology" = "leaf";
+    "checks:pane-nudge:test" = "leaf";
     "checks:paperless:watchdog" = "leaf";
     "checks:portfolio" = "leaf";
     "checks:ports" = "leaf";

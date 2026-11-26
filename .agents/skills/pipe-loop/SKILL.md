@@ -1,6 +1,6 @@
 ---
 name: pipe-loop
-description: "The standing lib/*.nix pipe-operator review loop packaged for any agent to run verbatim. The locked tier is checks:nix:style itself — converted classes (alias mixing, filter|>length, map (x: x.f)) stay zero or the gate refuses. The survey tier lists unlocked candidate classes — attrValues|>map, map|>concatLists, elemAt flip-lambdas, head-of-filter — for judgment, since index predicates and tuple destructuring are honest uses."
+description: "Pick me when the pipe-operator review dispatch fires: one task runs the locked tier (checks:nix:style verbatim) plus a survey of unlocked candidate classes for judgment."
 version: 0.1.0
 author: Devin
 license: MIT
@@ -64,3 +64,9 @@ or mis-scoped, not that a new idiom appeared.
 - **grep vs rg syntax drift.** The gate greps `grep -P` (PCRE); ad-hoc
   surveys need `rg --pcre2`. Same pattern, different engines — test the
   seeded case, never assume.
+- **Exit codes mean things.** 0 = locked tier clean, 1 = the gate refused
+  (a locked class has instances), 2 = `rg` missing — a survey tier that
+  cannot run must refuse, never print `none`.
+
+Truth: `scripts/task/pipe-loop.sh`, `scripts/task/nix-style-check.sh`,
+`taskfiles/dev.yml` — the loop and its gate; this page is the procedure.

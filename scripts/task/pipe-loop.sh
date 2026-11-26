@@ -16,6 +16,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 
 roots=(lib modules flake hosts)
 
+command -v rg >/dev/null || { echo "pipe-loop needs rg (survey tier greps with --pcre2)" >&2; exit 2; }
+
 echo "== locked tier: checks:nix:style (the gate, verbatim) =="
 if bash scripts/task/nix-style-check.sh; then
   gate=0

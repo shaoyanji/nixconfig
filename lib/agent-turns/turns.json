@@ -1,8 +1,26 @@
 {
-  "generated": "2026-11-26T09:34:11Z",
+  "generated": "2026-11-26T09:34:37Z",
   "count": 200,
-  "pin": "adce381530518a734cf3025ecdaf79ed6c3c30851c75000128425929bcd5433a",
+  "pin": "b8b4a6ab762d48d90ddbc1cb677c0c44724805ce548640f15c76e17c8423a08a",
   "turns": [
+    {
+      "id": "b09d1de2-4de8-457c-90e3-6ec07fbf0384",
+      "ts": "2026-11-26T09:34:20Z",
+      "source": "devji",
+      "subject": "nixconfig:job-scout",
+      "action": "Landed apps:sweep:pipeline + the jobsearch-pipeline skill on main: five boards, lane filter, dedupe against the whole record, name validation, rank, write through apps:scout, mail read, turn post.",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "taskfiles/apps.yml",
+        "scripts/task/jobsearch-pipeline.sh",
+        "scripts/task/jobsearch-sweep.py",
+        ".agents/skills/jobsearch-pipeline/SKILL.md"
+      ],
+      "base_commit": "171d5545f070b6c2a2311f07d7df2f2cb1906fc0",
+      "branch": "fix/ci-closure-budget-target",
+      "frame": "03hb1q96awye58biodteka390"
+    },
     {
       "id": "d9d6f6a9-3022-4fff-baaf-67cad4472495",
       "ts": "2026-11-26T09:33:00Z",
@@ -2871,19 +2889,6 @@
       "base_commit": "dd2bcdd994e5861fdceedcf00272c53b422722d6",
       "branch": "main",
       "frame": "03havzalv9tkz9a69gc49sr31"
-    },
-    {
-      "id": "428d60a6-9f89-4427-8a0c-576943dad1c9",
-      "ts": "2026-11-25T15:54:53Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-lane",
-      "action": "drove freebuff pane agents:2.1 with CV-site research task; jev-decide classify exit 2 needs_review but decisive margin: research p=0.49 margin=0.31 >= 0.3 -> drove top label; load-buffer + paste-buffer + Enter; pane shows working BUSY spinner 5s, link audit running",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "dd2bcdd994e5861fdceedcf00272c53b422722d6",
-      "branch": "main",
-      "frame": "03havzakl3f5m15vn6vyvmcro"
     }
   ]
 }

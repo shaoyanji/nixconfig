@@ -9,7 +9,7 @@ title = "Fleet Modular Control Knob Registry"
 description = "Declarative control knobs for optional profiles, services, and system roles across the fleet."
 version = "1.0.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
-total_knobs = 18
+total_knobs = 19
 
 # ------------------------------------------------------------------------------
 # 1. OPTIONAL PROFILES
@@ -199,7 +199,18 @@ type = "service"
 category = "knowledge"
 option = "services.private-deals.enable"
 path = "modules/services/private-deals.nix"
-description = "Deals, watchlists and price history in SQLite/FTS5 (:8462): RSS ingestion, JSON API and a one-page tailnet UI"
-port = 8462
+description = "Deals, watchlists and price history in SQLite/FTS5 (:8464): RSS ingestion, JSON API and a one-page tailnet UI"
+port = 8464
+default = false
+hosts = ["delphi"]
+
+[knobs.inventory-site]
+name = "Inventory Site"
+type = "service"
+category = "knowledge"
+option = "services.inventory-site.enable"
+path = "modules/services/inventory-site.nix"
+description = "Asset inventory in SQLite/FTS5 (:8465): locations, categories, tags, serials, warranties, value, JSON/CSV import-export, fleet-host seed"
+port = 8465
 default = false
 hosts = ["delphi"]

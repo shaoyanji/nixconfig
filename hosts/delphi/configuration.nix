@@ -317,6 +317,7 @@ in {
     self.modules."services.dsh-web"
     self.modules."services.dsh-free-models"
     self.modules."services.fleet-monitors"
+    self.modules."services.inventory-site"
     self.modules."services.mataroa-console"
     self.modules."services.media-relay"
     self.modules."services.offload-bridge"
@@ -1146,6 +1147,7 @@ in {
   services.agentTurns.enable = true;
   # Loopback only; the servicePortal mount is the whole exposure.
   services.private-deals.enable = true;
+  services.inventory-site.enable = true;
   # The outcome lane out of the log: a minutely watcher pushes changed turn
   # outcomes to the operator on Telegram (token is the `hermes` sops key,
   # aliased for this service — delphi's own bot keeps its `delphi-telegram`).
@@ -1452,6 +1454,13 @@ in {
           title = "Private deals";
           description = "Watched products, their price history, and the feeds that report them.";
           requires = ["private-deals.service"];
+        };
+        inventory-site = {
+          port = config.services.inventory-site.tailnetPort;
+          upstream = "http://127.0.0.1:${toString config.services.inventory-site.port}";
+          title = "Inventory";
+          description = "Assets with locations, categories, tags, serials, warranties and value; the fleet seeded in.";
+          requires = ["inventory-site.service"];
         };
       };
     entries.gatus = {

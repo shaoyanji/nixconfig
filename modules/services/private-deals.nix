@@ -27,7 +27,7 @@ in {
 
     port = lib.mkOption {
       type = lib.types.port;
-      default = 8099;
+      default = 8100;
       description = ''
         Loopback port the service listens on. The tailnet mount proxies it; this
         service never binds a public or tailnet address itself.
@@ -36,7 +36,7 @@ in {
 
     tailnetPort = lib.mkOption {
       type = lib.types.port;
-      default = 8462;
+      default = 8464;
       description = ''
         The `tailscale serve` port the mount binds. It is not the loopback port:
         the browser's Origin is `https://<tailnetHost>:<this>`, and the portal

@@ -1,8 +1,139 @@
 {
-  "generated": "2026-11-26T14:40:20Z",
+  "generated": "2026-11-26T14:55:14Z",
   "count": 200,
-  "pin": "1632c5e1fdfed08f2057a24d3dc0b6872b71905d77692367791c7533c5ea756e",
+  "pin": "85976f6c9e0bde084f754ddce998880ee75d33bf1a31f4643ffa45eaf37f5bc7",
   "turns": [
+    {
+      "id": "a9c25d11-d9c9-4cea-b3ff-8e14697fb0ea",
+      "ts": "2026-11-26T14:54:13Z",
+      "source": "buffy",
+      "subject": "nixconfig:clanker-web-research-cli",
+      "action": "web-research.py: search (tavily+context+firecrawl merged by canonical URL, s1..sN sources with accessed), extract (firecrawl/context/tavily/browser/http), health (agent-browser local|clanker, rendered-chars/ready/app-shell verdict), --format json|toon. Live: 3-provider search 8 hits, 3 witnessed twice; extract firecrawl 'Nix 2.34.9 Reference Manual' 7731 chars; browser on clanker 917 chars; health clanker 200 ok / 404 fail. 28 tests.| gate: unittest discover tests/web-research PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4f6485846f63b8613dd958c7afc1e4c94495a0d4",
+      "branch": "main",
+      "frame": "03hb3gqq0b6r9cgev7jdb9ktq"
+    },
+    {
+      "id": "c27c377e-8044-4e58-af3d-019361bdf30f",
+      "ts": "2026-11-26T14:49:54Z",
+      "source": "buffy",
+      "subject": "nixconfig:clanker-web-research-cli",
+      "action": "claim: one CLI for search+extract+rendered-page health over context/tavily/firecrawl/clanker agent-browser with cited, deduped JSON/TOON output",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/web-research.py tests/web-research"
+      ],
+      "files": [],
+      "base_commit": "2294022f64828b5335b29ed4fcec87a648993a84",
+      "branch": "main",
+      "frame": "03hb3fwelu2d5rp942zw95x6t"
+    },
+    {
+      "id": "c6433e5f-ce5e-455e-b29a-41bb14f1f555",
+      "ts": "2026-11-26T14:49:45Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-drive-20261126-1538",
+      "action": "drive devin: inventory-site-service (flake-change)",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/inventory-site",
+        "modules/services/inventory-site.nix",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml",
+        "modules.toml",
+        "lib/registry-schema.nix",
+        "docs/delphi-runtime.md"
+      ],
+      "files": [],
+      "base_commit": "92948702269fc56e1b10675b8b620c23d396ffd9",
+      "branch": "main",
+      "frame": "03hb3fv9emloqbrtv9w67b2rm"
+    },
+    {
+      "id": "3d7cb445-6b36-4546-93e3-c906a8dd3202",
+      "ts": "2026-11-26T14:48:40Z",
+      "source": "buffy",
+      "subject": "nixconfig:deals-scraper-merchant-fix",
+      "action": "merchant_from unwraps click trackers (url/u/target/dest/goto/*_url, 2 hops) before reading the host, alias map amzn->amazon, shop.samsung.com->samsung, shortener with no target -> ''. Live firecrawl techbargains: merchants now amazon x4 + walmart x1 (was 'cc' x5); ingest to local private-deals :8473 created 5, q=JBL -> walmart, list_price 39.95, 50%; ?merchant=walmart 1. 40 tests + py_compile.| gate: python3 -m unittest discover tests/deals-page-scrape PASS + local ingest/FTS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2294022f64828b5335b29ed4fcec87a648993a84",
+      "branch": "main",
+      "frame": "03hb3fnqjd8xcz2yps7x7doq7"
+    },
+    {
+      "id": "abdba80a-d464-450e-acfb-f7df281eac12",
+      "ts": "2026-11-26T14:47:23Z",
+      "source": "buffy",
+      "subject": "nixconfig:deals-scraper-merchant-fix",
+      "action": "claim: resolve merchant past redirect hosts (cc.techbargains.com) from query/path/known tokens instead of filing every deal under cc",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/deals-page-scrape.py tests/deals-page-scrape"
+      ],
+      "files": [],
+      "base_commit": "3b0bf87e088265fe87e6968918bc0599b06dfd9b",
+      "branch": "main",
+      "frame": "03hb3feoorw74br3bihv3cvno"
+    },
+    {
+      "id": "deb22032-a5b7-4ca1-a0a8-ca2311989428",
+      "ts": "2026-11-26T14:46:34Z",
+      "source": "buffy",
+      "subject": "nixconfig:deals-ingest-pipeline",
+      "action": "deals-ingest.py: scrape JSON -> POST /api/deals, original_price mapped to list_price, board host as source (not the cc.* redirect), canonical URL so re-runs update, unpriced cards refused. Live e2e on /tmp binary :8472: firecrawl techbargains 5 deals created, FTS q=knife hit with snippet, q=cleaner&min_discount=50 1, re-run 0 created/5 updated. 17 tests + py_compile.| gate: python3 -m unittest discover tests/deals-ingest PASS + live /api/deals FTS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3b0bf87e088265fe87e6968918bc0599b06dfd9b",
+      "branch": "main",
+      "frame": "03hb3f8wl0st1ylwzkvre6s7q"
+    },
+    {
+      "id": "d09e8c0b-0261-4e7c-ae1a-fa3692fd87d9",
+      "ts": "2026-11-26T14:45:00Z",
+      "source": "buffy",
+      "subject": "nixconfig:deals-ingest-pipeline",
+      "action": "claim: pipe deals-page-scrape JSON into private-deals over its HTTP API, mirroring jobs-ingest, verified against a local instance with an FTS5 query",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/deals-ingest.py tests/deals-ingest"
+      ],
+      "files": [],
+      "base_commit": "016f15c2554e461681a190d3c7fa203db0d26a5f",
+      "branch": "main",
+      "frame": "03hb3exwnxl10h3obe77griz5"
+    },
+    {
+      "id": "f4e0f46e-a671-4998-8325-c80a9396476b",
+      "ts": "2026-11-26T14:44:05Z",
+      "source": "buffy",
+      "subject": "nixconfig:clanker-deals-scraper-cli",
+      "action": "deals-page-scrape.py: card-level extraction (title/price/original/discount/merchant/url/category) over agent-browser, firecrawl, context, tavily, http. DE/US/CHF prices; two-amount cards are deals, -NN% marker computes the original, single prices dropped, coupon thresholds refused. Live: techbargains 18.99<-49.99 (62%) via firecrawl/context/http; clanker browser on dealnews 4 deals incl 68.49<-299.99 (77%). 34 tests + py_compile.| gate: python3 -m unittest discover tests/deals-page-scrape PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "016f15c2554e461681a190d3c7fa203db0d26a5f",
+      "branch": "main",
+      "frame": "03hb3erevuzje6mgn9ualon0g"
+    },
+    {
+      "id": "78122a6a-0d7e-4548-a42b-c30e8d8aa2d7",
+      "ts": "2026-11-26T14:42:21Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-site-publish",
+      "action": "landed: packet builder defaults to letters/<id>.json (was a letter.json that never existed, so packets came out CV-only); rebuilt 13 prep packets whose entry was a dangling store link; published matt CV site (deploy 8d85fdf8) | gate: checks:quick PASS, checks:appflow PASS, matt:cv:check 14/14, site:check PASS, cv:publish-check 6/6",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "92948702269fc56e1b10675b8b620c23d396ffd9",
+      "branch": "main",
+      "frame": "03hb3ef8h8lh3lhwwf7fef1si"
+    },
     {
       "id": "6545a181-d542-4838-b85d-e4bf84ab4751",
       "ts": "2026-11-26T14:38:28Z",
@@ -2906,136 +3037,6 @@
       "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
       "branch": "main",
       "frame": "03hb0ouvnlcel6b7tesjz6ynz"
-    },
-    {
-      "id": "19d9853d-7e03-4f26-bc2b-6f3fadb7a894",
-      "ts": "2026-11-26T06:17:04Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-0657-done",
-      "action": "devin verified image-daily Go port gates: nothing red, no fix needed, nothing committed (gate-change)",
-      "outcome": "done",
-      "claims": [
-        "modules/"
-      ],
-      "files": [],
-      "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
-      "branch": "main",
-      "frame": "03hb0npxvcpr386qnrvh0fwh7"
-    },
-    {
-      "id": "d3e60957-cfa4-4fa5-93e1-569fe3b5c8db",
-      "ts": "2026-11-26T06:16:00Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-0657",
-      "action": "devin: verify image-daily Go port gates and fix (gate-change)",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/"
-      ],
-      "files": [],
-      "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
-      "branch": "main",
-      "frame": "03hb0nifajgkkis7t5xgxnfqj"
-    },
-    {
-      "id": "0166cad1-e21a-45f2-93d8-eecb425993da",
-      "ts": "2026-11-26T06:05:18Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-20261126-0617",
-      "action": "done: image-daily gates re-verified on 3910aa30 — checks:image-daily rc=0 (dispatch+fallback+breakers+shrinkGuard), images:publish:test 9/9 incl. real-rev 470c9034^ refusal; nothing red, nothing to fix",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
-      "branch": "main",
-      "frame": "03hb0lf3plt04t3afe66aq5nj"
-    },
-    {
-      "id": "3df990ae-9827-43c0-8f41-52e2931fccd6",
-      "ts": "2026-11-26T06:00:22Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-26: 0 plate(s) kept of 0 spent, 0 roster row(s) waiting, 772 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hb0kggqaqzqvmq71biwspuh"
-    },
-    {
-      "id": "5d6e8582-ca60-42c3-88ba-5417929bb9d1",
-      "ts": "2026-11-26T05:55:46Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-20261126-0638",
-      "action": "landed: modules-edges refused the path imports — both sites now reach config.nginx-static-ui by name (self.modules; +self arg on appflow-board) | gate: modules:edges 168 modules every edge by name + drv-equality delphi + nix:lint 333",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3910aa30c7ec07a85ee7a77c2a0ed76c1a685475",
-      "branch": "main",
-      "frame": "03hb0jk2wtvdyf4cmmdk3bh2u"
-    },
-    {
-      "id": "7c8fc094-e181-417e-865d-5447a32e8b61",
-      "ts": "2026-11-26T05:51:38Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-20261126-0638",
-      "action": "start: check modules-edges sees the new config.nginx-static-ui import edges",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/appflow-board.nix",
-        "modules/services/media-relay.nix"
-      ],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb0ir1rmz323cjwawwmbahr"
-    },
-    {
-      "id": "6ef4cdd1-d18f-4858-87f3-ad06948ad5ee",
-      "ts": "2026-11-26T05:50:10Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-0638",
-      "action": "gate-change: modules-edges name imports appflow-board media-relay",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/appflow-board.nix",
-        "modules/services/media-relay.nix"
-      ],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb0ignnl5ch1lydwhva7k1d"
-    },
-    {
-      "id": "82edd383-3f44-49ab-bd46-1922b743ef9b",
-      "ts": "2026-11-26T05:36:02Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-0617",
-      "action": "chain-change survey done: no refactor surface remains; tree clean @3346ea27; open red gate checks:modules:edges (appflow-board, media-relay)",
-      "outcome": "done",
-      "claims": [
-        "modules/",
-        "hosts/"
-      ],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb0fpats8futeatmk646x5p"
-    },
-    {
-      "id": "eba89cdc-eb26-43c5-b5a6-492665e6a8ec",
-      "ts": "2026-11-26T05:22:56Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-20261126-0617",
-      "action": "done: hosts/+modules/ surveyed — every host's own-import set unique post chain-split; 0 repeated 5-line config blocks across host files; no repeated module surface remains (all single-sourced through 3346ea27) | gate: drv-equality 30/30 identical",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb0d5824gnmx0yla4sld9vy"
     }
   ]
 }

@@ -26,6 +26,10 @@
   # without naming it here.
   isLaptop = category == "laptop" || builtins.elem "small-screen" traits;
   defaultSideBySide = !isLaptop;
+  geminiApi =
+    if pkgs.stdenv.hostPlatform.system == "x86_64-linux"
+    then (self.packages.${pkgs.stdenv.hostPlatform.system} or {}).cli.ai.gemini-api or null
+    else null;
 in {
   imports = [
     self.modules."nixoshmsymlinks"
@@ -138,14 +142,16 @@ in {
         }
       ];
     };
-    home.packages = with pkgs; [
-      lazygit
-      #   sops #managed by sops module
-      #   yq
-      #   yq-go#managed by sops module
-      #   pass
-      #   gnupg
-      #   age
-    ];
+    home.packages =
+      (with pkgs; [
+        lazygit
+        #   sops #managed by sops module
+        #   yq
+        #   yq-go#managed by sops module
+        #   pass
+        #   gnupg
+        #   age
+      ])
+      ++ lib.optionals (geminiApi != null) [geminiApi];
   };
 }

@@ -111,6 +111,27 @@
     # Tools this flake builds rather than borrows: the families where `pkg` is a
     # local derivation instead of a nixpkgs attribute.
     ai = {
+      gemini-api.pkg = pkgs.stdenvNoCC.mkDerivation {
+        pname = "gemini-api";
+        version = "0.5.0";
+        src = pkgs.fetchurl {
+          url = "https://github.com/google-gemini/gemini-api-cli/releases/download/v0.5.0/gemini-api_Linux_x86_64.tar.gz";
+          hash = "sha256-/OIp3Uguwcr/Fc0Ueik1E/+1pSOQOU5SE2+FtKSXx0I=";
+        };
+        dontUnpack = true;
+        installPhase = ''
+          tar -xzf $src
+          mkdir -p $out/bin
+          cp gemini-api $out/bin/gemini-api
+          chmod +x $out/bin/gemini-api
+        '';
+        meta = {
+          description = "Google Gemini API CLI";
+          mainProgram = "gemini-api";
+          platforms = ["x86_64-linux"];
+        };
+      };
+
       # vox is the explainer layer: needle3 picks one tool call, jev routes the
       # lane, cpg says the result to a person. Go stdlib only, so `vendorHash =
       # null` and the binary builds on either architecture — the *engine* it

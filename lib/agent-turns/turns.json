@@ -1,8 +1,75 @@
 {
-  "generated": "2026-11-26T14:32:30Z",
+  "generated": "2026-11-26T14:36:45Z",
   "count": 200,
-  "pin": "9080ba8dbbe94d980e77845b8f16ae7cf5643246def3ed28ad5921f7ebf8bb08",
+  "pin": "e00a5c53223f65b2a7b4eea7240347aa985da6ab8935d713cd072e448531d139",
   "turns": [
+    {
+      "id": "3f82f9e9-5f4c-4a00-bd9b-b3c9592e443f",
+      "ts": "2026-11-26T14:36:43Z",
+      "source": "devin",
+      "subject": "nixconfig:private-deals-service",
+      "action": "landed: same evidence as nixconfig:steward-devin-drive-20261126-1512 — service, module, delphi wiring and inventory live on origin/main at c9187bfd | gates: go test PASS, checks:host HOST=delphi PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c9187bfdfe3c0f9c03d3833a856645c6f5805211",
+      "branch": "main",
+      "frame": "03hb3dboxb6n8wailksxjd94d"
+    },
+    {
+      "id": "5b4886a7-17c5-4a43-a5f2-776e817cdaab",
+      "ts": "2026-11-26T14:36:28Z",
+      "source": "devin",
+      "subject": "nixconfig:steward-devin-drive-20261126-1512",
+      "action": "landed: private-deals service — Go SQLite/FTS5 deals+watchlists+price history, RSS ingest timer, JSON API + one-page UI; loopback :8099, tailnet mount :8462 via servicePortal; kebab services.private-deals registered in modules.toml + inventory (link/services/key_services) | gates: go test PASS, nix sandbox build+checkPhase PASS, checks:registry:compiled PASS, checks:host HOST=delphi PASS (2150 assertions)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c9187bfdfe3c0f9c03d3833a856645c6f5805211",
+      "branch": "main",
+      "frame": "03hb3d9ysaqa3h8t4rxwkcd5c"
+    },
+    {
+      "id": "00fe4c24-ccec-43e1-b638-f3d6ddd6f7dd",
+      "ts": "2026-11-26T14:34:35Z",
+      "source": "buffy",
+      "subject": "nixconfig:clanker-deals-scraper-cli",
+      "action": "claim: deals scraper (title/price/original/discount/merchant/url/category) over agent-browser on clanker plus firecrawl/context/tavily/http, with fixtures and a live run",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/deals-page-scrape.py tests/deals-page-scrape"
+      ],
+      "files": [],
+      "base_commit": "e958d546476e5f092c6ae7a4204ddade0cd61923",
+      "branch": "main",
+      "frame": "03hb3cwos3h5zbf9ejra24raf"
+    },
+    {
+      "id": "ffd572b9-ee69-447a-8dac-e57ded5ffc08",
+      "ts": "2026-11-26T14:33:31Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-db-tavily-context-ingest",
+      "action": "apps:ingest pipes apps:page JSON into job-db-scraper POST /api/postings (company from ATS URL, URL as identity, unknown employer skipped/named); job-page-scrape gained Context.dev plus the Ashby 'Title • City • Full time' split. E2E local: linear+anthropic+n8n -> 18 postings; FTS5 q='account executive' 3, q=n8n 8; re-ingest 0 created/18 updated. Tavily returns text without card links, so 0 postings by design. 44 tests pass.| gate: python3 -m unittest discover tests/jobs-ingest PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e958d546476e5f092c6ae7a4204ddade0cd61923",
+      "branch": "main",
+      "frame": "03hb3cp5szzc5mgm70ab4k0f1"
+    },
+    {
+      "id": "f5bb8c1f-0069-4673-b367-f4c8f49cf244",
+      "ts": "2026-11-26T14:33:20Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff-drive",
+      "action": "drove freebuff pane 2: publish label, now working",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
+      "branch": "HEAD",
+      "frame": "03hb3cnvndt1ivwcj5mt2c1iy"
+    },
     {
       "id": "27bb3a14-e3ff-4c46-a558-65b370cccfa4",
       "ts": "2026-11-26T14:28:07Z",
@@ -2948,77 +3015,6 @@
       "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
       "branch": "main",
       "frame": "03hb0d1lgw5fb76eu0hfk1kjq"
-    },
-    {
-      "id": "00a730e5-8551-4ec3-bbd5-2becf8182066",
-      "ts": "2026-11-26T05:21:05Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-0617",
-      "action": "devin refactor: chain-change via jev-decide, task sent",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/",
-        "hosts/"
-      ],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb0cs8wbxx6rhbqeqkm9knr"
-    },
-    {
-      "id": "89121d95-7280-41ae-9397-07adb53000d8",
-      "ts": "2026-11-26T04:46:25Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:image-daily-gates",
-      "action": "gate-change: image-daily gates green on 3346ea27",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb060e8rngeie2ix5w0jav4"
-    },
-    {
-      "id": "7f31d21a-bf94-4223-a217-4567f3e9e41a",
-      "ts": "2026-11-26T04:44:29Z",
-      "source": "devin",
-      "subject": "nixconfig:image-daily-gates",
-      "action": "start: boundary verified + image-daily gate rc=0 on 3346ea27; drv-equality queued for 06:00 unlock",
-      "outcome": "in_progress",
-      "claims": [
-        "tools/os/internal/image",
-        "scripts/task/drv-equality.py"
-      ],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb05mqt30s13nv44jfmce2w"
-    },
-    {
-      "id": "f62bab2a-6149-48d7-b37e-45a30a1a2795",
-      "ts": "2026-11-26T04:43:00Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:image-daily-gates",
-      "action": "gate-change: verify image-daily gates green per commit",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb05cbmjl56x787fpxu3xib"
-    },
-    {
-      "id": "ee1c5c05-2abc-4087-8b3a-827e84291e02",
-      "ts": "2026-11-26T04:32:54Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:image-daily-gates",
-      "action": "gate-change: verify image-daily gates green per commit",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "3346ea27356cea9eb6538da3701f4afd45480f0b",
-      "branch": "main",
-      "frame": "03hb03depuf56tcgflnx71c92"
     }
   ]
 }

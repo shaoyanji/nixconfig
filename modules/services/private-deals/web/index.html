@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Private Deals</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="shell hero">
+    <nav class="topline" aria-label="service">
+      <div class="brand"><span class="mark">◆</span><span>Private Deals</span></div>
+      <div class="navactions">
+        <a class="ghost" href="/api/export.csv">Export CSV</a>
+        <button id="ingestButton" class="primary">Run ingestion</button>
+      </div>
+    </nav>
+    <section class="hero-grid">
+      <div>
+        <p class="eyebrow">tailnet intelligence</p>
+        <h1>Watch the price, not the noise.</h1>
+        <p class="lede">Deals, tracked products, watchlists and price history in one private SQLite/FTS5 index.</p>
+      </div>
+      <div class="stats" id="stats" aria-live="polite"></div>
+    </section>
+  </header>
+
+  <main class="shell layout">
+    <section class="workspace">
+      <form id="filters" class="filters">
+        <label class="search"><span>Search</span><input name="q" type="search" placeholder="laptop, headphones, coupon…" autocomplete="off"></label>
+        <label><span>Merchant</span><input name="merchant" placeholder="Amazon"></label>
+        <label><span>Category</span><select name="category"><option value="">All</option><option>computing</option><option>audio</option><option>phones</option><option>home</option><option>gaming</option><option>fashion</option></select></label>
+        <label><span>Min discount</span><input name="min_discount" type="number" min="0" max="99" placeholder="20"></label>
+        <label><span>Max price</span><input name="max_price" type="number" min="0" step="0.01" placeholder="500"></label>
+        <button class="secondary" type="submit">Filter</button>
+      </form>
+
+      <div class="sectionbar">
+        <div><p class="eyebrow">live index</p><h2>Deals</h2></div>
+        <p id="dealCount" class="muted"></p>
+      </div>
+      <div id="deals" class="dealgrid" aria-live="polite"></div>
+    </section>
+
+    <aside class="sidebar">
+      <details class="panel" open>
+        <summary>Add a deal</summary>
+        <form id="dealForm" class="stack">
+          <input name="title" required placeholder="Title">
+          <input name="url" placeholder="https://…">
+          <input name="merchant" placeholder="Merchant">
+          <div class="tworow"><input name="price" type="number" step="0.01" placeholder="Price"><input name="list_price" type="number" step="0.01" placeholder="List price"></div>
+          <input name="coupon_code" placeholder="Coupon code">
+          <textarea name="description" rows="3" placeholder="Notes, terms, expiry…"></textarea>
+          <button class="primary" type="submit">Save deal</button>
+        </form>
+      </details>
+
+      <details class="panel">
+        <summary>Track a product</summary>
+        <form id="productForm" class="stack">
+          <input name="name" required placeholder="Product name">
+          <input name="url" placeholder="Product URL">
+          <div class="tworow"><input name="merchant" placeholder="Merchant"><input name="brand" placeholder="Brand"></div>
+          <div class="tworow"><input name="current_price" type="number" step="0.01" placeholder="Current"><input name="target_price" type="number" step="0.01" placeholder="Target"></div>
+          <input name="category" placeholder="Category">
+          <button class="primary" type="submit">Track product</button>
+        </form>
+      </details>
+
+      <section class="panel">
+        <div class="panelhead"><h3>Watchlists</h3><button id="newListButton" class="tiny">New</button></div>
+        <form id="watchlistForm" class="stack hidden"><input name="name" required placeholder="List name"><button class="primary" type="submit">Create</button></form>
+        <select id="watchlistPicker" aria-label="watchlist target"></select>
+        <div id="watchlists" class="watchlists"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panelhead"><h3>Products</h3><span id="productCount" class="muted"></span></div>
+        <div id="products" class="products"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panelhead"><h3>Ingestion</h3><span id="ingestState" class="pill">idle</span></div>
+        <div id="sources" class="sources"></div>
+      </section>
+    </aside>
+  </main>
+
+  <dialog id="detailDialog">
+    <article id="detail"></article>
+    <form method="dialog"><button class="ghost close">Close</button></form>
+  </dialog>
+
+  <div id="toast" role="status"></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>

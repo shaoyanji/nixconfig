@@ -8,6 +8,7 @@
     "services.zettelGraph.enable"
     "services.mataroaConsole.enable"
     "services.jobDbScraper.enable"
+    "services.privateDeals.enable"
   ];
   umbrellaFamilies = ["checks:appflow"];
   sopsAnchorExceptions = ["garnix"];

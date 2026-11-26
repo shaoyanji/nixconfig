@@ -1,183 +1,244 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
+	"path/filepath"
 	"strings"
 	"testing"
 )
 
-func tempStore(t *testing.T) *server {
+func testStore(t *testing.T) *Store {
 	t.Helper()
-	db, err := openStore(t.TempDir() + "/deals.db")
+	store, err := OpenStore(filepath.Join(t.TempDir(), "deals.sqlite"))
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("OpenStore: %v", err)
 	}
-	t.Cleanup(func() { db.Close() })
-	return &server{db: db}
+	t.Cleanup(func() { _ = store.Close() })
+	return store
 }
 
-func post(t *testing.T, srv *server, path, body string) *httptest.ResponseRecorder {
+func TestCanonicalURLStripsTracking(t *testing.T) {
+	got := canonicalURL("HTTPS://WWW.Example.com/deal/42/?utm_source=x&aff=abc&size=8#fragment")
+	want := "https://example.com/deal/42?size=8"
+	if got != want {
+		t.Fatalf("canonicalURL got %q want %q", got, want)
+	}
+}
+
+func TestExtractPricing(t *testing.T) {
+	price, list, discount := extractPricing("ThinkPad X1 now €799, statt €999 — 20% off")
+	if price == nil || *price != 799 {
+		t.Fatalf("price %#v, want 799", price)
+	}
+	if list == nil || *list != 999 {
+		t.Fatalf("list %#v, want 999", list)
+	}
+	if discount != 20 {
+		t.Fatalf("discount %v, want 20", discount)
+	}
+}
+
+func TestParseRSSFeed(t *testing.T) {
+	items, err := parseFeed([]byte(`<?xml version="1.0"?><rss version="2.0"><channel><item><title>SSD sale €89</title><link>https://shop.example/deal/1?utm_source=x</link><pubDate>Thu, 26 Nov 2026 10:00:00 +0000</pubDate><description>Fast NVMe SSD deal</description><category>computing</category></item></channel></rss>`))
+	if err != nil {
+		t.Fatalf("parseFeed: %v", err)
+	}
+	if len(items) != 1 || items[0].Title != "SSD sale €89" || items[0].Categories[0] != "computing" {
+		t.Fatalf("unexpected items: %#v", items)
+	}
+}
+
+func TestParseAtomFeed(t *testing.T) {
+	items, err := parseFeed([]byte(`<feed xmlns="http://www.w3.org/2005/Atom"><entry><title>Headphones deal</title><link rel="alternate" href="https://audio.example/deals/9"/><summary>Now £49, was £99</summary><updated>2026-11-26T10:00:00Z</updated><category term="audio"/></entry></feed>`))
+	if err != nil {
+		t.Fatalf("parseFeed atom: %v", err)
+	}
+	if len(items) != 1 || items[0].Link != "https://audio.example/deals/9" || items[0].Categories[0] != "audio" {
+		t.Fatalf("unexpected atom items: %#v", items)
+	}
+}
+
+func TestDealFromMap(t *testing.T) {
+	payload := map[string]any{
+		"title": "NVMe SSD", "url": "https://shop.example/p/1", "merchant": "Shop", "price": "€89.99", "list_price": "129.99", "tags": []any{"ssd", "nvme"},
+	}
+	deal, ok := dealFromMap(payload)
+	if !ok {
+		t.Fatal("dealFromMap not ok")
+	}
+	if deal.Price == nil || *deal.Price != 89.99 {
+		t.Fatalf("price %#v", deal.Price)
+	}
+	if len(deal.Tags) != 3 { // json + ssd + nvme
+		t.Fatalf("tags %#v", deal.Tags)
+	}
+}
+
+func TestStoreDealProductFTSPriceHistoryAndWatchlist(t *testing.T) {
+	ctx := context.Background()
+	store := testStore(t)
+
+	price := 799.0
+	list := 999.0
+	productID, created, err := store.UpsertProduct(ctx, productInput{
+		URL: "https://shop.example/products/x1?utm_source=newsletter", Source: "manual", Merchant: "Shop", Brand: "Example", Name: "Example X1 Laptop",
+		Category: "computing", Currency: "EUR", CurrentPrice: &price, ListPrice: &list,
+	})
+	if err != nil || !created {
+		t.Fatalf("UpsertProduct created=%v err=%v", created, err)
+	}
+
+	dealID, created, err := store.UpsertDeal(ctx, dealInput{
+		URL: "https://shop.example/products/x1", Source: "rss", Merchant: "Shop", Title: "Example X1 Laptop deal", Description: "Now €799, was €999",
+		Price: &price, ListPrice: &list, Tags: []string{"laptop"},
+	})
+	if err != nil || !created {
+		t.Fatalf("UpsertDeal created=%v err=%v", created, err)
+	}
+	deal, history, err := store.GetDeal(ctx, dealID)
+	if err != nil {
+		t.Fatalf("GetDeal: %v", err)
+	}
+	if deal.ProductID == nil || *deal.ProductID != productID {
+		t.Fatalf("deal product link %#v, want %d", deal.ProductID, productID)
+	}
+	if deal.DiscountPct != 20 {
+		t.Fatalf("discount %v, want 20", deal.DiscountPct)
+	}
+	if len(history) == 0 {
+		t.Fatal("expected price history")
+	}
+
+	page, err := store.QueryDeals(ctx, dealQueryOptions{Q: "laptop", Active: true, Limit: 10})
+	if err != nil {
+		t.Fatalf("QueryDeals: %v", err)
+	}
+	if page.Total != 1 || !strings.Contains(page.Items[0].Snippet, "<mark>") {
+		t.Fatalf("fts page %#v", page)
+	}
+
+	watchlistID, err := store.CreateWatchlist(ctx, "Office upgrade", "machines")
+	if err != nil {
+		t.Fatalf("CreateWatchlist: %v", err)
+	}
+	if err := store.AddWatchlistItem(ctx, watchlistID, productID, "buy under 750"); err != nil {
+		t.Fatalf("AddWatchlistItem: %v", err)
+	}
+	items, err := store.WatchlistItems(ctx, watchlistID)
+	if err != nil || len(items) != 1 || items[0].Product.Name != "Example X1 Laptop" {
+		t.Fatalf("watchlist items %#v err=%v", items, err)
+	}
+
+	product, productHistory, linkedDeals, err := store.GetProduct(ctx, productID)
+	if err != nil {
+		t.Fatalf("GetProduct: %v", err)
+	}
+	if product.DiscountPct != 20 || len(productHistory) == 0 || len(linkedDeals) != 1 {
+		t.Fatalf("product %#v history=%d deals=%d", product, len(productHistory), len(linkedDeals))
+	}
+	stats, err := store.Stats(ctx)
+	if err != nil {
+		t.Fatalf("Stats: %v", err)
+	}
+	if stats["deals"] != 1 || stats["products"] != 1 || stats["watchlists"] != 1 {
+		t.Fatalf("stats %#v", stats)
+	}
+}
+
+func TestDealDedupesAndIncrementsSeenCount(t *testing.T) {
+	ctx := context.Background()
+	store := testStore(t)
+	input := dealInput{Source: "manual", Merchant: "Shop", Title: "Noise cancelling headphones", Description: "€99 instead of €149"}
+	first, created, err := store.UpsertDeal(ctx, input)
+	if err != nil || !created {
+		t.Fatalf("first created=%v err=%v", created, err)
+	}
+	second, created, err := store.UpsertDeal(ctx, input)
+	if err != nil {
+		t.Fatalf("second: %v", err)
+	}
+	if created || second != first {
+		t.Fatalf("second id=%d created=%v, want same existing id %d", second, created, first)
+	}
+	deal, _, err := store.GetDeal(ctx, first)
+	if err != nil {
+		t.Fatalf("GetDeal: %v", err)
+	}
+	if deal.SeenCount != 2 {
+		t.Fatalf("seen count %d, want 2", deal.SeenCount)
+	}
+}
+
+func TestRunAndSourceState(t *testing.T) {
+	ctx := context.Background()
+	store := testStore(t)
+	id, err := store.BeginRun(ctx, "rss")
+	if err != nil {
+		t.Fatalf("BeginRun: %v", err)
+	}
+	if err := store.FinishRun(ctx, id, "rss", "ok", 4, 2, 2, ""); err != nil {
+		t.Fatalf("FinishRun: %v", err)
+	}
+	states, err := store.SourceStates(ctx)
+	if err != nil || len(states) != 1 || states[0].TotalFetched != 4 {
+		t.Fatalf("states %#v err=%v", states, err)
+	}
+	runs, err := store.RecentRuns(ctx, 10)
+	if err != nil || len(runs) != 1 || runs[0].Status != "ok" {
+		t.Fatalf("runs %#v err=%v", runs, err)
+	}
+}
+
+func TestProviderSearchAndScrapeClients(t *testing.T) {
 	t.Helper()
-	req := httptest.NewRequest("POST", path, strings.NewReader(body))
-	rec := httptest.NewRecorder()
-	srv.mux().ServeHTTP(rec, req)
-	return rec
-}
-
-func get(t *testing.T, srv *server, path string) *httptest.ResponseRecorder {
-	t.Helper()
-	req := httptest.NewRequest("GET", path, nil)
-	rec := httptest.NewRecorder()
-	srv.mux().ServeHTTP(rec, req)
-	return rec
-}
-
-func TestAddSearchFTS(t *testing.T) {
-	srv := tempStore(t)
-	rec := post(t, srv, "/api/deals", `{"title":"ThinkPad T14 Gen 3 refurbished","url":"https://example.test/t14","price_cents":54900,"notes":"16GB RAM, good battery"}`)
-	if rec.Code != 200 {
-		t.Fatalf("add: %d %s", rec.Code, rec.Body)
-	}
-	var added struct {
-		ID  int64 `json:"id"`
-		New bool  `json:"new"`
-	}
-	json.Unmarshal(rec.Body.Bytes(), &added)
-	if !added.New {
-		t.Fatal("first insert must be new")
-	}
-
-	rec = get(t, srv, "/api/deals?q=thinkpad")
-	if rec.Code != 200 {
-		t.Fatalf("search: %d %s", rec.Code, rec.Body)
-	}
-	var res struct {
-		Count int `json:"count"`
-	}
-	json.Unmarshal(rec.Body.Bytes(), &res)
-	if res.Count != 1 {
-		t.Fatalf("fts search thinkpad: got %d, want 1", res.Count)
-	}
-
-	// FTS must hit notes too, and a query with punctuation must not break MATCH.
-	rec = get(t, srv, "/api/deals?q="+url.QueryEscape("battery,"))
-	json.Unmarshal(rec.Body.Bytes(), &res)
-	if res.Count != 1 {
-		t.Fatalf("fts notes search: got %d, want 1", res.Count)
-	}
-
-	rec = get(t, srv, "/api/deals?q=nothinghere")
-	json.Unmarshal(rec.Body.Bytes(), &res)
-	if res.Count != 0 {
-		t.Fatalf("miss search: got %d, want 0", res.Count)
-	}
-}
-
-func TestUpsertPriceHistory(t *testing.T) {
-	srv := tempStore(t)
-	post(t, srv, "/api/deals", `{"title":"SSD 2TB","url":"https://example.test/ssd","price_cents":9999}`)
-	post(t, srv, "/api/deals", `{"title":"SSD 2TB","url":"https://example.test/ssd","price_cents":8999}`)
-	post(t, srv, "/api/deals", `{"title":"SSD 2TB","url":"https://example.test/ssd","price_cents":8999}`)
-
-	rec := get(t, srv, "/api/deals/1")
-	var res struct {
-		Deal Deal `json:"deal"`
-		Hist []struct {
-			PriceCents int64 `json:"price_cents"`
-		} `json:"price_history"`
-	}
-	if err := json.Unmarshal(rec.Body.Bytes(), &res); err != nil {
-		t.Fatal(err)
-	}
-	if res.Deal.PriceCents != 8999 {
-		t.Fatalf("price after upsert: got %d, want 8999", res.Deal.PriceCents)
-	}
-	if len(res.Hist) != 2 {
-		t.Fatalf("price history rows: got %d, want 2 (no row for an unchanged price)", len(res.Hist))
-	}
-}
-
-func TestWatchlistRoundtrip(t *testing.T) {
-	srv := tempStore(t)
-	rec := post(t, srv, "/api/watchlists", `{"name":"thinkpads","query":"thinkpad t14"}`)
-	if rec.Code != 200 {
-		t.Fatalf("add watchlist: %d %s", rec.Code, rec.Body)
-	}
-	rec = get(t, srv, "/api/watchlists")
-	var res struct {
-		Watchlists []Watchlist `json:"watchlists"`
-	}
-	json.Unmarshal(rec.Body.Bytes(), &res)
-	if len(res.Watchlists) != 1 || res.Watchlists[0].Name != "thinkpads" {
-		t.Fatalf("watchlist roundtrip: %+v", res.Watchlists)
-	}
-}
-
-func TestFeedIngest(t *testing.T) {
-	feed := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`<?xml version="1.0"?><rss version="2.0"><channel>
-			<item><title>NAS 4 bay for €149,99</title><link>https://example.test/nas</link><description>uses 4 slots</description><pubDate>x</pubDate></item>
-			<item><title>no price here</title><link>https://example.test/np</link><description>d</description></item>
-		</channel></rss>`))
-	}))
-	defer feed.Close()
-
-	srv := tempStore(t)
-	post(t, srv, "/api/feeds", `{"url":"`+feed.URL+`"}`)
-	rec := post(t, srv, "/api/ingest", ``)
-	if rec.Code != 200 {
-		t.Fatalf("ingest: %d %s", rec.Code, rec.Body)
-	}
-	var res struct {
-		Ingested map[string]int `json:"ingested"`
-		Failed   map[string]string `json:"failed"`
-	}
-	json.Unmarshal(rec.Body.Bytes(), &res)
-	if res.Ingested[feed.URL] != 2 {
-		t.Fatalf("ingested: %+v failed %+v", res.Ingested, res.Failed)
-	}
-
-	rec = get(t, srv, "/api/deals/1")
-	var one struct {
-		Deal Deal `json:"deal"`
-	}
-	json.Unmarshal(rec.Body.Bytes(), &one)
-	if one.Deal.PriceCents != 14999 {
-		t.Fatalf("rss price extraction: got %d, want 14999", one.Deal.PriceCents)
-	}
-}
-
-func TestParseAmount(t *testing.T) {
-	for in, want := range map[string]int64{
-		"1.234,56": 123456,
-		"1,234.56": 123456,
-		"299":      29900,
-		"49,99":    4999,
-		"0,99":     99,
-	} {
-		if got := parseAmount(in); got != want {
-			t.Errorf("parseAmount(%q) = %d, want %d", in, got, want)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+		switch r.URL.Path {
+		case "/search":
+			_, _ = w.Write([]byte(`{"results":[{"title":"Laptop deal now €799 was €999","url":"https://shop.example/laptop-deal","content":"20% off laptop coupon","score":0.9}]}`))
+		case "/web/search":
+			_, _ = w.Write([]byte(`{"results":[{"title":"SSD sale €89","url":"https://shop.example/ssd","description":"NVMe SSD deal"}]}`))
+		case "/extract":
+			_, _ = w.Write([]byte(`{"results":[{"url":"https://shop.example/laptop-deal","raw_content":"# Laptop deal\nNow €799 was €999"}]}`))
+		case "/scrape":
+			_, _ = w.Write([]byte(`{"success":true,"data":{"markdown":"# Firecrawl deal\nNow €49 was €99"}}`))
+		case "/web/scrape/markdown":
+			w.Header().Set("content-type", "text/markdown")
+			_, _ = w.Write([]byte("# Context deal\nNow €25 was €50"))
+		default:
+			http.NotFound(w, r)
 		}
-	}
-	if got := extractPrice("something for €12,50 today"); got != 1250 {
-		t.Errorf("extractPrice prefix euro: got %d, want 1250", got)
-	}
-	if got := extractPrice("no money mentioned"); got != 0 {
-		t.Errorf("extractPrice no amount: got %d, want 0", got)
-	}
-}
+	}))
+	defer server.Close()
 
-func TestUIAndHealthz(t *testing.T) {
-	srv := tempStore(t)
-	rec := get(t, srv, "/healthz")
-	if rec.Code != 200 {
-		t.Fatalf("healthz: %d", rec.Code)
+	store := testStore(t)
+	ing := newIngester(store, providerConfig{
+		TavilyKey: "test", ContextKey: "test", FirecrawlKey: "test",
+		TavilyBase: server.URL, ContextBase: server.URL, FirecrawlBase: server.URL,
+	})
+	tavily, err := ing.tavilySearch(context.Background(), "laptop deal")
+	if err != nil || len(tavily) != 1 {
+		t.Fatalf("tavilySearch len=%d err=%v", len(tavily), err)
 	}
-	rec = get(t, srv, "/")
-	if rec.Code != 200 || !strings.Contains(rec.Body.String(), "private-deals") {
-		t.Fatalf("ui: %d", rec.Code)
+	if tavily[0].Price == nil || *tavily[0].Price != 799 || tavily[0].Source != "tavily-search" {
+		t.Fatalf("unexpected tavily deal %#v", tavily[0])
+	}
+	contextDeals, err := ing.contextSearch(context.Background(), "ssd deal")
+	if err != nil || len(contextDeals) != 1 {
+		t.Fatalf("contextSearch len=%d err=%v", len(contextDeals), err)
+	}
+	text, err := ing.tavilyExtract(context.Background(), "https://shop.example/laptop-deal")
+	if err != nil || !strings.Contains(text, "Laptop deal") {
+		t.Fatalf("tavilyExtract %q err=%v", text, err)
+	}
+	text, err = ing.firecrawlScrape(context.Background(), "https://example.com/deal")
+	if err != nil || !strings.Contains(text, "Firecrawl deal") {
+		t.Fatalf("firecrawlScrape %q err=%v", text, err)
+	}
+	text, err = ing.contextScrape(context.Background(), "https://example.com/deal")
+	if err != nil || !strings.Contains(text, "Context deal") {
+		t.Fatalf("contextScrape %q err=%v", text, err)
 	}
 }

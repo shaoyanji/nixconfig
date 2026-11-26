@@ -299,6 +299,12 @@ in {
     "d /var/lib/agy-system 0755 ${user.name} users -"
   ];
 
+  # `/sentinel/ingest` lives on frieren's `frieren.lan` vhost only; the bare
+  # tailnet address 404s there (measured 2026-11-26, every 15 minutes).
+  networking.extraHosts = ''
+    100.97.61.65 frieren.lan
+  '';
+
   # --- Closed-loop observation ledger & health endpoint ----------------------
   # Collects system health, unit states, disk and PSI pressure every 15 minutes.
   # Powers `task ops:health` and serves /var/lib/fleet-sentinel/www/status.json.
@@ -326,7 +332,7 @@ in {
     # times, both invisible to a collector that only asks the system manager.
     collectUserUnits = true;
     push = {
-      url = "http://100.97.61.65/sentinel/ingest";
+      url = "http://frieren.lan/sentinel/ingest";
       tokenFile = config.sops.secrets."agent-turns-token".path;
     };
     # The same publisher the appflow triage uses (hosts/delphi/email-archive.nix),

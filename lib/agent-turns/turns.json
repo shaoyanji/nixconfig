@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-26T09:20:39Z",
+  "generated": "2026-11-26T09:28:19Z",
   "count": 200,
-  "pin": "dae89a5cee11b62c39b22d21ce925cf9b05025de14365c9e3acf5c4af7be1e18",
+  "pin": "b8d6565eea879ee978a3be4d6619a562697ed9c3f3fbdbe3247b9a1e22304abb",
   "turns": [
+    {
+      "id": "2fe5a0f7-1a3d-4a3e-a4b7-cf21635f8634",
+      "ts": "2026-11-26T09:25:58Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-drive-20261126-1023",
+      "action": "jev chain-change: refactor module chain hosts into modules",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "e34a07bafd25c9866cc545d6fa9530e90107ca78",
+      "branch": "main",
+      "frame": "03hb1omb26kyekjnb48616eyx"
+    },
+    {
+      "id": "81eeddb8-b66c-4942-bd28-ae1f92093118",
+      "ts": "2026-11-26T09:20:56Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-lane",
+      "action": "landed: fetch-oneshot single-sourced — modules/config/fetch-unit.nix covers llm-server/parakeet/qwen-image verbatim + deepseek-v4 fork (exec/requires args); frieren /export binds deduped to hardware-configuration.nix; fern/stark disko assessed-and-left | gate: checks:drv-equality PASS 30/30 vs fresh HEAD baseline, checks:host HOST=eisen PASS (2087 assertions), checks:units eisen PASS (0 problems), checks:nix:style PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e34a07bafd25c9866cc545d6fa9530e90107ca78",
+      "branch": "main",
+      "frame": "03hb1nmzajd6qgwvnlwppk14a"
+    },
     {
       "id": "68796194-391b-4ce9-b853-d41b90a9fb85",
       "ts": "2026-11-26T09:10:56Z",
@@ -2851,34 +2877,6 @@
       "base_commit": "e2e1f3d369171d6db3c1006aea4bf7234d6c8664",
       "branch": "main",
       "frame": "03havvyhf76tr4ioi2zlbk163"
-    },
-    {
-      "id": "e7f8ab25-8b98-4f94-a404-b3f111072357",
-      "ts": "2026-11-25T15:34:32Z",
-      "source": "buffy",
-      "subject": "nixconfig:wallpaper-worker",
-      "action": "landed: six CVs rebuilt from nixconfig origin/main e2e1f3d3 (thirteen-host -> twenty-five-host correction), jekyll production build PASS, check-cv-links 6/6 over 73 pages, commit a985a7a pushed be17747..a985a7a, live verified after 36s on all six | gate: check-cv-links PASS",
-      "outcome": "done",
-      "claims": [
-        "assets/files"
-      ],
-      "files": [],
-      "base_commit": "97d0ae05dbb6d330eafc55aedc0eb356a39663f3",
-      "branch": "fix/ci-closure-budget-target",
-      "frame": "03havvbh7pggnpa33m2fr0p1q"
-    },
-    {
-      "id": "7fda8312-014c-4e6b-b0fe-7d896d455e88",
-      "ts": "2026-11-25T15:31:21Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-lane",
-      "action": "landed: drove delphi freebuff pane agents:3.1 over tmux tunnel with CV site publish task; jev-decide classify typesafe selected publish p=1.0 margin=1.0; working 6s confirmed",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e2e1f3d369171d6db3c1006aea4bf7234d6c8664",
-      "branch": "main",
-      "frame": "03havup5bjax7qio0d7045nsq"
     }
   ]
 }

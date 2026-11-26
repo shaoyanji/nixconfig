@@ -74,8 +74,14 @@ in {
     uptime-kuma = {
       enable = lib.mkOption {
         type = lib.types.bool;
-        default = true;
-        description = "Enable Uptime-Kuma service status dashboard";
+        default = false;
+        description = ''
+          Enable Uptime-Kuma on this host. Off by default because the fleet has
+          one monitor backend — gatus, `services.fleetMonitors` on delphi — and
+          frieren retired its empty kuma on 2026-11-04 (Story: note
+          frieren-ops-history). A second dashboard is a decision a host makes,
+          not something enabling the HA stack hands out.
+        '';
       };
       port = lib.mkOption {
         type = lib.types.port;

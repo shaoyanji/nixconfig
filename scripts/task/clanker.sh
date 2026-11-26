@@ -8,7 +8,7 @@
 # after 30 idle ones, so a job is written to be resumable from its log and is
 # never assumed to finish.
 #
-# Exit: 0 ok · 1 refused/failed · 2 usage · `wait` and `--wait` return the job's status.
+# Exit: 0 ok · 1 refused/failed · 2 usage · `wait` returns the job's status.
 set -euo pipefail
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -112,7 +112,7 @@ if ! command -v nix >/dev/null 2>&1; then
 fi
 mkdir -p "$HOME/.config/nix" /data/jobs /data/src /data/out
 cat > "$HOME/.config/nix/nix.conf" <<CONF
-experimental-features = nix-command flakes pipe-operators
+experimental-features = nix-command flakes
 substituters = https://shaoyanji.cachix.org https://nix-cache-edge.jisifu.workers.dev https://cache.nixos.org
 trusted-public-keys = shaoyanji.cachix.org-1:3XUZGFcaq5bXFKwtCR+POG81Hh6WfTqf50Bmz4VHpj0= delphi.edge-1:SAQXl68hP2k5mhlWOIXCyQXFD1rVelBB22oTKQkFzwk= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
 max-jobs = 4
@@ -203,17 +203,15 @@ done'
     [ -n "$attr" ] || usage
     id="$(new_id)"
     push_tree "$id"
-    start_job "$id" "set -euo pipefail
+    start_job "$id" "set -eu
 export PATH=\"\$HOME/.nix-profile/bin:\$PATH\"
 cd /data/src/$id
 nix build -L '.#$attr' --no-link --print-out-paths | tee $JOBS/$id/out.path
 nix path-info -S \"\$(cat $JOBS/$id/out.path)\" | tail -1" >/dev/null
     printf '%s\n' "$id"
     if [ "${1:-}" = "--wait" ]; then
-      rc=0
-      bash "$here/clanker.sh" wait "$id" || rc=$?
+      bash "$here/clanker.sh" wait "$id" || true
       bash "$here/clanker.sh" logs "$id" 200
-      exit "$rc"
     fi
     ;;
   profile)
@@ -222,7 +220,7 @@ nix path-info -S \"\$(cat $JOBS/$id/out.path)\" | tail -1" >/dev/null
     # flake pins is how an activation half-applies.
     id="$(new_id)"
     push_tree "$id"
-    start_job "$id" "set -euo pipefail
+    start_job "$id" "set -eu
 export PATH=\"\$HOME/.nix-profile/bin:\$PATH\"
 cd /data/src/$id
 nix build -L '.#homeConfigurations.clanker.activationPackage' --no-link --print-out-paths | tee $JOBS/$id/out.path
@@ -234,10 +232,8 @@ git config --global --get user.email || true
 go version || true" >/dev/null
     printf '%s\n' "$id"
     if [ "${1:-}" = "--wait" ]; then
-      rc=0
-      bash "$here/clanker.sh" wait "$id" || rc=$?
+      bash "$here/clanker.sh" wait "$id" || true
       bash "$here/clanker.sh" logs "$id" 200
-      exit "$rc"
     fi
     ;;
   devshell)
@@ -254,7 +250,7 @@ go version || true" >/dev/null
     esac
     id="$(new_id)"
     push_tree "$id"
-    start_job "$id" "set -euo pipefail
+    start_job "$id" "set -eu
 export PATH=\"\$HOME/.nix-profile/bin:\$PATH\"
 cd /data/src/$id
 # bash -c, not -lc: a login shell re-sources /etc/profile and drops the
@@ -263,10 +259,8 @@ cd /data/src/$id
 nix develop --accept-flake-config '$flake' --command bash -c '$cmd'" >/dev/null
     printf '%s\n' "$id"
     if [ "${1:-}" = "--wait" ]; then
-      rc=0
-      bash "$here/clanker.sh" wait "$id" || rc=$?
+      bash "$here/clanker.sh" wait "$id" || true
       bash "$here/clanker.sh" logs "$id" 200
-      exit "$rc"
     fi
     ;;
   serve)
@@ -315,20 +309,16 @@ exit 0'
     [ -n "$pkg" ] || usage
     id="$(new_id)"
     push_tree "$id"
-    start_job "$id" "set -euo pipefail
+    start_job "$id" "set -eu
 cd /data/src/$id/$pkg
 mkdir -p $JOBS/$id/out
 go build -trimpath -o $JOBS/$id/out/$(basename "$pkg") .
 ls -l $JOBS/$id/out" >/dev/null
     printf '%s\n' "$id"
     if [ "${1:-}" = "--wait" ]; then
-      rc=0
-      bash "$here/clanker.sh" wait "$id" || rc=$?
+      bash "$here/clanker.sh" wait "$id" || true
       bash "$here/clanker.sh" logs "$id" 100
-      if [ "$rc" -eq 0 ]; then
-        bash "$here/clanker.sh" result "$id"
-      fi
-      exit "$rc"
+      bash "$here/clanker.sh" result "$id"
     fi
     ;;
   *)

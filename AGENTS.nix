@@ -3193,33 +3193,32 @@
         tasks = ["checks:host"];
       };
       body = ''
-        **The rule.** Move what has no library and no shared logins, and keep the name and the copy
-        behind. stirling-pdf went 2026-10-21; paperless, vaultwarden and anki on 2026-11-02, over an
-        earlier "paperless stays": that rule protected the archive and the family's habits, not the laptop.
-        `docs.`, `vault.` and `anki.frieren.lan` are still frieren's vhosts, and `services.offloadBridge`
-        mirrors every tree to `/srv/backup/offload` at 03:10, inside the window that already carries those
-        copies to BurgerNAS.
+        **The rule.** Move what has no library and no shared logins, and keep the
+        name and the copy behind. stirling-pdf went 2026-10-21; paperless,
+        vaultwarden and anki 2026-11-02. `docs.`, `vault.` and `anki.frieren.lan`
+        stay frieren's vhosts, and `services.offloadBridge` mirrors every tree to
+        `/srv/backup/offload` at 03:10, inside the restic window. The tunnel file
+        was deleted only after all three names answered with frieren holding no
+        loopback listeners.
 
-        **What is left is a decision.** hermes stays resident on both hosts: each gateway polls its own bot
-        token, so the 226 MiB in `~/.hermes` buys two agents, not a conflict. The monitor pair moved
-        2026-11-04: frieren's gatus and its empty uptime-kuma are gone, the checks run in delphi's
-        `services.fleetMonitors` over the tailnet, alerts post back to frieren's SimpleX bridge — the only
-        host with an identity to deliver them. A name that lives on frieren still needs frieren's nginx.
+        **What is left is a decision.** hermes stays resident on both hosts (each
+        gateway polls its own bot token). The monitor pair moved 2026-11-04: gatus
+        and the empty uptime-kuma left frieren, the checks run in delphi's
+        `services.fleetMonitors` over the tailnet, alerts post back to frieren's
+        SimpleX bridge. A name that lives on frieren still needs frieren's nginx.
 
-        **The tunnel is gone.** Frieren was deployed 2026-11-02 with vhosts naming delphi's tailnet
-        address; `offload-tunnel` was stopped first and all three names still answered, so the cutover was
-        proved before the file and its import were deleted.
+        **Exit — met.** Each moved unit is gone from frieren's system.slice and
+        serves from delphi; the shelter copy sits under `/srv/backup/offload` in a
+        restic snapshot. Verified 2026-11-20 (devin): delphi answers on the tailnet
+        (stirling :8445 → 200, gatus :8181 → 200) while the three `*.frieren.lan`
+        names stay frieren vhosts, and snapshot d2228859 (03:30) carries the four
+        offload trees. Memory shed ~1.4 GiB (stirling 633, paperless ~480,
+        uptime-kuma 137, vaultwarden 58, gatus 42, anki 6 MiB).
 
-        **Exit, met.** No stirling/paperless/vaultwarden/anki/gatus/uptime-kuma unit in frieren's
-        system.slice; delphi answers on the tailnet (stirling :8445 200, uptime-kuma :8448 302, gatus :8181
-        200); the 03:10 mirror refreshed `/srv/backup/offload/{anki,paperless,vaultwarden,vaultwarden-backup}`
-        and snapshot d2228859 (03:30, `restic-frieren-local`) carries the tree; memory shed on delphi ~1.4
-        GiB (stirling 633, paperless ~480, uptime-kuma 137, vaultwarden 58, gatus 42, anki 6 MiB). Nothing
-        movable remains: the rest is library, the SimpleX identity, or hermes by decision.
-
-        **Finished 2026-11-26.** delphi's own uptime-kuma was still enabled on :8448 with zero monitors; the
-        service, its :8448 portal card and its `fleetSentinel` watch entry are gone, and
-        `services.fleetMonitors` now asserts that no host runs gatus and uptime-kuma together.
+        **Finished 2026-11-26.** Delphi's own uptime-kuma — enabled, listening on
+        :8448, zero monitors — was the last duplicate. Service, portal card and
+        `fleetSentinel` watch entry are gone, and `services.fleetMonitors` asserts
+        no host runs gatus and uptime-kuma together.
       '';
     };
     exp-114 = {
@@ -5307,6 +5306,42 @@
       '';
     };
 
+    delphi-host-clone-not-authority = {
+      title = "The checkout on delphi is not the tree that is deployed";
+      kind = "open";
+      status = "OPEN";
+      priority = "P2";
+      date = "2026-11-26";
+      summary = "Delphi keeps a clean, never-fetched clone of an October history that no unit builds from; the running generation comes from an archived flake source, so a rebuild there would run last month's config. Decide: delete it, or re-point it at the authoritative remote.";
+      refs = {
+        hosts = ["delphi"];
+        modules = ["hosts/delphi/infra-stack.nix"];
+        tasks = ["infra:deploy:host:delphi"];
+        docs = [".agents/deploy/hosts/delphi.md"];
+      };
+      body = ''
+        Measured 2026-11-26 with `sudo git -C /root/Documents/nixconfig log -1`:
+        `main` at e1216fa2 (2026-10-26), clean, no FETCH_HEAD, `modules/secrets`
+        uninitialised. The subject exists here as 57679c54, so the host holds a
+        different history rather than an older copy — it cannot fast-forward to
+        what runs. No systemd unit, `/etc/nixos` file or keeper path names it.
+
+        Inert but not harmless: it is the only git tree on a host people ssh
+        into, and a `nixos-rebuild --flake` against it rebuilds October. Delphi
+        switches from an archived source (`nix flake archive`, then
+        `/nix/store/<src>#delphi`), which the runbook now says.
+
+        The other half: local `main` holds the commits delphi runs and
+        `git branch -r --contains` names no remote for them, while `origin/main`
+        is a different commit. Until one is pushed, the deployed tree exists in a
+        single working copy.
+
+        Exit: `ssh delphi 'sudo rm -rf /root/Documents/nixconfig'` — or the tree
+        tracks the authoritative remote and fast-forwards; re-measure either way
+        before trusting a rebuild from it.
+      '';
+    };
+
     frieren-ops-history = {
       title = "Frieren retirements and measurements behind the surviving config";
       kind = "reference";
@@ -6521,29 +6556,27 @@
         docs = ["docs/delphi-runtime.md" ".agents/deploy/hosts/netbook.md" "docs/appflow-board.md"];
       };
       body = ''
-        Lane close-out 2026-11-25 (devin, nixconfig refactoring): both threads CLOSED, the tail CLOSED 2026-11-26.
+        Lane close-out 2026-11-25 (devin, nixconfig refactoring): both threads CLOSED.
 
         image-daily Go port — CLOSED. Every external-process boundary lives in
-        tools/os/internal/image behind .#cli.image.daily; engine.sh is retired (deleted with its budget
-        line — the family's last curl). Verified end-to-end the same day: go build/vet/test,
-        checks:image-daily, the 9-assert publish fixture, ship 4/4, images-check 771/771,
+        tools/os/internal/image behind .#cli.image.daily; engine.sh retired with
+        its budget line. Green end-to-end: go build/vet/test, checks:image-daily,
+        the 9-assert publish fixture, ship 4/4, images-check 771/771,
         checks:host frieren rc=0.
 
-        nix-comment-audit — CLOSED. Every Story:/Trap:/Fact: pointer in the heaviest .nix files resolves;
-        the tail sweep (netbook, outputs.nix, hermes-user) found one dangling cite, fixed at its doc home.
-        Census at close: 7259 comment lines, 519 pointers, all 54 task cites resolving; docs/ and
-        .agents/deploy/ sit outside the prose budget.
+        nix-comment-audit — CLOSED. Every Story:/Trap:/Fact: pointer resolves;
+        the tail sweep (netbook, outputs.nix, hermes-user) found one dangling
+        cite, fixed at its doc home. Census: 7259 comment lines, 519 pointers,
+        54/54 task cites; prose budget untouched.
 
-        Appflow tail — CLOSED. The first 404 was a dirty-checkout build: the board's allowlist named
-        `/api/applications` and `/api/applications-discovered` and the deployed npgsqlrest lacked both
-        .sql files, committed since 86bdb73b. `appflow-board.nix` now asserts at eval that every proxied
-        route has a `sql/<name>.sql` — fails checks:host, proven firing. The persistent 404 was the param
-        contract, not a missing deployment: re-verified live after delphi's 04:30 autoUpgrade, all five
-        read routes answer 200, `?lim=5` serves rows while bare `/api/applications` 404s because
-        NpgsqlRest refuses an unparametrized endpoint. docs/appflow-board.md now names the bare-route trap.
-
-        Tail gates green twice: comments 54/54, policies, images 772/772, hosts delphi+frieren+netbook,
-        06:49 image-daily + drv-equality 30/30.
+        Appflow tail — CLOSED 2026-11-26 on the live host. The Nov-25 404 was a
+        dirty-tree generation whose npgsqlrest lacked two committed .sql files
+        (a487f3d4 asserts every proxied route has one). The *persistent* 404 was
+        the param contract: NpgsqlRest answers "not found" for a parametrized
+        endpoint called bare, so `/api/applications` 404s while `?lim=5` serves.
+        All five read routes answer 200 with params; docs/appflow-board.md names
+        the bare-route trap. Gates green twice: comments 54/54, policies, images
+        772/772, hosts delphi+frieren+netbook, drv-equality 30/30.
       '';
     };
     shared-worktree-commit-race = {

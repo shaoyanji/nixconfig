@@ -1,8 +1,63 @@
 {
-  "generated": "2026-11-26T16:36:46Z",
+  "generated": "2026-11-26T16:40:07Z",
   "count": 200,
-  "pin": "b5d9378326e2cb750e38da7a448d2379d946152207b6e19fc8974bb591d7aab9",
+  "pin": "92dedcfd335583195a7fbffd905afbbafb5979bd333b11e5860460e5cd2908ee",
   "turns": [
+    {
+      "id": "04b76393-d994-46d1-a613-8ae2df9cf9a2",
+      "ts": "2026-11-26T16:40:05Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-delphi",
+      "action": "drove idle pane agents:3.1 (delphi/freebuff): jev route note-change p=0.97/m=0.95 — Trim AGENTS.nix notes to fit 512 KiB gate and commit open note; pane now working...",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "28f54a28ae51abeee22abfd7422dec81009edad2",
+      "branch": "main",
+      "frame": "03hb41f7mq4d1nep8hhh1l7hr"
+    },
+    {
+      "id": "e82dbec6-e60e-4762-8195-474850554f50",
+      "ts": "2026-11-26T16:40:04Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-devin",
+      "action": "drove idle pane agents:1.1 (devin): jev route bug-fix p=0.90/m=0.87 — Fix fold_umlauts call and verify, commit; pane now Thinking/working",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "28f54a28ae51abeee22abfd7422dec81009edad2",
+      "branch": "main",
+      "frame": "03hb41f48wg1ed47jykxqhcvh"
+    },
+    {
+      "id": "f7830e84-ebd2-406c-804a-90381e32183b",
+      "ts": "2026-11-26T16:39:08Z",
+      "source": "devin",
+      "subject": "nixconfig:clanker-runner-presets",
+      "action": "claim: add validated clanker job presets, SQLite recurring schedules with a background runner, web UI surfacing, and full Go/Nix/live verification",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/clanker-runner",
+        "modules/services/clanker-runner.nix"
+      ],
+      "files": [],
+      "base_commit": "befef047856483e497da0fc1e0dad09a226e2ba9",
+      "branch": "main",
+      "frame": "03hb418j8u7ca4rodwfu7fvfw"
+    },
+    {
+      "id": "58872a62-1bb8-46a3-a7e5-79b141526b8c",
+      "ts": "2026-11-26T16:37:22Z",
+      "source": "devin",
+      "subject": "nixconfig:inventory-site-audit-qr",
+      "action": "landed: asset event audit and checkout history, deduped warranty-expiry ntfy alerts, pure-Go printable SVG QR labels, and web UI surfacing | gate: go test/vet PASS, node check PASS, alejandra PASS, native delphi toplevel build PASS with Go checkPhase, live HTTP smoke PASS, checks:host delphi PASS rc=0",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "befef047856483e497da0fc1e0dad09a226e2ba9",
+      "branch": "main",
+      "frame": "03hb40w1g46p1ixsboyp5jqhh"
+    },
     {
       "id": "593c6b7c-1b64-46d3-81a0-269b95de2df2",
       "ts": "2026-11-26T16:36:45Z",
@@ -2998,72 +3053,6 @@
       "base_commit": "f43af3e8b7e148e4138b00186b36a276201cd961",
       "branch": "main",
       "frame": "03hb2iq90rpvkv568q6s6b9ni"
-    },
-    {
-      "id": "cf20291b-452a-4a11-bd99-9f0ba3c22a56",
-      "ts": "2026-11-26T11:57:31Z",
-      "source": "agy",
-      "subject": "nixconfig:apps-db-bulk-guard",
-      "action": "task-change: add bulk-write guard + offline test in scripts/task/apps…",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "tests/appflow-resolve"
-      ],
-      "files": [],
-      "base_commit": "a650c202a4f6c60d09e4ea2b4bfbbd324a403c12",
-      "branch": "main",
-      "frame": "03hb2i813m7jnmug0v5kg264m"
-    },
-    {
-      "id": "6dda5d4d-6093-4e7e-9efb-b7c1a85653fa",
-      "ts": "2026-11-26T11:57:29Z",
-      "source": "agy",
-      "subject": "nixconfig:appflow-board-reverify",
-      "action": "incident: verify delphi /api/applications + close refactoring note",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix",
-        "modules/services/appflow-board.nix",
-        "docs/appflow-board.md"
-      ],
-      "files": [],
-      "base_commit": "a650c202a4f6c60d09e4ea2b4bfbbd324a403c12",
-      "branch": "main",
-      "frame": "03hb2i7v7ll244dy7kpqfyfgs"
-    },
-    {
-      "id": "593f92e7-fc82-40e8-a99e-61c95a6b50b9",
-      "ts": "2026-11-26T11:57:26Z",
-      "source": "agy",
-      "subject": "nixconfig:image-go-tests",
-      "action": "landed: httptest coverage for publish/post + declared agy capability at a650c202 | gate: go test + checks:quick PASS",
-      "outcome": "done",
-      "claims": [
-        "tools/os/internal/image/main_test.go",
-        "tools/os/internal/image/publish.go",
-        "tools/os/internal/image/post.go"
-      ],
-      "files": [
-        "tools/os/internal/image/main_test.go",
-        "flake/intents.nix"
-      ],
-      "base_commit": "a650c202a4f6c60d09e4ea2b4bfbbd324a403c12",
-      "branch": "main",
-      "frame": "03hb2i7i89huebhfaoxnwz4v4"
-    },
-    {
-      "id": "6a879854-678d-4980-a94f-a14b90a468a5",
-      "ts": "2026-11-26T11:56:18Z",
-      "source": "devin",
-      "subject": "nixconfig:image-go-tests",
-      "action": "landed: 10 httptest/subprocess cases over publish.go (stagePublish dedupe+shifted/gone, blog ffmpeg crop, mergeServedURLs union + 3 skip paths, shrinkGuard pass + refuse-restore) and post.go (fmField/fmBody/verdictParts/no-SLUG die); also declared capability 'agy' — its own claim post made it an undeclared xs source and broke checks:intents | gate: go test 10/10 new PASS, checks:image-daily PASS, checks:images:publish:test PASS, checks:quick rc=0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a650c202a4f6c60d09e4ea2b4bfbbd324a403c12",
-      "branch": "main",
-      "frame": "03hb2hzk2a1oe32qyqqbf1nt2"
     }
   ]
 }

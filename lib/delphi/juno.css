@@ -321,6 +321,33 @@ ul.chips li { border: 1px solid var(--rule); padding: 0.18rem 0.5rem; font-size:
 }
 .filter input::placeholder { color: var(--muted); }
 .filter output { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.attention-button {
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  padding: 0.32rem 0.65rem;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.attention-button[aria-pressed="true"] { border-color: #d29922; color: #d29922; }
+.telemetry-exports { font-size: 0.72rem; color: var(--muted); }
+.telemetry-banner {
+  border: 1px solid #d29922;
+  background: color-mix(in srgb, #d29922 10%, transparent);
+  color: #d29922;
+  padding: 0.65rem 0.8rem;
+  margin: -0.6rem 0 1.2rem;
+  font-size: 0.78rem;
+}
+.live-latency,
+.live-uptime { border: 1px solid var(--rule); border-radius: 999px; padding: 0.04rem 0.36rem; }
+.live-spark { color: var(--accent); font-size: 0.74rem; letter-spacing: 0.02em; }
+.svc[data-live-status="degraded"] { box-shadow: inset 2px 0 0 #d29922; }
+.svc[data-live-status="offline"] { box-shadow: inset 2px 0 0 #f85149; }
 
 /* colophon ---------------------------------------------------------------- */
 .colophon {

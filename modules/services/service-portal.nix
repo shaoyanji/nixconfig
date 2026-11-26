@@ -11,7 +11,7 @@
 
   telemetryPackage = pkgs.buildGoModule {
     pname = "service-portal-telemetry";
-    version = "0.1.0";
+    version = "0.2.0";
     src = ./service-portal/telemetry;
     vendorHash = null;
     env.CGO_ENABLED = 0;
@@ -391,6 +391,12 @@
             .live[data-status="offline"] .live-status { color:#f85149; }
             .live-status { font-weight:600; text-transform:uppercase; letter-spacing:.08em; }
             .live-metric { color:var(--text); }
+            .live-latency, .live-uptime { border:1px solid var(--border); border-radius:999px; padding:.04rem .34rem; }
+            .live-spark { color:var(--accent); font-size:.72rem; letter-spacing:.02em; }
+            .card[data-live-status="degraded"] { border-color:#d29922; }
+            .card[data-live-status="offline"] { border-color:#f85149; }
+            .attention-banner { width:100%; max-width:60rem; margin:0 0 1rem; padding:.65rem .8rem;
+                                border:1px solid #d29922; border-radius:6px; color:#d29922; background:rgba(210,153,34,.08); }
             .gn { font-weight:400; color:#484f58; }
             .toolbar { width:100%; max-width:60rem; display:flex; flex-wrap:wrap; gap:.5rem;
                        align-items:center; margin:0 0 1rem; }
@@ -419,11 +425,13 @@
               ${lib.concatMapStrings (g: ''<button class="chip" data-filter="${esc g}" aria-pressed="false">${esc g}</button>'')
         cfg.groups}
             </div>
+            <button class="chip attention-chip" id="attention-chip" data-filter="attention" aria-pressed="false">attention</button>
             <span class="meta" id="count"></span>
           </div>
+          <div class="attention-banner" id="attention-banner" hidden></div>
           ${body}
           <p id="none" hidden>nothing matches that filter</p>
-          <footer><a href="data/services.json">data/services.json</a> · one registry, every renderer</footer>
+          <footer><a href="data/services.json">data/services.json</a> · telemetry <a href="/api/telemetry/export?format=json">json</a> · <a href="/api/telemetry/export?format=csv">csv</a> · <a href="/api/telemetry/export?format=markdown">markdown</a> · one registry, every renderer</footer>
           <script>
             (function () {
               var search = document.getElementById("search");
@@ -433,6 +441,7 @@
               var groups = Array.prototype.slice.call(document.querySelectorAll("section.group"));
               var chips = Array.prototype.slice.call(document.querySelectorAll(".chip"));
               var active = "all";
+              var attentionOnly = false;
               function apply() {
                 var words = search.value.toLowerCase().split(/\s+/).filter(Boolean);
                 var shown = 0;
@@ -440,7 +449,9 @@
                   var hay = card.getAttribute("data-search") || "";
                   var okGroup = active === "all" || card.getAttribute("data-group") === active;
                   var okWords = words.every(function (word) { return hay.indexOf(word) !== -1; });
-                  var ok = okGroup && okWords;
+                  var liveStatus = card.getAttribute("data-live-status") || "";
+                  var okAttention = !attentionOnly || liveStatus === "degraded" || liveStatus === "offline";
+                  var ok = okGroup && okWords && okAttention;
                   card.hidden = !ok;
                   if (ok) shown += 1;
                 });
@@ -455,13 +466,19 @@
               chips.forEach(function (chip) {
                 chip.addEventListener("click", function () {
                   var next = chip.getAttribute("data-filter");
-                  active = next === active ? "all" : next;
-                  chips.forEach(function (other) {
-                    other.setAttribute(
-                      "aria-pressed",
-                      String(other.getAttribute("data-filter") === active)
-                    );
-                  });
+                  if (next === "attention") {
+                    attentionOnly = !attentionOnly;
+                    chip.setAttribute("aria-pressed", String(attentionOnly));
+                  } else {
+                    active = next === active ? "all" : next;
+                    chips.forEach(function (other) {
+                      if (other.getAttribute("data-filter") === "attention") return;
+                      other.setAttribute(
+                        "aria-pressed",
+                        String(other.getAttribute("data-filter") === active)
+                      );
+                    });
+                  }
                   apply();
                 });
               });
@@ -485,22 +502,66 @@
                 if (typeof value === "boolean") return value ? "yes" : "no";
                 return String(value == null ? "—" : value);
               }
+              function sparkline(samples) {
+                if (!samples || !samples.length) return "";
+                var blocks = "▁▂▃▄▅▆▇█";
+                var max = Math.max.apply(null, samples.concat([1]));
+                return samples.map(function (latency) {
+                  var index = Math.max(0, Math.min(blocks.length - 1, Math.round((latency / max) * (blocks.length - 1))));
+                  return blocks.charAt(index);
+                }).join("");
+              }
               function renderLive(slot, state) {
                 slot.textContent = "";
                 slot.hidden = false;
                 slot.setAttribute("data-telemetry-active", "1");
                 slot.setAttribute("data-status", state.status || "unknown");
+                var card = slot.closest(".card");
+                if (card) card.setAttribute("data-live-status", state.status || "unknown");
                 var status = document.createElement("span");
                 status.className = "live-status";
                 status.textContent = state.status || "unknown";
                 slot.appendChild(status);
+                if (typeof state.latency_ms === "number") {
+                  var latency = document.createElement("span");
+                  latency.className = "live-latency";
+                  latency.textContent = state.latency_ms + " ms";
+                  slot.appendChild(latency);
+                }
+                if (typeof state.uptime_percent === "number") {
+                  var uptime = document.createElement("span");
+                  uptime.className = "live-uptime";
+                  uptime.textContent = state.uptime_percent.toFixed(1) + "% up";
+                  slot.appendChild(uptime);
+                }
+                var spark = sparkline(state.latency_samples || []);
+                if (spark) {
+                  var line = document.createElement("span");
+                  line.className = "live-spark";
+                  line.textContent = spark;
+                  slot.appendChild(line);
+                }
                 (state.metrics || []).slice(0, 3).forEach(function (metric) {
                   var item = document.createElement("span");
                   item.className = "live-metric";
                   item.textContent = metricText(metric.value) + " " + (metric.label || metric.key || "metric");
                   slot.appendChild(item);
                 });
-                slot.title = state.error || "live service telemetry";
+                slot.title = (state.error || "live service telemetry") +
+                  " · p50 " + (state.p50_latency_ms || 0) + " ms" +
+                  " · p95 " + (state.p95_latency_ms || 0) + " ms" +
+                  (state.last_transition_at ? " · last transition " + state.last_transition_at : "");
+              }
+              function updateAttention(services) {
+                var banner = document.getElementById("attention-banner");
+                if (!banner) return;
+                var names = Object.keys(services).filter(function (name) {
+                  return services[name].status === "degraded" || services[name].status === "offline";
+                });
+                banner.hidden = names.length === 0;
+                banner.textContent = names.length
+                  ? names.length + " service" + (names.length === 1 ? "" : "s") + " need attention: " + names.join(", ")
+                  : "";
               }
               function loadTelemetry() {
                 if (!liveSlots.length || !window.fetch) return;
@@ -519,6 +580,8 @@
                       }
                       renderLive(slot, state);
                     });
+                    updateAttention(services);
+                    apply();
                   })
                   .catch(function () {
                     liveSlots.forEach(function (slot) {
@@ -665,6 +728,42 @@ in {
         description = "Per-request timeout for a target health or stats read.";
       };
 
+      historySamples = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 144;
+        description = "Per-target ring-buffer samples kept for latency and uptime calculations.";
+      };
+
+      alertWebhook = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Optional ntfy or generic webhook URL receiving debounced degradation and recovery alerts as JSON posts. Prefer SERVICE_PORTAL_ALERT_WEBHOOK in environmentFile when the URL contains a private topic or credential.";
+      };
+
+      environmentFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Optional systemd EnvironmentFile containing SERVICE_PORTAL_ALERT_WEBHOOK. Render it from sops; never put private topics or credentials in the Nix store.";
+      };
+
+      alertCooldownSeconds = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 900;
+        description = "Minimum seconds between alert episodes for one target, suppressing flap spam.";
+      };
+
+      alertFailureThreshold = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 2;
+        description = "Consecutive non-online samples required before a degradation alert is posted.";
+      };
+
+      alertRecovery = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Post a recovery alert when a target that raised an alert returns online.";
+      };
+
       targets = lib.mkOption {
         type = lib.types.attrsOf telemetryTargetType;
         default = {};
@@ -773,7 +872,26 @@ in {
               "${toString cfg.telemetry.intervalSeconds}s"
               "-timeout"
               "${toString cfg.telemetry.timeoutMilliseconds}ms"
+              "-history"
+              (toString cfg.telemetry.historySamples)
+              "-alert-webhook"
+              (
+                if cfg.telemetry.alertWebhook == null
+                then ""
+                else cfg.telemetry.alertWebhook
+              )
+              "-alert-cooldown"
+              "${toString cfg.telemetry.alertCooldownSeconds}s"
+              "-alert-threshold"
+              (toString cfg.telemetry.alertFailureThreshold)
+              "-alert-recovery"
+              (
+                if cfg.telemetry.alertRecovery
+                then "true"
+                else "false"
+              )
             ];
+            EnvironmentFile = lib.optional (cfg.telemetry.environmentFile != null) cfg.telemetry.environmentFile;
             Restart = "always";
             RestartSec = 3;
             TimeoutStopSec = 10;

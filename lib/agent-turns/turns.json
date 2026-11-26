@@ -1,8 +1,465 @@
 {
-  "generated": "2026-11-26T18:42:00Z",
+  "generated": "2026-11-26T19:37:18Z",
   "count": 200,
-  "pin": "17b363df15c007c1974da25f0d4ffb1aad9217281b6198a3c4c3172a197e7b3b",
+  "pin": "461db696962e23ffb01e5fa0a258154742fa93028f85b745c41c70a3108ae88e",
   "turns": [
+    {
+      "id": "eb6d175b-5804-475e-b2d6-af6e2b918e2a",
+      "ts": "2026-11-26T19:28:50Z",
+      "source": "buffy",
+      "subject": "nixconfig:clanker-browser-ui-smoke-for-jobs-and-deals",
+      "action": "landed: tests/portfolio-ui/run.sh (two stub APIs + both web dirs on clanker, browser via clanker-browser.sh, setsid -f pidfiles, chmod+rm teardown), verify.py assertions, browser-stub fixture 3 cases as checks:portfolio-ui. Live clanker 32.9s: PASS jobs 2 postings/exports 3/stage interview/note written, PASS deals 2 deals/spark/2 bars/both polls; leftovers none on clanker or here | gate: checks:portfolio-ui PASS, portfolio-smoke 66 OK, checks:tasks PASS, checks:prose PASS (174)",
+      "outcome": "done",
+      "claims": [
+        "tests/portfolio-ui",
+        "taskfiles/checks.yml"
+      ],
+      "files": [],
+      "base_commit": "0daa91dbaf824a909e7afeb4c6cc9d6f6476d5d3",
+      "branch": "main",
+      "frame": "03hb4ydvbnt0qbltetb43rirq"
+    },
+    {
+      "id": "74819b71-7b88-409f-aeec-1e44220dc1a1",
+      "ts": "2026-11-26T19:25:12Z",
+      "source": "devin",
+      "subject": "nixconfig:enhance-service-portal-telemetry-and-alerts",
+      "action": "claim: service-portal telemetry history, alerting, exports, and portal surfacing",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/service-portal",
+        "modules/services/service-portal.nix",
+        "lib/delphi/juno.js",
+        "hosts/delphi/configuration.nix"
+      ],
+      "files": [],
+      "base_commit": "15f8c7cda2788e6704313a583b141ea7b69b85ac",
+      "branch": "main",
+      "frame": "03hb4xoe8g2wvmqtzld9xu6k5"
+    },
+    {
+      "id": "369f9066-fa93-45a6-8a49-bad28caf5e07",
+      "ts": "2026-11-26T19:25:06Z",
+      "source": "buffy",
+      "subject": "nixconfig:clanker-browser-ui-smoke-for-jobs-and-deals",
+      "action": "claim: render the jobs and deals pages with a stubbed API in clanker headless Chrome and assert the new controls",
+      "outcome": "in_progress",
+      "claims": [
+        "tests/portfolio-ui",
+        "tests/portfolio-smoke"
+      ],
+      "files": [],
+      "base_commit": "15f8c7cda2788e6704313a583b141ea7b69b85ac",
+      "branch": "main",
+      "frame": "03hb4xnlipo67cxbpk9zav8gp"
+    },
+    {
+      "id": "f5cc0af2-9c09-4dad-bcf5-c84cc7970831",
+      "ts": "2026-11-26T19:23:40Z",
+      "source": "buffy",
+      "subject": "nixconfig:update-portfolio-smoke-and-seed-for-new-endpoints",
+      "action": "landed: export checks (csv/markdown/rss/json by content type + body), OPTIONS route probe reading Allow (GET falls through GET / so 404 both ways), link-vault feeds+analytics, deals feed/export/poll; 66 tests. Live on tree builds: jobs 9/9 ok, deals 9/9 ok, link-vault 7/7 ok (feeds 2 keys, analytics 12). Deployed delphi 8464-8467 still 404 those routes (pre-deploy) | gate: portfolio-smoke 66 OK, portfolio-seed 23 OK, checks:tasks PASS, checks:prose PASS (174)",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/portfolio-smoke.py",
+        "tests/portfolio-smoke"
+      ],
+      "files": [],
+      "base_commit": "15f8c7cda2788e6704313a583b141ea7b69b85ac",
+      "branch": "main",
+      "frame": "03hb4xditloiwpbmu19mds6g2"
+    },
+    {
+      "id": "ebf20dbb-0750-4165-8475-5649b46ca0e5",
+      "ts": "2026-11-26T19:22:41Z",
+      "source": "devin",
+      "subject": "nixconfig:enhance-clanker-runner-job-templates-and-artifacts",
+      "action": "landed: clanker-runner job artifacts, bounded artifact archive capture, expanded typed templates, artifact UI | gate: go test+vet PASS; node --check PASS; alejandra PASS; checks:host delphi PASS; delphi toplevel --no-link PASS; mock InstaBox live smoke PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2dbd04a13855a500dbdda3d02f62017f84f34d2a",
+      "branch": "main",
+      "frame": "03hb4x6o4h098tlo1j064g7c1"
+    },
+    {
+      "id": "6c0572d3-c218-48bd-97d7-6522c08766b9",
+      "ts": "2026-11-26T19:20:20Z",
+      "source": "buffy",
+      "subject": "nixconfig:update-portfolio-smoke-and-seed-for-new-endpoints",
+      "action": "claim: add the new stage/notes/export/feed/analytics routes to the smoke lanes with offline tests",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/portfolio-smoke.py",
+        "scripts/task/portfolio-seed.py",
+        "tests/portfolio-smoke",
+        "tests/portfolio-seed"
+      ],
+      "files": [],
+      "base_commit": "2dbd04a13855a500dbdda3d02f62017f84f34d2a",
+      "branch": "main",
+      "frame": "03hb4wq50dfkbqrjdqk2o7y5n"
+    },
+    {
+      "id": "9ad0da7a-b184-49c6-a008-238b9d94548a",
+      "ts": "2026-11-26T19:17:44Z",
+      "source": "buffy",
+      "subject": "nixconfig:add-inventory-sync-and-service-port-audit",
+      "action": "landed: --toml adds tailnet links + declared services to host notes, audits port conflicts (two links or two units; link+unit = corroboration) and TOML-vs-compiled drift, conflicts exit 1 after posting; 15 new cases, first gate checks:inventory:sync (35 tests). Real audit: 38 hosts, 23 links, 164 declared (34 with port), 0 conflicts, drift only_in_compiled=[gok] | gate: checks:inventory:sync PASS, checks:tasks PASS, checks:prose PASS (174)",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/inventory-sync.py",
+        "tests/inventory-sync",
+        "taskfiles"
+      ],
+      "files": [],
+      "base_commit": "76fad79d671f5a4fc7e257c3a2b849f931fc655d",
+      "branch": "main",
+      "frame": "03hb4w7srzfjcetxab9oioymd"
+    },
+    {
+      "id": "6e9ad25c-b355-4291-95ae-dfdc5047e6e5",
+      "ts": "2026-11-26T19:16:03Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-wallpaper-publish",
+      "action": "Route publish to wallpaper-worker: generate and publish dark-themed wallpaper",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/image-daily"
+      ],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb4vw2e5lpcva52l2o7cq2a"
+    },
+    {
+      "id": "3f7e9aa5-654d-418e-b6da-1a80b4f7a85c",
+      "ts": "2026-11-26T19:15:59Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-chain",
+      "action": "Route chain-change to devin: refactor host modules into feature chains",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/hosts"
+      ],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb4vvj6rsv6ere28uvhyv96"
+    },
+    {
+      "id": "9c541357-a152-4e1d-8fb9-7b669e4b113d",
+      "ts": "2026-11-26T19:15:29Z",
+      "source": "buffy",
+      "subject": "nixconfig:add-inventory-sync-and-service-port-audit",
+      "action": "claim: audit inventory-sync coverage, add a service-port/endpoint check with offline tests",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/inventory-sync.py",
+        "tests/inventory-sync",
+        "taskfiles"
+      ],
+      "files": [],
+      "base_commit": "9025ac95b65a2c399aa36c80704e94071582631d",
+      "branch": "main",
+      "frame": "03hb4vs0eymon4oz28fqx4j6e"
+    },
+    {
+      "id": "46751923-1969-439b-8408-3d2146e45b6d",
+      "ts": "2026-11-26T19:14:41Z",
+      "source": "buffy",
+      "subject": "nixconfig:add-extract-on-push-to-web-research",
+      "action": "landed: --extract-on-push (+--extract-provider) sends extract:true on the same POST /api/links, counts extracted/extract_failed beside pushed/skipped/failed; 59 unit tests. Live: real binary + Firecrawl key -> 1 link, extraction_status ok provider firecrawl, 12311 chars, stats extracted 1; rerun skipped 1 + extracted 1 | gate: unittest 59 OK, checks:tasks PASS, checks:prose PASS (174), checks:docs:links PASS (189), budget 288/400",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/web-research.py",
+        "tests/web-research",
+        "taskfiles/agents.yml",
+        "docs/portfolio-services.md"
+      ],
+      "files": [],
+      "base_commit": "9025ac95b65a2c399aa36c80704e94071582631d",
+      "branch": "main",
+      "frame": "03hb4vmfq8h6wj6hibwjamcum"
+    },
+    {
+      "id": "bb6211ee-dc10-45c1-bfc5-dd7669e8f02e",
+      "ts": "2026-11-26T19:12:59Z",
+      "source": "devin",
+      "subject": "nixconfig:enhance-clanker-runner-job-templates-and-artifacts",
+      "action": "claim: clanker-runner artifacts, expanded templates, UI, tests",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/clanker-runner modules/services/clanker-runner.nix"
+      ],
+      "files": [],
+      "base_commit": "980d5096a6a5a99b2162bd527ada4469abd3dfeb",
+      "branch": "main",
+      "frame": "03hb4vai8xenwdtj5l9o43oui"
+    },
+    {
+      "id": "d56c1bad-1f58-4524-a8b7-b2672da1bbb4",
+      "ts": "2026-11-26T19:12:51Z",
+      "source": "buffy",
+      "subject": "nixconfig:add-extract-on-push-to-web-research",
+      "action": "claim: add extract-on-push to the link-vault push with status per link",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/web-research.py",
+        "tests/web-research",
+        "taskfiles/agents.yml"
+      ],
+      "files": [],
+      "base_commit": "980d5096a6a5a99b2162bd527ada4469abd3dfeb",
+      "branch": "main",
+      "frame": "03hb4v9gavwbjfqj3vfdzxb9y"
+    },
+    {
+      "id": "80cc6c4d-d5e7-4373-817f-0ab1de3d3b5a",
+      "ts": "2026-11-26T19:11:12Z",
+      "source": "buffy",
+      "subject": "nixconfig:build-web-research-to-link-vault-pipe",
+      "action": "landed: search --link-vault BASE (+--collection/--tags/--link-vault-token, LINK_VAULT_TOKEN) counts pushed/skipped/failed, 51 unit tests. Live: built link-vault CGO_ENABLED=0 in 3.7s, temp sqlite, real Tavily search 2 hits -> pushed 2, stats bookmarks 2 collections 1 tags 2, rerun skipped 2, server stopped | gate: unittest 51 OK, checks:tasks PASS, checks:prose PASS (174), checks:docs:links PASS (189), budget 283/400",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/web-research.py",
+        "tests/web-research",
+        "taskfiles/agents.yml",
+        "docs/portfolio-services.md"
+      ],
+      "files": [],
+      "base_commit": "980d5096a6a5a99b2162bd527ada4469abd3dfeb",
+      "branch": "main",
+      "frame": "03hb4uxviqfvmtmt0cvmagk5j"
+    },
+    {
+      "id": "91eeabdb-a980-44fc-b5a7-6dc015e85dd4",
+      "ts": "2026-11-26T19:10:45Z",
+      "source": "devin",
+      "subject": "nixconfig:enhance-mail-atlas-thread-view-and-saved-queries",
+      "action": "landed: mail-atlas saved views, thread timeline, domain/tag/triage analytics, UI panels, SQL contract tests | gate: go test+vet PASS; node --check PASS; alejandra PASS; checks:host delphi PASS; delphi toplevel --no-link PASS; live NpgsqlRest/PostgreSQL smoke PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "52394d7989b116ed9997f64fef2191e17504bd2e",
+      "branch": "main",
+      "frame": "03hb4uusjrp5fr3byjr05vae3"
+    },
+    {
+      "id": "abec5bad-213f-4284-8962-61f10b25fa91",
+      "ts": "2026-11-26T19:08:03Z",
+      "source": "buffy",
+      "subject": "nixconfig:build-web-research-to-link-vault-pipe",
+      "action": "claim: add --link-vault push mode to web-research with offline tests and a live link-vault check",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/web-research.py",
+        "tests/web-research",
+        "taskfiles/agents.yml"
+      ],
+      "files": [],
+      "base_commit": "6770b836733062f3f8eca4bd3242966a7ed5586b",
+      "branch": "main",
+      "frame": "03hb4ubrjpo720x7dtsri8x1y"
+    },
+    {
+      "id": "2fe77e86-7a89-4d1c-900f-dbc52c97793b",
+      "ts": "2026-11-26T19:07:05Z",
+      "source": "buffy",
+      "subject": "nixconfig:wire-clanker-browser-into-mail-atlas-site-test",
+      "action": "landed: CLANKER_BROWSER=1 lane in tests/mail-atlas-site/run.sh (site+stub copied to clanker, served on its loopback, browser via clanker-browser.sh, pidfile cleanup) + BROWSER_STUB hook and browser-stub fixture 3 cases as checks:mail-atlas:site. Live clanker run 27s: PASS 3 rows first github.com, untagged 1 of 3, hub ci lit 3. Leftovers: none on clanker or delphi | gate: checks:mail-atlas:site PASS, checks:tasks PASS, checks:prose PASS (174), ops:docs:budget PASS",
+      "outcome": "done",
+      "claims": [
+        "tests/mail-atlas-site",
+        "taskfiles/checks.yml",
+        "docs/mail-atlas.md"
+      ],
+      "files": [],
+      "base_commit": "6770b836733062f3f8eca4bd3242966a7ed5586b",
+      "branch": "main",
+      "frame": "03hb4u4xys441zv8v398n237r"
+    },
+    {
+      "id": "7bfcc3c0-533d-4d07-8379-4edb31c2b52d",
+      "ts": "2026-11-26T19:03:48Z",
+      "source": "antigravity",
+      "subject": "nixconfig:security-hardening",
+      "action": "remediated: (1) unset rotatedouttelegram+morrow-telegram in secrets.yaml, (2) infra:secrets:sync, (3) scoped tailnet-policy.hujson, (4) SIGNUPS_ALLOWED=false on delphi+frieren, (5) dropped metered lebrel fallback; gates PASS: sops:drift, infron, infron:test, host delphi+frieren, yaml:lint",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/secrets/",
+        "modules/config/tailnet-policy.hujson",
+        "hosts/delphi/vaultwarden.nix",
+        "modules/user/ai/hermes-persona/config.yaml"
+      ],
+      "files": [
+        "modules/secrets/secrets.yaml",
+        "modules/secrets.yaml",
+        "modules/config/tailnet-policy.hujson",
+        "hosts/delphi/vaultwarden.nix",
+        "modules/user/ai/hermes-persona/config.yaml"
+      ],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb4thvessdypqtm7680md6a"
+    },
+    {
+      "id": "18ff471f-46ec-474d-8c75-0918a012030a",
+      "ts": "2026-11-26T19:03:08Z",
+      "source": "hermes",
+      "subject": "nixconfig:security-hardening",
+      "action": "landed: renamed panes to actual state; agy standing with remediation goal; gemini packaging verified complete",
+      "outcome": "done",
+      "claims": [
+        "agents:panes",
+        "modules/secrets/"
+      ],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb4td7ti1gtvfycmai9384h"
+    },
+    {
+      "id": "b34a58e8-a986-4c38-8c9e-010e85910f35",
+      "ts": "2026-11-26T18:58:28Z",
+      "source": "devin",
+      "subject": "nixconfig:enhance-mail-atlas-thread-view-and-saved-queries",
+      "action": "claim: add saved atlas views, thread timeline, domain/tag/triage analytics, and compatible UI panels",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/email-archive",
+        "modules/services/email-archive.nix",
+        "modules/services/mail-atlas",
+        "modules/services/mail-atlas.nix"
+      ],
+      "files": [],
+      "base_commit": "f0d4d8c20095b380c40bb6b2552ee1db06e27c52",
+      "branch": "main",
+      "frame": "03hb4sgby7h2bgdmx9oq4e5g7"
+    },
+    {
+      "id": "a513e21c-100f-4b06-8c14-07082e6e7bc3",
+      "ts": "2026-11-26T18:57:21Z",
+      "source": "devin",
+      "subject": "nixconfig:enhance-job-db-scraper-dedupe-and-interview-tracker",
+      "action": "landed: cross-source canonical merge metadata, append-only application/interview journal, stage filters/stats, export packet endpoints, and UI controls | gate: go test+vet, node, alejandra, checks:host, delphi toplevel, live smoke PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/services/job-db-scraper",
+        "modules/services/job-db-scraper.nix"
+      ],
+      "files": [
+        "modules/services/job-db-scraper",
+        "modules/services/job-db-scraper.nix"
+      ],
+      "base_commit": "f0d4d8c20095b380c40bb6b2552ee1db06e27c52",
+      "branch": "main",
+      "frame": "03hb4s8j2sagamqvesf4rjc1a"
+    },
+    {
+      "id": "91dc312a-3855-4d3a-a56f-09d4efe400b7",
+      "ts": "2026-11-26T18:53:53Z",
+      "source": "buffy",
+      "subject": "nixconfig:wire-clanker-browser-into-mail-atlas-site-test",
+      "action": "claim: add an opt-in clanker-browser lane to the mail-atlas drawer smoke, keeping the local path intact",
+      "outcome": "in_progress",
+      "claims": [
+        "tests/mail-atlas-site",
+        "scripts/task/clanker-browser.sh",
+        "taskfiles/checks.yml"
+      ],
+      "files": [],
+      "base_commit": "c1ca96cb04064e3d34af3ca81fb584a28c7412cb",
+      "branch": "main",
+      "frame": "03hb4rk65zkprkcejtwkxnv99"
+    },
+    {
+      "id": "2697b076-92ef-43dc-aef0-147b80a4190e",
+      "ts": "2026-11-26T18:51:49Z",
+      "source": "buffy",
+      "subject": "nixconfig:add-mail-atlas-cli-and-smoke-tests",
+      "action": "landed: agents:mail:atlas:probe (probe|stats|recent|search|routes, read-only) + tests/mail-atlas-api 10 cases; check: checks:mail-atlas (also gates the 10 orphan drain tests). Live: ok, letters 3930 tagged 2686, newest 1h, openAction 20, queued 0m, 53 routes, search 50 rows. Trap measured: ?q=x&lim=2 = 404 while ?q=x = 200 | gate: checks:mail-atlas PASS, checks:tasks PASS (847), checks:prose PASS (174); site test needs agent-browser, not run",
+      "outcome": "done",
+      "claims": [
+        "scripts/task",
+        "tests/mail-atlas-api",
+        "taskfiles"
+      ],
+      "files": [],
+      "base_commit": "c1ca96cb04064e3d34af3ca81fb584a28c7412cb",
+      "branch": "main",
+      "frame": "03hb4r5mlvbdy9y8xijzma11m"
+    },
+    {
+      "id": "5667597d-40e7-4ca0-b49a-ba2177d0764e",
+      "ts": "2026-11-26T18:49:09Z",
+      "source": "buffy",
+      "subject": "nixconfig:add-mail-atlas-cli-and-smoke-tests",
+      "action": "claim: inspect mail-atlas/email-archive coverage, add a CLI/health probe with offline fixtures where the gap is",
+      "outcome": "in_progress",
+      "claims": [
+        "tests/mail-atlas-site",
+        "scripts/task",
+        "taskfiles"
+      ],
+      "files": [],
+      "base_commit": "ddd5c94738e358219c835f84621667605a6eceda",
+      "branch": "main",
+      "frame": "03hb4qmvdg83azp17l9mgzggc"
+    },
+    {
+      "id": "8d573fbe-6bce-4f47-aaa7-528821bc2ff4",
+      "ts": "2026-11-26T18:48:03Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-service-health-and-resource-audit",
+      "action": "audit: delphi / 92G/195G 50%, RAM 3.9/11Gi (avail 7.7), swap 1.8/5.8, load 2.78/4.09/4.80, PSI cpu avg300 47.7, 0 failed units, journal 297.6M, store 78.6G/2971 roots, /tmp 2.0G->1.6G (-368MiB sweep scratch), sentinel ok 3m, endpoints 8464-8467/8450/8455/8456 200, xs ok; service-portal+link-vault not in deployed gen 83b8ed8b. Fix: ops:health refuses a stale ok (>45m) | gate: checks:tasks, checks:prose, checks:ops:health",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/ops-health.sh",
+        "tests/ops-health",
+        "taskfiles/ops.yml",
+        "taskfiles/checks.yml"
+      ],
+      "files": [],
+      "base_commit": "ddd5c94738e358219c835f84621667605a6eceda",
+      "branch": "main",
+      "frame": "03hb4qf2et1wf9ebxo4a5ip5l"
+    },
+    {
+      "id": "1c5c0eb6-c9db-463f-8f09-c00ea26bbfb6",
+      "ts": "2026-11-26T18:46:46Z",
+      "source": "devin",
+      "subject": "nixconfig:enhance-job-db-scraper-dedupe-and-interview-tracker",
+      "action": "claim: add cross-source canonical dedupe, application/interview stage tracking, exports, and UI controls",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/job-db-scraper",
+        "modules/services/job-db-scraper.nix"
+      ],
+      "files": [],
+      "base_commit": "ddd5c94738e358219c835f84621667605a6eceda",
+      "branch": "main",
+      "frame": "03hb4q642e368v9j2c6ixe24e"
+    },
+    {
+      "id": "1e01f5a3-9c47-4361-9a79-a33459c12228",
+      "ts": "2026-11-26T18:45:59Z",
+      "source": "devin",
+      "subject": "nixconfig:enhance-private-deals-price-alerts-and-scrapers",
+      "action": "landed: watchlist-aware polling, price-drop event ledger, deduped ntfy alerts, RSS/Atom/JSON exports, and UI controls | gate: go test+vet, node, alejandra, checks:host, delphi toplevel, live smoke PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/services/private-deals",
+        "modules/services/private-deals.nix"
+      ],
+      "files": [
+        "modules/services/private-deals",
+        "modules/services/private-deals.nix"
+      ],
+      "base_commit": "ddd5c94738e358219c835f84621667605a6eceda",
+      "branch": "main",
+      "frame": "03hb4q0l219ra90aqu73ulba4"
+    },
     {
       "id": "739af2ed-a2b7-4b19-89ce-a3c0752a4aa7",
       "ts": "2026-11-26T18:32:23Z",
@@ -2652,417 +3109,6 @@
       "base_commit": "c9187bfdfe3c0f9c03d3833a856645c6f5805211",
       "branch": "main",
       "frame": "03hb3d9ysaqa3h8t4rxwkcd5c"
-    },
-    {
-      "id": "00fe4c24-ccec-43e1-b638-f3d6ddd6f7dd",
-      "ts": "2026-11-26T14:34:35Z",
-      "source": "buffy",
-      "subject": "nixconfig:clanker-deals-scraper-cli",
-      "action": "claim: deals scraper (title/price/original/discount/merchant/url/category) over agent-browser on clanker plus firecrawl/context/tavily/http, with fixtures and a live run",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/deals-page-scrape.py tests/deals-page-scrape"
-      ],
-      "files": [],
-      "base_commit": "e958d546476e5f092c6ae7a4204ddade0cd61923",
-      "branch": "main",
-      "frame": "03hb3cwos3h5zbf9ejra24raf"
-    },
-    {
-      "id": "ffd572b9-ee69-447a-8dac-e57ded5ffc08",
-      "ts": "2026-11-26T14:33:31Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-db-tavily-context-ingest",
-      "action": "apps:ingest pipes apps:page JSON into job-db-scraper POST /api/postings (company from ATS URL, URL as identity, unknown employer skipped/named); job-page-scrape gained Context.dev plus the Ashby 'Title • City • Full time' split. E2E local: linear+anthropic+n8n -> 18 postings; FTS5 q='account executive' 3, q=n8n 8; re-ingest 0 created/18 updated. Tavily returns text without card links, so 0 postings by design. 44 tests pass.| gate: python3 -m unittest discover tests/jobs-ingest PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e958d546476e5f092c6ae7a4204ddade0cd61923",
-      "branch": "main",
-      "frame": "03hb3cp5szzc5mgm70ab4k0f1"
-    },
-    {
-      "id": "f5bb8c1f-0069-4673-b367-f4c8f49cf244",
-      "ts": "2026-11-26T14:33:20Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-freebuff-drive",
-      "action": "drove freebuff pane 2: publish label, now working",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
-      "branch": "HEAD",
-      "frame": "03hb3cnvndt1ivwcj5mt2c1iy"
-    },
-    {
-      "id": "27bb3a14-e3ff-4c46-a558-65b370cccfa4",
-      "ts": "2026-11-26T14:28:07Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-db-tavily-context-ingest",
-      "action": "claim: exercise job-page-scrape on real boards via tavily/context/firecrawl, add an ingest path into job-db-scraper's API/SQLite, verify with a local instance + FTS5 query",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task"
-      ],
-      "files": [],
-      "base_commit": "55fd912a17f64184dae1ef261bcf8ec9e64f4b37",
-      "branch": "main",
-      "frame": "03hb3bn5cqclwg566y9dshr31"
-    },
-    {
-      "id": "119927fc-5f41-42a7-acdc-4f305ffc802b",
-      "ts": "2026-11-26T14:26:00Z",
-      "source": "buffy",
-      "subject": "nixconfig:mail-atlas-archive-catchup",
-      "action": "cause: --max-pages 20 silenced pages_for(); 3516 archived > 20x100 meant every hourly run reread the same 2000 known envelopes, imported 0, exited 0. Fix: a window shorter than the archive widens to the derived one (logged), default maxPages=0, --start-page + resume hint. 9 unittest cases, py_compile + nix parse clean. Live dry-run widened to 38 pages and found unseen mail at page 36. Units run the old build until rebuild.| gate: python3 -m unittest discover tests/email-archive-import PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "55fd912a17f64184dae1ef261bcf8ec9e64f4b37",
-      "branch": "main",
-      "frame": "03hb3b8aaobtu2l129s1njy24"
-    },
-    {
-      "id": "b86c771c-7ab7-41c6-b6f3-d5d05d3a962c",
-      "ts": "2026-11-26T14:23:35Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-1512",
-      "action": "continue private-deals-service + delphi host check",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "6a292f2b6acdb6b44d0e5345822980f13fa99d95",
-      "branch": "main",
-      "frame": "03hb3ar9x96nbg8affe1nts92"
-    },
-    {
-      "id": "3ad1cb19-d8a6-4be0-967c-952cbd45ff37",
-      "ts": "2026-11-26T14:23:04Z",
-      "source": "buffy",
-      "subject": "nixconfig:mail-atlas-archive-catchup",
-      "action": "claim: diagnose why the archive holds 3.5k of 7.5k inbox letters, fix the importer window/paging or add a bounded catch-up path, unit tests + dry-run",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/email-archive-import.py"
-      ],
-      "files": [],
-      "base_commit": "12b09d596faba39dbc27c54852df08a7aabd902c",
-      "branch": "main",
-      "frame": "03hb3anlvsi5iltk8q0gb7vih"
-    },
-    {
-      "id": "22a85ec3-2e64-49fa-8fbf-019b9a3fc19f",
-      "ts": "2026-11-26T14:23:01Z",
-      "source": "devin",
-      "subject": "nixconfig:steward-devin-drive-20261126-1512",
-      "action": "claim: continue private-deals-service + delphi host check — Go SQLite/FTS5 deals service in tools/os, module + delphi wiring, gate checks:host HOST=delphi",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/private-deals",
-        "modules/services/private-deals.nix",
-        "hosts/delphi/configuration.nix"
-      ],
-      "files": [],
-      "base_commit": "6a292f2b6acdb6b44d0e5345822980f13fa99d95",
-      "branch": "main",
-      "frame": "03hb3ancbj41r58050ijb1q50"
-    },
-    {
-      "id": "fd78b0f4-ff69-455a-b113-52e500c0d978",
-      "ts": "2026-11-26T14:20:50Z",
-      "source": "buffy",
-      "subject": "nixconfig:clanker-agent-browser-job-cli",
-      "action": "apps:page reads a JS-rendered career page via agent-browser -> firecrawl -> tavily -> http+JSON-LD, every refusal named. Live on clanker (agent-browser 0.45.0): leverdemo, ashby/linear, greenhouse/anthropic -> 3 clean titles each, greenhouse city list split into location. On delphi the browser is absent, so auto fell to firecrawl with the warning kept. 24 unittest cases + py_compile pass; wired as task apps:page.| gate: python3 -m unittest discover tests/job-page-scrape PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "12b09d596faba39dbc27c54852df08a7aabd902c",
-      "branch": "main",
-      "frame": "03hb3a7vqp7ipz510cl6yxqle"
-    },
-    {
-      "id": "afc3ca62-4c72-48c6-be52-91ec3a0591c5",
-      "ts": "2026-11-26T14:17:10Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-site-publish",
-      "action": "landed: xs rejects space-joined COMMITS client-side; appflow-send now consumes '-- <id>' (was refusing every packet as usage); blog checkout+_site+live 6/6 CV hashes match; audit 46 held/10 no-date/3 no-packet; ClickHouse duplicate closed. gate: checks:appflow PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "scripts/task/appflow-send.sh",
-        "scripts/task/xs-turn-post.sh"
-      ],
-      "base_commit": "6a292f2b6acdb6b44d0e5345822980f13fa99d95",
-      "branch": "main",
-      "frame": "03hb39i8l4h08h6pxaik2wrld"
-    },
-    {
-      "id": "911b8681-531c-43c4-a891-5076177cf78e",
-      "ts": "2026-11-26T14:10:11Z",
-      "source": "buffy",
-      "subject": "nixconfig:clanker-agent-browser-job-cli",
-      "action": "claim: build a job-board CLI scraper on agent-browser (+ Firecrawl/Tavily/Context keys) for JS-rendered career pages, test it on clanker against real URLs, wire it under scripts/ if clean",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task"
-      ],
-      "files": [],
-      "base_commit": "4cf503e288de8676cae8841d8b0e9df46b91a480",
-      "branch": "main",
-      "frame": "03hb384zkjgi0ndvowdkca8qf"
-    },
-    {
-      "id": "f327d93d-2fea-4a43-803e-2aca9e06fb97",
-      "ts": "2026-11-26T14:09:18Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-site-publish",
-      "action": "claim: xs COMMITS client-side validation; appflow-send '-- <id>' parser fix; blog surface verify; packet audit",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task",
-        "~/Documents/shaoyanji.is-a.dev"
-      ],
-      "files": [],
-      "base_commit": "fd1a6fac4709bdb28f298289f5b4cc8cc8ae9847",
-      "branch": "main",
-      "frame": "03hb37yukogmqgzxn8rn2pq45"
-    },
-    {
-      "id": "ab951d9e-209d-4d00-8596-9eb2dc778372",
-      "ts": "2026-11-26T14:08:13Z",
-      "source": "buffy",
-      "subject": "nixconfig:mail-atlas-drain-fixes",
-      "action": "mail-atlas: drain no longer closes a missed decision as gone — reads one page past a full final page, drops stopword query tokens, checks archive/trash for an already-moved letter, reads the newest pages before calling it absent; atlas-stats and the header now carry queue age. 10 unittest cases pass, py_compile clean, live --dry-run exits 0. | gate: python3 -m unittest test_drain PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4cf503e288de8676cae8841d8b0e9df46b91a480",
-      "branch": "main",
-      "frame": "03hb37r84gzo13edj5bgca4re"
-    },
-    {
-      "id": "41e98263-16fd-44a7-90c2-3f675caf18e6",
-      "ts": "2026-11-26T14:08:10Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-lane",
-      "action": "freebuff: drive publish task cv-site-publish",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd1a6fac4709bdb28f298289f5b4cc8cc8ae9847",
-      "branch": "main",
-      "frame": "03hb37qt06md3fyb7pd76jvza"
-    },
-    {
-      "id": "b6f927ac-db39-486b-bee7-eea145fe218f",
-      "ts": "2026-11-26T14:06:45Z",
-      "source": "devin",
-      "subject": "nixconfig:private-deals-service",
-      "action": "claim: build private-deals tailnet service — Go SQLite/FTS5 deals/watchlists/price history, provider+RSS/JSON/manual ingestion, API and UI on delphi",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/private-deals",
-        "modules/services/private-deals.nix",
-        "hosts/delphi/configuration.nix",
-        "inventory.toml",
-        "modules.toml",
-        "lib/registry-schema.nix",
-        "docs/delphi-runtime.md"
-      ],
-      "files": [
-        "modules/services/private-deals",
-        "modules/services/private-deals.nix",
-        "hosts/delphi/configuration.nix",
-        "inventory.toml",
-        "modules.toml",
-        "lib/registry-schema.nix",
-        "docs/delphi-runtime.md"
-      ],
-      "base_commit": "f2e3ec95",
-      "branch": "main",
-      "frame": "03hb37gxj36r65f6jffalfggz"
-    },
-    {
-      "id": "27c0f131-bdfa-46c4-8d14-3dd68bc3964a",
-      "ts": "2026-11-26T14:04:32Z",
-      "source": "devin",
-      "subject": "nixconfig:job-db-scraper-service",
-      "action": "landed job-db-scraper: Go scraper/dedupe/SQLite FTS5 API+UI, delphi servicePortal mount 8464 -> 127.0.0.1:8101 | gate: checks:host HOST=delphi PASS; native aarch64 nix build+go test PASS; live arbeitnow scrape 895 rows, FTS query 445 hits, UI 200",
-      "outcome": "done",
-      "claims": [
-        "modules/services/job-db-scraper",
-        "modules/services/job-db-scraper.nix",
-        "hosts/delphi/configuration.nix",
-        "inventory.toml",
-        "modules.toml",
-        "lib/registry-schema.nix",
-        "docs/delphi-runtime.md"
-      ],
-      "files": [
-        "modules/services/job-db-scraper",
-        "modules/services/job-db-scraper.nix",
-        "hosts/delphi/configuration.nix",
-        "inventory.toml",
-        "modules.toml",
-        "lib/registry-schema.nix",
-        "docs/delphi-runtime.md"
-      ],
-      "base_commit": "9401d481",
-      "branch": "main",
-      "frame": "03hb3719e76kh0di1sih5qm2x"
-    },
-    {
-      "id": "eb57ba13-02bd-4280-9182-7e83b2517e8e",
-      "ts": "2026-11-26T14:04:11Z",
-      "source": "buffy",
-      "subject": "nixconfig:mail-atlas-drain-fixes",
-      "action": "claim: guard dismiss with a bounded recent scan, fix scan page-cap miss and stopword tokens, make move-then-close idempotent on retry, surface queue age in atlas-stats + page, unit tests",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/mail-atlas"
-      ],
-      "files": [],
-      "base_commit": "f2e3ec9500b5ed6f696cd60517970187ab1488f5",
-      "branch": "main",
-      "frame": "03hb36ytjlk907vzfrvdgncwc"
-    },
-    {
-      "id": "a9792bd2-da35-4b7d-821c-93c77663d3d5",
-      "ts": "2026-11-26T14:01:57Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-health-and-atlas-audit",
-      "action": "delphi: sentinel ok, 0 failed units, disk 47% (87/195G), mem 4.4/11.9G, PSI cpu some 99% (agent concurrency on 2 OCPU; mem/io <0.2). clanker auto-suspended 13:58Z, 0 OOM. xs LIVE=1: 26 claims, 0 stale, 6 blocked — incl delphi-pane 'tailnet unreachable', false (we are on delphi). mail-atlas timers green; archive has 3510 of 7379 inbox envelopes, 100/h = ~39h backlog. Fixes: stale queued -> inbox; dismiss only after recent-page scan; queue age in atlas-stats; log atlas-boxes 20k cap.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9401d48165c7e07ed94c8476f8b54c33f1be279a",
-      "branch": "main",
-      "frame": "03hb36j4ctqz068mtps39lnru"
-    },
-    {
-      "id": "6ba783f0-46a6-49fb-b66b-ee478746d595",
-      "ts": "2026-11-26T13:59:12Z",
-      "source": "freebuff",
-      "subject": "nixconfig:cv-site-publish",
-      "action": "verified post-deploy: checks:site:links PASS (91 links/17 pages/6 PDFs, all anchors download); live matt.bountystash.com 17/17 pages 200, 6/6 CV sha256 equal to built artifact, root 200, 404 probe 404",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd1a6fac4709bdb28f298289f5b4cc8cc8ae9847",
-      "branch": "main",
-      "frame": "03hb35zrcygixvxarcyswr1mr"
-    },
-    {
-      "id": "579288a8-b3ca-4aa2-ad10-50ef358499d5",
-      "ts": "2026-11-26T13:58:50Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-freebuff-drive-20261126-1449",
-      "action": "novel: verify CV site live + site:links gate",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd1a6fac4709bdb28f298289f5b4cc8cc8ae9847",
-      "branch": "main",
-      "frame": "03hb35x80w4f9vu9f8hka1ds2"
-    },
-    {
-      "id": "240db69b-c53f-4d49-9a7b-cc8d86ba82f9",
-      "ts": "2026-11-26T13:58:03Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "corrects the previous entry's count: the pass parsed 5415 postings across three reads (1881 Upper Rhine + linkedin/jobsch, 1240 small towns, 2294 German metros), not 3355. Finding unchanged: no new employer from either region; 3 filed from LinkedIn, Lexware closed as a duplicate of the open Haufe-Lexware row.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9401d48165c7e07ed94c8476f8b54c33f1be279a",
-      "branch": "main",
-      "frame": "03hb35rpk3dx3z1p9px0a2lkg"
-    },
-    {
-      "id": "d8bd7ba8-1dfc-4d8c-bc3c-221e4db8a55c",
-      "ts": "2026-11-26T13:57:54Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: sweep 2026-11-26h — read the Upper Rhine (Freiburg, Karlsruhe, Basel, Offenburg, Loerrach) plus eight German metros; 3355 postings, both spent, 0 new there. 3 leads filed from LinkedIn: ZKB PostgreSQL platform, Kanton Zuerich Finanzdirektion KI, Viseca Azure. Lexware closed as a duplicate of the open Haufe-Lexware application. 3 rows in the is-a.dev CV page (blog f75ad19). No code change. Gate: self-test 22/22, 3 links 200, 165 rows 0 malformed; checks:quick unbuildable on aarch64.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9401d48165c7e07ed94c8476f8b54c33f1be279a",
-      "branch": "main",
-      "frame": "03hb35qmlv2my2dqh7ll4fmgu"
-    },
-    {
-      "id": "6c315171-0ba8-4b80-9b0a-f32b6f1f52ab",
-      "ts": "2026-11-26T13:53:48Z",
-      "source": "devin",
-      "subject": "nixconfig:desktop-facts-one-module",
-      "action": "landed: blast-radius audit + proposal note desktop-facts-one-module (PROPOSED, P2) — six facts duplicated verbatim across hosts/*.nix; one shared desktop module owns them, overrides as data | gate: nix eval .#agentsNotes.issues clean for the note",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "AGENTS.nix"
-      ],
-      "base_commit": "fd1a6fac4709bdb28f298289f5b4cc8cc8ae9847",
-      "branch": "main",
-      "frame": "03hb34xunphxpe0lwmyt4u6qk"
-    },
-    {
-      "id": "9247884a-260b-4662-9a48-0a1d2d3c0279",
-      "ts": "2026-11-26T13:51:37Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "claim: job-scout pass 2026-11-26h — read the Upper Rhine (Freiburg, Karlsruhe, Basel) that no pass has covered, plus LinkedIn and jobs.ch one page deeper, file linked leads via apps:scout, fold into the is-a.dev CV page with framing distinct from 26d/26e/26f/26g",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/jobsearch-sweep.py"
-      ],
-      "files": [],
-      "base_commit": "9401d48165c7e07ed94c8476f8b54c33f1be279a",
-      "branch": "main",
-      "frame": "03hb34ieoeb6wovswuf6rvxm0"
-    },
-    {
-      "id": "f97d5827-d03b-4f55-adc9-f0941d37dae8",
-      "ts": "2026-11-26T13:51:06Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-config-verify",
-      "action": "checks:host HOST=delphi MODE=eval FAILED on the working tree (rc=1): attribute \"services.job-db-scraper\" missing — hosts/delphi/configuration.nix imports self.modules.\"services.job-db-scraper\" but the uncommitted modules.toml registers it under [knobs.job-db-scraper]. Same gate on a clean worktree at HEAD 9401d481 PASSES: 2141 assertions, registry 38, 6.92s. Those failing edits are another lane's and were left untouched.",
-      "outcome": "failed: delphi host check fails on the uncommitted job-db-scraper module; HEAD is green, tree needs retry after that lane lands",
-      "claims": [],
-      "files": [],
-      "base_commit": "9401d48165c7e07ed94c8476f8b54c33f1be279a",
-      "branch": "main",
-      "frame": "03hb34eta7cxzk2gtt3eyggf6"
-    },
-    {
-      "id": "31892012-a74b-4f68-8a0a-aa2936046464",
-      "ts": "2026-11-26T13:50:06Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-config-verify",
-      "action": "claim: run checks:host HOST=delphi, read the delphi inventory entry, report status, post the done turn naming gate and result",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/delphi"
-      ],
-      "files": [],
-      "base_commit": "9401d48165c7e07ed94c8476f8b54c33f1be279a",
-      "branch": "main",
-      "frame": "03hb347qkpoo7knwzyywd2n5t"
-    },
-    {
-      "id": "3ca60c4b-7d07-4ba1-af19-dc99f558b0ea",
-      "ts": "2026-11-26T13:49:35Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "corrects the previous entry, which named d1cd1e26: the LinkedIn retry landed as 9401d481, after the hook refused a commit that had another lane's staged job-db-scraper files. Sweep 2026-11-26g: 4158 parsed, 333 fresh, 29 new at 1694 held; 8 filed (Enovos, Banque de Luxembourg, LUXHUB, LIST, CMS, Deloitte, NSI, Uni Zurich), staffing firms refused; 8 rows in the is-a.dev CV page (blog acf8780). Gate: self-test 22/22, py_compile, bash -n; checks:quick unbuildable on aarch64.",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/jobsearch-sweep.py"
-      ],
-      "files": [],
-      "base_commit": "9401d48165c7e07ed94c8476f8b54c33f1be279a",
-      "branch": "main",
-      "frame": "03hb34443ib2kd1u0ej1anka6"
     }
   ]
 }

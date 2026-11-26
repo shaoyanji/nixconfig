@@ -401,7 +401,7 @@ in {
       };
 
       maxPages = lib.mkOption {
-        type = lib.types.ints.nonnegative;
+        type = lib.types.ints.unsigned;
         default = 0;
         description = ''
           Envelope pages a run may scan. 0 derives the window from the archive

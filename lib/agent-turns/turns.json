@@ -1,8 +1,113 @@
 {
-  "generated": "2026-11-26T15:16:41Z",
+  "generated": "2026-11-26T15:26:27Z",
   "count": 200,
-  "pin": "17ce30cc4238477b339021c6be3317d78d1d6828df175d0a32c86a6062f8932e",
+  "pin": "61581bad1a9e93931fd337fb6b3f22d6e35dccac9839e646a480ee22e882e781",
   "turns": [
+    {
+      "id": "9a828a7d-20dd-439b-b248-9dc83b3b870b",
+      "ts": "2026-11-26T15:24:49Z",
+      "source": "buffy",
+      "subject": "nixconfig:clanker-disk-gc",
+      "action": "clanker nix-collect-garbage -d: store paths 14454 -> 14395 (59 deleted), /nix 9.0G -> 8.5G, gc reported 190.7 MiB freed, root free 549M -> 1.1G (97% -> 94%). agent-browser 0.45.0 and profile (agent-browser dsh home-manager-path nix piper-tts) intact, one generation left. /data 13G/20G 65%. /data/jobs 108 dirs 129M, 104 older than 7d (report only). Biggest live: dsh 942M, chromium 935M, piper-tts closure ~2.6G.| gate: agent-browser --version ok",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "dd4a70ebb14b82abedd1e8e71c7d4e838e7b274b",
+      "branch": "main",
+      "frame": "03hb3mpx9kc59leuvyc0gxstz"
+    },
+    {
+      "id": "cea62021-1e13-4efe-9afd-4647a1915247",
+      "ts": "2026-11-26T15:23:44Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cover-letter",
+      "action": "jev-decide novel p=0.9/m=0.84; fed cover letter task to freebuff",
+      "outcome": "in_progress",
+      "claims": [
+        "letters/hisolutions.json"
+      ],
+      "files": [],
+      "base_commit": "f2eb9f3eae5463dc6170fc6c175e913c1980c994",
+      "branch": "main",
+      "frame": "03hb3mi7gx9memp1nbl4qsbv5"
+    },
+    {
+      "id": "5d3749e3-2081-46f7-84bf-d8ad4b02a1f7",
+      "ts": "2026-11-26T15:22:26Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-clanker-maintenance",
+      "action": "sentinel ok, delphi running, 0 failed units. delphi load 2.04 on 2 cores, mem 4.0/11Gi (7.6 avail), zram 1G/5.8G, PSI cpu60=20.2 io=0.4 mem=0.02, disk 88G/195G 48%, store 64318 paths 16054 dead, /tmp 1.9G/1825 (other lanes). clanker 98% root (399M free): /nix 9.1G /usr 3.1G /opt 1.5G, /data 65%, /tmp 88M. Cleaned only my files. xs 26 live 0 queued; stale: agy delphi-pane block, appflow-db-remediate mislabeled, 10 steward turns.| gate: read-only pass",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "dd4a70ebb14b82abedd1e8e71c7d4e838e7b274b",
+      "branch": "main",
+      "frame": "03hb3m985kgfl2041da5n9qy5"
+    },
+    {
+      "id": "1c52e16f-7a3c-4324-b773-de2653bbcf87",
+      "ts": "2026-11-26T15:19:24Z",
+      "source": "devin",
+      "subject": "nixconfig:delphi-toplevel-build-fix",
+      "action": "claim: fix email-archive ints.nonnegative and any delphi toplevel Nix build blockers in service modules, verify alejandra, checks:host and full toplevel nix build without switching",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/email-archive.nix",
+        "modules/services/job-db-scraper.nix",
+        "modules/services/private-deals.nix",
+        "modules/services/inventory-site.nix",
+        "modules/services/mail-atlas.nix"
+      ],
+      "files": [],
+      "base_commit": "dd4a70ebb14b82abedd1e8e71c7d4e838e7b274b",
+      "branch": "main",
+      "frame": "03hb3lns00cxod3wfw19mr729"
+    },
+    {
+      "id": "f22e8355-aaa2-461e-882d-6382ed1234bf",
+      "ts": "2026-11-26T15:17:30Z",
+      "source": "devin",
+      "subject": "nixconfig:private-deals-batch-alerts",
+      "action": "landed: private-deals batch upsert API, watchlist alert evaluation, deduped ntfy/webhook notifications, alert/status UI and price-trend polish | gate: go test -count=1 PASS, go vet PASS, node --check PASS, native aarch64 nix package build+checkPhase PASS, live batch+ntfy smoke PASS, checks:host HOST=delphi rc=0",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "dd4a70ebb14b82abedd1e8e71c7d4e838e7b274b",
+      "branch": "main",
+      "frame": "03hb3laff1wz4zrtpt7alra1g"
+    },
+    {
+      "id": "f7ce9408-5ed8-4d48-8e7d-c707fa1cf9f0",
+      "ts": "2026-11-26T15:17:23Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-clanker-maintenance",
+      "action": "claim: maintenance pass over delphi and clanker (health, PSI, disk, /tmp, failed units) plus xs queue audit; no commits while devin holds the tree",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "dd4a70ebb14b82abedd1e8e71c7d4e838e7b274b",
+      "branch": "main",
+      "frame": "03hb3l9nqxg62hqvkpughkmcp"
+    },
+    {
+      "id": "b390234b-e461-4b47-b84e-cc15b76ebff0",
+      "ts": "2026-11-26T15:17:09Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-dewin-intents-push",
+      "action": "dewin verified intents state: tree clean, local main == origin/main, nothing unpushed — autoUpgrade safe, nothing to commit (f2eb9f3e already remote)",
+      "outcome": "done",
+      "claims": [
+        "tests/intents/run.sh",
+        "docs/intents.md",
+        "flake/intents.nix"
+      ],
+      "files": [
+        "scripts/task/xs-turn-post.sh"
+      ],
+      "base_commit": "f2eb9f3eae5463dc6170fc6c175e913c1980c994",
+      "branch": "main",
+      "frame": "03hb3l7whcz54u4js2k0ag4l3"
+    },
     {
       "id": "61baefaa-f695-4261-9935-897f9db6a501",
       "ts": "2026-11-26T15:15:58Z",
@@ -2949,105 +3054,6 @@
       "base_commit": "1a1729cc01e314f22407e09d36a329bd910cbce2",
       "branch": "main",
       "frame": "03hb16nstc7b9h107t26z1y2n"
-    },
-    {
-      "id": "295d3893-3568-4a74-87ee-c74fda5b5828",
-      "ts": "2026-11-26T07:42:41Z",
-      "source": "freebuff",
-      "subject": "nixconfig:steward-freebuff-drive-20261126-0801",
-      "action": "freebuff: publish CV site (jev publish p=0.97 m=0.95) — claim lib/site, build both sites, polish, deploy",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/site"
-      ],
-      "files": [],
-      "base_commit": "fd468c31f255239c8b51015562cefa7e3a49c1c1",
-      "branch": "main",
-      "frame": "03hb14fz75lo24381lbhhuc8v"
-    },
-    {
-      "id": "bfa56eb5-8bee-40b0-bd9f-bfbd74924810",
-      "ts": "2026-11-26T07:41:47Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-freebuff-drive-20261126-0801",
-      "action": "freebuff: publish CV site via lib/site (jev publish)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd468c31f255239c8b51015562cefa7e3a49c1c1",
-      "branch": "main",
-      "frame": "03hb149mofzaxdy9zg2m8inge"
-    },
-    {
-      "id": "8a75a95d-859e-4a93-9f97-8a832cd6087b",
-      "ts": "2026-11-26T07:37:13Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-epistemics",
-      "action": "start: epistemics/ontology v0.0.1->v1.0.0rc — reading SCHEMA, notes, predesign doc, kg surface",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/agents-notes.nix",
-        "lib/knowledge-graph.nix",
-        "flake/epistemics.nix",
-        "AGENTS.nix",
-        "docs/"
-      ],
-      "files": [],
-      "base_commit": "fd468c31f255239c8b51015562cefa7e3a49c1c1",
-      "branch": "main",
-      "frame": "03hb13dhuqfqlsn419pfjpnlk"
-    },
-    {
-      "id": "38ce6e56-862f-47b7-9c82-25659c5e3a1d",
-      "ts": "2026-11-26T07:32:43Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: sweep 2026-11-26a — five boards read (germantechjobs 586 feed items, Stepstone 6 lane queries/136 cards, BSJ 12, WWR 87, RemoteOK 101 US-only); 108 employers held a core role, 75 already tracked, 7 new leads filed at origin scout-2026-11-26a, nothing sent (2026-12-07 hold)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd468c31f255239c8b51015562cefa7e3a49c1c1",
-      "branch": "main",
-      "frame": "03hb12hu3gcwsbfhmbw7oohmu"
-    },
-    {
-      "id": "3e22e368-1a17-46c8-834e-24316ff503b0",
-      "ts": "2026-11-26T07:31:58Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-drive-20261126-0823",
-      "action": "chain-change: refactor shared module chain — hosts/ into modules/",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd468c31f255239c8b51015562cefa7e3a49c1c1",
-      "branch": "main",
-      "frame": "03hb12clizlpu136vzh8n80tb"
-    },
-    {
-      "id": "52385e5d-7aaa-4e74-ab7c-e5c8d75274ea",
-      "ts": "2026-11-26T07:23:29Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout",
-      "action": "claim: sweep 2026-11-26a — read germantechjobs, WWR, RemoteOK, Stepstone, BSJ; rank by GitHub activity + live postings; file leads only",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd468c31f255239c8b51015562cefa7e3a49c1c1",
-      "branch": "main",
-      "frame": "03hb10oy41awt4sv8gisejzld"
-    },
-    {
-      "id": "0bb44ca5-d6c9-4240-b716-2d4fbcfccad0",
-      "ts": "2026-11-26T07:23:20Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-lane",
-      "action": "landed: hmModules/hmFeatures now derived from features in the mapAttrs projection (containers->floor, dms->desktop); 8+10 restated lines cut, divergences (fern/cassini/home/demo) stay explicit — change rode the flake-update lane's commit fd468c31 | gate: drv-equality 30/30 x2, nix:lint 333, eval: delphi floor / frieren desktop / fern fork",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fd468c31f255239c8b51015562cefa7e3a49c1c1",
-      "branch": "main",
-      "frame": "03hb10nyrpwyzae760ycid12d"
     }
   ]
 }

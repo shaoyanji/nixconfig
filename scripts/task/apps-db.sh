@@ -93,6 +93,9 @@ usage: apps-db.sh <verb> [args]
                            current row from a fixture instead of the API.
   add --company C --role R [--id slug] [--apply-url U] [--status S] [--next-action N]
                              [--notes N] [--category C] [--language L] [--origin O] [--fit 0-100|1-5]
+                           a new id needs no guard; --id naming an existing row is an
+                           overwrite, so it takes --if-status <12 hex>, --expect-absent
+                           (refused when the row exists) or --force
   upsert [file|-]          upsert an application record (JSON or TOON on stdin or in a file),
                            guarded like `update`: --if-status <12 hex> for a row that
                            exists, --expect-absent for one that does not, --force, --dry
@@ -368,12 +371,14 @@ case "$verb" in
     ;;
 
   upsert | add)
+    # Both verbs replace a whole record, so the guard below reads one set of
+    # variables whichever spelling the caller used.
+    upsert_hash=""
+    upsert_absent=0
+    upsert_force=0
+    upsert_dry=0
     if [ "$verb" = upsert ]; then
       src=""
-      upsert_hash=""
-      upsert_absent=0
-      upsert_force=0
-      upsert_dry=0
       while [ "$#" -gt 0 ]; do
         case "$1" in
           --if-status) upsert_hash=${2:-}; shift 2 ;;
@@ -414,6 +419,9 @@ case "$verb" in
           --language) language=${2:-}; shift 2 ;;
           --origin) origin=${2:-}; shift 2 ;;
           --fit) fit=${2:-}; shift 2 ;;
+          --if-status) upsert_hash=${2:-}; shift 2 ;;
+          --expect-absent) upsert_absent=1; shift ;;
+          --force) upsert_force=1; shift ;;
           --dry) dry=1; shift ;;
           *) echo "apps-db: unknown flag $1" >&2; exit 2 ;;
         esac
@@ -496,48 +504,51 @@ case "$verb" in
       echo "apps-db: upsert needs an id" >&2
       exit 2
     fi
-    # An upsert replaces the whole record, so it is the widest write this verb
-    # set has; it gets the same expectation as `update`. A row that exists must
-    # be named by the fingerprint of the status you read; a row that does not
-    # must be declared new. `apps:scout` reaches the table through `add`, which
-    # is intentionally not guarded — it creates one lead at a time.
-    if [ "$verb" = upsert ]; then
-      rid=$(printf '%s' "$payload" | jq -r '.id')
-      curb=""
-      if [ -n "${APPFLOW_ROWS:-}" ] && [ -r "${APPFLOW_ROWS}" ]; then
-        curb=$(jq -c --arg id "$rid" '.[] | select(.id == $id)' "$APPFLOW_ROWS" | head -1)
-      else
-        curb=$(curl -fsS -G "$api/api/application-get" --data-urlencode "id=$rid" 2>/dev/null | jq -c '.[0] // empty' || true)
+    # Both verbs replace the whole record, so both get the expectation `update`
+    # has. A row that exists must be named by the fingerprint of the status you
+    # read. `add` keeps its one-lead-at-a-time shape for a new id, but a slug
+    # that already exists (a re-run, a collided sweep id) is an overwrite: that
+    # is the write behind `add` silently nulling a row's fields, so it is
+    # guarded here rather than documented as a known hole.
+    rid=$(printf '%s' "$payload" | jq -r '.id')
+    curb=""
+    if [ -n "${APPFLOW_ROWS:-}" ] && [ -r "${APPFLOW_ROWS}" ]; then
+      curb=$(jq -c --arg id "$rid" '.[] | select(.id == $id)' "$APPFLOW_ROWS" | head -1)
+    else
+      curb=$(curl -fsS -G "$api/api/application-get" --data-urlencode "id=$rid" 2>/dev/null | jq -c '.[0] // empty' || true)
+    fi
+    write_log=${APPS_DB_WRITE_LOG:-$HOME/.local/state/appflow/apps-db-writes.log}
+    write_max=${APPS_DB_WRITE_MAX:-50}
+    if [ "$upsert_force" = 0 ]; then
+      recent=0
+      if [ -r "$write_log" ]; then
+        recent=$(awk -v since="$(( $(date +%s) - 600 ))" '$1 >= since' "$write_log" | wc -l | tr -d ' ')
       fi
-      write_log=${APPS_DB_WRITE_LOG:-$HOME/.local/state/appflow/apps-db-writes.log}
-      write_max=${APPS_DB_WRITE_MAX:-50}
-      if [ "$upsert_force" = 0 ]; then
-        recent=0
-        if [ -r "$write_log" ]; then
-          recent=$(awk -v since="$(( $(date +%s) - 600 ))" '$1 >= since' "$write_log" | wc -l | tr -d ' ')
+      if [ "${recent:-0}" -ge "$write_max" ]; then
+        echo "apps-db: refusing $verb $rid — ${recent} writes in ten minutes (ceiling ${write_max}): a loop, not a decision." >&2
+        exit 5
+      fi
+      if [ -z "$curb" ]; then
+        if [ "$verb" = upsert ] && [ "$upsert_absent" = 0 ]; then
+          echo "apps-db: refusing upsert $rid — no such row: pass --expect-absent if this is a new application, or --force" >&2
+          exit 2
         fi
-        if [ "${recent:-0}" -ge "$write_max" ]; then
-          echo "apps-db: refusing upsert $rid — ${recent} writes in ten minutes (ceiling ${write_max}): a loop, not a decision." >&2
-          exit 5
+      else
+        cur_status=$(printf '%s' "$curb" | jq -r '.status // ""')
+        cur_hash=$(printf '%s' "$cur_status" | sha256sum | cut -c1-12)
+        cur_stage=$(printf '%s' "$curb" | jq -r '.stage // ""')
+        if [ "$verb" = add ] && [ "$upsert_absent" = 1 ]; then
+          echo "apps-db: refusing add $rid — the row exists (status $cur_hash, stage $cur_stage); drop --expect-absent, or --force to overwrite it" >&2
+          exit 2
         fi
-        if [ -z "$curb" ]; then
-          if [ "$upsert_absent" = 0 ]; then
-            echo "apps-db: refusing upsert $rid — no such row: pass --expect-absent if this is a new application, or --force" >&2
-            exit 2
+        if [ -n "$upsert_hash" ]; then
+          if [ "$upsert_hash" != "$cur_hash" ]; then
+            echo "apps-db: refusing $verb $rid — the status changed since you read it (now $cur_hash, you gave $upsert_hash)" >&2
+            exit 4
           fi
         else
-          cur_status=$(printf '%s' "$curb" | jq -r '.status // ""')
-          cur_hash=$(printf '%s' "$cur_status" | sha256sum | cut -c1-12)
-          cur_stage=$(printf '%s' "$curb" | jq -r '.stage // ""')
-          if [ -n "$upsert_hash" ]; then
-            if [ "$upsert_hash" != "$cur_hash" ]; then
-              echo "apps-db: refusing upsert $rid — the status changed since you read it (now $cur_hash, you gave $upsert_hash)" >&2
-              exit 4
-            fi
-          else
-            echo "apps-db: refusing upsert $rid — the row exists: pass --if-status $cur_hash (stage $cur_stage) or --force" >&2
-            exit 2
-          fi
+          echo "apps-db: refusing $verb $rid — the row exists: pass --if-status $cur_hash (stage $cur_stage) or --force" >&2
+          exit 2
         fi
       fi
     fi

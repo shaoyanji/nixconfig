@@ -70,6 +70,24 @@ check "--expect-absent allows a new row" "$rc" 0
 upsert_run "$work/new.json" --force --dry
 check "--force still allows a new row" "$rc" 0
 
+# --- add: a new lead needs nothing, but an existing id is an overwrite ------
+add_run() { set +e; out=$("$db" add "$@" 2>&1); rc=$?; set -e; }
+: >"$APPS_DB_WRITE_LOG"
+add_run --id brand-new-2 --company "New Co" --role SRE --dry
+check "add of a new id needs no guard" "$rc" 0
+add_run --id open-row --company Acme --role SRE --status "Closed" --dry
+check "add of an existing id without a guard is refused" "$rc" 2
+case $out in *--if-status*) note ok "the add refusal names the fingerprint flag" ;; *) note FAIL "the add refusal names the fingerprint flag: $out" ; fail=1 ;; esac
+add_run --id open-row --company Acme --role SRE --status "Closed" --if-status 000000000000 --dry
+check "add with a stale fingerprint is refused" "$rc" 4
+add_run --id open-row --company Acme --role SRE --status "Closed" --expect-absent --dry
+check "add declaring an existing row new is refused" "$rc" 2
+add_run --id open-row --company Acme --role SRE --status "Closed" --if-status "$hash" --dry
+check "add with the right fingerprint passes" "$rc" 0
+add_run --id open-row --company Acme --role SRE --status "Closed" --force --dry
+check "add with --force overwrites" "$rc" 0
+check "no add case wrote" "$( [ -f "$APPS_DB_WRITE_LOG" ] && wc -l <"$APPS_DB_WRITE_LOG" | tr -d ' ' || echo 0 )" 0
+
 now=$(date +%s)
 for i in $(seq 1 51); do printf '%s id-%s\n' "$now" "$i"; done >"$APPS_DB_WRITE_LOG"
 run open-row --status "Closed" --expect-stage prep --dry

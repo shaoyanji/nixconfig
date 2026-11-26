@@ -1,8 +1,50 @@
 {
-  "generated": "2026-11-26T16:49:44Z",
+  "generated": "2026-11-26T16:55:20Z",
   "count": 200,
-  "pin": "c99fd0622e60b140d22e4dd40e32df616156224a20e87cea9d61aded3e059517",
+  "pin": "bfc0a9a6bd8bcb616ce6d4dea20a8d2620056f09f974cf4721353096c99635c4",
   "turns": [
+    {
+      "id": "6dfdc1bc-ea8b-4b31-bba3-c71fcf42d94a",
+      "ts": "2026-11-26T16:54:12Z",
+      "source": "devin",
+      "subject": "nixconfig:clanker-runner-presets",
+      "action": "landed validated job presets and sqlite recurring schedules | gate: checks:host delphi PASS; go test/vet PASS; node/alejandra PASS; delphi toplevel build PASS; mock instabox smoke PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c43989da3e5780c15882362820b576e6bff8d287",
+      "branch": "main",
+      "frame": "03hb446fipkhkg8glnw6zwshj"
+    },
+    {
+      "id": "c87609aa-294c-4f54-a7ae-e25b8a9d99fd",
+      "ts": "2026-11-26T16:52:08Z",
+      "source": "buffy",
+      "subject": "nixconfig:portfolio-and-atlas-docs",
+      "action": "claim: read the landed routes before writing a word (batch/scoring/alerts, asset_events, qr.svg, atlas-senders), then update both pages inside proseBudget and commit through a temp index",
+      "outcome": "in_progress",
+      "claims": [
+        "docs/portfolio-services.md",
+        "docs/mail-atlas.md"
+      ],
+      "files": [],
+      "base_commit": "e576524e7c4ec19a01f067bc1e63a8d0243403e7",
+      "branch": "main",
+      "frame": "03hb43ryomhwxyo8nhxlm2iuu"
+    },
+    {
+      "id": "3cdb8a2c-f75d-4f3e-b15e-3ac41cfbdbf1",
+      "ts": "2026-11-26T16:50:14Z",
+      "source": "buffy",
+      "subject": "nixconfig:mail-atlas-analytics-ui",
+      "action": "atlas-senders.sql: domain rollup (letters, addresses, untagged, oldest/newest), domain from the address not the display name; run live (github 648, kleinanzeigen 443, google 87 with 80 untagged). Sources drawer: S opens it before any query, volume bars, gold untagged count, sort toggle, click searches that shore; 源 added to the font subset. Browser smoke serves the derivation with a canned API.| gate: node --check, derivation builds, smoke PASS, delphi eval 2184, comments 6493/6495",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e576524e7c4ec19a01f067bc1e63a8d0243403e7",
+      "branch": "main",
+      "frame": "03hb43eoc0a1bnu44v8vs5p51"
+    },
     {
       "id": "5d1903b3-0626-4fe4-badf-fb2f33b14c71",
       "ts": "2026-11-26T16:43:44Z",
@@ -3001,52 +3043,6 @@
       "base_commit": "dd5103be9c15cc172e8094284ab77722d540d3ed",
       "branch": "main",
       "frame": "03hb2k6iw33iawgasmhlmcapd"
-    },
-    {
-      "id": "90e8aba8-8bbe-4758-9cd0-b525719340f2",
-      "ts": "2026-11-26T12:04:27Z",
-      "source": "agy",
-      "subject": "nixconfig:appflow-placeholder-resolve",
-      "action": "novel: read email threads to resolve 55 placeholder appflow rows",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "scripts/task/appflow-check.sh"
-      ],
-      "files": [],
-      "base_commit": "dd5103be9c15cc172e8094284ab77722d540d3ed",
-      "branch": "main",
-      "frame": "03hb2jkvz0k6o4mch8bc89hvj"
-    },
-    {
-      "id": "78ea43b3-cacc-4a0e-934a-b4fa575341f9",
-      "ts": "2026-11-26T12:04:26Z",
-      "source": "agy",
-      "subject": "nixconfig:frieren-ops-health",
-      "action": "incident: fix frieren restic-burgernas & downloads-sort ops:health",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/frieren",
-        "modules/services",
-        "modules/profiles"
-      ],
-      "files": [],
-      "base_commit": "dd5103be9c15cc172e8094284ab77722d540d3ed",
-      "branch": "main",
-      "frame": "03hb2jkqn2l0ue684k91i4lel"
-    },
-    {
-      "id": "2b1d05a5-1057-4a90-99ea-165d0712fa83",
-      "ts": "2026-11-26T12:02:44Z",
-      "source": "devin",
-      "subject": "nixconfig:appflow-board-reverify",
-      "action": "landed: all 5 read routes verified 200 on delphi — applications?lim=5, applications-discovered?lim=5, application-pipeline, application-get?id=, application-mail?applicationId=; the bare-GET 404 that seeded the incident was npgsqlrest's param contract (unparametrized endpoint -> 404), not a missing .sql in the deployed tree; doc names the trap, devin-lane-refactoring-2026-11-25 CLOSED | gate: ops:notes parses, checks:prose PASS, checks:docs:links PASS, checks:nix:lint PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "dd5103be9c15cc172e8094284ab77722d540d3ed",
-      "branch": "main",
-      "frame": "03hb2j8st63zmtl8tw8qvuf0y"
     }
   ]
 }

@@ -25,6 +25,21 @@ query; `POST /api/postings` files one; `GET /api/stats` counts postings,
 companies and locations; `GET /api/scrape` and `POST /api/scrape` read and
 trigger the service's own sweep, which is off by default on this host.
 
+`POST /api/postings/batch` files up to 500 at once (`{postings: […]}` or
+`{items: […]}`), drops duplicates inside the batch and answers
+`created`/`updated`/`skipped`/`failed` with up to 25 per-item errors, so one bad
+record costs one record. `apps:ingest` posts in chunks of that size.
+
+Every posting carries a deterministic `score` 0–100 — weighted terms for the
+lane (DevOps, SRE, Platform, Kubernetes, NixOS, …), a DACH bonus, a remote
+bonus, capped at 100, with the matched lanes returned beside it — stored as an
+indexed column, so `?sort=score` is how the board reads first. Alerts are that
+score with a floor: `services.jobDbScraper.minAlertScore` (80) and an `ntfyUrl`,
+`GET /api/alerts` for the queue and `POST /api/alerts/evaluate` to re-run it. A
+row in `job_score_alerts` is keyed on the posting's fingerprint and carries
+`attempts` and `notify_error`, so a failed send is retried rather than dropped.
+The batch evaluates alerts before it answers.
+
 **private-deals** — products, deals, watchlists and price history.
 `GET /api/deals?q=` searches deals and takes `min_discount`, `max_price`,
 `merchant`, `category` and `watchlist` alongside it; `POST /api/deals` files one;
@@ -32,10 +47,34 @@ trigger the service's own sweep, which is off by default on this host.
 rest. Deals carry `price` and `list_price` — the struck-through original — plus
 `discount_pct`.
 
+`POST /api/deals/batch` is the same contract for deals. Watchlists are what an
+alert is about: a deal enters `deal_alerts` as `target-price` (at or below the
+product's `target_price`), `price-drop` (under 95% of its current price) or
+`watchlist-match` (a watched product with any active deal), fingerprinted on
+deal, currency and price, so the same deal at the same price notifies once.
+`GET /api/watchlists`, `POST /api/watchlists/{id}/items` and
+`DELETE …/items/{product}` build the set; `GET /api/alerts` lists the queue,
+`POST /api/alerts/evaluate` re-runs it, and `services.privateDeals.ntfyUrl` is
+where a match goes.
+
 **inventory-site** — fleet hardware and personal assets with serials, warranties
 and value. `GET /api/items?q=` searches; `POST /api/items`, `PUT /api/items/{id}`
 and `DELETE /api/items/{id}` write; `GET /api/meta/{kind}` lists the vocabularies
 (rooms, categories, owners); `GET /api/export.json` dumps everything.
+
+`asset_events` is the custody trail: `POST /api/items/{id}/events` records a
+`checkout`, a `checkin` or a `note` with actor, from/to location and a note,
+`GET …/events` reads it back, and the detail dialog draws it as a timeline.
+`GET /api/items/{id}/qr.svg` renders a printable label whose QR encodes the
+item's URL at the configured origin, so a sticker on the shelf opens the record.
+
+Warranty is a queue rather than a column: `warranty_alerts` holds one row per
+item and expiry date inside the `-warranty-warn-days` window (30), and the
+service evaluates on start and every six hours — `GET /api/alerts` lists the
+queue, `POST /api/alerts/evaluate` runs it by hand, and `notify_count` /
+`last_error` say what happened to each row. `GET /api/stats` counts assets,
+units, tracked value and warranties inside 90 days; the UI's warranty badge is
+read off `warranty_until`.
 
 **clanker-runner** — InstaBox machine state, wake and exec triggers, and a run
 history of Nix and agent-browser jobs. `GET /api/machines` lists them,
@@ -52,9 +91,9 @@ no credentials on `delphi`:
 | Task | Script | Reads through | Writes to |
 | :--- | :--- | :--- | :--- |
 | `apps:page` | `scripts/task/job-page-scrape.py` | `http` GET plus JSON-LD, or Firecrawl, Tavily, agent-browser | stdout JSON, one object per URL |
-| `apps:ingest` | `scripts/task/jobs-ingest.py` | stdin or `--in` | `POST /api/postings` on job-db-scraper |
+| `apps:ingest` | `scripts/task/jobs-ingest.py` | stdin or `--in` | `POST /api/postings/batch` on job-db-scraper |
 | `deals:page` | `scripts/task/deals-page-scrape.py` | agent-browser, Firecrawl, Context.dev, Tavily, plain GET | stdout JSON, one object per URL |
-| `deals:ingest` | `scripts/task/deals-ingest.py` | stdin or `--in` | `POST /api/deals` on private-deals |
+| `deals:ingest` | `scripts/task/deals-ingest.py` | stdin or `--in` | `POST /api/deals/batch` on private-deals |
 | `agents:web` | `scripts/task/web-research.py` | the three hosted providers at once, or agent-browser | stdout only |
 | `dev:inventory:site` | `scripts/task/inventory-sync.py` | `nix eval .#inventory.hosts`, or `--in` a JSON dump | `POST /api/items` on inventory-site |
 
@@ -89,8 +128,10 @@ task dev:inventory:site DRY=0 ONLY=delphi,frieren    # write two hosts
 ```
 
 Every ingester prints a summary of what it filed, and exits 1 when the server
-refused a record — one refusal does not stop the rest. Both are idempotent: the
-URL is the identity the server fingerprints, so a second run updates instead of
+refused a record. A refusal inside a batch is counted and named by index (25 per
+call) while the rest of the chunk still lands, and a service that predates the
+batch route falls back to one request per record. Both are idempotent: the URL
+is the identity the server fingerprints, so a second run updates instead of
 duplicating. `deals:ingest` maps the scraper's `original_price` to the store's
 `list_price`.
 

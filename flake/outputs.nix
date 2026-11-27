@@ -155,7 +155,7 @@
   };
   # nixFilesCtl / nixRegistry are bound above the chains: `flake/nix-registry.nix`
   # is the walk's naming layer, shared with the knowledge graph.
-  # The CLI table is compiled once and projected into `packages.<system>.cli`
+  # The CLI table is compiled once and projected into `legacyPackages.<system>.cli`
   # only: a flake app must be a leaf and the tree is two levels deep, so an
   # `apps.cli` projection made `nix run .#cli.<family>.<tool>` fail rather than
   # fall through. `meta.mainProgram` carries the executable instead.
@@ -165,12 +165,12 @@
       pkgs = pkgsFor system;
     };
 in {
-  packages = import ./packages.nix {
+  legacyPackages = import ./packages.nix {
     inherit lib systems pkgsFor inventory cliFor docsGen skillsCtl agentsNotesCtl knowledgeGraphCtl self;
   };
 
-  # No apps: the CLI tree lives in `packages.<system>.cli` and `nix run` falls
-  # through to it (flake/apps must be leaves; see flake/cli.nix).
+  # No apps: the CLI tree lives in `legacyPackages.<system>.cli` and `nix run`
+  # falls through to it (flake/apps must be leaves; see flake/cli.nix).
   apps = lib.genAttrs systems.work (_: {});
 
   # `nix flake init -t .#agent-shell` — the two entry points in templates/ that

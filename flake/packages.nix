@@ -1,4 +1,4 @@
-# `packages.<system>` as a tree, not a bag: one namespace per kind of artifact —
+# `legacyPackages.<system>` as a tree, not a bag: one namespace per kind of artifact —
 # sites, artifacts, servers, cli. The CLI tree is imported from flake/cli.nix, so
 # a tool cannot exist in one namespace and be missing from the other.
 {
@@ -144,7 +144,7 @@ in
       # is bash plus writeText, so it builds in well under a second on either
       # architecture. They were once gated to x86_64-linux, which made
       # `nix build .#artifacts.docs` on an aarch64 host resolve the foreign
-      # `packages.x86_64-linux` attribute and fail for want of an x86 builder:
+      # `legacyPackages.x86_64-linux` attribute and fail for want of an x86 builder:
       # the gate created the failure it was written to prevent.
       docs = docsGen.mkDocs pkgs;
 

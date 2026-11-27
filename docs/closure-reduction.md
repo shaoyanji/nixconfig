@@ -257,7 +257,7 @@ direction, and the cheapest thing to fix.
 ### First move
 
 The tree exists now: `flake/cli.nix` holds the CLI families, and
-`packages.<system>.cli.<family>.<tool>` is both the store path and the run target,
+`legacyPackages.<system>.cli.<family>.<tool>` is both the store path and the run target,
 so `nix run .#cli.search.qmd` resolves from the store — on a warm host, effectively
 immediate. `meta.mainProgram` is what makes it a run target; a flake `apps` entry
 must be a leaf, so a nested `apps.cli` tree only broke the lookup. The next move is

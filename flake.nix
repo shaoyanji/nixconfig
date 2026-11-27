@@ -185,12 +185,11 @@
     };
     systemsCtl = import ./flake/systems.nix {inherit nixpkgs;};
   in
-    # `packages` stays on the outer attrset because flake-parts types
-    # `flake.packages.<system>` as `attrsOf package`, while the artifact namespace
-    # is nested (`.#artifacts.docs` and its siblings). Splatting it back keeps `.#`
-    # identical to the pre-flake-parts output set; flattening the artifacts is its
-    # own change, not wiring.
-    (inputs.flake-parts.lib.mkFlake {inherit inputs;} {
+    # The artifact namespaces are nested (`.#artifacts.docs`, `.#cli.ai.vox` and
+    # their siblings), so they live in `legacyPackages`: the `packages` schema is
+    # one flat level of derivations, while the nested tree is exactly what
+    # `legacyPackages` exists to carry. The `.#` installables stay unchanged.
+    inputs.flake-parts.lib.mkFlake {inherit inputs;} {
       systems = systemsCtl.systems.work;
       # Dev shells are `perSystem`'s business: one body, fanned out to the
       # declared systems by flake-parts instead of by a hand-written genAttrs.
@@ -204,7 +203,6 @@
           root = ./.;
         };
       };
-      flake = builtins.removeAttrs projected ["packages"];
-    })
-    // {inherit (projected) packages;};
+      flake = projected;
+    };
 }

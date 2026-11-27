@@ -266,7 +266,7 @@
     # interpreter. It replaced `python3 -m http.server`, which ignores Range.
     # Folded into the os umbrella (tools/os, internal/serve) — `bin/static-serve`
     # is the argv[0] alias, so both callers resolve unchanged; the same
-    # derivation also backs `packages.<system>.servers.static-serve`.
+    # derivation also backs `legacyPackages.<system>.servers.static-serve`.
     serve = {
       static-serve = {
         bin = "static-serve";
@@ -295,8 +295,8 @@
 
   # A flake app must be a leaf, so `apps.<system>.cli.<family>.<tool>` cannot
   # exist: `nix run` finds the `cli` attrset, asks it for `.program` and fails
-  # instead of falling through to `packages`. One namespace replaces the two:
-  # `nix run .#cli.<family>.<tool>` resolves through `packages`, and
+  # instead of falling through to `legacyPackages`. One namespace replaces the two:
+  # `nix run .#cli.<family>.<tool>` resolves through `legacyPackages`, and
   # `meta.mainProgram` is what picks the executable. Without it nix guesses from
   # the derivation name (`bind` for `dnsutils`, `gnused` for `sed`).
   #
@@ -307,7 +307,7 @@
       meta = (old.meta or {}) // {mainProgram = program;};
     });
 in rec {
-  # `packages.cli.<family>.<tool>` — the derivation, for `nix build`, for a host
+  # `legacyPackages.<system>.cli.<family>.<tool>` — the derivation, for `nix build`, for a host
   # that wants the store path, and for `nix run` (see `runnable` above).
   packages =
     families

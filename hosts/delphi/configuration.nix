@@ -1798,7 +1798,7 @@ in {
     antigravity-cli
     # The same binary's Gemini API key route: `agy-gemini` sets modelProvider=gemini
     # for one session, so Hydrogen runs without touching the account route.
-    self.packages.${pkgs.stdenv.hostPlatform.system}.cli.ai.agy-gemini
+    self.legacyPackages.${pkgs.stdenv.hostPlatform.system}.cli.ai.agy-gemini
     llm-agents.freebuff
     freebuff-headless
     # Autonomous Cloud Workspace Seeder: sets up ~/Documents/nixconfig and ~/vaults/personal

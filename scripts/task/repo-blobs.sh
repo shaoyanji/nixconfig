@@ -38,8 +38,9 @@ ALLOW="${ALLOW:-}"
 # 531 KiB in HEAD the 512 KiB gate refused every note, and the per-path ALLOW
 # then admitted the blob permanently. So it answers to its own ceiling, held
 # below MAX and shrink-only: a trim lowers this number in the commit that frees
-# the bytes, nothing raises it. History is judged by the same ceiling, because
-# the older revisions below it are the record, not drift.
+# the bytes, nothing raises it. History is the record, not drift, so --history
+# skips AGENTS.nix entirely and leaves the legacy binaries to MAX: only what
+# lands is bounded.
 AGENTS_CEILING="${AGENTS_CEILING:-522636}"
 self="scripts/task/repo-blobs.sh"
 
@@ -158,6 +159,8 @@ while IFS=$'\t' read -r path size; do
     biggest_path=$path
   fi
   	if [ "$path" = "AGENTS.nix" ]; then
+	  # Older revisions are the record; the ceiling bounds only what lands.
+	  [ "$mode" = history ] && continue
 	  [ "$size" -le "$AGENTS_CEILING" ] && continue
 	  bad=$((bad + 1))
 	  printf '  CEILING  %9s  %s (own ceiling %s; trim %s bytes)\n' \

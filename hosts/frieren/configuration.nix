@@ -224,6 +224,10 @@ in {
       enable = true;
       tokenFile = config.sops.secrets."agent-turns-token".path;
     };
+    push = {
+      url = "http://frieren.lan/sentinel/ingest";
+      tokenFile = config.sops.secrets."agent-turns-token".path;
+    };
   };
 
   sops.secrets."agent-turns-token" = {};

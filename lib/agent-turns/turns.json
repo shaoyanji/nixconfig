@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-27T20:59:41Z",
+  "generated": "2026-11-27T21:01:58Z",
   "count": 200,
-  "pin": "7e6c191d17b1fecf5f70a60dbc940ea8da40571f4621dce294f0b010632eeacd",
+  "pin": "aeb94287192f09a5026b74025c2bef437bff16c86e2fb653b7720f54de5778fe",
   "turns": [
+    {
+      "id": "eb4e35e2-b01d-4829-920f-f0c29481048b",
+      "ts": "2026-11-27T21:01:46Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-cv-evidence-gate",
+      "action": "landed: resume.cv.json and resume.json DevOps now NixOS/Linux+systemd/containers/Kubernetes foundations/GitHub Actions/monitoring, no Azure/GCP/AWS claim; cv-software stack drops the same providers. New cv-evidence-check.sh: a stack item must render in a built CV, an unrendered DevOps keyword must name one, a provider claim must resolve a path+pattern; wired as matt:cv:evidence and into agents:cv:publish-check | gate: matt:cv:evidence PASS (132 items, 6 CVs, 18 keywords, 7 providers)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbd9u6uf0u348r3tmyo83f8"
+    },
     {
       "id": "6309bab6-edf8-4e93-afcc-ea9403d34e0a",
       "ts": "2026-11-27T20:54:53Z",
@@ -2895,19 +2908,6 @@
       "base_commit": "06bff2e5c346918bb69890c2390eeea99717eee5",
       "branch": "main",
       "frame": "03hb8sd0qlazegl4zg6ihpa5x"
-    },
-    {
-      "id": "53d060c6-0e08-4156-9e60-a2ddfcf6fa37",
-      "ts": "2026-11-27T07:09:33Z",
-      "source": "freebuff",
-      "subject": "nixconfig:hisolutions-cv-fix",
-      "action": "landed: appflow jdselect drops the half-of-best floor and mirrors the English stopwords in German (kunde/projekt/optional), glossary maps Infrastruktur/Pipeline/Deployment; HiSolutions packet rebuilt with 15/39 highlights and its fleet bullet + nixconfig project restored; site deployed https://a90d10d5.matt-9pf.pages.dev | gate: checks:appflow PASS, cv-links-check 14 ok/0 failed live==artifact",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "06bff2e5c346918bb69890c2390eeea99717eee5",
-      "branch": "main",
-      "frame": "03hb8r9nvvr0rdj4sjdtkna9l"
     }
   ]
 }

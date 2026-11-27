@@ -901,13 +901,13 @@
     dormant-host-gates = {
       title = "Dormant host gates — minyx and cassini";
       kind = "open";
-      status = "IN FLIGHT";
+      status = "DELIVERED";
       priority = "P0";
-      date = "2026-11-19";
-      summary = "`minyx`'s `boot.kernelPackages` collision is fixed (`mkOverride 1200`). `cassini`'s darwin chain is being repaired: the module-shape and Linux-option faults are landed and a Linux host still gates, the third fault is an infinite recursion in the home role.";
+      date = "2026-11-27";
+      summary = "`minyx`'s `boot.kernelPackages` collision is fixed (`mkOverride 1200`). `cassini`'s darwin chain is repaired: the last fault was tailscale-policy testing only `services.tailscale`, not its Linux-only `extraSetFlags` leaf; both dormant hosts now pass eval.";
       refs = {
         hosts = ["minyx" "cassini"];
-        modules = ["modules/global/macos.nix" "modules/global/linux-systemd.nix" "modules/global/global.nix" "flake/module-sets.nix" "modules/roles/home.nix" "modules/profiles/base-node.nix" "modules/user/ai/freebuff-remote.nix"];
+        modules = ["modules/global/macos.nix" "modules/global/linux-systemd.nix" "modules/global/global.nix" "modules/global/tailscale-policy.nix" "flake/module-sets.nix" "modules/roles/home.nix" "modules/profiles/base-node.nix" "modules/user/ai/freebuff-remote.nix"];
         tasks = ["checks:host"];
       };
       body = ''
@@ -928,18 +928,19 @@
            the missing-option check runs with the condition false. Measured twice,
            both gating attempts reverted.
 
-        Third fault, now the head: infinite recursion while evaluating
-        `modules/roles/home.nix`, module argument `dankShell` — the darwin chain
-        provides no such argument, and the role's `fleet.hmUserFeatures` default
-        includes `desktop`. Hypothesis to test next: darwin's feature list must not
-        include `desktop`, or `dankShell` needs a darwin default.
+        Final fault, 2026-11-27: nix-darwin has `services.tailscale` but not the
+        Linux module's `extraSetFlags` suboption. `tailscale-policy.nix` now tests
+        that leaf before emitting the definition. `optionalAttrs` is required:
+        `mkIf` is pushed down before the missing-option check, so it cannot hide a
+        definition from the module system.
 
-        Gates so far: `checks:host HOST=netbook` green in 10.2 s after the split, so
-        the move did not change a Linux host. cassini is still red at fault 3.
+        Gates: `checks:host HOST=netbook` green in 10.2 s after the Linux-option
+        split; `ALLOW_PRESERVED=1 task checks:host HOST=cassini MODE=eval` green
+        with 585 assertions after the tailscale leaf fix. `zeno`, `mtfuji`,
+        `deckstation` and `applevalley` also pass the same eval gate.
 
-        Exit: a green (or explicitly expected-red) `checks:host HOST=<one>
-        MODE=eval`, run by the owner when the hardware is powered on. Verification
-        of a dormant host is the owner's call, never an agent's drive-by eval.
+        Exit: delivered — both named dormant hosts have a green module-system eval;
+        re-open only if the owner revives the hardware and the real switch fails.
       '';
     };
     kernel-collision-gate = {

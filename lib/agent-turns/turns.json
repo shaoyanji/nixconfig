@@ -1,8 +1,264 @@
 {
-  "generated": "2026-11-27T11:08:20Z",
+  "generated": "2026-11-27T12:05:17Z",
   "count": 200,
-  "pin": "bfa19abaa5213b7d83f4c3a36fab715bb57d9564e3b90f0d927f020588f2fe24",
+  "pin": "38c7ec3cf44f367ac24d909dbe927600eff5d5c465a2e2458797bf4e414fdb75",
   "turns": [
+    {
+      "id": "7f8b3aa1-3758-41bd-822e-8e045e3bc707",
+      "ts": "2026-11-27T12:03:58Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff-cv-scout-2026-11-27",
+      "action": "publish: freebuff 2.1 CV scout sweep, job-search page + push",
+      "outcome": "in_progress",
+      "claims": [
+        "CV job-search page; publish-check gate; origin/main push"
+      ],
+      "files": [],
+      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
+      "branch": "main",
+      "frame": "03hbacs640zqyrtkatpoen1g1"
+    },
+    {
+      "id": "0c9f0e31-0ba2-41d0-9192-f598aafbc10f",
+      "ts": "2026-11-27T11:57:49Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-3-delphi-rate-limited",
+      "action": "drove pane3 via jev classify=publish p=0.94; task started (Thought 7.4s, explored 4 files, ran cmd) then free Gemini quota exhausted ~142h reset; backed off per skill",
+      "outcome": "blocked: free Gemini quota exhausted ~142h reset; pane idle at composer",
+      "claims": [],
+      "files": [],
+      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
+      "branch": "main",
+      "frame": "03hbabkvk8mz8u3mwdjmenkti"
+    },
+    {
+      "id": "338df7ff-1d97-4bc9-82f5-c727ef76d0cc",
+      "ts": "2026-11-27T11:56:28Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "Sweep 2026-11-27q: the five-board pipeline returned 1381 postings / 0 new employers, so the pass read the Stepstone arrows whose card markup hides the name — 3 untracked German leads filed as lead (Löwenstein Medical, New Monday, PerFact) and folded into the CV job-search table as their own block | gate: checks:appflow PASS (1737 applications)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
+      "branch": "main",
+      "frame": "03hbabbd44xp1hmw6cwq8ha30"
+    },
+    {
+      "id": "e0bf1be1-d170-4aaf-b4b4-d3c1015055da",
+      "ts": "2026-11-27T11:52:12Z",
+      "source": "devin",
+      "subject": "nixconfig:lumi-access-traefik",
+      "action": "claim: lumi ssh access, Debian package refresh, and Traefik public ingress",
+      "outcome": "in_progress",
+      "claims": [
+        "lumi-host"
+      ],
+      "files": [],
+      "base_commit": "e2e6b78b4366fd6b14ba89f5d909f3e81a3adf89",
+      "branch": "zeno-stage1",
+      "frame": "03hbaahejcdavzs271txshk03"
+    },
+    {
+      "id": "ea742827-9ca1-41cc-89ec-1fbba63f8c14",
+      "ts": "2026-11-27T11:49:31Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff-cv-jobscout",
+      "action": "scout CV job leads, fold into CV job-search page, gate + push",
+      "outcome": "in_progress",
+      "claims": [
+        "ryoku-cv"
+      ],
+      "files": [],
+      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
+      "branch": "main",
+      "frame": "03hba9yinb8954rr8jt7gzk52"
+    },
+    {
+      "id": "18a6aa26-7f96-4f8c-b332-4bd8a91fd0b5",
+      "ts": "2026-11-27T11:41:32Z",
+      "source": "devin",
+      "subject": "nixconfig:lumi-stage1",
+      "action": "landed: Debian 12 hardened (devji sudo, ssh key-only, ufw, zram+2G swap); Nix 2.36.0 with persistent max-jobs=0; Home Manager generation 1 active from github commit; user sops age recipient rekeyed and decrypts; Tailscale lumi 100.110.93.14 reachable; cloudflared+lumi-http survive reboot and https://lumi.bountystash.com returns 200 | gate: nixcachix workflow_dispatch 45991578137 PASS; post-reboot ssh/nix/hm/sops/tailscale/public verification PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e2e6b78b4366fd6b14ba89f5d909f3e81a3adf89",
+      "branch": "zeno-stage1",
+      "frame": "03hba8ec77zdk41gzl0mnn7gz"
+    },
+    {
+      "id": "29fc7ded-cf0a-4b01-b0a2-28c1c5ec5b62",
+      "ts": "2026-11-27T11:40:45Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-3-delphi-rate-limited",
+      "action": "delphi wedged on free Gemini quota; backed off",
+      "outcome": "blocked: free Gemini quota exhausted (~142h reset); plain agy not on PATH; TUI wedged; backed off per skill",
+      "claims": [],
+      "files": [],
+      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
+      "branch": "main",
+      "frame": "03hba88surbn2fdpoq7wn6art"
+    },
+    {
+      "id": "cc4ce6e4-b7a9-45fe-8ae2-1db0c6e9eb28",
+      "ts": "2026-11-27T11:40:36Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-1-devin-lumi-stage1",
+      "action": "drove devin agents:1.1 via jev; lumi-stage1-finish p=0.97",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
+      "branch": "main",
+      "frame": "03hba87ttyp0aq4qmcgfhu43h"
+    },
+    {
+      "id": "5fc26d78-cbfc-4a6d-a90e-d15be5550bf8",
+      "ts": "2026-11-27T11:39:15Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout-leads-2026-11-27",
+      "action": "landed: CV site confirmed live (matt.bountystash.com / /de/ /work/nixos-fleet /de/work/nixos-fleet /brief/platform all 200; matt:cv:check 14 ok 0 failed, every PDF sha == build artifact). Filed 3 new leads with packets: magazino...devops-infras (fit 5, NixOS), applicative...rust-linux-nix (fit 4, Nix), infios...ki-infrastruktur (fit 3). All three held, nothing sent | gate: checks:appflow PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/matt",
+        "scripts/task"
+      ],
+      "files": [],
+      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
+      "branch": "main",
+      "frame": "03hba7ya4v3m7xzhu79lvv9sx"
+    },
+    {
+      "id": "fd36c02b-8186-4974-b934-ce44da8dc08d",
+      "ts": "2026-11-27T11:38:34Z",
+      "source": "buffy",
+      "subject": "nixconfig:reconcile-main",
+      "action": "landed: jevdecide rewrite pushed to origin/main (6f95f207); merged origin into main across 21 conflicts — the three duplicated delphi services keep the local line, AGENTS.nix prose takes origin's. Unblocked: intents falls back to impure eval (no aarch64 task-list builder), six checks:* got inventory rows, probe ref gained ?submodules=1#, jevdecide budget 170 | gate: checks:quick PASS, checks:host delphi PASS (2197 assertions)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "65c5165a40449e5292ee2768e43c0179dc674f7d",
+      "branch": "main",
+      "frame": "03hba7tgk1ku9s1hxq1fu3u01"
+    },
+    {
+      "id": "081e6045-97db-44f7-939d-a288bfedb2be",
+      "ts": "2026-11-27T11:22:33Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: pushed b0784ddc to origin/main (Workerbase submit note) and swept the open lanes — appflow queue 11 items all deferred off-delphi (model batch disabled, ssh needs Tailscale check); ledger repaired: HWI duplicate closed, Qdrant canonical moved to rejected on the 2026-11-27 mail, abtis placeholder role named, untracked ETC Deutschland/Enritec application added; gate: checks:appflow PASS (1730 rows, 120 prep)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
+      "branch": "main",
+      "frame": "03hba4oxwz07498r1obbs19a5"
+    },
+    {
+      "id": "ba022ae9-e448-4644-9548-bf630bb702e7",
+      "ts": "2026-11-27T11:17:12Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout",
+      "action": "drove freebuff pane via jev route; job-scout follow-up started",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
+      "branch": "main",
+      "frame": "03hba3n70mpc6uyky59jn8jy7"
+    },
+    {
+      "id": "300ce426-c8ae-4e4b-9077-94be6b7bb4a8",
+      "ts": "2026-11-27T11:16:27Z",
+      "source": "devin",
+      "subject": "nixconfig:lumi-stage1",
+      "action": "claim: lumi Debian base, Nix/Home Manager, SOPS, Tailscale, Cloudflare hostname, reboot verification",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/lumi.nix",
+        "inventory.toml",
+        ".sops.yaml",
+        "modules/secrets/.sops.yaml"
+      ],
+      "files": [],
+      "base_commit": "dc0d0001",
+      "branch": "zeno-stage1",
+      "frame": "03hba3hz6wlv4nbf4y66nv714"
+    },
+    {
+      "id": "42dd1d9d-2912-4c1d-9ac7-3bfd998ab231",
+      "ts": "2026-11-27T11:16:24Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:job-scout",
+      "action": "drove freebuff pane via jev route; job-scout follow-up started",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
+      "branch": "main",
+      "frame": "03hba3hn30hs7wqvz3sksvscb"
+    },
+    {
+      "id": "9364eb6d-5a3a-4042-834b-a223335e638e",
+      "ts": "2026-11-27T11:14:04Z",
+      "source": "antigravity",
+      "subject": "nixconfig:lumi-stage1",
+      "action": "handoff->devin(pane3): zeno marked preserved; lumi (kind=home, roles.lean+sops) pushed to zeno-stage1@dc0d0001 (CI building). VPS reinstalled to Debian 12 (93.127.139.146:10033, 961MiB RAM). Do NOT touch GRUB/boot/network or kexec. See /home/devji/.gemini/antigravity-cli/brain/72fe92e6-717e-4f29-802a-537ac179e060/lumi-handoff.md",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/lumi.nix",
+        "inventory.toml",
+        "flake/host-inventory.nix"
+      ],
+      "files": [],
+      "base_commit": "dc0d0001afae89eab320f12c9ed40e5ee977be83",
+      "branch": "zeno-stage1",
+      "frame": "03hba317eie9awand7urdfizi"
+    },
+    {
+      "id": "0e666ce0-ba38-438c-8301-ce020e0f0ec1",
+      "ts": "2026-11-27T11:10:41Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-desktop-facts-note",
+      "action": "note-change: log desktop-facts refactor + red fixture state — detail on the ledger",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [
+        "AGENTS.nix"
+      ],
+      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
+      "branch": "main",
+      "frame": "03hba2dhvvtevclhfgu0qr6uh"
+    },
+    {
+      "id": "315b38d4-da68-40d6-9ba5-55469e7593c7",
+      "ts": "2026-11-27T11:09:58Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-desktop-facts-note",
+      "action": "note-change: log desktop-facts refactor + red fixture state",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
+      "branch": "main",
+      "frame": "03hba28ecb8q7lyw9mudd0lj8"
+    },
+    {
+      "id": "27ec7ac0-3e2a-4ab2-acb8-4fc1bcedfa60",
+      "ts": "2026-11-27T11:08:33Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "landed: Workerbase Senior DevOps Engineer submitted 2026-11-27 via Arbeitnow apply -> Ashby form (c14264f0); 1p letter + 2p CV A4, salary 72k, start 07.12.2026; ledger prep -> applied, follow-up 2026-12-11; note workerbase-devops-submitted-2026-11-27 | gate: agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
+      "branch": "main",
+      "frame": "03hba1ygnmigatbksjqscqrk7"
+    },
     {
       "id": "13f95eaa-ac98-4505-9ba1-283a8b8e05b4",
       "ts": "2026-11-27T11:03:38Z",
@@ -2789,278 +3045,6 @@
       "base_commit": "53eda1adbe3ead1a7888b413d824d114ad573a14",
       "branch": "main",
       "frame": "03hb4hhznklbcd4g27j7cctja"
-    },
-    {
-      "id": "5d67a017-3811-4bd1-a07f-a7b5cf72f966",
-      "ts": "2026-11-26T18:01:19Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-docs-link-vault",
-      "action": "landed: docs/portfolio-services.md covers link-vault (8106/8468, FTS5 over title/description/content/excerpt/site/tags, unread-read-archived, firecrawl /v2/scrape -> tavily -> context -> http, collections, tags, import, export.json/.md), the five telemetry targets (bookmarks/read/tags on the badge), and agents:web firecrawl /v2/search + --format markdown | gate: checks:prose PASS, ops:docs:budget 270/400, checks:docs:links PASS after rewording a literal [title](url) the gate read as a link",
-      "outcome": "done",
-      "claims": [
-        "docs/portfolio-services.md"
-      ],
-      "files": [],
-      "base_commit": "53eda1adbe3ead1a7888b413d824d114ad573a14",
-      "branch": "main",
-      "frame": "03hb4hafmp1f7mgmvdtics9cs"
-    },
-    {
-      "id": "3979eb7e-478b-4b96-8b2f-18e16ac5b712",
-      "ts": "2026-11-26T18:00:02Z",
-      "source": "devin",
-      "subject": "nixconfig:link-vault-feeds-analytics",
-      "action": "claim: add link-vault feed watchlists, deduped polling, analytics API, and web analytics panels",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/link-vault",
-        "modules/services/link-vault.nix"
-      ],
-      "files": [],
-      "base_commit": "fa701c167a3d58579bab7d28e78c9f0c16ea1043",
-      "branch": "main",
-      "frame": "03hb4h1hnwkw7ca0ut8khtyte"
-    },
-    {
-      "id": "5b02d66f-dead-4c17-8f71-449ac105cd00",
-      "ts": "2026-11-26T17:59:34Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-docs-link-vault",
-      "action": "claim: document link-vault (8106/8468, FTS5, extraction providers, collections, export), the 5-target telemetry, and agents:web firecrawl v2 + --format markdown",
-      "outcome": "in_progress",
-      "claims": [
-        "docs/portfolio-services.md"
-      ],
-      "files": [],
-      "base_commit": "fa701c167a3d58579bab7d28e78c9f0c16ea1043",
-      "branch": "main",
-      "frame": "03hb4gy6wpneq8efgyw50jicu"
-    },
-    {
-      "id": "a9173446-0f34-468a-8019-8701f402ba27",
-      "ts": "2026-11-26T17:57:42Z",
-      "source": "devin",
-      "subject": "nixconfig:link-vault-portal-telemetry",
-      "action": "landed: link-vault portal telemetry now reports bookmarks, read, and tags; generic portal renderer already consumes target-defined metrics; regression test pins metric order; live loopback smoke showed all five services online and link-vault metrics bookmarks=1 read=1 tags=2 | gates: go test PASS, go vet PASS, node --check PASS, alejandra PASS, checks:host delphi rc=0, delphi toplevel nix build --no-link rc=0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fa701c167a3d58579bab7d28e78c9f0c16ea1043",
-      "branch": "main",
-      "frame": "03hb4gl0xhkaha7m4xhpg2ih0"
-    },
-    {
-      "id": "e0b69ac0-d06d-4da7-93e2-7bad87fed41d",
-      "ts": "2026-11-26T17:57:33Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-fleet-maintenance",
-      "action": "verified read-only: delphi ok — load 5.55/5.33/4.86 on 2 vCPU (65%us/15%sy), RAM 3.7/11G, zram swap 1.9/5.8G (427M compressed), PSI cpu60 58.5 mem 0 io 0.49, disk 91/195G 50%, 0 failed units, sentinel ok gen 1.4h, 16 open actions; /tmp 2.0G (46 dirs >10M = 1332MB browser profiles 11-23..11-25, nothing >7d but X sockets); clanker suspended ready=false; xs 17 live stale none, queue 0/0; blocked job-scout-fresh-tailor, pane-steward-freebuff, resolver-independence, frieren-ops-health",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "7b6619e8ff7134d46001a95d4918ed5107cf98f2",
-      "branch": "main",
-      "frame": "03hb4gjxqibcejah900l9uai7"
-    },
-    {
-      "id": "b258b834-cb7a-47c6-b029-3b3beaf23c7e",
-      "ts": "2026-11-26T17:56:07Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward-freebuff",
-      "action": "jev route publish p=0.90/m=0.83 — finish cover letter + CV packet, publish CV PDF, rebuild, publish to origin, appflow guard audit; task echoed by freebuff but no working confirmation; pane unresponsive to Enter/Esc",
-      "outcome": "blocked: freebuff echoed task but no fresh working line; pane unresponsive to Enter/Esc",
-      "claims": [],
-      "files": [],
-      "base_commit": "82571921e8f8a94e73c1741f0c5183bb1d89baa8",
-      "branch": "main",
-      "frame": "03hb4g9yjf8vmyg4vn4ire25t"
-    },
-    {
-      "id": "d7fbffbe-6ada-41fb-ba4a-564061a9a966",
-      "ts": "2026-11-26T17:55:34Z",
-      "source": "buffy",
-      "subject": "nixconfig:web-research-firecrawl-v2",
-      "action": "landed: firecrawl search moved to /v2/search (body {query,limit}, reads data.web; v1 flat list still parses; top-level warning surfaced instead of a hardcoded deprecation note) + --format markdown (linked titles, [sN] citations, Sources section, flattened snippets; extract and health reports too) | gate: unittest 40 OK, py_compile, live task agents:web search 'nix flake devshell' --max 4 --format markdown exit 0 with firecrawl in providers and no deprecation text",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/web-research.py",
-        "tests/web-research"
-      ],
-      "files": [],
-      "base_commit": "7b6619e8ff7134d46001a95d4918ed5107cf98f2",
-      "branch": "main",
-      "frame": "03hb4g62ukmtm6ib6rudl8lj7"
-    },
-    {
-      "id": "3742b76b-43de-497b-a54f-85e5900bd841",
-      "ts": "2026-11-26T17:53:04Z",
-      "source": "buffy",
-      "subject": "nixconfig:web-research-firecrawl-v2",
-      "action": "claim: firecrawl /v1/search -> /v2/search + --format markdown cited report in web-research",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/web-research.py",
-        "tests/web-research"
-      ],
-      "files": [],
-      "base_commit": "0943e026ed96e81b0b06aae5da394f396326515d",
-      "branch": "main",
-      "frame": "03hb4foequ8b07z5p2u0uotrl"
-    },
-    {
-      "id": "87b112f8-7ac0-4e35-a071-9a8e245e8f4d",
-      "ts": "2026-11-26T17:51:34Z",
-      "source": "devin",
-      "subject": "nixconfig:link-vault-portal-telemetry",
-      "action": "claim: show link-vault status and bookmarks/read/tags metrics on live portal cards",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/delphi/configuration.nix",
-        "lib/delphi-site.nix",
-        "lib/delphi/juno.js",
-        "lib/delphi/tailnet.html",
-        "modules/services/service-portal/telemetry"
-      ],
-      "files": [],
-      "base_commit": "0943e026ed96e81b0b06aae5da394f396326515d",
-      "branch": "main",
-      "frame": "03hb4fdw4w4575hli4x1t9g3n"
-    },
-    {
-      "id": "b3528992-f78e-4272-b4c3-9a75d25b2e83",
-      "ts": "2026-11-26T17:50:50Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-docs-seed",
-      "action": "landed: agents:portfolio:seed documented in the verbs table + a paragraph (lanes, --jobs/--deals vs --jobs-from/--deals-from, --api-*, --inventory-hosts/--inventory-from, --only, --dry-run, --format toon, zero-page = zero, refusal exits 1) | gate: checks:prose PASS, ops:docs:budget PASS 243/400, checks:docs:links PASS; first commit refused mid-flight by devin landing link-vault (26186e27), retried on the new HEAD",
-      "outcome": "done",
-      "claims": [
-        "docs/portfolio-services.md"
-      ],
-      "files": [],
-      "base_commit": "0943e026ed96e81b0b06aae5da394f396326515d",
-      "branch": "main",
-      "frame": "03hb4f8s4pm20lb3i4knue4dn"
-    },
-    {
-      "id": "02af2d2b-e991-4c59-b4a4-edea0dee5de0",
-      "ts": "2026-11-26T17:50:33Z",
-      "source": "devin",
-      "subject": "nixconfig:link-vault-service",
-      "action": "landed: tailnet link-vault with SQLite FTS5, extraction providers, collections/states, exports, UI and portal telemetry | gates: go test+vet PASS, node --check PASS, alejandra PASS, registry PASS, checks:host delphi rc=0, delphi toplevel rc=0, live HTTP+env-file smoke PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "26186e27e73cc2984b30087bcae60046eed89632",
-      "branch": "main",
-      "frame": "03hb4f6q6vnm5t8e6kzxxyv1m"
-    },
-    {
-      "id": "a7d66e8d-b0d3-4c31-91d0-375ef9e7c768",
-      "ts": "2026-11-26T17:49:15Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-docs-seed",
-      "action": "claim: document task agents:portfolio:seed (scripts/task/portfolio-seed.py, --dry-run, --only, --format json|toon) in docs/portfolio-services.md",
-      "outcome": "in_progress",
-      "claims": [
-        "docs/portfolio-services.md"
-      ],
-      "files": [],
-      "base_commit": "f7a200ff555d8c0403547391267e9fe328fc9942",
-      "branch": "main",
-      "frame": "03hb4exnuqw03iyv15g3q99p2"
-    },
-    {
-      "id": "cf17a289-14da-45c0-9d6a-c554871db086",
-      "ts": "2026-11-26T17:48:34Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-batch-seed-cli",
-      "action": "landed: portfolio-seed.py + agents:portfolio:seed run three lanes (page scrape -> jobs/deals batch route, inventory-sync --eval) with --dry-run, --only, --jobs-from/--deals-from, --format json|toon; zero-hit page is a zero, refusal exits 1 naming the first error | gate: unittest 23 OK, py_compile, checks:tasks PASS (844 tasks), live run on temp jobs+deals servers exit 0 (dry 0 posted, real 2 postings + 1 deal read back from /api/stats)",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/portfolio-seed.py",
-        "tests/portfolio-seed",
-        "taskfiles/agents.yml"
-      ],
-      "files": [],
-      "base_commit": "f7a200ff555d8c0403547391267e9fe328fc9942",
-      "branch": "main",
-      "frame": "03hb4estckml7u5v13eig5s67"
-    },
-    {
-      "id": "99c41a5d-6647-459a-9c65-f9b7d39e5eec",
-      "ts": "2026-11-26T17:44:48Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-batch-seed-cli",
-      "action": "claim: one orchestrator (page-scrape -> ingest --batch per lane, inventory-sync) with --dry-run, --only, --format json|toon for the portfolio seed",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/portfolio-seed.py",
-        "tests/portfolio-seed",
-        "taskfiles/agents.yml"
-      ],
-      "files": [],
-      "base_commit": "d0660910c3cae431538dfc26bbe275b25cbec060",
-      "branch": "main",
-      "frame": "03hb4e2buw3w078tk0rcg4x8p"
-    },
-    {
-      "id": "d69f20f1-4cf6-4925-be5d-29736ffe6bbc",
-      "ts": "2026-11-26T17:43:23Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-regression-health-audit",
-      "action": "verified: 256 unittests green in 9 suites (portfolio-smoke 47, deals-page 40, deals-ingest 26, job-page 33, jobs-ingest 28, web-research 28, inventory-sync 20, atlas-reconcile 25, archive-import 9; 0 failures); checks:tasks PASS (843 tasks/31 files, no hard violations); ops:health ok on delphi (sentinel ok, no reasons, generation age 1.1h, disk 49%, psi io 0.11); clanker suspended, runtime.ready=false (idle); xs live 17 claims, stale none; read-only, no repo or index changes",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d0660910c3cae431538dfc26bbe275b25cbec060",
-      "branch": "main",
-      "frame": "03hb4dsdm4ppf0la1lf6hdk9q"
-    },
-    {
-      "id": "c8e763dc-2817-4d2e-b6d2-2466aef63260",
-      "ts": "2026-11-26T17:40:25Z",
-      "source": "buffy",
-      "subject": "nixconfig:mail-atlas-graph-clustering",
-      "action": "landed: hover/focus a node lights its cluster (rail tag = keyboard hub) and dims the rest; chip row gains untagged view over the loaded page + last 5 remembered queries; smoke drives untagged toggle, hub cluster size, recent chip | gate: node --check PASS, site derivation built, tests/mail-atlas-site/run.sh PASS (sources drawer + triage/cluster)",
-      "outcome": "done",
-      "claims": [
-        "modules/services/mail-atlas/site",
-        "tests/mail-atlas-site"
-      ],
-      "files": [],
-      "base_commit": "d0660910c3cae431538dfc26bbe275b25cbec060",
-      "branch": "main",
-      "frame": "03hb4d7hwaqh9shj4eublxr50"
-    },
-    {
-      "id": "c39f262b-f061-41c4-b5e3-85ccba1a2c0f",
-      "ts": "2026-11-26T17:35:35Z",
-      "source": "buffy",
-      "subject": "nixconfig:mail-atlas-graph-clustering",
-      "action": "claim: relation-graph clustering (tag-hub highlight on hover/focus) + triage quick chips (untagged-only, recent queries) in mail-atlas site",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/mail-atlas/site"
-      ],
-      "files": [],
-      "base_commit": "febdaf8a672d1a24f2d9aacfd67087f295212d0f",
-      "branch": "main",
-      "frame": "03hb4c9gkeavqmhycxm9dn3g5"
-    },
-    {
-      "id": "d7375a3e-b62c-4827-906a-e96627168c9b",
-      "ts": "2026-11-26T17:34:59Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-docs-analytics-telemetry",
-      "action": "landed: docs/portfolio-services.md now names the /api/analytics report behind each panel and what the panel does with it (jobs bars filter the list), clanker-runner presets + schedules (4 code-declared presets, interval 15-604800), service-portal-telemetry /api/telemetry live badges (online/degraded/offline, decoration only), and the four-service smoke with the skipped-on-empty QR | gate: checks:prose PASS, ops:docs:budget PASS (223/400), checks:docs:links PASS",
-      "outcome": "done",
-      "claims": [
-        "docs/portfolio-services.md"
-      ],
-      "files": [],
-      "base_commit": "febdaf8a672d1a24f2d9aacfd67087f295212d0f",
-      "branch": "main",
-      "frame": "03hb4c5asawawl3bibpq863bz"
     }
   ]
 }

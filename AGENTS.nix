@@ -1099,33 +1099,28 @@
         tasks = ["ytcast"];
       };
       body = ''
-        **The TV.** Philips 65OLED759/12 at 192.168.3.26, Titan OS (`titanos.local`). It advertises
-        `_philipstv_s_rpc._tcp`:1926, jointSPACE:1925 and `_secure-mqtt._tcp`:8883 — no `_googlecast._tcp`,
-        no `_dial._tcp`, nothing on 8008/8009 — no Cast receiver. Port **49152** is the way in.
+        **The TV.** Philips 65OLED759/12 at 192.168.3.26, Titan OS: jointSPACE 1925, `_philipstv_s_rpc._tcp` 1926,
+        secure-mqtt 8883 — no Cast receiver, no DIAL, nothing on 8008/8009, and SSDP M-SEARCH gets zero replies,
+        so discovery tools conclude there is no renderer. Port **49152** is the way in.
 
-        **Any local file, via DLNA.** A direct GET is the only way to find it: `curl http://192.168.3.26:49152/description.xml`
-        returns `urn:schemas-upnp-org:device:MediaRenderer:1` (DMR-1.50) with AVTransport at `/avt_control`, while an SSDP
-        M-SEARCH to the set gets zero replies, so every discovery tool concludes there is no renderer. Verified 2026-11-11:
-        browse Jellyfin's ContentDirectory (`/dlna/<uuid>/contentdirectory/control`, library `arr`), take the item's `res`
-        URL, then SOAP `SetAVTransportURI` + `Play` on `http://192.168.3.26:49152/avt_control` — transport went PLAYING with
-        `dur=1:38:40`. Serving from frieren on a new port does not work: the firewall drops it and the set retries to STOPPED.
+        **Any local file, via DLNA.** `curl http://192.168.3.26:49152/description.xml` returns MediaRenderer:1
+        (DMR-1.50) with AVTransport at `/avt_control`. Verified 2026-11-11: browse Jellyfin's ContentDirectory
+        (library `arr`), take the item's `res` URL, SOAP SetAVTransportURI + Play — transport PLAYING, dur=1:38:40.
+        Serving from frieren on a new port fails: the firewall drops it, the set retries to STOPPED.
 
-        **Why casting still works.** `ytcast -pair <code>` redeems the app's TV code through
-        `https://www.youtube.com/api/lounge/pairing/get_screen` and caches a screen id; playback is then
-        cloud-relayed via `POST /api/lounge/bc/bind`. Port 8009 is never touched.
+        **Casting.** `ytcast -pair <code>` redeems the TV code through the lounge pairing API and caches a screen
+        id; playback is cloud-relayed via bind, port 8009 never touched.
 
-        **What wedges it.** A live stream (2026-11-11, `jfKfPfyJRdk`): the app dropped to ambient mode and
-        answered nothing afterwards, and a VOD cast from the same session vanished too — exit 0 both times,
-        because Lounge accepts what the TV never hears. Recovery needs a physical key press: `/6/input/key`,
-        `/6/powerstate` and `/6/pair/request` all return 403 on this set, and the Steam Link's `cecmanager`
-        has no CLI and is not running.
+        **What wedges it.** A live stream (2026-11-11, jfKfPfyJRdk): the app dropped to ambient mode and answered
+        nothing afterwards — even VOD vanished with exit 0, because Lounge accepts what the TV never hears.
+        Recovery needs a physical key press: `/6/input/key`, `/6/powerstate`, `/6/pair/request` all return 403,
+        and the Steam Link's cecmanager has no CLI and is not running.
 
-        **Rule.** VOD only, one cast at a time, and opening the YouTube app is the last step: a cast is
-        queued, not raised — 2026-11-11, `ytcast` returned 0 while Bloomberg TV was on screen and the video
-        played the moment the app was opened by hand, so nothing on the network opens it. Stopping the DMR
-        hands the set back to the previous input, which makes `media:stop` restore the channel that was on. The `ytcast` task allows only
-        `not_live`/`was_live` and refuses anything it cannot classify — the first guard failed open on
-        `jfKfPfyJRdk`, where yt-dlp errors instead of reporting `is_live`. Pair again when a cast goes silent.
+        **Rule.** VOD only, one cast at a time, opening the YouTube app is the last step — a cast is queued, not
+        raised (Bloomberg TV stayed on screen; the video played when the app was opened by hand). Stopping the DMR
+        restores the previous input, which is what makes `media:stop` bring the channel back. The `ytcast` task
+        allows only not_live/was_live and refuses what it cannot classify — the first guard failed open on
+        jfKfPfyJRdk, where yt-dlp errors instead of reporting is_live. Pair again when a cast goes silent.
       '';
     };
     resolver-independence = {
@@ -2015,63 +2010,32 @@
       date = "2026-10-19";
       summary = "Mode: dynamic remote inference bridge pairing local host agents (Hermes, crush) with ephemeral cloud accelerators (Kaggle TPU VM v3-8 / RunPod / Colab) over an ephemeral Tailscale mesh node (tailscale0), with automatic fallback to hosted APIs. Status: design study. Motivated by the analysis of cloud inference economics and agent prefill limits (see…";
       body = ''
-        **Mode:** dynamic remote inference bridge pairing local host agents (Hermes, crush) with ephemeral cloud
-        accelerators (Kaggle TPU VM v3-8 / RunPod / Colab) over an ephemeral Tailscale mesh node (`tailscale0`),
-        with automatic fallback to hosted APIs.
-        **Status:** design study. Motivated by the analysis of cloud inference economics and agent prefill limits
-        (see [Investigation: Kaggle 32GB VRAM vs TPU vs Hosted](#investigation-kaggle-32gb-vram-vs-tpu-vs-hosted)).
+        **Mode:** dynamic remote inference bridge pairing local host agents (Hermes, crush) with ephemeral
+        cloud accelerators (Kaggle TPU v3-8 / RunPod / Colab) over an ephemeral Tailscale mesh node, with
+        automatic fallback to hosted APIs. Design study; frieren (4c/8t, UHD 620, 11 GiB) cannot run Qwen
+        27B/32B locally at usable precision, so burst inference comes from free cloud accelerator hours.
 
-        **Use case.** Running strong reasoning and coding models (e.g. Qwen 2.5/3 27B/32B) locally on frieren (4c/8t,
-        Intel UHD 620, 11 GiB RAM) is impossible without quantization down to unusable precision and single-digit
-        token speeds. Offloading inference to ephemeral cloud notebook accelerators (e.g. Kaggle's 30 free GPU/TPU
-        hours/week) provides burst compute for heavy agent planning sessions.
+        **Why tutorial implementations break (measured):**
+        1. Layer split: Qwen 27B 4-bit (~17 GB) exceeds one T4's 15.3 GiB usable VRAM; Ollama splits layers
+           across both cards and generation relay-races at 320 GB/s — 16-18 tok/s.
+        2. Prefill stall vs Cloudflare's unconfigurable 100 s free-tier timeout: a 30k-token agent prompt
+           prefills in 92 s at T4's ~325 tok/s — requests die as HTTP 524.
+        3. Kaggle notebooks die on 20 min idle / 12 h runtime, reissue random URLs per restart, and
+           unauthenticated Ollama on public quick tunnels violates Kaggle ToS.
 
-        **The engineering analysis — what breaks in tutorial implementations:**
-        Tutorials frequently promote pairing Kaggle's dual Nvidia Tesla T4 GPUs (2× 16GB = 32GB VRAM) with Ollama
-        and a Cloudflare quick tunnel (`trycloudflare.com`). Ground-truth measurement reveals three fatal defects:
-        1. **Layer split penalty:** Qwen 27B at 4-bit (~17 GB) exceeds one T4's 15.3 GiB usable VRAM. Ollama splits
-           layers across both cards. Generation becomes an alternating relay race rather than parallel execution:
-           memory bandwidth is capped at 320 GB/s, yielding only 16–18 tokens/sec.
-        2. **Prefill stall vs Cloudflare 100s timeout:** Agent harnesses (Hermes, Claude Code) send massive system
-           prompts and context history (15,000–30,000 tokens). On T4 compute (65 TFLOPS), prefill runs at ~325
-           tokens/sec. A 30k token prompt takes **92 seconds of prefill silence**. Cloudflare Quick Tunnels enforce
-           an unconfigurable **100-second request timeout** on the free tier, killing agent requests with HTTP 524.
-        3. **Ephemeral URL drift & ToS:** Kaggle notebooks die on 20 min idle or 12h runtime; each restart takes
-           15–30 min and issues a new random URL. Furthermore, unauthenticated Ollama over public quick tunnels
-           violates Kaggle ToS and exposes an open endpoint to internet scanning.
+        **The alternative: Kaggle TPU VM v3-8 + Tailscale.** 8 chips x 16 GB HBM = 128 GB at 800 GB/s per
+        chip; vLLM (>= 0.28.0, Kaggle TPU Lab) runs Qwen 27B at full FP16/BF16 (55.6 GB, 262k context):
+        ~130 tok/s generation (8x), ~10,300 tok/s prefill (30x — 30k prompt in 3 s). An ephemeral Tailscale
+        auth key replaces tunnels entirely: zero public exposure, no timeout, stable tailnet hostname.
 
-        **The architectural alternative: Kaggle TPU VM v3-8 + Tailscale:**
-        - **Accelerator:** Kaggle's free tier includes `TPU VM v3-8` (8 TPU chips, 16GB HBM each = **128 GB HBM**,
-          800 GB/s per chip). With vLLM (>= 0.28.0) supporting Qwen attention via `Kaggle TPU Lab`, Qwen 27B runs
-          at full FP16/BF16 (55.6 GB, 262k context):
-          - Generation: ~130 tokens/sec (8× faster than dual T4).
-          - Prefill: ~10,300 tokens/sec (30× faster); a 30k prompt prefills in 3s instead of 92s.
-        - **Networking:** Ephemeral Tailscale auth key (`tailscale up --authkey=... --hostname=kaggle-vllm`).
-          Eliminates Cloudflare tunnels entirely: zero public exposure, no 100-second timeout, and a stable
-          tailnet hostname (`http://kaggle-vllm:8000/v1`).
+        **Module shape.** `profiles.ai.remoteInference` probes the tailnet endpoint with instant fallback to
+        hosted APIs (OpenRouter / Nous) when the notebook is offline: endpoint, model, apiKeyFile from the
+        sops plane, timeout, fallbackProviders list.
 
-        **Module shape.** A profile that configures Hermes and local CLI agents to probe the tailnet endpoint with
-        instant fallback to commercial hosted APIs (OpenRouter / Nous) when the notebook is offline:
-
-        ```nix
-        profiles.ai.remoteInference = {
-          enable = true;
-          endpoint = "http://kaggle-vllm.frieren.lan:8000/v1"; # or tailnet IP/hostname
-          model = "Qwen/Qwen2.5-Coder-32B-Instruct";
-          apiKeyFile = config.sops.secrets.remote_llm_key.path;
-          timeout = 300;
-          fallbackProviders = [
-            { provider = "openrouter"; model = "qwen/qwen-2.5-coder-32b-instruct"; }
-            { provider = "nous"; model = "inclusionai/ling-3.0-flash-sante:free"; }
-          ];
-        };
-        ```
-
-        **Why it is not prod.** Running headless daemon tunnels on free-tier Kaggle accounts is a gray area under
-        Kaggle's June 2025 Acceptable Use Policy; notebook lifecycle is fundamentally non-durable; and at $1.49 / 1M
-        tokens on commercial endpoints (Cerebras/OpenRouter), a full week of Kaggle quota is worth ~$4.31. Exit
-        criteria: an automated notebook launch script verified over Tailscale, a validated Hermes failover event
-        when the notebook terminates, and authenticated endpoint tokens.
+        **Why not prod.** Headless daemon tunnels on free-tier Kaggle are gray-area under the June 2025 AUP;
+        the notebook lifecycle is non-durable; a week of Kaggle quota is worth ~$4.31 at $1.49/1M tokens on
+        commercial endpoints. Exit: automated notebook launch verified over Tailscale, a validated Hermes
+        failover event on notebook termination, authenticated endpoint tokens.
       '';
     };
     exp-021 = {
@@ -2277,31 +2241,18 @@
       date = "2026-10-19";
       summary = "Mode: Julia-1 message triage and routing integrated into the local SimpleX SMP WebSocket bridge (simplex-chat). Status: design study & architectural specification. Motivated by managing inter-agent fleet coordination (frieren, poseidon, guckloch, eisen) without human notification spam.";
       body = ''
-        **Mode:** Julia-1 message triage and routing integrated into the local SimpleX SMP WebSocket bridge (`simplex-chat`).
-        **Status:** design study & architectural specification. Motivated by managing inter-agent fleet coordination (`frieren`, `poseidon`, `guckloch`, `eisen`) without human notification spam.
+        SimpleX Chat is the encrypted inter-agent bus; autonomous hosts exchange dozens of `#Fleet` messages
+        daily, and without semantic classification the operator gets push notifications for every routine
+        heartbeat. `services.simplexMessageClassifier` is an inline gateway between the WebSocket RPC daemon
+        (:5225) and the agent ingestion runtime: Julia-1 classifies each decrypted message in its 8k context
+        into FLEET_HEARTBEAT_STATUS (silent log), BACKGROUND_CLOSURE_WARMED (daily digest), or
+        CRITICAL_SECURITY_INCIDENT / HARDWARE_FAULT (immediate push with severity, host, runbook).
 
-        **Use case.** SimpleX Chat is deployed fleet-wide as the encrypted inter-agent bus. As autonomous hosts collaborate (e.g. frieren warming binary caches for poseidon, nightly backup notifications, task triage updates), agents exchange dozens of messages daily in `#Fleet`. Without semantic classification, human operators receive push notifications for every routine heartbeat and backup status line. `services.simplexMessageClassifier` acts as an inline message gateway between the local WebSocket RPC daemon (`:5225`) and the agent ingestion runtime. Julia-1 processes each incoming decrypted message across its 8k token context window, outputting structured classification tags:
-        1. `FLEET_HEARTBEAT_STATUS`: silent logging in `/var/log/simplex/agent-mesh.log`.
-        2. `BACKGROUND_CLOSURE_WARMED`: appended to daily summary digest.
-        3. `CRITICAL_SECURITY_INCIDENT` / `HARDWARE_FAULT`: immediate high-priority push alert formatted with severity header, targeted host, and suggested remediation runbook.
+        **Module shape.** `services.simplexMessageClassifier` = { enable; model = "julia-1"; listenPort = 5225;
+        monitoredGroups = [ "#Fleet" ]; priorityThresholds = { silent = 0.40; digest = 0.70; immediateAlert = 0.85; }; }
 
-        **Module shape.**
-
-        ```nix
-        services.simplexMessageClassifier = {
-          enable = true;
-          model = "julia-1";
-          listenPort = 5225;
-          monitoredGroups = [ "#Fleet" ];
-          priorityThresholds = {
-            silent = 0.40;
-            digest = 0.70;
-            immediateAlert = 0.85;
-          };
-        };
-        ```
-
-        **Evidence.** SimpleX SMP server is active on `*:5223` and client daemon is running on port 5225. `#Fleet` group currently connects frieren, devji, and guckloch. Python WebSocket client `simplex-rpc.py` communicates cleanly with the daemon in sub-millisecond roundtrips.
+        **Evidence.** SMP server on *:5223, client daemon on 5225, `#Fleet` connects frieren/devji/guckloch, and
+        `simplex-rpc.py` talks to the daemon in sub-millisecond roundtrips.
 
         **Why it is not prod.** Requires end-to-end testing with simulated agent messages from poseidon and frieren to verify zero message loss or classification stalls. Exit criteria: 100 test messages across varied fleet scenarios categorized with 100% precision and < 5ms processing latency per message.
       '';
@@ -8684,6 +8635,48 @@
       '';
     };
 
+    classification-gate-placement = {
+      title = "Move the systemd classification gate out of host eval, or keep paying 314 MiB for its guarantee";
+      kind = "proposal";
+      status = "PROPOSED";
+      priority = "P2";
+      date = "2026-11-27";
+      summary = "systemd-policy costs ~314 MiB of every host eval because its assertion force-reads the full unit set; moving it beside checks:units drops the desktop gate under 1 GiB, but enforcement then depends on wiring the new gate into CI and the deploy chain, which is why this is an operator safety call.";
+      from = ["eval-cost-ladder"];
+      refs = {
+        modules = ["modules/systemd-policy.nix" "scripts/task/chain-profile.sh" "scripts/task/unit-gate.sh" "flake/host-check.nix"];
+        tasks = ["checks:units" "checks:host"];
+        docs = ["docs/control-plane-vision.md" "docs/nix-patterns.md"];
+      };
+      body = ''
+        Reproduce the costs: `bash scripts/task/chain-profile.sh base nixos dms` with
+        and without `systemd-policy` in EXTRA_NIX's hmUserFeatures force. Measured
+        2026-11-27: systemd-policy is ~314 MiB of the 1176 MiB desktop gate — the
+        only feature whose cost is a full-config force, because its assertion
+        reads every user unit plus osConfig.systemd.services, and that read IS
+        the check.
+
+        Options:
+        A. Status quo — assertion stays in the host eval. Every checks:host, CI
+           hostChecks build and deploy re-gate pays the 314 MiB; a violating
+           config cannot reach a switch, because every path to one forces
+           assertions.
+        B. Move beside checks:units — one force, two verdicts; desktop gate drops
+           under 1 GiB. Safety then depends entirely on wiring, and checks:units
+           is today wired NOWHERE — not CI, not the deploy chain. Moving without
+           wiring is a silent enforcement regression. Wiring means the CI
+           per-host job, the warm-host/activate re-gate, and a checks:quick
+           smoke that keeps both honest.
+        C. Enforcement flag (off local, on CI) — rejected: dev/CI drift trains
+           bypassing, and the failure surfaces where it is hardest to fix.
+        D. Shrink the force — rejected: the force is the check, not overhead.
+
+        Operator decision: is 314 MiB per host eval the price of a guarantee, or
+        does the fleet wire B properly? Exit if B: checks:host on a desktop under
+        1 GiB AND the classification gate green in CI per host — both, never one.
+        No gate change without sign-off.
+      '';
+    };
     workerbase-devops-submitted-2026-11-27 = {
       title = "Workerbase Senior DevOps Engineer submitted via Arbeitnow";
       kind = "handoff";

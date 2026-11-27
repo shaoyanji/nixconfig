@@ -1,5 +1,6 @@
 {
   self,
+  config,
   pkgs,
   lib,
   user,
@@ -22,6 +23,7 @@ in {
     # The fleet desktop baseline: Dux shell on niri, greetd. The Ryoku tier that
     # replaced it from 2026-11-02 to 2026-11-11 is retired.
     self.modules."profiles.base-desktop-environment"
+    self.modules."services.fleet-sentinel"
     self.modules."profiles.laptop"
     # Dock + battery ceiling — host-hardware leaves that used to ride
     # base-node for every host (chain-split).
@@ -134,6 +136,25 @@ in {
     #   { from = 8000; to = 8010; }
     # ];
   };
+
+  # note p1-sentinel-push; frieren.lan pin: the bare tailnet address 404s the vhost.
+  networking.extraHosts = ''
+    100.97.61.65 frieren.lan
+  '';
+
+  services.fleetSentinel = {
+    enable = true;
+    watchUnits = [
+      {unit = "nixos-upgrade.service";}
+      {unit = "tailscaled.service";}
+    ];
+    push = {
+      url = "http://frieren.lan/sentinel/ingest";
+      tokenFile = config.sops.secrets."agent-turns-token".path;
+    };
+  };
+
+  sops.secrets."agent-turns-token" = {};
 
   system.stateVersion = "25.11";
   nixpkgs.config.nvidia.acceptLicense = true;

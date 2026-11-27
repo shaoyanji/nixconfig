@@ -1,8 +1,44 @@
 {
-  "generated": "2026-11-27T20:45:49Z",
+  "generated": "2026-11-27T20:53:33Z",
   "count": 200,
-  "pin": "d56d7ed36b9192fd117ec69acb66df854851c7e5000baa41678400013db8dbe7",
+  "pin": "c9ddba68c2fd16c718c36bb091e8d46782d21e09a5316672b2bb818e683d7e0b",
   "turns": [
+    {
+      "id": "ac4c0525-b5c7-486e-91fc-8438ceb03487",
+      "ts": "2026-11-27T20:47:00Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-cv-publish-2026-11-27b",
+      "action": "landed: CV stack now names Linux/systemd, containers, Kubernetes as foundations, GitHub Actions and CI gates, gatus with the alert bridge; Prometheus and the Lambda keyword removed; 6 site CVs and the packet republished | gate: agents:cv:publish-check PASS",
+      "outcome": "done",
+      "claims": [
+        "site/cv",
+        "content/cv"
+      ],
+      "files": [
+        "lib/matt/profile.json",
+        "lib/matt/profile.de.json",
+        "lib/matt/lebenslauf.json"
+      ],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbd6yby7jmp0sxrr5nog2dx"
+    },
+    {
+      "id": "b1fb47e4-c541-4278-a1ba-5cb09837ea26",
+      "ts": "2026-11-27T20:46:44Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:p1-sentinel-push-2026-11-27",
+      "action": "chain-change 0.71/0.56: add sentinel pushUrl egress; gate 3 hosts",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/services/fleet-sentinel.nix",
+        "hosts/frieren/infra-stack.nix"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbd6wfu47bac3b0tlmi6c03"
+    },
     {
       "id": "8ed25bef-a5a1-4af5-a609-3592870e76e6",
       "ts": "2026-11-27T20:41:17Z",
@@ -2868,32 +2904,6 @@
       "base_commit": "5ff0947f2bd9e0d38bad74b298dbef3c3de5ecd7",
       "branch": "main",
       "frame": "03hb8qozjs2uhz4n0ajaww386"
-    },
-    {
-      "id": "0ecb05c7-2a8a-4e6e-9091-636d638e7125",
-      "ts": "2026-11-27T06:51:42Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-packet",
-      "action": "freebuff: review Hisolutions CV packet; run cv-links and cv-ats checks",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "5ff0947f2bd9e0d38bad74b298dbef3c3de5ecd7",
-      "branch": "main",
-      "frame": "03hb8ns6689nrjjgowtila280"
-    },
-    {
-      "id": "c1866836-1f6e-4f87-af63-d448502d807b",
-      "ts": "2026-11-27T06:43:01Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-hisolutions-ag-2026-11-27",
-      "action": "landed: AGENTS.nix handoff note freebuff-hisolutions-ag-2026-11-27 (HiSolutions packet: letter names employer, German CV bullets fixed, letter-pdf-check + cv-ats-check + checks:appflow PASS, 1p letter / 2p CV, site redeployed, send held to 2026-12-07). Committed via the documented ALLOW=AGENTS.nix exception in scripts/task/repo-blobs.sh (index blob 519KiB, printed as allowed), pushed to origin/main. | gate: checks:nix:format PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5ff0947f2bd9e0d38bad74b298dbef3c3de5ecd7",
-      "branch": "main",
-      "frame": "03hb8m30yxqlk0wivj7zysmcq"
     }
   ]
 }

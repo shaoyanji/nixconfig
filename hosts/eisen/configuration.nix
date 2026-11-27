@@ -3,6 +3,7 @@
 # notes eisen-llm-stack and open-eisen-gpu-off-bus.
 {
   self,
+  config,
   pkgs,
   user,
   ...
@@ -10,6 +11,7 @@
   imports = [
     ./hardware-configuration.nix
     ./amd-rx-5700.nix
+    self.modules."services.fleet-sentinel"
     # Gamescope-only kiosk: greetd auto-logs devji into `steam-gamescope`, so
     # Steam Big Picture is the entire UI — the same shape as ares and
     # deckstation. profiles.steamos brings profiles.steam with it. The desktop
@@ -219,6 +221,24 @@
     codec = "qwen-tokenizer-12hz-Q8_0.gguf";
     voice = "vivian";
   };
+
+  networking.extraHosts = ''
+    100.97.61.65 frieren.lan
+  '';
+
+  services.fleetSentinel = {
+    enable = true;
+    watchUnits = [
+      {unit = "nixos-upgrade.service";}
+      {unit = "tailscaled.service";}
+    ];
+    push = {
+      url = "http://frieren.lan/sentinel/ingest";
+      tokenFile = config.sops.secrets."agent-turns-token".path;
+    };
+  };
+
+  sops.secrets."agent-turns-token" = {};
 
   services.openssh.enable = true;
   system.stateVersion = "25.05";

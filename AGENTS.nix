@@ -2830,31 +2830,29 @@
         **The rule.** Pick the lane by identity before bandwidth: delphi 1.38 Gbps and
         10 TB/month on a datacenter IP, frieren 50/20 on the only residential, lumi
         ~50 Mbps behind a shared US NAT — home is trust, not bytes. Seen live: delphi
-        92.5.115.103 AS31898, frieren 79.215.107.59 AS3320 on a direct path; lumi has
-        no direct path (DERP dfw), so 93.127.139.146 stays a lookup.
+        92.5.115.103 AS31898 Frankfurt, frieren 79.215.107.59 AS3320 on a direct path;
+        lumi has no direct path (DERP dfw), so 93.127.139.146 stays a lookup.
 
         **Lanes.** `bulk` (delphi): RSS, sitemaps, HF, GitHub, corpora,
         many-connection pulls. `us` (lumi): US-only pricing, retail and APIs — JSON
         and text only, four connections, no Chrome. `local` (frieren): sources that
         only trust a residential IP, plus the JS door at :3002. Fallback is
         `us -> bulk`, never `local -> bulk`: a datacenter retry on a blocked source
-        is how the OCI range gets blocklisted, which takes the exit node and DNS
-        failover with it.
+        is how the OCI range gets blocklisted, taking the exit node and DNS failover.
 
-        **Built, and ranked (Jev 1.14.0).** Cache 57%, broker 30%, sink 7%, rest 1%;
-        cache-then-broker 61% at 0.52 confidence. `fetchcache`
-        keys a page by SHA-256 of the URL, stores body, ETag, Last-Modified and
-        fetched-at, revalidates with `If-None-Match` on a 304 at zero upstream bytes;
-        three services adopt it with caps intact. `fetch-broker` answers
-        `POST /v1/fetch`, owns the lanes through `tailnet-forward-proxy`, and applies
-        the rule.
+        **Built, and ranked (Jev 1.14.0).** Cache then broker, in that order: a page
+        comes from `fetchcache`; only a miss spends a lane. Jev ranks cache 57%,
+        broker 30%, sink 7%, cache-then-broker 61% at 0.52. `fetchcache` keys a page
+        by SHA-256 of the URL, stores body, ETag, Last-Modified and fetched-at, and
+        revalidates with `If-None-Match` on a 304 at zero upstream bytes; three adopt
+        it with caps intact. `fetch-broker` answers `POST /v1/fetch` cache-first and
+        owns the lanes through `tailnet-forward-proxy`.
 
         **Measured (2026-11-28, delphi, 20 URLs, twice).** Cold p50 154 then 152 ms,
         p95 823 then 726, 1.40 MB upstream, 0.15 s a page; the set warm p50 46 then
         41 ms, 0.085 MB — 94% fewer bytes, 3.3-3.7x faster; direct p50 165 then 256
-        ms, so a miss costs no more. No proxy is deployed and the shipped defaults
-        do not resolve, so `us` falls back on DNS and `local` 502s at CONNECT, no
-        retry; gnu.org fails from bulk.
+        ms, so a miss costs no more. No proxy is deployed and the defaults do not
+        resolve, so `us` falls back on DNS and `local` 502s at CONNECT; gnu.org fails.
       '';
     };
     exp-120 = {

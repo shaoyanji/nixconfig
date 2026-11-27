@@ -1151,7 +1151,7 @@ tasks:
       EXPECT=, FORMAT=json|toon; exit 1 names every mount that did not answer.
     cmds:
       - |
-        nix eval --json .#nixosConfigurations.delphi.config.services.servicePortal.mounts \
+        nix eval --json '.?submodules=1#nixosConfigurations.delphi.config.services.servicePortal.mounts' \
           --apply 'ms: builtins.mapAttrs (_: m: {inherit (m) port upstream;}) ms' |
           python3 scripts/task/endpoints-smoke.py \
             --host "{{.HOST | default "delphi.cloudforest-kardashev.ts.net"}}" \

@@ -1,8 +1,377 @@
 {
-  "generated": "2026-11-26T21:39:29Z",
+  "generated": "2026-11-27T01:32:41Z",
   "count": 200,
-  "pin": "94225456b9e22b1c175395d7e829663ded93f16bb6290cf7b928444f89eb6a0d",
+  "pin": "d5fb5d5479824445054238a603bdd36e99fae5a73125f2c976fb22d5ed276fb4",
   "turns": [
+    {
+      "id": "32bd2d37-8ab9-4996-8a3e-d69a7319745f",
+      "ts": "2026-11-27T01:26:25Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-pane5-wall-sleep-brief",
+      "action": "bug-fix: resolve held wall-neumorph-sleep 502 brief; land xs",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/image-daily/"
+      ],
+      "files": [],
+      "base_commit": "ea6d8bd2bd04027aa119678e0b5184472c2dca36",
+      "branch": "main",
+      "frame": "03hb6w8lbmpg8cmafc7etu7qq"
+    },
+    {
+      "id": "00ca99fd-9187-4a7b-839f-cb0afd058c28",
+      "ts": "2026-11-27T01:00:44Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:steward-pane5-wallpaper-incident",
+      "action": "incident resolved (hold): cpg seedream-5.5 healthy (probe ok), 502 is prompt-specific to wall-neumorph-sleep; 0 waiting rows in plates.txt",
+      "outcome": "done",
+      "claims": [
+        "lib/image-daily/"
+      ],
+      "files": [],
+      "base_commit": "ea6d8bd2bd04027aa119678e0b5184472c2dca36",
+      "branch": "main",
+      "frame": "03hb6r7z2bfbxyvk9lreofzej"
+    },
+    {
+      "id": "8cef1d8e-07c3-4f71-b06d-a506edc7510f",
+      "ts": "2026-11-27T00:58:34Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-pane5-wallpaper-incident",
+      "action": "incident|0.99|0.98: cpg 502 check, next-plate fallback, publish or hold",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/image-daily/"
+      ],
+      "files": [],
+      "base_commit": "ea6d8bd2bd04027aa119678e0b5184472c2dca36",
+      "branch": "main",
+      "frame": "03hb6qssgwf2pavenls1hjk9s"
+    },
+    {
+      "id": "f13939bb-bbcd-4470-ae10-0db2ba6ef313",
+      "ts": "2026-11-27T00:40:31Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-pane5-wallpaper-drive",
+      "action": "pane5 wallpaper: publish daily plate, 502->next-plate fallback gate",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/image-daily/briefs.json lib/image-daily/rotation.json"
+      ],
+      "files": [],
+      "base_commit": "ea6d8bd2bd04027aa119678e0b5184472c2dca36",
+      "branch": "main",
+      "frame": "03hb6n9s0vnq6niy9obug9v9z"
+    },
+    {
+      "id": "33a060fd-3cfc-4692-8972-f22d2e0356f3",
+      "ts": "2026-11-27T00:39:07Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:image-daily-wallpaper-2026-11-27",
+      "action": "blocked: wall-neumorph-sleep hit cpg HTTP 502 (00:38Z); 0 unused non-held rows in plates.txt and 0 other due briefs",
+      "outcome": "blocked: wall-neumorph-sleep cpg HTTP 502 and 0 waiting non-held plates in roster",
+      "claims": [
+        "lib/image-daily/briefs.json",
+        "lib/image-daily/rotation.json",
+        "lib/image-daily/plates.txt"
+      ],
+      "files": [],
+      "base_commit": "ea6d8bd2bd04027aa119678e0b5184472c2dca36",
+      "branch": "main",
+      "frame": "03hb6mzybggtpehksgcukj5g6"
+    },
+    {
+      "id": "9f6cdc46-6abe-4640-8776-6db78de5388d",
+      "ts": "2026-11-27T00:26:25Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:image-daily-wallpaper-2026-11-27",
+      "action": "failed: wall-neumorph-sleep retry after 00:00Z reset still hit cpg HTTP 502 (rc=1); 100/100 daily images unused",
+      "outcome": "failed: cpg image generation returned upstream HTTP 502 for wall-neumorph-sleep after daily reset",
+      "claims": [
+        "lib/image-daily/",
+        "wallpapers/"
+      ],
+      "files": [],
+      "base_commit": "ea6d8bd2bd04027aa119678e0b5184472c2dca36",
+      "branch": "main",
+      "frame": "03hb6kin42iv5npkjpzelxns5"
+    },
+    {
+      "id": "cef12d05-2580-401f-84a5-5d6327594022",
+      "ts": "2026-11-27T00:26:16Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-pane5-wallpaper-drive",
+      "action": "drove idle pane 5 (wallpaper-worker): retry wall-neumorph-sleep cpg gen after upstream 502; jev-decide duel publish p=0.58 m=0.16 top by margin; fresh Working... confirmed",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "ea6d8bd2bd04027aa119678e0b5184472c2dca36",
+      "branch": "main",
+      "frame": "03hb6khkjoymlmeb0ttjph32k"
+    },
+    {
+      "id": "feab3f55-8620-4876-b746-1bfcbf54f2d8",
+      "ts": "2026-11-27T00:10:38Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-27: 0 plate(s) kept of 0 spent, 0 roster row(s) waiting, 784 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": null,
+      "branch": null,
+      "frame": "03hb6hfo3zw65auhhbo3s7d77"
+    },
+    {
+      "id": "1fcc6ea4-042d-4d27-8efd-5eb27336fdc1",
+      "ts": "2026-11-26T23:57:27Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-pane5-wallpaper-drive",
+      "action": "steward drive complete: pane 5 ff-synced origin ea6d8bd2, verified frieren-neumorph publish images-check 784/784, posted wallpaper-publish-next xs done, wall-neumorph-sleep cpg-502 blocker recorded (not retried)",
+      "outcome": "done",
+      "claims": [
+        "nixconfig:wallpaper-publish-next"
+      ],
+      "files": [],
+      "base_commit": "ea6d8bd2bd04027aa119678e0b5184472c2dca36",
+      "branch": "main",
+      "frame": "03hb6euwqaa5nc17yhtzxtv9t"
+    },
+    {
+      "id": "950e93cd-d2b9-484d-98b2-f152b3ea5022",
+      "ts": "2026-11-26T23:57:00Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:wallpaper-publish-next",
+      "action": "closed wallpaper-publish-next: frieren-neumorph publish landed, images-check 784/784",
+      "outcome": "done",
+      "claims": [
+        "nixconfig:wallpaper-publish-next"
+      ],
+      "files": [],
+      "base_commit": "ea6d8bd2bd04027aa119678e0b5184472c2dca36",
+      "branch": "main",
+      "frame": "03hb6ertyy4z61nqhbxgbcotu"
+    },
+    {
+      "id": "39b80627-9c9d-4869-89c6-f0dab04ce932",
+      "ts": "2026-11-26T23:55:40Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-pane5-wallpaper-drive",
+      "action": "drove idle wallpaper pane 5 (agy-standing): jev-decide publish p=0.63 m=0.31 decisive; submitted close wallpaper-publish-next + sync origin task",
+      "outcome": "in_progress",
+      "claims": [
+        "nixconfig:wallpaper-publish-next"
+      ],
+      "files": [],
+      "base_commit": "ea6d8bd2bd04027aa119678e0b5184472c2dca36",
+      "branch": "main",
+      "frame": "03hb6eif2kqikmz5jfp4xw3jj"
+    },
+    {
+      "id": "504dc17f-6503-4b0a-b01d-1ba513a2a1a6",
+      "ts": "2026-11-26T23:42:25Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:image-daily-wallpaper-2026-11-27",
+      "action": "failed: wall-neumorph-sleep retry hit cpg HTTP 502 again (rc=1); nothing generated, published, or pushed",
+      "outcome": "failed: cpg image generation returned upstream HTTP 502 for wall-neumorph-sleep on retry",
+      "claims": [
+        "lib/image-daily/",
+        "wallpapers/"
+      ],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb6bx9wrms4dtna3q1r9gec"
+    },
+    {
+      "id": "06589c06-ae44-4650-bb4d-9e525de434fc",
+      "ts": "2026-11-26T23:41:57Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:image-daily-wallpaper-2026-11-27",
+      "action": "drive agents:5 to retry wallpaper generation after upstream 502 (jev route: publish)",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/image-daily/",
+        "wallpapers/"
+      ],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb6btx8o7v5adtp5wb6h74j"
+    },
+    {
+      "id": "04e84345-65d5-431a-ab48-c9669bcef902",
+      "ts": "2026-11-26T23:37:43Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:image-daily-wallpaper-2026-11-27",
+      "action": "failed: wall-neumorph-sleep cpg generation returned HTTP 502 (rc=1); nothing generated, published, or pushed",
+      "outcome": "failed: cpg image generation returned upstream HTTP 502 for wall-neumorph-sleep",
+      "claims": [
+        "lib/image-daily/",
+        "wallpapers/"
+      ],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb6b05eqsuq84hgmwthyzlf"
+    },
+    {
+      "id": "9ed08e26-a95c-4a6e-a451-9324248b7bf9",
+      "ts": "2026-11-26T23:35:59Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:image-daily-wallpaper-2026-11-27",
+      "action": "publish 2026-11-27 wallpaper; commit briefs/rotation; push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/image-daily/",
+        "wallpapers/"
+      ],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb6anzhovs1bw2z271to6wz"
+    },
+    {
+      "id": "367dc557-7d74-44e1-9da8-d11b1dfda1a6",
+      "ts": "2026-11-26T23:25:10Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:wallpaper-publish-next",
+      "action": "publish-next-done: frieren-neumorph published, rotation.json on origin/main ea6d8bd2, images-check 784/784",
+      "outcome": "done",
+      "claims": [
+        "lib/image-daily/rotation.json",
+        "published/wall/2026-11-26/frieren-neumorph.png"
+      ],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb68jxz04zfeaavpgu3o8d6"
+    },
+    {
+      "id": "cbde675a-424f-4a9d-b282-3d80870a5720",
+      "ts": "2026-11-26T23:24:48Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:wallpaper-publish-next",
+      "action": "verified: wall-neumorph-frieren (2026-11-26/frieren-neumorph.png) kept, on Cloudinary (200), and in origin/main ea6d8bd2; 0 unpushed local commits | gate: checks:images PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/image-daily/rotation.json",
+        "published/wall/2026-11-26/frieren-neumorph.png"
+      ],
+      "files": [
+        "lib/image-daily/rotation.json",
+        "lib/image-daily/briefs.json",
+        "wallpapers/nixconfig-dark.png",
+        "AGENTS.nix"
+      ],
+      "base_commit": "2099a85a",
+      "branch": "main",
+      "frame": "03hb68hchmi4iijt4kr6ckuew"
+    },
+    {
+      "id": "4fcf27b9-0180-4ab1-a1a8-0fbebf01e663",
+      "ts": "2026-11-26T23:23:53Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:wallpaper-publish-next",
+      "action": "verify frieren-neumorph publish; post done; push origin/main",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/image-daily/rotation.json",
+        "published/wall/2026-11-26/frieren-neumorph.png"
+      ],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb68aw4kiuk0r1497dlp6gz"
+    },
+    {
+      "id": "89ef8466-1c74-40cb-a253-a0bc0d70d726",
+      "ts": "2026-11-26T23:02:48Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:wallpaper-publish-next",
+      "action": "drove idle wallpaper pane 5 (agy-standing): jev-decide publish p=0.98 m=0.97; submitted frieren-neumorph wallpaper publish task; fresh working counter confirmed",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb646mmq7x7t3d1kn1wpmt5"
+    },
+    {
+      "id": "7c620195-f3b0-42e2-8641-1833289882cc",
+      "ts": "2026-11-26T22:51:08Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-pane5-wallpaper-publish-retry",
+      "action": "drove pane 5 wallpaper-worker; retry Cloudinary publish + commit/briefs/rotation push",
+      "outcome": "in_progress",
+      "claims": [
+        "wallpapers/nixconfig-dark.png",
+        "lib/image-daily/briefs.json",
+        "lib/image-daily/rotation.json"
+      ],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb61wm7969ffktzyshh70u6"
+    },
+    {
+      "id": "5ea3a443-e155-4e43-9ede-f4c3bfd91272",
+      "ts": "2026-11-26T22:32:50Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-pane5-wallpaper-publish",
+      "action": "publish: commit staged wallpaper + briefs/rotation, push",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb5ybw3d4izj0lurqpqwg4h"
+    },
+    {
+      "id": "6b62fdd9-39da-4ebf-9252-c598413c6ded",
+      "ts": "2026-11-26T22:08:57Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-pane5-wallpaper",
+      "action": "drove pane 5 wallpaper-worker; wall-neumorph-sleep retry failed cpg 502",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb5tnvdoii18j7l7txlw1d7"
+    },
+    {
+      "id": "c18c03b9-d952-46e1-ab82-64fe9c893845",
+      "ts": "2026-11-26T22:03:07Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:image-daily-wall-neumorph-sleep",
+      "action": "retry failed: wall-neumorph-sleep hit cpg HTTP 502 again (22:02:52Z); no plate generated, nothing published or pushed",
+      "outcome": "failed: cpg image generation returned upstream HTTP 502 for wall-neumorph-sleep",
+      "claims": [
+        "lib/image-daily/rotation.json"
+      ],
+      "files": [],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb5siwzbkeds8j8rfjhcdig"
+    },
+    {
+      "id": "59d78731-2c83-4a55-bc0d-21e22ca78d0f",
+      "ts": "2026-11-26T21:39:40Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:image-daily-wall-round",
+      "action": "ran wall round (wall-neumorph-sleep failed cpg HTTP 502, 0 kept); approved 4 prior 2026-11-26 keeps into rotation.json on origin/main | gate: checks:image-daily + checks:images PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/image-daily/rotation.json"
+      ],
+      "files": [
+        "lib/image-daily/rotation.json"
+      ],
+      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
+      "branch": "main",
+      "frame": "03hb5nxzvg0vl4paimx2d1ro0"
+    },
     {
       "id": "ef913cff-efca-4b91-977d-ebcd499a4fe8",
       "ts": "2026-11-26T21:37:23Z",
@@ -2742,369 +3111,6 @@
       "base_commit": "dd4a70ebb14b82abedd1e8e71c7d4e838e7b274b",
       "branch": "main",
       "frame": "03hb3mpx9kc59leuvyc0gxstz"
-    },
-    {
-      "id": "cea62021-1e13-4efe-9afd-4647a1915247",
-      "ts": "2026-11-26T15:23:44Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cover-letter",
-      "action": "jev-decide novel p=0.9/m=0.84; fed cover letter task to freebuff",
-      "outcome": "in_progress",
-      "claims": [
-        "letters/hisolutions.json"
-      ],
-      "files": [],
-      "base_commit": "f2eb9f3eae5463dc6170fc6c175e913c1980c994",
-      "branch": "main",
-      "frame": "03hb3mi7gx9memp1nbl4qsbv5"
-    },
-    {
-      "id": "5d3749e3-2081-46f7-84bf-d8ad4b02a1f7",
-      "ts": "2026-11-26T15:22:26Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-clanker-maintenance",
-      "action": "sentinel ok, delphi running, 0 failed units. delphi load 2.04 on 2 cores, mem 4.0/11Gi (7.6 avail), zram 1G/5.8G, PSI cpu60=20.2 io=0.4 mem=0.02, disk 88G/195G 48%, store 64318 paths 16054 dead, /tmp 1.9G/1825 (other lanes). clanker 98% root (399M free): /nix 9.1G /usr 3.1G /opt 1.5G, /data 65%, /tmp 88M. Cleaned only my files. xs 26 live 0 queued; stale: agy delphi-pane block, appflow-db-remediate mislabeled, 10 steward turns.| gate: read-only pass",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "dd4a70ebb14b82abedd1e8e71c7d4e838e7b274b",
-      "branch": "main",
-      "frame": "03hb3m985kgfl2041da5n9qy5"
-    },
-    {
-      "id": "1c52e16f-7a3c-4324-b773-de2653bbcf87",
-      "ts": "2026-11-26T15:19:24Z",
-      "source": "devin",
-      "subject": "nixconfig:delphi-toplevel-build-fix",
-      "action": "claim: fix email-archive ints.nonnegative and any delphi toplevel Nix build blockers in service modules, verify alejandra, checks:host and full toplevel nix build without switching",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/email-archive.nix",
-        "modules/services/job-db-scraper.nix",
-        "modules/services/private-deals.nix",
-        "modules/services/inventory-site.nix",
-        "modules/services/mail-atlas.nix"
-      ],
-      "files": [],
-      "base_commit": "dd4a70ebb14b82abedd1e8e71c7d4e838e7b274b",
-      "branch": "main",
-      "frame": "03hb3lns00cxod3wfw19mr729"
-    },
-    {
-      "id": "f22e8355-aaa2-461e-882d-6382ed1234bf",
-      "ts": "2026-11-26T15:17:30Z",
-      "source": "devin",
-      "subject": "nixconfig:private-deals-batch-alerts",
-      "action": "landed: private-deals batch upsert API, watchlist alert evaluation, deduped ntfy/webhook notifications, alert/status UI and price-trend polish | gate: go test -count=1 PASS, go vet PASS, node --check PASS, native aarch64 nix package build+checkPhase PASS, live batch+ntfy smoke PASS, checks:host HOST=delphi rc=0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "dd4a70ebb14b82abedd1e8e71c7d4e838e7b274b",
-      "branch": "main",
-      "frame": "03hb3laff1wz4zrtpt7alra1g"
-    },
-    {
-      "id": "f7ce9408-5ed8-4d48-8e7d-c707fa1cf9f0",
-      "ts": "2026-11-26T15:17:23Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-clanker-maintenance",
-      "action": "claim: maintenance pass over delphi and clanker (health, PSI, disk, /tmp, failed units) plus xs queue audit; no commits while devin holds the tree",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "dd4a70ebb14b82abedd1e8e71c7d4e838e7b274b",
-      "branch": "main",
-      "frame": "03hb3l9nqxg62hqvkpughkmcp"
-    },
-    {
-      "id": "b390234b-e461-4b47-b84e-cc15b76ebff0",
-      "ts": "2026-11-26T15:17:09Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-dewin-intents-push",
-      "action": "dewin verified intents state: tree clean, local main == origin/main, nothing unpushed — autoUpgrade safe, nothing to commit (f2eb9f3e already remote)",
-      "outcome": "done",
-      "claims": [
-        "tests/intents/run.sh",
-        "docs/intents.md",
-        "flake/intents.nix"
-      ],
-      "files": [
-        "scripts/task/xs-turn-post.sh"
-      ],
-      "base_commit": "f2eb9f3eae5463dc6170fc6c175e913c1980c994",
-      "branch": "main",
-      "frame": "03hb3l7whcz54u4js2k0ag4l3"
-    },
-    {
-      "id": "61baefaa-f695-4261-9935-897f9db6a501",
-      "ts": "2026-11-26T15:15:58Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-dewin-intents-push",
-      "action": "drove dewin: intents commit+push; flake-change 0.82/0.78; Thinking",
-      "outcome": "in_progress",
-      "claims": [
-        "tests/intents/run.sh",
-        "docs/intents.md",
-        "flake/intents.nix"
-      ],
-      "files": [
-        "scripts/task/xs-turn-post.sh"
-      ],
-      "base_commit": "f2eb9f3eae5463dc6170fc6c175e913c1980c994",
-      "branch": "main",
-      "frame": "03hb3kzpc3nwlgr9gbahap7oj"
-    },
-    {
-      "id": "d89c4112-c271-4756-ae79-b8db37f03728",
-      "ts": "2026-11-26T15:15:37Z",
-      "source": "buffy",
-      "subject": "nixconfig:mail-atlas-ui-graph-polish",
-      "action": "mail-atlas: f filters to sender (reader + focused row, raw sender so <addr> survives plain()), t filters to first tag, sender/tag buttons in the reader, Home/End, click the query node clears q, header tagged% (1536/2050) with counts in tooltip. Browser test on clanker vs canned API: f -> ?q=billing%40acme.test, reader button -> same after close, t -> ?q=invoice. node --check, 46/46 ids, css balanced, drain unit, docs-links 189, prose 174.| gate: node --check + browser smoke + docs PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b761e41a60d7d40aba10194390bc225fa9f9dcdd",
-      "branch": "main",
-      "frame": "03hb3kx8z5wtqgmw3zmdznqsb"
-    },
-    {
-      "id": "4aa23cc2-0b1a-4fa0-a91b-3b7c87a72df6",
-      "ts": "2026-11-26T15:10:41Z",
-      "source": "buffy",
-      "subject": "nixconfig:mail-atlas-ui-graph-polish",
-      "action": "claim: keyboard nav, graph focus/filter, sender/tag quick filters and coverage polish in mail-atlas site, verified with node --check and a static server smoke test",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/mail-atlas"
-      ],
-      "files": [],
-      "base_commit": "31cb076baad769809adc44c793c4887e234af00d",
-      "branch": "main",
-      "frame": "03hb3jyiz8nvvd2dm34wtcfol"
-    },
-    {
-      "id": "9c4d6d60-05fc-4034-9902-5211a8013ff3",
-      "ts": "2026-11-26T15:08:51Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-services-doc",
-      "action": "docs/portfolio-services.md (91 lines): delphi job-db-scraper 8101/8464, private-deals 8102/8465, inventory-site 8103/8466 with options+modules, one search endpoint each, the five verbs (apps:page/ingest, deals:page/ingest, agents:web) and the clanker/keys split; ports point at nix eval .#inventory.hosts.delphi. docs:links PASS, prose PASS, services:ports PASS (32 records), checks:tasks exit 0.| gate: docs-links + prose + services:ports + checks:tasks PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "31cb076baad769809adc44c793c4887e234af00d",
-      "branch": "main",
-      "frame": "03hb3jlklmyhw700sibt32ofh"
-    },
-    {
-      "id": "a4f84314-616a-45e7-9091-f974271905ba",
-      "ts": "2026-11-26T15:06:33Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-services-doc",
-      "action": "claim: document delphi's tailnet portfolio services (job-db-scraper, private-deals, inventory-site) and the five CLI verbs over clanker/agent-browser/providers",
-      "outcome": "in_progress",
-      "claims": [
-        "docs/portfolio-services.md"
-      ],
-      "files": [],
-      "base_commit": "89eee1d1856f989468cedbcf9531de19afe2fc1c",
-      "branch": "main",
-      "frame": "03hb3j5e8zucddvm273rkxyro"
-    },
-    {
-      "id": "adbe3cb3-9ff9-40b2-832a-0f64c5dfeea7",
-      "ts": "2026-11-26T15:05:08Z",
-      "source": "buffy",
-      "subject": "nixconfig:e2e-task-verbs-and-clanker",
-      "action": "e2e all 6 verbs: agents:web search 3 providers (s1,s3 witnessed twice), extract firecrawl 'Nix 2.34.9 Reference Manual' 7731, health --via clanker 200 ok/404 fail; apps:page greenhouse 50 -> apps:ingest :8481 created 50, FTS 'account executive' 10; deals:page firecrawl 4 (merchants amazon) -> deals:ingest :8482 created 4, q=knife 1, re-run 0 new/4 updated. Fixed: glued Greenhouse label split + jobLocation. 33/… tests + checks:tasks exit 0. Servers stopped.| gate: unittest + checks:tasks PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "89eee1d1856f989468cedbcf9531de19afe2fc1c",
-      "branch": "main",
-      "frame": "03hb3ivhlwn0pfy0gzcaxni1j"
-    },
-    {
-      "id": "aac2d222-c7f1-4682-941c-d756f8397773",
-      "ts": "2026-11-26T15:04:07Z",
-      "source": "devin",
-      "subject": "nixconfig:private-deals-batch-alerts",
-      "action": "claim: upgrade private-deals with POST /api/deals/batch, watchlist-match alert evaluation, optional ntfy/webhook notifications deduped per deal+price, price-history/trend and alert UI polish; scoped only to modules/services/private-deals*",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/private-deals",
-        "modules/services/private-deals.nix"
-      ],
-      "files": [],
-      "base_commit": "4960effb92e8e9f98795b7606fa5c39b38982505",
-      "branch": "main",
-      "frame": "03hb3io9kbx6z3sl6fink2jkt"
-    },
-    {
-      "id": "463474c7-014b-49e4-9052-d046f82867b1",
-      "ts": "2026-11-26T15:03:10Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-site-publish",
-      "action": "landed: published matt CV site origin (root 61cc526f22f453ed == artifact), appflow guard audit green (checks:appflow + roundtrip, 380 docs) | gate: checks:appflow PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f2eb9f3eae5463dc6170fc6c175e913c1980c994",
-      "branch": "main",
-      "frame": "03hb3ihpemnanl3uau7uqzkb2"
-    },
-    {
-      "id": "26099aa7-ace7-4a8e-9266-0362f4bf07c1",
-      "ts": "2026-11-26T15:02:22Z",
-      "source": "buffy",
-      "subject": "nixconfig:e2e-task-verbs-and-clanker",
-      "action": "claim: exercise agents:web, apps:page+apps:ingest, deals:page+deals:ingest end to end against local test instances and fix what breaks",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task tests"
-      ],
-      "files": [],
-      "base_commit": "4960effb92e8e9f98795b7606fa5c39b38982505",
-      "branch": "main",
-      "frame": "03hb3ibzxoixy1k9h08pxl39l"
-    },
-    {
-      "id": "57f27219-c17d-4299-ad57-0bc75fe68805",
-      "ts": "2026-11-26T15:01:32Z",
-      "source": "buffy",
-      "subject": "nixconfig:checks-tasks-apps-summary",
-      "action": "apps:sweep:pipeline summary 648 -> 534 chars, same facts (six boards, lane filter, dedupe, not-filed rule, APPLY/MAIL/XS); task checks:tasks now 'hard violations: none' exit 0. Health: sentinel ok, clanker running, delphi disk 87G/195G (48%, 98G free), mem 4.7Gi/11Gi used 6.9Gi avail, zram 1G/5.8G, 0 failed units, running, load 2.19.| gate: task checks:tasks exit 0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4960effb92e8e9f98795b7606fa5c39b38982505",
-      "branch": "main",
-      "frame": "03hb3i65rd4n53fioopvz3cu2"
-    },
-    {
-      "id": "ccd5d718-3594-403f-94ef-f548d5d8949c",
-      "ts": "2026-11-26T15:01:29Z",
-      "source": "devin",
-      "subject": "nixconfig:inventory-site-service",
-      "action": "landed inventory-site: Go SQLite/FTS5 asset register with items, locations, categories, tags, serials, warranties, value, JSON+CSV import/export, inventory.toml host seed, API+UI; delphi mount 8466 -> 127.0.0.1:8103 | gates: go test PASS, go vet PASS, aarch64 nix build PASS, alejandra PASS, checks:registry:compiled PASS, checks:host HOST=delphi PASS",
-      "outcome": "done",
-      "claims": [
-        "modules/services/inventory-site",
-        "modules/services/inventory-site.nix",
-        "hosts/delphi/configuration.nix",
-        "inventory.toml",
-        "modules.toml",
-        "lib/registry-schema.nix",
-        "docs/delphi-runtime.md"
-      ],
-      "files": [
-        "modules/services/inventory-site",
-        "modules/services/inventory-site.nix",
-        "hosts/delphi/configuration.nix",
-        "inventory.toml",
-        "modules.toml",
-        "lib/registry-schema.nix",
-        "docs/delphi-runtime.md"
-      ],
-      "base_commit": "0a7e5995",
-      "branch": "main",
-      "frame": "03hb3i5r0vb8pbbr3qfq0t8a1"
-    },
-    {
-      "id": "f77e1a67-42bc-4e76-b1f0-9b4608b96bb0",
-      "ts": "2026-11-26T15:01:16Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:publish-frieren-cv-site",
-      "action": "Drove idle freebuff pane agents:2.1 (publish); jev-decide selected publish p=0.93/m=0.90; task fed via load-buffer+paste-buffer, DeepThink started",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hb3i49b1wkws7dtry1iorti"
-    },
-    {
-      "id": "36863132-8333-4a7f-839b-56146e2404cd",
-      "ts": "2026-11-26T15:00:19Z",
-      "source": "buffy",
-      "subject": "nixconfig:checks-tasks-apps-summary",
-      "action": "claim: trim apps:sweep:pipeline summary under the 600-char budget so checks:tasks exits 0, then read fleet health",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/apps.yml"
-      ],
-      "files": [],
-      "base_commit": "0a7e59956b0a908a9b17ec5aedbd1b78a801d6fc",
-      "branch": "main",
-      "frame": "03hb3hxjrjdcaghlklmnv9544"
-    },
-    {
-      "id": "8b6422b3-795d-4e52-a10a-74129e1dac52",
-      "ts": "2026-11-26T14:58:58Z",
-      "source": "buffy",
-      "subject": "nixconfig:deals-research-taskfile-wiring",
-      "action": "taskfiles/deals.yml (deals:page, deals:ingest) included in Taskfile.yml; agents:web in agents.yml; README map updated; no internal:true. task --list-all shows 3 (desc 116-148), task <name> -- --help reaches argparse, live: deals:page firecrawl 2 deals amazon, deals:ingest dry-run 5, agents:web search 3 providers 2 hits. checks:tasks clean for my files (pre-existing longSummary apps:sweep:pipeline at e958d546). 40+17+28 tests OK.| gate: checks:tasks + 3 unittest suites PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0a7e59956b0a908a9b17ec5aedbd1b78a801d6fc",
-      "branch": "main",
-      "frame": "03hb3ho28of3w8zfv8e1255h0"
-    },
-    {
-      "id": "ed500ae2-25b3-49d4-97c0-aadd8e7e4e7a",
-      "ts": "2026-11-26T14:56:00Z",
-      "source": "buffy",
-      "subject": "nixconfig:deals-research-taskfile-wiring",
-      "action": "claim: expose deals:page, deals:ingest and agents:web as visible tasks with descriptions, no internal:true",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/deals.yml Taskfile.yml taskfiles/agents.yml"
-      ],
-      "files": [],
-      "base_commit": "4f6485846f63b8613dd958c7afc1e4c94495a0d4",
-      "branch": "main",
-      "frame": "03hb3h36ry8tvpshhav72n77b"
-    },
-    {
-      "id": "aacd067e-4c4b-45e7-aa21-5e8ca5c7d753",
-      "ts": "2026-11-26T14:55:46Z",
-      "source": "devin",
-      "subject": "nixconfig:inventory-site-service",
-      "action": "landed: inventory-site tailnet service — SQLite/FTS5 assets with locations/categories/tags/serials/warranties/value, JSON+CSV import-export, facet UI, fleet hosts seeded from the eval-time inventory projection; loopback :8101, mount :8465; also fixed private-deals port collisions (8099->8100 off turns-dashboard, 8462->8464 off appflow vhost) | gates: go test, sandbox build, checks:registry:compiled, checks:host HOST=delphi PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f2eb9f3eae5463dc6170fc6c175e913c1980c994",
-      "branch": "main",
-      "frame": "03hb3h1ne9t83zzbqys5zs0ol"
-    },
-    {
-      "id": "a9c25d11-d9c9-4cea-b3ff-8e14697fb0ea",
-      "ts": "2026-11-26T14:54:13Z",
-      "source": "buffy",
-      "subject": "nixconfig:clanker-web-research-cli",
-      "action": "web-research.py: search (tavily+context+firecrawl merged by canonical URL, s1..sN sources with accessed), extract (firecrawl/context/tavily/browser/http), health (agent-browser local|clanker, rendered-chars/ready/app-shell verdict), --format json|toon. Live: 3-provider search 8 hits, 3 witnessed twice; extract firecrawl 'Nix 2.34.9 Reference Manual' 7731 chars; browser on clanker 917 chars; health clanker 200 ok / 404 fail. 28 tests.| gate: unittest discover tests/web-research PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4f6485846f63b8613dd958c7afc1e4c94495a0d4",
-      "branch": "main",
-      "frame": "03hb3gqq0b6r9cgev7jdb9ktq"
-    },
-    {
-      "id": "c27c377e-8044-4e58-af3d-019361bdf30f",
-      "ts": "2026-11-26T14:49:54Z",
-      "source": "buffy",
-      "subject": "nixconfig:clanker-web-research-cli",
-      "action": "claim: one CLI for search+extract+rendered-page health over context/tavily/firecrawl/clanker agent-browser with cited, deduped JSON/TOON output",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/web-research.py tests/web-research"
-      ],
-      "files": [],
-      "base_commit": "2294022f64828b5335b29ed4fcec87a648993a84",
-      "branch": "main",
-      "frame": "03hb3fwelu2d5rp942zw95x6t"
     }
   ]
 }

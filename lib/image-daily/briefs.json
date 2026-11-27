@@ -235,10 +235,10 @@
       "lane": "wall",
       "every": 4,
       "size": "1536x1024",
-      "name": "frieren-sleep.png",
-      "prompt": "Frieren, the elf mage from the anime Frieren: Beyond Journey's End, asleep in a field of white flowers with her staff beside her, seen from a low angle, cel-shaded anime illustration, one clear focal point, soft morning light, no text.",
-      "expect": "Frieren asleep in a flower field, never an abstract emblem or a UI panel",
-      "rev": 3
+      "name": "meadow-sleep.png",
+      "prompt": "A sleeping red fox curled peacefully on a mossy stone step in a quiet meadow of white wildflowers at dawn, illustrated scene, one clear focal point, soft morning light, no text.",
+      "expect": "a sleeping red fox in a flower meadow, never an abstract emblem or a UI panel",
+      "rev": 5
     },
     {
       "id": "wall-nixconfig-dark",

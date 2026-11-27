@@ -40,7 +40,7 @@ ALLOW="${ALLOW:-}"
 # below MAX and shrink-only: a trim lowers this number in the commit that frees
 # the bytes, nothing raises it. History is judged by the same ceiling, because
 # the older revisions below it are the record, not drift.
-AGENTS_CEILING="${AGENTS_CEILING:-533819}"
+AGENTS_CEILING="${AGENTS_CEILING:-522636}"
 self="scripts/task/repo-blobs.sh"
 
 mode=""

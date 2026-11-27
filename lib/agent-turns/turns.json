@@ -1,8 +1,80 @@
 {
-  "generated": "2026-11-27T07:55:42Z",
+  "generated": "2026-11-27T08:16:56Z",
   "count": 200,
-  "pin": "57d3396c06c0845f6c6a32784ad6b350b3e630dcf5b21b8a01e8c5378822c141",
+  "pin": "95976e12c5daaa7843bb0cedab8d4ed71d2bb917327ad23bd18734b91546a3a3",
   "turns": [
+    {
+      "id": "1dec0b4d-2f16-4706-b7dc-a918b4584136",
+      "ts": "2026-11-27T08:11:15Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-note-change",
+      "action": "freebuff p2: CV packet note-change started",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "f77ec7fab0ddd4b47f43bb9de1fb9e8cccc122a0",
+      "branch": "main",
+      "frame": "03hb93bk3i01uohlpw8cdcjwc"
+    },
+    {
+      "id": "7a7fc9f7-a644-4824-9505-cd747ff0dc82",
+      "ts": "2026-11-27T08:08:17Z",
+      "source": "freebuff",
+      "subject": "nixconfig:delphi-health-fix",
+      "action": "prepared: commit 0ffca974 on delphi-private-deals-port pins services.private-deals.port=8104 (8100 is media-relay); checks:host HOST=delphi PASS 2168 assertions; deploy held until pane 2 zeno install completes",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi",
+        "modules/services/private-deals.nix"
+      ],
+      "files": [],
+      "base_commit": "9b284f018a1dfdf501fd504f96d75cd90077fbb4",
+      "branch": "main",
+      "frame": "03hb92qoajjfn4banwqh9w4kv"
+    },
+    {
+      "id": "abfdc52f-a401-4796-b16f-b5c90dfc8fce",
+      "ts": "2026-11-27T07:57:11Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-note-change",
+      "action": "done freebuff note-change: f77ec7fa skills + e1131a45 AGENTS.nix ceiling, pushed origin/main",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "f77ec7fab0ddd4b47f43bb9de1fb9e8cccc122a0",
+      "branch": "main",
+      "frame": "03hb90kqxblwiukp6m3bhavu7"
+    },
+    {
+      "id": "644a6c7c-6a9e-40d6-9c66-6847b601aa49",
+      "ts": "2026-11-27T07:56:39Z",
+      "source": "freebuff",
+      "subject": "nixconfig:agents-nix-ceiling-skills",
+      "action": "landed: committed the 12 untracked skills (f77ec7fa) and gave AGENTS.nix a shrink-only ceiling in repo-blobs.sh (e1131a45); trim plan measured: 36 sweep notes hold 104.6KB, compressing the 8 largest frees 29.7KB | gate: repo-blobs --index PASS, kg-check PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f77ec7fab0ddd4b47f43bb9de1fb9e8cccc122a0",
+      "branch": "main",
+      "frame": "03hb90gwbv470std9qnd3oh1q"
+    },
+    {
+      "id": "1ab8af9b-9b4a-4c3c-984d-839b9a200824",
+      "ts": "2026-11-27T07:56:22Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-note-change",
+      "action": "drive freebuff note-change: gate the ceiling, commit untracked skills, push origin/main",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "f77ec7fab0ddd4b47f43bb9de1fb9e8cccc122a0",
+      "branch": "main",
+      "frame": "03hb90ew9uwjvcoor34wv39hd"
+    },
     {
       "id": "75d4bff4-8876-4096-81eb-7b74955d6c55",
       "ts": "2026-11-27T07:51:51Z",
@@ -2974,80 +3046,6 @@
       "base_commit": "befef047856483e497da0fc1e0dad09a226e2ba9",
       "branch": "main",
       "frame": "03hb40w1g46p1ixsboyp5jqhh"
-    },
-    {
-      "id": "593c6b7c-1b64-46d3-81a0-269b95de2df2",
-      "ts": "2026-11-26T16:36:45Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-endpoints-smoke",
-      "action": "claim: taking over from tmux-pane-steward; task-change|0.27 delphi services endpoints smoke — reading the runtime page and what already exists before writing a new verb",
-      "outcome": "in_progress",
-      "claims": [
-        "docs/delphi-runtime.md"
-      ],
-      "files": [],
-      "base_commit": "46e401129415e0f79b19af06a7b93b3e7fe52634",
-      "branch": "main",
-      "frame": "03hb40rt2bycvinxv92xz0hk2"
-    },
-    {
-      "id": "a38581d1-c362-45d2-adcb-5b4a03f58a9c",
-      "ts": "2026-11-26T16:36:45Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-smoke-taskfile",
-      "action": "agents:portfolio:smoke wired to portfolio-smoke.py (summary 587 chars, not internal); docs/portfolio-services.md gains clanker-runner (loopback 8104 / tailnet 8467, machine + job routes) and the verb, with what it calls a pass. Inventory-site untouched; committed through a temp GIT_INDEX_FILE so Pane 3's staged work stayed staged.| gate: checks:tasks 842 tasks no hard violations, unittest 31 OK, task agents:portfolio:smoke -- --help prints usage",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "46e401129415e0f79b19af06a7b93b3e7fe52634",
-      "branch": "main",
-      "frame": "03hb40rqxgxjzb97ij0q7pcfp"
-    },
-    {
-      "id": "5422230b-2f20-410f-b2a2-476acdd67eca",
-      "ts": "2026-11-26T16:35:27Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:frieren-gates-audit",
-      "action": "incident|0.66|0.5: checks_quick_and_hosts_audit (take over)",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/frieren",
-        "taskfiles/checks.yml"
-      ],
-      "files": [],
-      "base_commit": "28f54a28ae51abeee22abfd7422dec81009edad2",
-      "branch": "main",
-      "frame": "03hb40ilv1mkrta4dpisygk74"
-    },
-    {
-      "id": "da005584-fed0-48b5-afca-849e186b0b6b",
-      "ts": "2026-11-26T16:35:04Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-endpoints-smoke",
-      "action": "task-change|0.27|0.05000000000000002: delphi_services_endpoints_smoke…",
-      "outcome": "in_progress",
-      "claims": [
-        "docs/delphi-runtime.md"
-      ],
-      "files": [],
-      "base_commit": "28f54a28ae51abeee22abfd7422dec81009edad2",
-      "branch": "main",
-      "frame": "03hb40fzbchvti8rqney2ctkw"
-    },
-    {
-      "id": "ce17caf7-d2c3-4d97-a758-932240ebff07",
-      "ts": "2026-11-26T16:35:02Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:skills-sync-backport",
-      "action": "bug-fix|0.71|0.62: skills_sync_backport (take over)",
-      "outcome": "in_progress",
-      "claims": [
-        ".agents/skills"
-      ],
-      "files": [],
-      "base_commit": "28f54a28ae51abeee22abfd7422dec81009edad2",
-      "branch": "main",
-      "frame": "03hb40fqmeoc84abexvgd92sw"
     }
   ]
 }

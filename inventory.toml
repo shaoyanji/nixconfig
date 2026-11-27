@@ -1092,7 +1092,7 @@ ssh_alias = "lumi"
 [hosts.lumi.software]
 module_chain = "globalModulesHome"
 impermanence = false
-key_services = ["openssh (NAT 10033 -> 22)", "tailscaled", "nix-daemon (max-jobs = 0)", "sops-nix (user)", "cloudflared (lumi.bountystash.com)"]
+key_services = ["openssh (NAT 10033 -> 22)", "tailscaled", "nix-daemon (max-jobs = 0)", "sops-nix (user)", "cloudflared (lumi.bountystash.com) → lumi-http :8081 as the tunnel origin"]
 services = [{ name = "openssh", port = 22 }, { name = "tailscale" }, { name = "nix" }, { name = "cloudflared" }, { name = "lumi-http", port = 8081 }]
 traits = ["cloud-server", "x86_64", "1gb-ram", "nat-vps", "debian-12", "standalone-home-manager", "lean-profile"]
 

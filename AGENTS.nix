@@ -2827,9 +2827,11 @@
         docs = ["docs/media-relay.md" "docs/storage-taxonomy.md"];
       };
       body = ''
-        **The rule.** Pick the lane by identity before bandwidth: delphi 1.38 Gbps down
-        and 10 TB/month free on a datacenter IP, frieren 50/20 on the only residential
-        IP, lumi ~50 Mbps on a shared US NAT IP and 961 MiB — home is trust, not bytes.
+        **The rule.** Pick the lane by identity before bandwidth: delphi 1.38 Gbps and
+        10 TB/month on a datacenter IP, frieren 50/20 on the only residential, lumi
+        ~50 Mbps behind a shared US NAT — home is trust, not bytes. Seen live: delphi
+        92.5.115.103 AS31898, frieren 79.215.107.59 AS3320 on a direct path; lumi has
+        no direct path (DERP dfw), so 93.127.139.146 stays a lookup.
 
         **Lanes.** `bulk` (delphi): RSS, sitemaps, HF, GitHub, corpora,
         many-connection pulls. `us` (lumi): US-only pricing, retail and APIs — JSON
@@ -2841,20 +2843,18 @@
 
         **Built, and ranked (Jev 1.14.0).** Cache 57%, broker 30%, sink 7%, rest 1%;
         cache-then-broker 61% at 0.52 confidence. `fetchcache`
-        keys a page by SHA-256 of the normalised URL, stores body, ETag,
-        Last-Modified and fetched-at, turns a stored validator into
-        `If-None-Match`, and moves fetched-at on a 304 at zero upstream bytes; the
-        three services adopt it with their caps intact. `fetch-broker` answers
-        `POST /v1/fetch` on the tailnet, owns the lanes through
-        `tailnet-forward-proxy`, and enforces the fallback rule itself.
+        keys a page by SHA-256 of the URL, stores body, ETag, Last-Modified and
+        fetched-at, revalidates with `If-None-Match` on a 304 at zero upstream bytes;
+        three services adopt it with caps intact. `fetch-broker` answers
+        `POST /v1/fetch`, owns the lanes through `tailnet-forward-proxy`, and applies
+        the rule.
 
         **Measured (2026-11-28, delphi, 20 URLs, twice).** Cold p50 154 then 152 ms,
         p95 823 then 726, 1.40 MB upstream, 0.15 s a page; the set warm p50 46 then
         41 ms, 0.085 MB — 94% fewer bytes, 3.3-3.7x faster; direct p50 165 then 256
         ms, so a miss costs no more. No proxy is deployed and the shipped defaults
-        do not resolve (`lumi`/`frieren` are NXDOMAIN to crab-hole), so `us` fell
-        back 4/4 and `local` 502s at CONNECT, no retry, as designed. gnu.org fails
-        from bulk too.
+        do not resolve, so `us` falls back on DNS and `local` 502s at CONNECT, no
+        retry; gnu.org fails from bulk.
       '';
     };
     exp-120 = {

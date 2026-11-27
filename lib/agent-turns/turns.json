@@ -1,8 +1,120 @@
 {
-  "generated": "2026-11-27T23:28:17Z",
+  "generated": "2026-11-27T23:35:59Z",
   "count": 200,
-  "pin": "dae1c70f8c95a9035ae12eb70207ba9279c2954d7df08fc0aad44d14cb60e1a3",
+  "pin": "b15be4cb10e9f4fe9a37cb46a13d6f2f18a72f9a06388a1eab3ff8bf4945e099",
   "turns": [
+    {
+      "id": "efdab6cb-6402-4dcc-8f97-55fbb9bc533c",
+      "ts": "2026-11-27T23:35:11Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-cv-ats-land-2026-11-28",
+      "action": "landed: cherry-picked db40d4fa onto origin/main b69b233f as 2ca9a316 and pushed (b69b233f..2ca9a316); .#sites.cv-ats-site builds 6/6 on the upstream tree and its artifact is byte-identical to live cv-ats-8lh.pages.dev; shared checkout's 23 dirty files untouched, local main not rebased (would disturb other lanes) — still 4 ahead/132 behind. | gate: nix build .#sites.cv-ats-site + pins --check PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/matt",
+        "lib/matt-site.nix",
+        "flake/packages.nix"
+      ],
+      "files": [
+        "lib/cv-ats-site.nix",
+        "lib/cv-ats-report.py",
+        "lib/matt-site.nix",
+        "flake/packages.nix",
+        "taskfiles/site-manifest.json",
+        "scripts/task/site-target.sh",
+        "docs/cv-ats-compliance.md"
+      ],
+      "base_commit": "db40d4fa3519d1e1ca48af45b302d9fa0f62f85f",
+      "branch": "main",
+      "frame": "03hbe3t2l6lbzy595ybe7lr78"
+    },
+    {
+      "id": "7ae621ba-333b-4c52-8812-bebe5173cb24",
+      "ts": "2026-11-27T23:34:38Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-egress-ips-2026-11-28",
+      "action": "claim: verify per-lane egress identity, record in the egress note, push",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "b69b233f6620bd68172efdc96d9bd4b47caf1435",
+      "branch": "main",
+      "frame": "03hbe3p89729v571p9x7rtseb"
+    },
+    {
+      "id": "01f41f7f-1b07-4787-8ad1-0c3728b5db24",
+      "ts": "2026-11-27T23:34:12Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-egress-ips-2026-11-28",
+      "action": "verify lane egress IPs, record in egress note, push",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "db40d4fa3519d1e1ca48af45b302d9fa0f62f85f",
+      "branch": "main",
+      "frame": "03hbe3m5vfkkd3etv54ij2ri4"
+    },
+    {
+      "id": "8844da8e-789c-462a-9c5b-2e556e6f38e7",
+      "ts": "2026-11-27T23:34:09Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-ats-land-2026-11-28",
+      "action": "rebase local main onto origin/main, push cv-ats commit db40d4fa",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt",
+        "lib/matt-site.nix",
+        "flake/packages.nix"
+      ],
+      "files": [],
+      "base_commit": "db40d4fa3519d1e1ca48af45b302d9fa0f62f85f",
+      "branch": "main",
+      "frame": "03hbe3lsrxn6lvw2ncfh9an0o"
+    },
+    {
+      "id": "c4437e4a-04a6-49f7-95dd-66d0b29e0e44",
+      "ts": "2026-11-27T23:29:19Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-cv-ats-surface-2026-11-28",
+      "action": "publish 0.9: .#sites.cv-ats-site — six CVs re-read against their records, page + report.json; manifest target cv-ats + new pages deploy method; live cv-ats-8lh.pages.dev serves index sha == build, report ok 6/6, matt-site output unchanged; commit db40d4fa is local (main 4 ahead/126 behind, no push). | gate: nix build .#sites.cv-ats-site PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/matt",
+        "lib/matt-site.nix",
+        "flake/packages.nix",
+        "taskfiles/site-manifest.json",
+        "scripts/task/site-target.sh"
+      ],
+      "files": [
+        "lib/cv-ats-site.nix",
+        "lib/cv-ats-report.py",
+        "lib/matt-site.nix",
+        "flake/packages.nix",
+        "taskfiles/site-manifest.json",
+        "scripts/task/site-target.sh",
+        "docs/cv-ats-compliance.md"
+      ],
+      "base_commit": "db40d4fa3519d1e1ca48af45b302d9fa0f62f85f",
+      "branch": "main",
+      "frame": "03hbe2ntm7taf5ihn270nq36x"
+    },
+    {
+      "id": "8f3d80d1-57cb-42c1-85b1-1b65a58bc1ff",
+      "ts": "2026-11-27T23:28:29Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-egress-perf-2026-11-28",
+      "action": "landed: second 20-URL pass reproduces the first (cold p50 154->152 ms at 1.40 MB, warm 46->41 ms at 0.085 MB, direct 165->256 ms); live endpoints verified — :8470/:8471/:8469 all closed and lumi/frieren NXDOMAIN to crab-hole, so us falls back on DNS not CONNECT and local never reaches a proxy; note carries both runs | gate: agents-notes-schema PASS + repo-blobs --index clean (510 KiB/522082)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b69b233f6620bd68172efdc96d9bd4b47caf1435",
+      "branch": "main",
+      "frame": "03hbe2hzw01pvmqbst6ro88c0"
+    },
     {
       "id": "8b225c82-02f0-4a19-a1a6-5f42fc9ba3be",
       "ts": "2026-11-27T23:25:47Z",
@@ -2849,91 +2961,6 @@
       "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
       "branch": "main",
       "frame": "03hbabbd44xp1hmw6cwq8ha30"
-    },
-    {
-      "id": "e0bf1be1-d170-4aaf-b4b4-d3c1015055da",
-      "ts": "2026-11-27T11:52:12Z",
-      "source": "devin",
-      "subject": "nixconfig:lumi-access-traefik",
-      "action": "claim: lumi ssh access, Debian package refresh, and Traefik public ingress",
-      "outcome": "in_progress",
-      "claims": [
-        "lumi-host"
-      ],
-      "files": [],
-      "base_commit": "e2e6b78b4366fd6b14ba89f5d909f3e81a3adf89",
-      "branch": "zeno-stage1",
-      "frame": "03hbaahejcdavzs271txshk03"
-    },
-    {
-      "id": "ea742827-9ca1-41cc-89ec-1fbba63f8c14",
-      "ts": "2026-11-27T11:49:31Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-freebuff-cv-jobscout",
-      "action": "scout CV job leads, fold into CV job-search page, gate + push",
-      "outcome": "in_progress",
-      "claims": [
-        "ryoku-cv"
-      ],
-      "files": [],
-      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
-      "branch": "main",
-      "frame": "03hba9yinb8954rr8jt7gzk52"
-    },
-    {
-      "id": "18a6aa26-7f96-4f8c-b332-4bd8a91fd0b5",
-      "ts": "2026-11-27T11:41:32Z",
-      "source": "devin",
-      "subject": "nixconfig:lumi-stage1",
-      "action": "landed: Debian 12 hardened (devji sudo, ssh key-only, ufw, zram+2G swap); Nix 2.36.0 with persistent max-jobs=0; Home Manager generation 1 active from github commit; user sops age recipient rekeyed and decrypts; Tailscale lumi 100.110.93.14 reachable; cloudflared+lumi-http survive reboot and https://lumi.bountystash.com returns 200 | gate: nixcachix workflow_dispatch 45991578137 PASS; post-reboot ssh/nix/hm/sops/tailscale/public verification PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e2e6b78b4366fd6b14ba89f5d909f3e81a3adf89",
-      "branch": "zeno-stage1",
-      "frame": "03hba8ec77zdk41gzl0mnn7gz"
-    },
-    {
-      "id": "29fc7ded-cf0a-4b01-b0a2-28c1c5ec5b62",
-      "ts": "2026-11-27T11:40:45Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-3-delphi-rate-limited",
-      "action": "delphi wedged on free Gemini quota; backed off",
-      "outcome": "blocked: free Gemini quota exhausted (~142h reset); plain agy not on PATH; TUI wedged; backed off per skill",
-      "claims": [],
-      "files": [],
-      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
-      "branch": "main",
-      "frame": "03hba88surbn2fdpoq7wn6art"
-    },
-    {
-      "id": "cc4ce6e4-b7a9-45fe-8ae2-1db0c6e9eb28",
-      "ts": "2026-11-27T11:40:36Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin-lumi-stage1",
-      "action": "drove devin agents:1.1 via jev; lumi-stage1-finish p=0.97",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
-      "branch": "main",
-      "frame": "03hba87ttyp0aq4qmcgfhu43h"
-    },
-    {
-      "id": "5fc26d78-cbfc-4a6d-a90e-d15be5550bf8",
-      "ts": "2026-11-27T11:39:15Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout-leads-2026-11-27",
-      "action": "landed: CV site confirmed live (matt.bountystash.com / /de/ /work/nixos-fleet /de/work/nixos-fleet /brief/platform all 200; matt:cv:check 14 ok 0 failed, every PDF sha == build artifact). Filed 3 new leads with packets: magazino...devops-infras (fit 5, NixOS), applicative...rust-linux-nix (fit 4, Nix), infios...ki-infrastruktur (fit 3). All three held, nothing sent | gate: checks:appflow PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/matt",
-        "scripts/task"
-      ],
-      "files": [],
-      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
-      "branch": "main",
-      "frame": "03hba7ya4v3m7xzhu79lvv9sx"
     }
   ]
 }

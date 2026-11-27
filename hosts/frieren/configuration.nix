@@ -475,6 +475,8 @@ in {
   # --- Thermal management (controls fan curve on Intel) ---
   services.thermald.enable = true;
 
+  programs.dms-greeter.enable = false;
+
   # --- Boot persona: headless server by default, desktop on demand ---
   # This file is the boot default: no compositor, no greeter, no DisplayLink, no
   # X. specialisation.desktop (desktop.nix) adds the niri media-centre stack

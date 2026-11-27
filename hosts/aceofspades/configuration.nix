@@ -19,5 +19,7 @@
   ];
   system.stateVersion = "24.05";
   services.displayManager.sddm.enable = true;
+  programs.dms-greeter.enable = false;
+  ssh.ca.enableClient = false;
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 }

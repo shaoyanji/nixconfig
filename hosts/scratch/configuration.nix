@@ -19,6 +19,7 @@
   # profile (modules/profiles/dwl-desktop.nix); this host only chooses which of
   # them it wants.
   profiles.dwlDesktop.enable = true;
+  programs.dms-greeter.enable = false;
 
   # Replaces the fleet userland default; see [[flake/policies.nix#desktop-fork-not-disable]].
   fleet.hmUserModules = [

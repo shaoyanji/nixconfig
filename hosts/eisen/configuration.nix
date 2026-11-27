@@ -4,7 +4,6 @@
 {
   self,
   pkgs,
-  lib,
   user,
   ...
 }: {
@@ -42,6 +41,7 @@
   # Steam provides at the priority it is set); greetd ignores it and autologins
   # from `default_session` instead.
   services.displayManager.defaultSession = "steam";
+  programs.dms-greeter.enable = false;
 
   # X server for XWayland: Steam spawns legacy X11-only windows inside
   # gamescope's Wayland surface.
@@ -94,16 +94,18 @@
   # are set to "both" so eisen can act as an exit node and subnet router
   # if needed later.  DNS through the pi-hole at frieren (100.97.61.65)
   # keeps ad-blocking consistent across the tailnet.
+  fleet.tailscale = {
+    clientPolicy = true;
+    acceptDns = false;
+    acceptRoutes = false;
+  };
+
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "both";
     # eisen is physically on 192.168.3.0/24 (LAN). Accepting the tailnet's
     # advertised 192.168.3.0/24 subnet route causes table 52 to hijack all
     # direct LAN traffic (e.g. Steam Link at 192.168.3.48), breaking local streaming.
-    extraSetFlags = lib.mkForce [
-      "--accept-dns=false"
-      "--accept-routes=false"
-    ];
   };
 
   # profiles.dnsClient: resolved queries the whole list in parallel — ads best-effort.

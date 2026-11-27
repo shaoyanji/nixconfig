@@ -28,10 +28,8 @@
   # address on a "LAN" ssh becomes 100.100.253.25). eisen hit the identical
   # bug on Steam Link and documents the same override (hosts/eisen).
   # Tailscale's "skips routes for directly-attached subnets" did not hold here.
-  services.tailscale.extraSetFlags = lib.mkForce [
-    "--accept-dns=true"
-    "--accept-routes=false"
-  ];
+  fleet.tailscale.clientPolicy = true;
+  fleet.tailscale.acceptRoutes = false;
 
   # Declarative Fleet DNS: Pi-hole on frieren (192.168.3.25 LAN / 100.97.61.65 Tailscale)
   # Scoped specifically to ~lan and ~frieren.lan routing domains.

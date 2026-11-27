@@ -9,6 +9,7 @@
   lanServer = "192.168.3.25"; # frieren, static LAN address
   tailnetServer = "100.97.61.65"; # frieren over Tailscale
   exportPath = "/data"; # NFSv4 pseudo-root → /export/data on frieren
+  cfg = config.profiles.nasClient;
 
   # A NAS server does not mount its own export, and which host that is belongs in
   # inventory.toml (`nas-server`) rather than in a name compared here: this profile
@@ -168,8 +169,14 @@
     # never wait on the governor (it probes the network with a 3 s timeout).
     exec ${pkgs.systemd}/bin/systemctl start --no-block nas-path-governor.service
   '';
-in
-  lib.mkIf (!isNasServer) {
+in {
+  options.profiles.nasClient.extraOptions = lib.mkOption {
+    type = lib.types.listOf lib.types.str;
+    default = [];
+    description = "Additional NFS mount options for hosts with a stricter local mount policy.";
+  };
+
+  config = lib.mkIf (!isNasServer) {
     environment.systemPackages = [
       pkgs.nfs-utils
       governor
@@ -187,20 +194,22 @@ in
     fileSystems.${mountPoint} = {
       device = "${lanServer}:${exportPath}";
       fsType = "nfs";
-      options = [
-        "x-systemd.automount"
-        "_netdev"
-        "nofail"
-        "noauto"
-        "x-systemd.idle-timeout=60"
-        "x-systemd.device-timeout=5s"
-        "x-systemd.mount-timeout=8s"
-        # Roaming-safe: bounded RPC timeouts, never an indefinite block.
-        # See the module header for why this is not `hard`.
-        "soft"
-        "timeo=100"
-        "retrans=2"
-      ];
+      options =
+        [
+          "x-systemd.automount"
+          "_netdev"
+          "nofail"
+          "noauto"
+          "x-systemd.idle-timeout=60"
+          "x-systemd.device-timeout=5s"
+          "x-systemd.mount-timeout=8s"
+          # Roaming-safe: bounded RPC timeouts, never an indefinite block.
+          # See the module header for why this is not `hard`.
+          "soft"
+          "timeo=100"
+          "retrans=2"
+        ]
+        ++ cfg.extraOptions;
     };
 
     systemd.units = {
@@ -274,4 +283,5 @@ in
       after = ["nas-path-governor.service"];
       serviceConfig.ExecStartPre = "${gcRootGuard}/bin/nas-gc-root-guard";
     };
-  }
+  };
+}

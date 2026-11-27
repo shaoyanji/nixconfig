@@ -1,8 +1,216 @@
 {
-  "generated": "2026-11-27T10:00:37Z",
+  "generated": "2026-11-27T11:01:40Z",
   "count": 200,
-  "pin": "05af194b5ed0d6cfaa40c7d7c6e078ec39dc951ce825ab01b317ba573c8c4958",
+  "pin": "30a5510912b508896bebaaa51b5baac3f220d72f48be0adf07ad32134a04318d",
   "turns": [
+    {
+      "id": "0a1a1a66-ac97-4e2e-b758-94be1bf0b065",
+      "ts": "2026-11-27T10:57:35Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-27: 1 plate(s) kept of 1 spent, 0 roster row(s) waiting, 789 asset(s) published",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0c8ab0bc08608087a8c787ee591eff097b4df353",
+      "branch": "main",
+      "frame": "03hb9ztf13p9wy2o0mmk6zta6"
+    },
+    {
+      "id": "3d043c89-6e73-4133-9390-10b39833d537",
+      "ts": "2026-11-27T10:49:24Z",
+      "source": "antigravity",
+      "subject": "nixconfig:image-daily-unblock",
+      "action": "start: review parked briefs (wall-char-himmel, fleet-terminal-texture) and unhold/run image-daily-round for kept wallpaper",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/image-daily/briefs.json",
+        "lib/image-daily/plates.txt",
+        "lib/image-daily/rotation.json"
+      ],
+      "files": [],
+      "base_commit": "0c8ab0bc08608087a8c787ee591eff097b4df353",
+      "branch": "main",
+      "frame": "03hb9y7smdu3jpgblb3sz8ezr"
+    },
+    {
+      "id": "b3ab063d-a683-4440-86a0-4e3a3b5927c9",
+      "ts": "2026-11-27T10:48:34Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:image-daily-unblock",
+      "action": "unblock wallpaper: clear parked rerolls, run round",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "0c8ab0bc08608087a8c787ee591eff097b4df353",
+      "branch": "main",
+      "frame": "03hb9y1xb8o54ocbr85pwl0o7"
+    },
+    {
+      "id": "3d6e2789-c794-4064-99d6-2eaa1cf6112e",
+      "ts": "2026-11-27T10:48:34Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:cv-publish-gate",
+      "action": "cv publish gate: 6/6 PDF hash + anchor check",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "0c8ab0bc08608087a8c787ee591eff097b4df353",
+      "branch": "main",
+      "frame": "03hb9y1wrn8s7po6m2kddhonx"
+    },
+    {
+      "id": "8a8802bf-a588-413b-90b4-5debfa22cc33",
+      "ts": "2026-11-27T10:40:36Z",
+      "source": "freebuff",
+      "subject": "nixconfig:jevdecide-typesafe",
+      "action": "correction: final commit is 0a94af26 (amended from abbe3357; same change, one duplicate paragraph removed) on branch jevdecide-typesafe-first off origin/main 49d914f7 | gate: checks:prose PASS, checks:docs:links PASS, checks:skills:mirror PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9b284f018a1dfdf501fd504f96d75cd90077fbb4",
+      "branch": "main",
+      "frame": "03hb9whv2klvni7d5c7i1zgr3"
+    },
+    {
+      "id": "e3f47fd2-f431-4102-b023-838209b35d28",
+      "ts": "2026-11-27T10:38:19Z",
+      "source": "freebuff",
+      "subject": "nixconfig:job-scout",
+      "action": "filed workerbase-senior-devops-engineer (Arbeitnow, Munich, posted 2026-11-25) and built its packet: 1p letter / 2p CV A4, 11/39 highlights, 4/10 projects | gate: apps:lane STAGE=packet PASS",
+      "outcome": "in_progress",
+      "claims": [
+        "~/.local/state/appflow/submissions/workerbase-senior-devops-engineer"
+      ],
+      "files": [],
+      "base_commit": "0c8ab0bc08608087a8c787ee591eff097b4df353",
+      "branch": "main",
+      "frame": "03hb9w1xanugyaag79heif21k"
+    },
+    {
+      "id": "7364b517-aecb-4b9e-b8da-1b795272205e",
+      "ts": "2026-11-27T10:33:42Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:wallpaper-lane",
+      "action": "agy wallpaper run",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "0c8ab0bc08608087a8c787ee591eff097b4df353",
+      "branch": "main",
+      "frame": "03hb9v5cka5sqaww4ox4az153"
+    },
+    {
+      "id": "eb57b988-4636-4e82-99f0-c40813eac1be",
+      "ts": "2026-11-27T10:33:42Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:cv-publish-gate",
+      "action": "freebuff cv publish gate",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "0c8ab0bc08608087a8c787ee591eff097b4df353",
+      "branch": "main",
+      "frame": "03hb9v5aib1eaoqef0np5wb8l"
+    },
+    {
+      "id": "ef812f2d-7eea-40cf-b548-305b4c6fe0ad",
+      "ts": "2026-11-27T10:31:42Z",
+      "source": "devin",
+      "subject": "nixconfig:desktop-facts-one-module",
+      "action": "claim: implement desktop-facts-one-module; centralize six duplicated desktop facts with per-host overrides",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/profiles/base-desktop-environment.nix",
+        "modules/profiles/nas-client.nix",
+        "modules/profiles/desktop-client.nix",
+        "modules/global/dms.nix",
+        "hosts/aristotle/configuration.nix",
+        "hosts/diogenes/configuration.nix",
+        "hosts/poseidon/configuration.nix",
+        "hosts/stark/configuration.nix",
+        "hosts/fern/configuration.nix",
+        "hosts/eisen/configuration.nix",
+        "hosts/delphi/configuration.nix",
+        "hosts/frieren/configuration.nix",
+        "hosts/frieren/desktop.nix",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "0c8ab0bc08608087a8c787ee591eff097b4df353",
+      "branch": "main",
+      "frame": "03hb9ur9b2551swdxvu1am8w5"
+    },
+    {
+      "id": "6a660460-e87b-4958-9bc3-809d9eed2ad4",
+      "ts": "2026-11-27T10:25:10Z",
+      "source": "freebuff",
+      "subject": "nixconfig:jevdecide-typesafe",
+      "action": "landed: jevdecide skill now states one provider ladder with TypeSafe as the required first step (direct /v1/systemone call when jev-decide is absent) and openrouter, Laya and the in-repo scorer as named fallbacks | gate: checks:prose PASS, checks:docs:links PASS, checks:skills:mirror PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9b284f018a1dfdf501fd504f96d75cd90077fbb4",
+      "branch": "main",
+      "frame": "03hb9thbdzq8rkrhnni7fruny"
+    },
+    {
+      "id": "f025fd0e-169c-4552-b674-5ed25b7e2988",
+      "ts": "2026-11-27T10:24:24Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-publish",
+      "action": "jev publish p=0.86 -> freebuff pane agents:2.1 driving CV-site commit+publish; working... 5s confirmed",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "0c8ab0bc08608087a8c787ee591eff097b4df353",
+      "branch": "main",
+      "frame": "03hb9tbxtj4ke7o22j8qvq1oq"
+    },
+    {
+      "id": "3c9ee700-7383-4036-929e-bce782bc33a1",
+      "ts": "2026-11-27T10:08:26Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:hisolutions-cv-publish-2026-11-27",
+      "action": "freebuff: refine Hisolutions CV packet, publish static site",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "0c8ab0bc08608087a8c787ee591eff097b4df353",
+      "branch": "main",
+      "frame": "03hb9q7nbjnujr93z0ivw1m1z"
+    },
+    {
+      "id": "1bced8b5-cc79-4f2f-98a6-1ffa5f830f29",
+      "ts": "2026-11-27T10:07:49Z",
+      "source": "antigravity",
+      "subject": "nixconfig:zeno-stage1",
+      "action": "OOPSIE: Wedged zeno (93.127.139.146:10033, no VNC/reinstall). kexec OOMed on 961MiB; instead of staying on Ubuntu 24.04+Nix+Tailscale as instructed, I did an in-place NixOS GRUB+network switch (moved /boot, switch-to-configuration boot, rebooted). Box now returns No route to host; awaiting provider Ubuntu 24.04 reimage. zeno-stage1@52784dd8 has host+SOPS config (submodule .sops.yaml still needs &zenohost).",
+      "outcome": "failed: zeno VPS unreachable (No route to host) after risky in-place NixOS reboot",
+      "claims": [
+        "hosts/zeno",
+        "inventory.toml",
+        ".sops.yaml",
+        "flake/host-inventory.nix"
+      ],
+      "files": [],
+      "base_commit": "52784dd8c0e9d8d087bbe4819a70598d25982765",
+      "branch": "zeno-stage1",
+      "frame": "03hb9q3bp0bm0tila0d20b15b"
+    },
+    {
+      "id": "1bc94c69-c5fe-4b0b-9f35-8a5f9840f33b",
+      "ts": "2026-11-27T10:00:47Z",
+      "source": "freebuff",
+      "subject": "nixconfig:hisolutions-cv-prose-review-2026-11-27",
+      "action": "landed: HiSolutions packet prose pass + site republish — 4 letter lines (Deployment von Anwendungen, darunter ein Einsatz, kein Quartalsprojekt, kommuniziere), PLZ-Ort address block in both templates, CV address on its own line; live site 03527414.matt-9pf.pages.dev serves this corpus | gate: matt:build 6 CVs ATS + 91 links PASS, site:check 35/0, matt:cv:check 14/0 sha==artifact, agents:cv:publish-check 6/6",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0c8ab0bc08608087a8c787ee591eff097b4df353",
+      "branch": "main",
+      "frame": "03hb9opwrs9dokwko92rgl44o"
+    },
     {
       "id": "26538508-dc9c-4329-b307-f0a5f7ad9f13",
       "ts": "2026-11-27T09:54:24Z",
@@ -2834,214 +3042,6 @@
       "base_commit": "cfa5113da8159ef216655657587a8d3f2db5d374",
       "branch": "main",
       "frame": "03hb4b2p6xbs4vk9k13n4nzv2"
-    },
-    {
-      "id": "be336de7-5a7a-471d-a32a-ffab867781e1",
-      "ts": "2026-11-26T17:28:59Z",
-      "source": "devin",
-      "subject": "nixconfig:link-vault-service",
-      "action": "claim: tailnet link archive with FTS, extraction, collections, exports, UI, and API",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/link-vault",
-        "modules/services/link-vault.nix",
-        "hosts/delphi/configuration.nix",
-        "inventory.toml",
-        "modules.toml",
-        "lib/registry-schema.nix",
-        "docs/delphi-runtime.md"
-      ],
-      "files": [],
-      "base_commit": "da12d15c52d9143fc41458bac38fbb6cc4647425",
-      "branch": "main",
-      "frame": "03hb4az0khrvxxkinxgg8zn38"
-    },
-    {
-      "id": "6a54b292-1ba5-4663-8003-43727b87dd42",
-      "ts": "2026-11-26T17:26:31Z",
-      "source": "devin",
-      "subject": "nixconfig:service-portal-live-telemetry",
-      "action": "landed: loopback telemetry aggregator, nginx proxy, live service cards | gates: go test+vet PASS, node --check PASS, alejandra PASS, checks:host delphi rc=0, delphi toplevel rc=0, live store-binary smoke all four online",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "da12d15c52d9143fc41458bac38fbb6cc4647425",
-      "branch": "main",
-      "frame": "03hb4ahq4o38dnkt7keu9idby"
-    },
-    {
-      "id": "e7a75557-047d-4e0d-8218-c09e5268bdcb",
-      "ts": "2026-11-26T17:22:40Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-smoke-clanker-analytics",
-      "action": "claim: extend the smoke to clanker-runner, the three /api/analytics routes and the QR label, with unit tests that fail when a surface stops answering",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/portfolio-smoke.py",
-        "tests/portfolio-smoke"
-      ],
-      "files": [],
-      "base_commit": "2abeaf61007eb0cf3a86ab9970c78b634201967d",
-      "branch": "main",
-      "frame": "03hb49qp7f3pdy6swa6sc5ri1"
-    },
-    {
-      "id": "3e2cff04-f3af-43cc-9d31-940e50f48989",
-      "ts": "2026-11-26T17:21:05Z",
-      "source": "buffy",
-      "subject": "nixconfig:inventory-site-analytics",
-      "action": "GET /api/analytics?days=&limit=: value by category and location (value_cents*quantity, share), warranty book in fixed expired/30d/healthy/none buckets with count+value, top tags, events by kind + window count. Panel: 5 figures, category/location rows drive the existing form filter (only /api/meta names are buttons), meta first. Test caught GROUP BY name hitting items.name.| gate: go vet, go test, node --check, live smoke + browser (0 console, 0 errors, click 4->1), server stopped, /tmp clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2abeaf61007eb0cf3a86ab9970c78b634201967d",
-      "branch": "main",
-      "frame": "03hb49fimgymjjiwow9rlr127"
-    },
-    {
-      "id": "9e5dd3b6-cba5-4ca6-8204-09d1b87e6b79",
-      "ts": "2026-11-26T17:16:19Z",
-      "source": "devin",
-      "subject": "nixconfig:gemini-api-cli-package",
-      "action": "claim: package gemini-api in cli output and shared env packages",
-      "outcome": "in_progress",
-      "claims": [
-        "flake/cli.nix",
-        "modules/env.nix"
-      ],
-      "files": [],
-      "base_commit": "82571921e8f8a94e73c1741f0c5183bb1d89baa8",
-      "branch": "main",
-      "frame": "03hb48i2jo7eh1sf7b2b3hvoo"
-    },
-    {
-      "id": "ca95ffbc-eae3-4930-ab4c-fc2845134067",
-      "ts": "2026-11-26T17:15:38Z",
-      "source": "buffy",
-      "subject": "nixconfig:inventory-site-analytics",
-      "action": "claim: valuation by category and location, warranty buckets, tag and event counts from the store's own tables; a panel whose rows narrow the list; tests on a temp SQLite before a live smoke",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/inventory-site"
-      ],
-      "files": [],
-      "base_commit": "6cd2c020463ab9ad6f3e79c554d257d320ed27b2",
-      "branch": "main",
-      "frame": "03hb48d7n9ujshy7ngh61q9oo"
-    },
-    {
-      "id": "b3035875-b4d7-4183-a4c3-171d5a6395a3",
-      "ts": "2026-11-26T17:13:59Z",
-      "source": "buffy",
-      "subject": "nixconfig:analytics-browser-verify",
-      "action": "agent-browser on seeded temp servers, both pages: 0 console messages, 0 page errors. Found the jobs panel was dead (handler bound to #analytics, section had only a class -> threw, boot never finished) and the deals sparkline letterboxed in an 844 column; fixed both, plus plurals and the heading scope. Re-verified: spark 844x46 with a path, 5 columns one row, company 6->2, lane 1, chips clear.| gate: go vet+test both, node --check, browser rerun, no servers or /tmp left",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6cd2c020463ab9ad6f3e79c554d257d320ed27b2",
-      "branch": "main",
-      "frame": "03hb481ngfadsokltpnmukq8b"
-    },
-    {
-      "id": "a536cacc-efdf-4ace-9e28-9bf8b4ee0948",
-      "ts": "2026-11-26T17:07:29Z",
-      "source": "buffy",
-      "subject": "nixconfig:analytics-browser-verify",
-      "action": "claim: drive both analytics UIs in agent-browser with seeded temp servers, capture console/page errors, then fix what the screenshots and probes disagree with",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/job-db-scraper/web",
-        "modules/services/private-deals/web"
-      ],
-      "files": [],
-      "base_commit": "6d467ef3175805edb1917cfa5b512e8b1b636ddc",
-      "branch": "main",
-      "frame": "03hb46rxoyt7tow69up166efy"
-    },
-    {
-      "id": "bcfad567-411d-4371-a2ed-6d4b13092147",
-      "ts": "2026-11-26T17:06:10Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-db-scraper-analytics",
-      "action": "GET /api/analytics?days=&limit=: hiring companies (postings, mean/max score, remote), locations, board counts, lane counts from one Go scan of the JSON lanes column (broken JSON loses a lane, not the report), five score bands summing to active. Postings gained lane= (json_each); company/lane rows filter the list with clearable chips. Tests: counts, lanes, band sum, clamps, lane filter.| gate: go vet, go test, node --check, live smoke, server stopped",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6d467ef3175805edb1917cfa5b512e8b1b636ddc",
-      "branch": "main",
-      "frame": "03hb46ikzdnqeyhjh4vlizn1q"
-    },
-    {
-      "id": "91539243-98d6-4168-b6a7-094d52d80fc5",
-      "ts": "2026-11-26T17:02:34Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-db-scraper-analytics",
-      "action": "claim: an analytics read over the postings table (companies, locations, lanes, boards, score bands), a panel whose company and lane rows re-run the list, and tests against a temp SQLite before a live smoke",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/job-db-scraper"
-      ],
-      "files": [],
-      "base_commit": "2229785f4fed3459b2043ee67ee276342ead69bc",
-      "branch": "main",
-      "frame": "03hb45tbp17608dpwlig1exe4"
-    },
-    {
-      "id": "29d1b982-df1a-4324-8303-43307dfdcfe4",
-      "ts": "2026-11-26T17:01:20Z",
-      "source": "buffy",
-      "subject": "nixconfig:private-deals-analytics-sparklines",
-      "action": "GET /api/analytics?window=&limit=: top discounts, biggest drops (first/last price per product in one window-function pass, feeding fell/rose/flat too), merchant + category buckets, window history with daily buckets; clamps 365/50, defaults 30/5, empty arrays not nulls. UI: analytics panel + inline SVG sparkline of the daily low. Tests: ranking, tiebreak, buckets, movement, empty index.| gate: go vet, go test, node --check, live smoke of analytics + / + assets, server stopped",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2229785f4fed3459b2043ee67ee276342ead69bc",
-      "branch": "main",
-      "frame": "03hb45kkmnda67ahoxj5jwz21"
-    },
-    {
-      "id": "96fa230a-1c36-42fa-a13b-07c63f8fc44e",
-      "ts": "2026-11-26T16:57:41Z",
-      "source": "buffy",
-      "subject": "nixconfig:private-deals-analytics-sparklines",
-      "action": "claim: analytics endpoint from the store's own queries + a sparkline in the reader, tested against a temp SQLite, then a live smoke; commit only this directory through a temp index",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/private-deals"
-      ],
-      "files": [],
-      "base_commit": "74b8018a3fe51284fc8bc4448899120e605ebcb5",
-      "branch": "main",
-      "frame": "03hb44uyq86wx3240epcaroyc"
-    },
-    {
-      "id": "c6099051-cb2d-4f46-a072-e0f0b95a147f",
-      "ts": "2026-11-26T16:56:06Z",
-      "source": "devin",
-      "subject": "nixconfig:service-portal-live-telemetry",
-      "action": "claim: live telemetry aggregation for delphi service portal cards",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/service-portal.nix",
-        "hosts/delphi/configuration.nix"
-      ],
-      "files": [],
-      "base_commit": "74b8018a3fe51284fc8bc4448899120e605ebcb5",
-      "branch": "main",
-      "frame": "03hb44jvt6gz1zmm0bqxq1psj"
-    },
-    {
-      "id": "d274bc2a-42e6-486e-83fb-b14f265e27e2",
-      "ts": "2026-11-26T16:55:43Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-and-atlas-docs",
-      "action": "portfolio-services: /batch routes (500, per-item errors), deterministic 0-100 score + minAlertScore -> retried job_score_alerts, deal_alerts reasons (target-price, price-drop<95%, watchlist-match), asset_events trail, qr.svg label, warranty queue at start + 6-hourly; ingest rows name /batch. mail-atlas: atlas-senders row, S drawer bullet (f is the one-sender form), curl + smoke in Verify. Claims read off the handlers.| gate: checks:prose, docs:budget 169/400 + 345/400, docs:links",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "74b8018a3fe51284fc8bc4448899120e605ebcb5",
-      "branch": "main",
-      "frame": "03hb44h590pm1b2gwuom1lljt"
     }
   ]
 }

@@ -29,8 +29,6 @@ in {
     self.modules."profiles.battery-charge-limit"
   ];
 
-  ssh.ca.enableClient = true;
-
   boot = {
     kernelPackages = lib.mkForce nvidiaPkgs.linuxPackages;
     kernelModules = [];
@@ -54,10 +52,7 @@ in {
   # The xs-notify toaster was rewritten to a Telegram lane on delphi
   # (ea0e6766): this host's toast flag went with it.
 
-  services.tailscale.extraSetFlags = lib.mkForce [
-    "--accept-dns=true"
-    "--accept-routes=false"
-  ];
+  fleet.tailscale.acceptRoutes = false;
 
   # --- Dell D6000 Universal Dock (DisplayLink / EVDI) ---
   # Display and USB only: the dock's CDC-NCM port stays unmanaged. The cable
@@ -128,12 +123,6 @@ in {
   services.displayManager.autoLogin = {
     enable = true;
     user = user.name;
-  };
-
-  programs.dms-greeter = {
-    enable = true;
-    compositor.name = "niri";
-    configHome = user.home; # Sync themes with the user's DankMaterialShell config
   };
 
   networking.firewall = {

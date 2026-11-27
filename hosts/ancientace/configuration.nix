@@ -65,6 +65,8 @@
   boot.kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
 
   hardware.graphics.extraPackages = [];
+  programs.dms-greeter.enable = false;
+  ssh.ca.enableClient = false;
   services = {
     displayManager.sddm.enable = true;
 

@@ -4,7 +4,6 @@
 {
   self,
   lib,
-  user,
   ...
 }: {
   imports = [
@@ -21,11 +20,7 @@
   # greetd's initial_session (DMS greeter) runs niri straight away; the greeter
   # is the fallback when the session exits.
   services.displayManager.defaultSession = "niri";
-  programs.dms-greeter = {
-    enable = true;
-    compositor.name = "niri";
-    configHome = user.home;
-  };
+  programs.dms-greeter.enable = lib.mkForce true;
 
   # DisplayLink/EVDI video, dlm, and the USB-autosuspend exemptions that keep
   # the dock's DisplayLink ASIC and Bluetooth alive.

@@ -4,13 +4,11 @@
     ./nvidia.nix
     self.modules."profiles.steam"
     self.modules."profiles.impermanence"
-    # dms/niri greeter — schneeeule has dms in its closure (desktop chain),
-    # so it can define programs.dank-material-shell.  noDE kiosks must not
-    # import this.
-    self.modules."profiles.impermanence-greeter"
     self.modules."profiles.base-desktop-environment"
     self.modules."profiles.laptop"
   ];
+
+  ssh.ca.enableClient = false;
 
   fileSystems."/persist/data" = {
     device = "/dev/disk/by-uuid/ae50ae59-36e2-4e9a-88d0-04951f6a51fc";

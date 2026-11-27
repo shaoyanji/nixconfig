@@ -78,6 +78,7 @@
         system.configurationRevision = self.rev or self.dirtyRev or null;
       }
       moduleFiles.global
+      moduleFiles."global.tailscale-policy"
       # llm-agents.nix: prebuilt AI agent CLI packages under pkgs.llm-agents.<name>
       # Exposing the flake's packages attribute set directly ensures 100% cache hits
       # from https://cache.numtide.com instead of compiling from source.

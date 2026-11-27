@@ -16,6 +16,7 @@
   ];
 
   profiles.nasMedia.enable = lib.mkDefault true;
+  fleet.tailscale.clientPolicy = lib.mkDefault true;
 
   # Enable FUSE so kbfsfuse can call /run/wrappers/bin/fusermount
   programs.fuse = {
@@ -86,12 +87,6 @@
     pulseaudio.enable = false;
     tailscale.enable = true;
     tailscale.useRoutingFeatures = "both";
-    # The tailnet pushes DNS and the LAN route through `tailscale set`; the old
-    # `--dns=` flag never applied. Why: docs/dns-failover.md §"Point clients at it".
-    tailscale.extraSetFlags = lib.mkDefault [
-      "--accept-dns=true"
-      "--accept-routes=true"
-    ];
     resolved.enable = true;
     resolved.settings.Resolve.Domains = ["~lan" "~frieren.lan"];
   };

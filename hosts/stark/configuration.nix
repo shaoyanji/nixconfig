@@ -28,11 +28,7 @@
   };
   services.displayManager.defaultSession = "steam";
 
-  programs.dms-greeter = {
-    enable = true;
-    compositor.name = "niri";
-    configHome = user.home; # Sync themes with user's DankMaterialShell config
-  };
+  ssh.ca.enableClient = false;
 
   # --- Steam under gamescope ---
   # steam.nix enables programs.steam.gamescopeSession, so greetd/DMS can

@@ -1,8 +1,276 @@
 {
-  "generated": "2026-11-27T05:10:43Z",
+  "generated": "2026-11-27T06:15:46Z",
   "count": 200,
-  "pin": "d8ff9fde7c15a2f0f05a98ade09d07729ae300373937f70820f226b00e77d902",
+  "pin": "f6feb126f543a2aa4383cce10bf9625132c196177a92e7a73dbf115af1054626",
   "turns": [
+    {
+      "id": "952bfb67-cf03-465d-9199-0b3b8385e68b",
+      "ts": "2026-11-27T06:14:55Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-27: 1 plate(s) kept of 1 spent, 0 roster row(s) waiting, 787 asset(s) published",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb8gli1uzbmy92z8kmstf5l"
+    },
+    {
+      "id": "f0f69002-0586-4777-93cf-7e618cbf8a4a",
+      "ts": "2026-11-27T06:11:54Z",
+      "source": "antigravity",
+      "subject": "nixconfig:agy-image-daily-publish",
+      "action": "claim: append new plate/brief, render, checks:images, publish, commit/push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/image-daily/"
+      ],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb8g09pdvjmbrvpwhpuf76z"
+    },
+    {
+      "id": "20f80789-ca58-47a6-9e00-04a145e58c9e",
+      "ts": "2026-11-27T06:11:40Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:agy-image-daily-publish",
+      "action": "jev publish @0.88/0.82; drive image-daily publish cycle",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb8fynr6tawf5xt0e5obsnk"
+    },
+    {
+      "id": "785785f6-e174-4f30-9cef-83adacd65537",
+      "ts": "2026-11-27T06:01:52Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:agy-image-daily-publish",
+      "action": "jev-decide publish @0.83/0.74; drove image-daily plan; agy ran git status/log, explored plates.txt rotation.json, grep plates; now presents publish options (re-cast wildflower-meadow-wind or append plate row + render/checks/publish), awaiting decision",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/image-daily",
+        "scripts/task/image-daily-*.sh"
+      ],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb8e1p3b0c69hu93icpflli"
+    },
+    {
+      "id": "aab9279b-375b-403b-b668-65a100a80f64",
+      "ts": "2026-11-27T06:01:40Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-agents-nix-note",
+      "action": "jev-decide note-change @1.0/1.0; wrote AGENTS.nix handoff note freebuff-hisolutions-ag-2026-11-27 at line 8670; uncommitted, 512 KiB blob gate blocks staging AGENTS.nix",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb8e09zi84ii1904yejcvt7"
+    },
+    {
+      "id": "700e867c-cdc5-41f4-8654-1a592f05c59a",
+      "ts": "2026-11-27T06:00:18Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-27: 0 plate(s) kept of 0 spent, 0 roster row(s) waiting, 786 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": null,
+      "branch": null,
+      "frame": "03hb8dqpe0q3gzjfks8iyt9l0"
+    },
+    {
+      "id": "44d81b12-6773-4c48-8300-f2f2cb398ce2",
+      "ts": "2026-11-27T05:50:37Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-handoff-note",
+      "action": "freebuff: AGENTS.nix handoff note freebuff-hisolutions-ag-2026-11-27 written; 512 KiB gate blocks commit",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb8bujqi7acl5rfrvbz6fnp"
+    },
+    {
+      "id": "f0612bb9-f2b5-4ce1-816c-925a1b51e311",
+      "ts": "2026-11-27T05:49:46Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:wallpaper-images-fix",
+      "action": "wallpaper-worker: IMAGES_ROOT + cmd_publish/approve fixes applied, shellcheck passed, changes uncommitted",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb8bol274td9n4meki1rkb8"
+    },
+    {
+      "id": "8b162e05-8e26-4fc4-950d-6bf6e4b21686",
+      "ts": "2026-11-27T05:47:42Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:wallpaper-images-fix",
+      "action": "drove agents:5 wallpaper-worker: IMAGES_ROOT + cmd_publish/approve fix, Working... confirmed",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb8b9zkjbjk8a29sfe3puf2"
+    },
+    {
+      "id": "dd208be2-8362-4d71-9836-b84c3e6c6ab0",
+      "ts": "2026-11-27T05:47:41Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-handoff-note",
+      "action": "drove agents:2.1 freebuff: AGENTS.nix handoff note, working... confirmed",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb8b9wh1hx53y1ll0aupoam"
+    },
+    {
+      "id": "1ac89efc-f233-4165-8029-3d6ea674cfa2",
+      "ts": "2026-11-27T05:43:08Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:wallpaper-plan-check",
+      "action": "verified: design record + image-daily-plan (due 0 across all 5 lanes, 94 left); wallpaper-worker idle at 8fcfc085",
+      "outcome": "done",
+      "claims": [
+        "lib/image-daily/"
+      ],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb8ae055ttoyhzhry2sgr7m"
+    },
+    {
+      "id": "203ce812-7739-48ac-9995-7561210c648b",
+      "ts": "2026-11-27T05:36:50Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:wallpaper-plan-check",
+      "action": "novel|0.55|0.10 check image-daily design record plan plates",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/image-daily/"
+      ],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb895lo3z09y4mqz8cqncv9"
+    },
+    {
+      "id": "6dcf88b8-0c9a-4ba1-adcd-2d91af00445b",
+      "ts": "2026-11-27T05:36:44Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-handoff-note",
+      "action": "note-change|1.00|1.00 freebuff AGENTS.nix handoff note",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/cv-ats-check.sh",
+        "scripts/task/letter-pdf-check.sh"
+      ],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb894zs04nxjzlj5x8i6jc2"
+    },
+    {
+      "id": "e793869e-e75c-4650-bb27-6bd48415a552",
+      "ts": "2026-11-27T05:35:39Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:wallpaper-plan-check",
+      "action": "verified: design record (image-daily-queue, wall-prompt-family, wall-plate-rounds) + image-daily-plan (due 0 across all 5 lanes, 94 left); found unexported IMAGES_ROOT in image-daily-lib.sh & cmd_publish/cmd_approve in image-daily-run.sh",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb88xc6qt87dblhc8wi8l4h"
+    },
+    {
+      "id": "c1b1ea9c-f7a3-495b-beb4-4e80d7bdb0a9",
+      "ts": "2026-11-27T05:27:25Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-handoff-note",
+      "action": "note-change|1.00|1.00 freebuff AGENTS.nix handoff note",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb87besffte6mvatujewq9a"
+    },
+    {
+      "id": "70ad0627-17ad-4559-9b1e-41a9605436d4",
+      "ts": "2026-11-27T05:18:38Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:wallpaper-plan-check",
+      "action": "novel: check image-daily design record, plan due plates",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb85lnrmxhb0xt9cpadht86"
+    },
+    {
+      "id": "b8f777c7-43d4-4c4c-9ab7-f33d4b8eb671",
+      "ts": "2026-11-27T05:18:37Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-handoff-note",
+      "action": "note-change: freebuff AGENTS.nix handoff note",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb85lkx3qsf6ejptcmqrc3s"
+    },
+    {
+      "id": "407a3771-f891-4f18-add0-d7f23a35acf7",
+      "ts": "2026-11-27T05:17:45Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:wallpaper-6-publish-plate",
+      "action": "landed: wall-nixconfig-aurora (nixconfig-aurora.png) kept, published to Cloudinary+Pages (786/786), approved in rotation.json (8fcfc085); images:plan due 0 (94 remaining) | gate: checks:images + checks:image-daily PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/image-daily/"
+      ],
+      "files": [
+        "lib/image-daily/briefs.json",
+        "lib/image-daily/rotation.json"
+      ],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb85fgyu6op5t2d5i30y2un"
+    },
+    {
+      "id": "42243762-f25a-441e-ad70-074f5da8e751",
+      "ts": "2026-11-27T05:11:56Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-hisolutions-ag-cv",
+      "action": "landed: hiSolutions letter + German CV tightened, packet rebuilt — letter now names the employer, English=Muttersprache matches the CV, k8s/Helm stated as use not architecture; CV bullets fixed (SOPS casing, final stops, CI aus der Inventardatei); packet 1p letter/2p CV with letter-pdf-check + cv-ats-check PASS; checks:appflow PASS; site redeployed, matt:cv:check 14 ok 0 failed (cv-software-de 787d1d89). Nothing sent, hold to 2026-12-07 | gate: checks:appflow PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/matt"
+      ],
+      "files": [],
+      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
+      "branch": "main",
+      "frame": "03hb84aiyy67ixz4j25f0u7i2"
+    },
     {
       "id": "a3b65e49-e48b-484a-9814-609fa08211ba",
       "ts": "2026-11-27T05:08:13Z",
@@ -2799,312 +3067,6 @@
       "base_commit": "59bf181dfd8f34359d138c6b46137e5c28654244",
       "branch": "main",
       "frame": "03hb3wnjwkozhvr2nx78a79py"
-    },
-    {
-      "id": "5bc79c8a-b7a2-4e41-b52d-1c157624aef4",
-      "ts": "2026-11-26T16:13:34Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-gdrive-sync-fix",
-      "action": "claim: taking over from tmux-pane-steward; bug-fix|0.37: delphi archive gdrive mirror — the unit skips on a missing rclone.conf and reports success, so the mirror has never run and nothing says so",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/email-archive.nix",
-        "hosts/delphi"
-      ],
-      "files": [],
-      "base_commit": "59bf181dfd8f34359d138c6b46137e5c28654244",
-      "branch": "main",
-      "frame": "03hb3w8oel6vgecwxft07fq8d"
-    },
-    {
-      "id": "6cd57bc5-0b8f-4061-9d6f-0734ca0ffe8f",
-      "ts": "2026-11-26T16:13:21Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-gdrive-sync-fix",
-      "action": "bug-fix|0.37|0.020000000000000018: delphi_archive_gdrive_fix (take over)",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/email-archive.nix",
-        "hosts/delphi"
-      ],
-      "files": [],
-      "base_commit": "40b7d1226bf1cf6a44e869382925541cf47ab4b1",
-      "branch": "main",
-      "frame": "03hb3w77x9fb8shryiu9537ir"
-    },
-    {
-      "id": "de815ad9-32c3-46c6-a604-e41ceccb2d17",
-      "ts": "2026-11-26T16:13:18Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:cv-packet-pdf-audit",
-      "action": "bug-fix|0.26|0.03: cv_packet_pdf_audit (take over)",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/plugins/appflow",
-        "lib/site"
-      ],
-      "files": [],
-      "base_commit": "40b7d1226bf1cf6a44e869382925541cf47ab4b1",
-      "branch": "main",
-      "frame": "03hb3w6vjh5hpmobd5rwwx05k"
-    },
-    {
-      "id": "f047d979-18fa-4b58-b4bf-fa085eb64318",
-      "ts": "2026-11-26T16:12:55Z",
-      "source": "devin",
-      "subject": "nixconfig:clanker-runner-service",
-      "action": "landed: clanker-runner tailnet control plane with InstaBox machine state/wake/exec, detached remote jobs, SQLite FTS5 history, web UI and delphi wiring | gate: go test/vet/node/alejandra PASS, checks:host rc=0, delphi toplevel build rc=0, live HTTP smoke PASS",
-      "outcome": "done",
-      "claims": [
-        "modules/services/clanker-runner",
-        "modules/services/clanker-runner.nix",
-        "hosts/delphi/configuration.nix",
-        "inventory.toml",
-        "modules.toml",
-        "lib/registry-schema.nix",
-        "docs/delphi-runtime.md"
-      ],
-      "files": [
-        "modules/services/clanker-runner",
-        "modules/services/clanker-runner.nix",
-        "hosts/delphi/configuration.nix",
-        "inventory.toml",
-        "modules.toml",
-        "lib/registry-schema.nix",
-        "docs/delphi-runtime.md"
-      ],
-      "base_commit": "59bf181dfd8f34359d138c6b46137e5c28654244",
-      "branch": "main",
-      "frame": "03hb3w46ql4p4k5letqj20mra"
-    },
-    {
-      "id": "b3f8d9d2-2047-4b05-b0d1-e3bb58874c95",
-      "ts": "2026-11-26T16:12:47Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-ui-smoke-suite",
-      "action": "portfolio-smoke.py: health (names the service), stats, / as HTML with the JS-filled id, search via q=; empty answer passes, --expect-hit needs rows, --format toon, --browser DOM check (missing binary = skip). Live on three local binaries seeded one record each: 12/12 checks exit 0; scraper stopped -> exit 1 naming jobs; Chrome read #metric-jobs=1, #stats=1Active deals/1Assets. 31 tests.| gate: unittest 31 + py_compile + live smoke (servers stopped, /tmp clean)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "59bf181dfd8f34359d138c6b46137e5c28654244",
-      "branch": "main",
-      "frame": "03hb3w37lqxu2jnpnft6td101"
-    },
-    {
-      "id": "f25fb6eb-d250-4e09-8c5b-ddcf8a122f68",
-      "ts": "2026-11-26T16:11:53Z",
-      "source": "buffy",
-      "subject": "nixconfig:appflow-guard-followups",
-      "action": "landed: add is guarded when its id exists (a new id still needs nothing); 8 fixture cases added, naming the fingerprint flag, stale hash, --expect-absent refusal, --force, and no write on dry. Also named the 4 BFL roles the mail hub had discovered as one undiscovered row, which the live check was failing on | gate: checks:appflow PASS (1709 apps, 6/6 rules, both guard fixtures)",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "tests/appflow-resolve"
-      ],
-      "files": [],
-      "base_commit": "40b7d1226bf1cf6a44e869382925541cf47ab4b1",
-      "branch": "main",
-      "frame": "03hb3vwxl9ubpxm4d0697mm1j"
-    },
-    {
-      "id": "770d190e-60f3-4db2-8aff-c883174a4671",
-      "ts": "2026-11-26T16:08:56Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-ui-smoke-suite",
-      "action": "claim: one smoke verb over job-db-scraper/private-deals/inventory-site — health, stats, HTML root, FTS search, optional agent-browser DOM check, JSON/TOON pass/fail; verified live against three local instances",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/portfolio-smoke.py",
-        "tests/portfolio-smoke"
-      ],
-      "files": [],
-      "base_commit": "100418d12ec25330340df4e8c67ca45c9d34a54f",
-      "branch": "main",
-      "frame": "03hb3vc4sjkcvf26vdl59vcww"
-    },
-    {
-      "id": "620b165e-9a4c-446c-b50f-ab968194b420",
-      "ts": "2026-11-26T16:08:07Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-pg-backup-gap",
-      "action": "Landed hosts/delphi/backups.nix: postgresqlBackup for email_archive+umami+miniflux at 02:50, offloadBridge set delphi-postgres -> /var/backup/postgresql (frieren 03:10 push, restic 03:30), Sunday drill floor 14 tables (measured 18/30/14); docs updated. checks:host delphi eval 2184 assertions; hand pg_dump restores 18 tables / 3530 letters. NOT activated: tree still holds another pane's staged clanker-runner, a deploy now would switch it in.| gate: checks:host delphi MODE=eval + pg_dump restore",
-      "outcome": "done",
-      "claims": [
-        "hosts/delphi",
-        "docs/email-archive.md"
-      ],
-      "files": [],
-      "base_commit": "100418d12ec25330340df4e8c67ca45c9d34a54f",
-      "branch": "main",
-      "frame": "03hb3v6fiwgs1pflcbksehx2l"
-    },
-    {
-      "id": "08d9672f-560a-4776-b716-df23f00f427f",
-      "ts": "2026-11-26T16:07:52Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:appflow-guard-followups",
-      "action": "task-change|0.6|0.38: appflow_guard_followups (take over)",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/apps-db.sh",
-        "tests/appflow-resolve"
-      ],
-      "files": [],
-      "base_commit": "383573b7667afa2a115ae181c71879f6992f4e03",
-      "branch": "main",
-      "frame": "03hb3v4n8f3gs0pridv73mwo4"
-    },
-    {
-      "id": "759153b1-91d7-4d04-8a7d-a9f606fe803c",
-      "ts": "2026-11-26T16:06:41Z",
-      "source": "buffy",
-      "subject": "nixconfig:frieren-burgernas-fix",
-      "action": "landed: the audit now counts backup/upgrade failures BEFORE reset-failed (a reset sets Result to success, so the count always read 0 and the quiet path called a lost burgernas backup clean). Proven on a probe unit: failed -> reset -> inactive | gate: checks:host HOST=frieren PASS (86s)",
-      "outcome": "done",
-      "claims": [
-        "hosts/frieren"
-      ],
-      "files": [],
-      "base_commit": "383573b7667afa2a115ae181c71879f6992f4e03",
-      "branch": "main",
-      "frame": "03hb3uwc09dsbfi7asiskesqu"
-    },
-    {
-      "id": "5db75939-6d85-4056-876e-5d34c3b41e4d",
-      "ts": "2026-11-26T16:04:14Z",
-      "source": "buffy",
-      "subject": "nixconfig:frieren-burgernas-fix",
-      "action": "claim: take over from tmux-pane-steward — the audit resets failed units before it counts backup failures, so a failed night is unreadable; fix the order",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/frieren"
-      ],
-      "files": [],
-      "base_commit": "11fee22de1c5b97982a086789376c16150b776e4",
-      "branch": "main",
-      "frame": "03hb3uf49up4q2pscgdxah6tp"
-    },
-    {
-      "id": "2a8568ee-77bc-42dc-bba1-fafebe8663a6",
-      "ts": "2026-11-26T16:04:06Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:intents-test-green",
-      "action": "bug-fix|0.7|0.47: fix_checks_intents_test (take over)",
-      "outcome": "in_progress",
-      "claims": [
-        "flake/intents.nix",
-        "tests/intents/run.sh",
-        "docs/intents.md"
-      ],
-      "files": [],
-      "base_commit": "11fee22de1c5b97982a086789376c16150b776e4",
-      "branch": "main",
-      "frame": "03hb3ue65lfq6v7xcghuznnlh"
-    },
-    {
-      "id": "85faaa96-b264-4bca-b466-430b59611760",
-      "ts": "2026-11-26T16:03:42Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:frieren-burgernas-fix",
-      "action": "bug-fix|0.44|0.07: frieren_restic_burgernas_silent (take over)",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/frieren",
-        "modules/services"
-      ],
-      "files": [],
-      "base_commit": "11fee22de1c5b97982a086789376c16150b776e4",
-      "branch": "main",
-      "frame": "03hb3ubcn7tq2pxgb0edizmz1"
-    },
-    {
-      "id": "dc19a7eb-7420-4986-802e-6c0f7a0f93ff",
-      "ts": "2026-11-26T16:03:11Z",
-      "source": "devin",
-      "subject": "nixconfig:pane-nudge-gate",
-      "action": "landed: tests/pane-nudge fixture (11 cases, stub tmux — C-u before paste, named buffer deleted after, one Enter, no Escape, send-keys carries only C-u/Enter, line shape with CLAIM=none degradation, missing input rc=2, unknown window rc=1), wired checks:pane-nudge:test into checks:quick + leaf row in check-inventory | gates: checks:pane-nudge:test 11/11, check:verify 159 rows no drift — flag: checks:intents:test fails on clean HEAD, pre-existing, not this change",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "11fee22de1c5b97982a086789376c16150b776e4",
-      "branch": "main",
-      "frame": "03hb3u7owv4itrowbn3ly2hqr"
-    },
-    {
-      "id": "035c8ae8-3307-4a36-ae4a-60b7dce9a0c6",
-      "ts": "2026-11-26T16:02:01Z",
-      "source": "buffy",
-      "subject": "nixconfig:jobsearch-sweep-26e",
-      "action": "closed stale subject: 26e landed 13:36 under nixconfig:job-scout, but this row was left in_progress. Re-verified now: 7 rows carry origin scout-2026-11-26e (6 lead, 1 agency other), py_compile ok, self-test 20/20, read-only pipeline exit 0 (1401 parsed, 115 fresh, 0 new at 1706 held; 38 Stepstone cards unnameable by design) | gate: apps:sweep:pipeline dry run + sweep self-test",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/jobsearch-pipeline.sh",
-        "scripts/task/apps-scout.sh"
-      ],
-      "files": [],
-      "base_commit": "cebe6bddad364a8a9a39883788cd5dc00458490d",
-      "branch": "main",
-      "frame": "03hb3tzkai7wbnodze8x6m89p"
-    },
-    {
-      "id": "8c3910ac-b4f4-4544-b810-4ab18980ab6f",
-      "ts": "2026-11-26T15:59:48Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:jobsearch-sweep-26e",
-      "action": "task-change|0.39|0.15000000000000002: jobsearch_sweep_26e (take over)",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/jobsearch-pipeline.sh",
-        "scripts/task/apps-scout.sh"
-      ],
-      "files": [],
-      "base_commit": "cebe6bddad364a8a9a39883788cd5dc00458490d",
-      "branch": "main",
-      "frame": "03hb3tjxmq0d1q9x4irpt6km7"
-    },
-    {
-      "id": "0e489d74-d6dd-48d9-b40a-5ac4eda07581",
-      "ts": "2026-11-26T15:58:41Z",
-      "source": "buffy",
-      "subject": "nixconfig:frieren-ops-health",
-      "action": "verified: ops:health ok, hermes-check clean, downloads-sort/sentinel/local restic exit 0. BurgerNAS restic repo is an empty skeleton (28K, config only, 0 snapshots/index/data); nightly runs die at the fixed 04:00 NAS poweroff (exit 130, 272G read, 1.2G sent), timer fired 03:28 not 02:45; local repo has 33 snapshots (latest 2026-11-26, 32.7G). NAS powered back off.",
-      "outcome": "blocked: no off-host snapshot exists; re-seed needs an approved hours-long window",
-      "claims": [
-        "hosts/frieren"
-      ],
-      "files": [],
-      "base_commit": "cebe6bddad364a8a9a39883788cd5dc00458490d",
-      "branch": "main",
-      "frame": "03hb3tc3dyc0b0jdkoyljhrc7"
-    },
-    {
-      "id": "15402a1e-3f28-45b7-93dc-8c3d101ea51f",
-      "ts": "2026-11-26T15:58:23Z",
-      "source": "buffy",
-      "subject": "nixconfig:mail-atlas-reconcile-tests",
-      "action": "reconcile.py guards: doc without envelopes is a failed read ({} used to archive the whole inbox), empty walk over a non-empty archive aborts (--allow-empty overrides), multi-page walk re-reads page-1 head and refuses if it moved, himalaya timeout -> ok:false exit 2, box-list failure aborts before the walk, --limit reports truncated. box-set upsert is idempotent. tests/mail-atlas-reconcile 25.| gate: unittest 25 + test_drain 10 + py_compile PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "d6203e48a89db2403a2659d794f309e34f0c2ffe",
-      "branch": "main",
-      "frame": "03hb3t9vpaecvhlr8x9l1b4rx"
-    },
-    {
-      "id": "702e965f-37d0-4ab5-9ead-26ccbfac0ffd",
-      "ts": "2026-11-26T15:58:17Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-pg-backup-gap",
-      "action": "claim: taking over from tmux-pane-steward per operator; bug-fix|0.7|0.51 delphi_postgres_backup_gap — email_archive has no backup (62MB db + 24MB attachments, single copy on delphi)",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/delphi",
-        "modules/services/email-archive.nix"
-      ],
-      "files": [],
-      "base_commit": "d6203e48a89db2403a2659d794f309e34f0c2ffe",
-      "branch": "main",
-      "frame": "03hb3t979r39c6n9z47joxudw"
     }
   ]
 }

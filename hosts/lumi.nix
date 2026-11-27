@@ -24,6 +24,15 @@
     $DRY_RUN_CMD chmod 700 "$HOME/.ssh"
   '';
 
+  home.activation.lumiAuthorizedKeysCopy = lib.hm.dag.entryAfter ["linkGeneration"] ''
+    if [ -e "$HOME/.ssh/authorized_keys" ]; then
+      tmp="$HOME/.ssh/.authorized_keys.copy.$$"
+      $DRY_RUN_CMD cp -L "$HOME/.ssh/authorized_keys" "$tmp"
+      $DRY_RUN_CMD chmod 600 "$tmp"
+      $DRY_RUN_CMD mv -f "$tmp" "$HOME/.ssh/authorized_keys"
+    fi
+  '';
+
   home.file.".ssh/authorized_keys" = {
     text = (lib.concatStringsSep "\n" config.ssh.authorizedKeys.keys) + "\n";
     force = true;

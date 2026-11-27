@@ -1,8 +1,122 @@
 {
-  "generated": "2026-11-27T14:59:07Z",
+  "generated": "2026-11-27T15:31:53Z",
   "count": 200,
-  "pin": "6ee92f5128bc20eb3cbfe0f78c8788d74c2d1ef152a17bd533836116fce62f13",
+  "pin": "63054e4bd6c8667f97db565116232b9f4d0eee956d5378311c954eff5c0ae1e5",
   "turns": [
+    {
+      "id": "3073dd40-42f2-415a-8c84-ee6b4541e354",
+      "ts": "2026-11-27T15:28:02Z",
+      "source": "devin",
+      "subject": "nixconfig:hm-leaf-chain-audit",
+      "action": "landed: no-change closure. 32/32 module-system hosts audited: all multi-host HM chains already centralize in modules/global/user.nix (hmDesktopBase/Suite x12, hmContainerFloor x9); remainder are singleton forks. roles.minimal's pair is universal across desktops, splitting extracts nothing; eval cost is option surface, not leaves. No further HM leaf extraction justified | gate: checks:hosts poseidon+mtfuji+cassini+penguin MODE=eval PASS 4/4",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "7f65eacb5a233f17856e7de89aa5cd583bd79419",
+      "branch": "HEAD",
+      "frame": "03hbbgn9uc3bwsh17c38lgnti"
+    },
+    {
+      "id": "26ff15e5-2156-4322-9019-b73be9f0c2bd",
+      "ts": "2026-11-27T15:25:21Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-1-devin-chain-change",
+      "action": "drove agents:1.1 chain-change 0.87|0.80; thinking 3s fresh",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbbg4djfyztnmlwnmgbzohr"
+    },
+    {
+      "id": "768119d0-13d4-4dfa-b37d-bb7adff4a0e9",
+      "ts": "2026-11-27T15:24:31Z",
+      "source": "devin",
+      "subject": "nixconfig:hm-leaf-chain-audit",
+      "action": "claim: audit whether another minimal HM leaf extraction is justified after hm-leaf-chain-split; bounded reads/evals only in the isolated lane",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/host-inventory.nix",
+        "flake/module-sets.nix",
+        "modules/global/user.nix",
+        "modules/user/base.nix",
+        "modules/user/ai/default.nix"
+      ],
+      "files": [],
+      "base_commit": "7f65eacb5a233f17856e7de89aa5cd583bd79419",
+      "branch": "HEAD",
+      "frame": "03hbbfyjdl98roc2ea4do9or5"
+    },
+    {
+      "id": "12d44a08-97a6-4309-9a40-033bf5e20c8a",
+      "ts": "2026-11-27T15:24:10Z",
+      "source": "devin",
+      "subject": "nixconfig:lumi-ssh-authorized-keys-copy",
+      "action": "claim: fix lumi authorized_keys symlink rejected by sshd StrictModes through Nix store; restore regular-file keys declaratively",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/lumi.nix"
+      ],
+      "files": [],
+      "base_commit": "a9d43dc2b4c982721dcce676578daf6a7c60a3d3",
+      "branch": "main",
+      "frame": "03hbbfvysmuv5kmpgt21ropk7"
+    },
+    {
+      "id": "48b2f84d-0b6e-4aff-b5d4-b2e9a1cc5b75",
+      "ts": "2026-11-27T15:20:01Z",
+      "source": "devin",
+      "subject": "nixconfig:gemini-api-packaging-turn",
+      "action": "landed: nested artifact/CLI namespaces moved to legacyPackages; gemini-api build/run/dry-run pass | gate: checks:nix:lint PASS, docs:build PASS, checks:policies PASS, frieren/delphi eval PASS; flake eval schema probe passed, final full fleet eval OOM-killed on 8GiB clanker",
+      "outcome": "done",
+      "claims": [
+        "flake/cli.nix",
+        "modules/env.nix"
+      ],
+      "files": [],
+      "base_commit": "7f65eacb5a233f17856e7de89aa5cd583bd79419",
+      "branch": "HEAD",
+      "frame": "03hbbf2vc8wtru7lb3ggmtszp"
+    },
+    {
+      "id": "8e6f5862-f835-4372-abe8-edec2c33d10d",
+      "ts": "2026-11-27T15:10:15Z",
+      "source": "buffy",
+      "subject": "nixconfig:jobsearch-sweep-2026-11-27y",
+      "action": "landed: sweep 2026-11-27y for the freebf lane - five boards parsed 1381 fresh 113 new 0 rejected 39; arbeitnow 35 pages 5790 postings 101 in-lane at 85 employers, 73 already on file, 12 new, 2 filed (Zscaler remote-EMEA Staff DevOps, Lefebvre Sdu The Hague Senior DevOps) | table 150 -> 152 rows, record 1751 -> 1753 | send gate holds to 2026-12-07, no mail | gate: pages build 46022175432 PASS + live 8/8 routes and 10/10 PDFs 200",
+      "outcome": "done",
+      "claims": [
+        "_tabs/cv.md"
+      ],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbbd67kaieeylhu27cn7l8s"
+    },
+    {
+      "id": "de638d29-6766-4758-a8ff-544441fd5167",
+      "ts": "2026-11-27T15:10:03Z",
+      "source": "devin",
+      "subject": "nixconfig:pane-3-lumi-harness-steer",
+      "action": "landed: zeno-stage1 merged/pushed, lumi ZeroClaw accepts both Telegram ids, sqlite memory schema deployed; round-trip still needs operator probe | gate: checks:quick+checks:host HOST=lumi+checks:policies PASS, nixcachix 46021338928 PASS",
+      "outcome": "blocked: operator Telegram probe required",
+      "claims": [
+        "hosts/lumi.nix",
+        "modules/user/ai/zeroclaw.nix"
+      ],
+      "files": [
+        "hosts/lumi.nix",
+        "modules/user/ai/zeroclaw.nix",
+        "flake/host-inventory.nix",
+        "inventory.toml",
+        "flake/policies.nix",
+        "lib/home-agents.nix"
+      ],
+      "base_commit": "a9d43dc2b4c982721dcce676578daf6a7c60a3d3",
+      "branch": "main",
+      "frame": "03hbbd4p4f1kj7zustcrz6z48"
+    },
     {
       "id": "8dd2d108-55c5-4cde-80d8-54b1bdf162b6",
       "ts": "2026-11-27T14:46:53Z",
@@ -2820,125 +2934,6 @@
       "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
       "branch": "main",
       "frame": "03hb5nhy4izns3ndo2v7td3bz"
-    },
-    {
-      "id": "c7850e97-a24d-4ec9-8eef-46e476ea6c13",
-      "ts": "2026-11-26T21:20:28Z",
-      "source": "wallpaper-worker",
-      "subject": "nixconfig:image-daily-wallpaper",
-      "action": "published: nixconfig-dark.png on Cloudinary + bountystash-assets.pages.dev (784/784); closed AGENTS.nix note (0327134d) on origin/main | gate: images:publish + checks:images PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/image-daily/briefs.json",
-        "lib/image-daily/rotation.json",
-        "wallpapers/nixconfig-dark.png"
-      ],
-      "files": [
-        "AGENTS.nix",
-        "lib/image-daily/briefs.json",
-        "lib/image-daily/rotation.json",
-        "wallpapers/nixconfig-dark.png"
-      ],
-      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
-      "branch": "main",
-      "frame": "03hb5k6z0d3d37vdcpnddkqck"
-    },
-    {
-      "id": "a436fafa-070c-47ae-be19-9a4e186202d8",
-      "ts": "2026-11-26T21:18:04Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:image-daily-wallpaper",
-      "action": "publish nixconfig-dark wallpaper to Cloudinary, commit image-daily briefs/rotation, push origin/main",
-      "outcome": "in_progress",
-      "claims": [
-        "wallpapers/nixconfig-dark.png",
-        "lib/image-daily/briefs.json",
-        "lib/image-daily/rotation.json"
-      ],
-      "files": [],
-      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
-      "branch": "main",
-      "frame": "03hb5jq4ehqvduwg1hjtn1dm6"
-    },
-    {
-      "id": "05ce94de-560a-45f9-8dd7-b5fd1fce50b1",
-      "ts": "2026-11-26T20:58:24Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:agy-standing-eisen-strata-research",
-      "action": "research: strata-inkling-mini-2-eisen exceeds 62.7 GiB ceiling alongside IQ1_M; stop strata.service :8085 to test",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix hosts/eisen/strata.nix hosts/eisen/llm-server.nix"
-      ],
-      "files": [],
-      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
-      "branch": "main",
-      "frame": "03hb5fvtss69yyd4vfrm92kw6"
-    },
-    {
-      "id": "62efa369-558a-4efb-aa07-a677e995afde",
-      "ts": "2026-11-26T20:56:35Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:agy-standing-eisen-strata-research",
-      "action": "research eisen strata-inkling-mini-2-eisen page-cache fit",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix hosts/eisen/strata.nix hosts/eisen/llm-server.nix"
-      ],
-      "files": [],
-      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
-      "branch": "main",
-      "frame": "03hb5fj0yhe3ufnr6ic06rfdh"
-    },
-    {
-      "id": "cc8d7eca-9c5e-4830-8bc2-0fdce74a31d4",
-      "ts": "2026-11-26T20:46:07Z",
-      "source": "wallpaper-worker",
-      "subject": "nixconfig:image-daily-wallpaper",
-      "action": "landed: wallpapers/nixconfig-dark.png + lib/image-daily/{briefs,rotation}.json (b5920ed6) and AGENTS.nix note wallpaper-nixconfig-dark-publish-blocked (d76fd440) on origin/main | gate: pre-commit + pre-push + agentsNotes.index PASS",
-      "outcome": "done",
-      "claims": [
-        "wallpapers/nixconfig-dark.png",
-        "lib/image-daily/briefs.json",
-        "lib/image-daily/rotation.json"
-      ],
-      "files": [
-        "wallpapers/nixconfig-dark.png",
-        "lib/image-daily/briefs.json",
-        "lib/image-daily/rotation.json",
-        "AGENTS.nix"
-      ],
-      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
-      "branch": "main",
-      "frame": "03hb5dhe1wxc6tnui5342c1wg"
-    },
-    {
-      "id": "3f126b08-c6df-434b-a69d-b05010d3015c",
-      "ts": "2026-11-26T20:44:29Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:wallpaper-agent-note",
-      "action": "drive wallpaper-worker note-change; Cloudinary quota blocks publish",
-      "outcome": "in_progress",
-      "claims": [
-        "agents-notes/"
-      ],
-      "files": [],
-      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
-      "branch": "main",
-      "frame": "03hb5d5yj3okdoo54z0ubbqkn"
-    },
-    {
-      "id": "0040c702-ae97-4ffb-95b4-3b7dd395c471",
-      "ts": "2026-11-26T20:27:10Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-26: 0 plate(s) kept of 0 spent, 0 roster row(s) waiting, 780 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hb59s6fwp247q4nctrj9dah"
     }
   ]
 }

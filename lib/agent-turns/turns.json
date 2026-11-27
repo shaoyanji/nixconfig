@@ -1,8 +1,38 @@
 {
-  "generated": "2026-11-27T20:53:33Z",
+  "generated": "2026-11-27T20:59:41Z",
   "count": 200,
-  "pin": "c9ddba68c2fd16c718c36bb091e8d46782d21e09a5316672b2bb818e683d7e0b",
+  "pin": "7e6c191d17b1fecf5f70a60dbc940ea8da40571f4621dce294f0b010632eeacd",
   "turns": [
+    {
+      "id": "6309bab6-edf8-4e93-afcc-ea9403d34e0a",
+      "ts": "2026-11-27T20:54:53Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-evidence-gate",
+      "action": "freebuff: cv skills cleanup + evidence gate | gate-change .82/.76",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/resume.cv.json",
+        "content/cv",
+        "cv/skills"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbd8hri2keif1h3dro3lh3v"
+    },
+    {
+      "id": "d5f2f91c-d093-4f27-95f2-b77d230da2f1",
+      "ts": "2026-11-27T20:53:54Z",
+      "source": "devin",
+      "subject": "nixconfig:p1-sentinel-push-2026-11-27",
+      "action": "landed 25edb771: poseidon+eisen now push sentinel status to frieren.lan/sentinel/ingest (delphi shape: shared agent-turns-token bearer, frieren.lan pinned since bare tailnet 404s). Note p1-sentinel-push exit needs 3 pushing: delphi+poseidon+eisen configured — the week of live pushing starts when the offline hosts wake | gate: checks:hosts poseidon eisen frieren eval 3/3 PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "25edb77109f97fc0af9343cbe719b0d8b9c03b9e",
+      "branch": "HEAD",
+      "frame": "03hbd8au7m9wpk7cc38lq7yef"
+    },
     {
       "id": "ac4c0525-b5c7-486e-91fc-8438ceb03487",
       "ts": "2026-11-27T20:47:00Z",
@@ -2878,32 +2908,6 @@
       "base_commit": "06bff2e5c346918bb69890c2390eeea99717eee5",
       "branch": "main",
       "frame": "03hb8r9nvvr0rdj4sjdtkna9l"
-    },
-    {
-      "id": "3af92741-0083-48dd-bd85-3cb0ad673218",
-      "ts": "2026-11-27T07:08:33Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-publish",
-      "action": "jev publish 1.0/1.0; freebuff: commit CV fixes, publish",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "06bff2e5c346918bb69890c2390eeea99717eee5",
-      "branch": "main",
-      "frame": "03hb8r2lqg5ijydq240mfoh6b"
-    },
-    {
-      "id": "2ee17380-95ad-47fa-a0dc-482904924f61",
-      "ts": "2026-11-27T07:06:37Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-packet",
-      "action": "freebuff cv-packet done: Hisolutions packet reviewed, cv-links and cv-ats checks run, lib/matt CV fixes applied; pane idle at prompt",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5ff0947f2bd9e0d38bad74b298dbef3c3de5ecd7",
-      "branch": "main",
-      "frame": "03hb8qozjs2uhz4n0ajaww386"
     }
   ]
 }

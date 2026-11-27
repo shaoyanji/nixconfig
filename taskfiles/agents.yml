@@ -288,11 +288,11 @@ tasks:
       scripts/task/cv-blog-check.sh: the six published PDFs — cv, cv-de,
       cv-energy, cv-energy-de, cv-software, cv-software-de — must hash equal to
       `.#sites.matt-site` and, in `_site`, be the target of an anchor with
-      `download` that resolves. Measured 2026-11-25: exit 0, 6/6 hash-equal and
-      6/6 anchors resolving; the German CV's "dreizehn Hosts" still matches the
-      13 active NixOS hosts. Env: BLOG_REPO, ARTIFACT, SITE, REQUIRED. Exit 0
-      linked, 1 drift, 2 cannot tell. Deploys, sends and commits nothing.
+      `download` that resolves. `matt:cv:evidence` runs first, so the published
+      hash also carries claims a built PDF and an artifact back. Exit 0 linked,
+      1 drift, 2 cannot tell. Deploys, sends and commits nothing.
     cmds:
+      - bash scripts/task/cv-evidence-check.sh
       - bash scripts/task/cv-blog-check.sh
 
   agents:agy:

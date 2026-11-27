@@ -220,6 +220,24 @@ tasks:
     cmds:
       - bash scripts/task/cv-links-check.sh https://matt.bountystash.com
 
+  # The claim gate. A CV skills line is prose until something backs it: the
+  # rendered stack must reach a built PDF, the unrendered resume corpus may not
+  # out-claim that stack, and a provider technology needs an artifact in this
+  # tree. `agents:cv:publish-check` runs it, so a publish carries the proof.
+  matt:cv:evidence:
+    desc: "[gate] every CV skill claim renders in a built PDF and every provider claim has an artifact"
+    summary: >
+      scripts/task/cv-evidence-check.sh, three legs over the six profile
+      corpora and the three resume corpora: every `stack` item must appear in a
+      PDF under ARTIFACT (`/tmp/matt-site`, so run `matt:build`); every DevOps
+      keyword in `resume.cv.json` / `resume.json` / `lebenslauf.json` must name
+      a rendered stack item; a provider claim (AWS, Azure, Google Cloud, Lambda,
+      Prometheus, Grafana, Kubernetes) must resolve a path plus pattern
+      registered in the script, where an empty probe list means nothing here
+      backs it. Exit 0 backed, 1 unbacked, 2 cannot tell.
+    cmds:
+      - bash scripts/task/cv-evidence-check.sh
+
   matt:gist:pull:
     desc: Fetch resume.json and lebenslauf.json from the gists into the local cache
     cmds:

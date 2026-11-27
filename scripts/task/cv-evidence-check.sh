@@ -22,31 +22,42 @@
 #           artifact always fails. Add the real artifact and then its probe,
 #           never the probe alone.
 #
+#   packet  the blog publishes redacted copies of packets, and a copy is a PDF
+#           nobody rebuilds: its skills line keeps claiming whatever the stack
+#           said the day it was cut, so a withdrawn item lives on in public.
+#           The `align` matcher runs on the DevOps line of each `lebenslauf.pdf`
+#           / `cv*.pdf` in a packet directory.
+#
 # The provider table is data at the top of the Python block: a new technology
 # that should not be claimed without proof is a row there, and a claim that
 # outgrows its evidence is how the row changes.
 #
-# Env: ARTIFACT (default /tmp/matt-site — the output of `task matt:build`).
+# Env: ARTIFACT (default /tmp/matt-site — the output of `task matt:build`),
+# PACKETS (default the is-a.dev checkout's `assets/files/packets`; a machine
+# without that checkout simply has no packets to read).
 # Builds nothing, writes nothing.
 #
 # EXIT
 #   0  every claim renders, every DevOps keyword is in the stack, every
-#      provider claim has an artifact
+#      provider claim has an artifact, every public packet's skills line is
+#      still the stack's
 #   1  a claim is unbacked
-#   2  cannot tell: no artifact, no pdftotext, or a corpus that will not parse
+#   2  cannot tell: no artifact, no pdftotext, no skills line in a packet, or a
+#      corpus that will not parse
 set -uo pipefail
 
 root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 ARTIFACT="${ARTIFACT:-/tmp/matt-site}"
+PACKETS="${PACKETS:-$HOME/Documents/shaoyanji.is-a.dev/assets/files/packets}"
 
-exec python3 - "$root" "$ARTIFACT" <<'PY'
+exec python3 - "$root" "$ARTIFACT" "$PACKETS" <<'PY'
 import json
 import os
 import re
 import subprocess
 import sys
 
-root, artifact = sys.argv[1:3]
+root, artifact, packets_dir = sys.argv[1:4]
 
 CORPORA = [
     "lib/matt/profile.json",
@@ -132,6 +143,37 @@ def flat(text):
     return re.sub(r"[^a-z0-9]+", "", text).replace("and", "")
 
 
+def aligns(keyword):
+    """One matcher for two readers: a corpus keyword and a public skills item.
+
+    One direction only: a short rendered item (`Go`) would otherwise satisfy
+    any keyword that contains it (`Google Cloud`), which is the bug this leg
+    exists to catch.
+    """
+    needle = compact(keyword)
+    if any(needle and needle in compact(item) for _, item in stack):
+        return True
+    return any(
+        alias in compact(item) for _, item in stack for alias in ALIASES.get(needle, ())
+    )
+
+
+def skills_groups(text):
+    """The labelled lines under Skills/Kenntnisse: the claims a copy repeats."""
+    lines = [line.strip() for line in text.splitlines()]
+    for here, line in enumerate(lines):
+        if line.lower() not in ("skills", "kenntnisse"):
+            continue
+        groups = []
+        for nxt in lines[here + 1 :]:
+            head, sep, items = nxt.partition(" — ")
+            if not nxt or not sep:
+                break
+            groups.append((head.strip(), items))
+        return groups
+    return None
+
+
 def load(rel):
     try:
         with open(os.path.join(root, rel), encoding="utf-8") as fh:
@@ -212,18 +254,7 @@ for rel, item in stack:
 for rel, keyword, is_devops in claims:
     if not is_devops:
         continue
-    needle = compact(keyword)
-    # One direction only: a short rendered item (`Go`) would otherwise satisfy
-    # any keyword that contains it (`Google Cloud`), which is the bug this leg
-    # exists to catch.
-    matched = [item for _, item in stack if needle and needle in compact(item)]
-    if not matched:
-        matched = [
-            item
-            for _, item in stack
-            if any(alias in compact(item) for alias in ALIASES.get(needle, ()))
-        ]
-    if not matched:
+    if not aligns(keyword):
         problems.append(
             f'{rel}: DevOps keyword "{keyword}" is not in the rendered stack '
             f"(add it to lib/matt/profile.json and profile.de.json, or drop it)"
@@ -250,6 +281,47 @@ for rel, keyword, _ in claims:
                 f"({probes})"
             )
 
+# packet — a public copy claims the stack to a stranger, and nothing rebuilds
+# it: the copy keeps whatever skills line the corpus had the day it was cut.
+# Only the DevOps group is judged, because that is the group the `align` leg
+# holds to the rendered stack; a web or backend line is the base resume's and
+# renders nothing here.
+CV_PDF = re.compile(r"^(cv|lebenslauf)[^/]*\.pdf$", re.I)
+copies = sorted(
+    os.path.join(base, name)
+    for base, _, names in os.walk(packets_dir)
+    for name in names
+    if CV_PDF.search(name)
+)
+for copy in copies:
+    run = subprocess.run(["pdftotext", copy, "-"], capture_output=True, text=True)
+    if run.returncode != 0:
+        print(
+            f"cv-evidence-check: pdftotext failed on {copy}: {run.stderr.strip()}",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    groups = [
+        (group, items)
+        for group, items in (skills_groups(run.stdout) or [])
+        if compact(group) == "devops"
+    ]
+    if not groups:
+        print(
+            f"cv-evidence-check: no DevOps skills line in {copy} — cannot tell",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    for _, items in groups:
+        for item in items.split(","):
+            item = item.strip()
+            if item and not aligns(item):
+                problems.append(
+                    f"{os.path.relpath(copy, packets_dir)}: the skills line claims "
+                    f'"{item}", which no CV stack item backs (rebuild the packet '
+                    f"or withdraw the public copy)"
+                )
+
 if problems:
     for line in problems:
         print(f"FAIL {line}")
@@ -260,6 +332,7 @@ devops = sum(1 for _, _, is_devops in claims if is_devops)
 print(
     f"cv-evidence-check: {len(stack)} stack item(s) render in {len(pdfs)} built CV(s), "
     f"{devops} DevOps keyword(s) align with the stack, "
-    f"{len(PROVIDERS)} provider class(es) backed by an artifact or unclaimed"
+    f"{len(PROVIDERS)} provider class(es) backed by an artifact or unclaimed, "
+    f"{len(copies)} public packet(s) still match it"
 )
 PY

@@ -1,8 +1,66 @@
 {
-  "generated": "2026-11-27T21:35:54Z",
+  "generated": "2026-11-27T21:58:12Z",
   "count": 200,
-  "pin": "6db996a497856a6e37014e7e402cc93479bf9092e0ec0ba726e5e1829a465c98",
+  "pin": "86f6bc94fa2f3c70c03df929aafe49b35ba0351fae86a4c00ca26ee357bc8c40",
   "turns": [
+    {
+      "id": "dceadc4c-dcd5-4de5-bcb2-2acfcd93a39b",
+      "ts": "2026-11-27T21:54:52Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-stale-packets-2026-11-27",
+      "action": "gate-change .96/.93: harden CV gate; fix stale Flink+Pentland; push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/",
+        "scripts/task/"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbdk7klr8dtb55zngjy9pnb"
+    },
+    {
+      "id": "ca6e7cba-3920-48fc-b84f-dcac92228499",
+      "ts": "2026-11-27T21:41:24Z",
+      "source": "devin",
+      "subject": "nixconfig:nixcachix-ci-fix-2026-11-27",
+      "action": "landed 1880862e: two independent reds fixed. hygiene — cv-evidence-check probe resolves via paths.sh secrets-dir instead of spelling the plane path. delphi build — inventory-site compile broken since 9915102b's half-finished rewrite: api.go+import.go were dead leftovers redeclaring server/writeJSON; deleted, nothing references them. CI run 46071401269: hygiene SUCCESS, plan+site-cv-links green | gate: policies build rc=0, go build+test pass locally, CI hygiene green",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "1880862ebf0b07f544e6da0d2ad4b781fcf2389d",
+      "branch": "HEAD",
+      "frame": "03hbdhkvkvofkxcqm6gwokz2q"
+    },
+    {
+      "id": "15a03421-c2a0-4e6b-9ad1-9f383d44b17a",
+      "ts": "2026-11-27T21:39:04Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-cv-publish-verify-2026-11-27",
+      "action": "landed: clean build of origin/main 1880862e reproduces all 6 live CVs byte-for-byte; Pages deploy uploaded 0 files (already current), blog 6/6 match | gate: matt:build + matt:cv:evidence PASS (132 stack items, 7 provider classes backed), dev:blog:cv:check PASS, 0 provider words",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbdh4h7rrqqs7or622mdyqd"
+    },
+    {
+      "id": "56055070-4892-4013-ace0-df75b1d7ea18",
+      "ts": "2026-11-27T21:37:51Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-publish-verify-2026-11-27",
+      "action": "publish 0.96/0.95: verify CV packet vs origin/main, republish, gate",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/resume.cv.json",
+        "lib/matt/cv-software.json"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbdgvzwl9k54pd5y796xmiw"
+    },
     {
       "id": "0e75996e-d4d3-4659-8841-bc6cc37ba4ab",
       "ts": "2026-11-27T21:34:54Z",
@@ -2863,65 +2921,6 @@
       "base_commit": "f77ec7fab0ddd4b47f43bb9de1fb9e8cccc122a0",
       "branch": "main",
       "frame": "03hb93bk3i01uohlpw8cdcjwc"
-    },
-    {
-      "id": "7a7fc9f7-a644-4824-9505-cd747ff0dc82",
-      "ts": "2026-11-27T08:08:17Z",
-      "source": "freebuff",
-      "subject": "nixconfig:delphi-health-fix",
-      "action": "prepared: commit 0ffca974 on delphi-private-deals-port pins services.private-deals.port=8104 (8100 is media-relay); checks:host HOST=delphi PASS 2168 assertions; deploy held until pane 2 zeno install completes",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/delphi",
-        "modules/services/private-deals.nix"
-      ],
-      "files": [],
-      "base_commit": "9b284f018a1dfdf501fd504f96d75cd90077fbb4",
-      "branch": "main",
-      "frame": "03hb92qoajjfn4banwqh9w4kv"
-    },
-    {
-      "id": "abfdc52f-a401-4796-b16f-b5c90dfc8fce",
-      "ts": "2026-11-27T07:57:11Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-note-change",
-      "action": "done freebuff note-change: f77ec7fa skills + e1131a45 AGENTS.nix ceiling, pushed origin/main",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "f77ec7fab0ddd4b47f43bb9de1fb9e8cccc122a0",
-      "branch": "main",
-      "frame": "03hb90kqxblwiukp6m3bhavu7"
-    },
-    {
-      "id": "644a6c7c-6a9e-40d6-9c66-6847b601aa49",
-      "ts": "2026-11-27T07:56:39Z",
-      "source": "freebuff",
-      "subject": "nixconfig:agents-nix-ceiling-skills",
-      "action": "landed: committed the 12 untracked skills (f77ec7fa) and gave AGENTS.nix a shrink-only ceiling in repo-blobs.sh (e1131a45); trim plan measured: 36 sweep notes hold 104.6KB, compressing the 8 largest frees 29.7KB | gate: repo-blobs --index PASS, kg-check PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "f77ec7fab0ddd4b47f43bb9de1fb9e8cccc122a0",
-      "branch": "main",
-      "frame": "03hb90gwbv470std9qnd3oh1q"
-    },
-    {
-      "id": "1ab8af9b-9b4a-4c3c-984d-839b9a200824",
-      "ts": "2026-11-27T07:56:22Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-note-change",
-      "action": "drive freebuff note-change: gate the ceiling, commit untracked skills, push origin/main",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "f77ec7fab0ddd4b47f43bb9de1fb9e8cccc122a0",
-      "branch": "main",
-      "frame": "03hb90ew9uwjvcoor34wv39hd"
     }
   ]
 }

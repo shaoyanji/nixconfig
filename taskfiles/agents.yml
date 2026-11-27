@@ -289,8 +289,10 @@ tasks:
       cv-energy, cv-energy-de, cv-software, cv-software-de — must hash equal to
       `.#sites.matt-site` and, in `_site`, be the target of an anchor with
       `download` that resolves. `matt:cv:evidence` runs first, so the published
-      hash also carries claims a built PDF and an artifact back. Exit 0 linked,
-      1 drift, 2 cannot tell. Deploys, sends and commits nothing.
+      hash also carries claims a built PDF and an artifact back, and it fails a
+      public packet copy whose DevOps skills line names a stack item the CVs no
+      longer render. Exit 0 linked, 1 drift, 2 cannot tell. Deploys, sends and
+      commits nothing.
     cmds:
       - bash scripts/task/cv-evidence-check.sh
       - bash scripts/task/cv-blog-check.sh

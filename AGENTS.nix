@@ -8614,49 +8614,47 @@
       '';
     };
     hisolutions-cv-prose-review-2026-11-27 = {
-      title = "HiSolutions AG packet: CV prose reviewed, both documents gated, submit held";
+      title = "HiSolutions AG packet: prose pass, documents gated, CV site republished";
       kind = "handoff";
       status = "DELIVERED";
       priority = "P2";
       date = "2026-11-27";
-      summary = "The HiSolutions packet is finished: the CV prose follows the ad (eight fixes, selection floor removed), the letter and CV cite 25 NixOS hosts as the inventory does, and letter-pdf-check, cv-ats-check, both page budgets and checks:appflow pass on the shipped 1-page letter / 2-page CV. Nothing is sent before 2026-12-07, and this change deploys nothing.";
+      summary = "The review closed, then a prose pass: compounds arrive whole, cv-ats-check fails on the glued text, both PDFs come from one build. matt.bountystash.com serves this corpus (site:check 35/0, six live PDFs hash-equal); nothing sends before 2026-12-07.";
       from = ["freebuff-hisolutions-ag-2026-11-27"];
       refs = {
         modules = [
           "lib/matt/lebenslauf.json"
           "lib/matt/cv-software.de.json"
-          "lib/matt/projects.json"
-          "modules/plugins/appflow/jdselect.py"
           "modules/plugins/appflow/packet.nix"
           "scripts/task/cv-ats-check.sh"
           "scripts/task/letter-pdf-check.sh"
         ];
-        tasks = ["checks:appflow" "matt:cv:check"];
+        tasks = ["checks:appflow" "checks:quick"];
         docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
-        Reviewed in 06bff2e5: the German corpus `lib/matt/lebenslauf.json` and its two variants, the
-        project record, the JSON Resume projection, and the selector that picks highlights from the ad.
-        Eight prose fixes landed — "sops" to "SOPS", "Speicherdruck" to "PSI-Druck",
-        "inventargetriebene CI" to "CI aus der Inventardatei", final stops on every bullet — and
-        jdselect lost the half-of-best floor that dropped the fleet and CI lines the letter opens with,
-        with German stopwords mirroring the English ones and 16 cases holding it.
+        Closed 2026-11-27. The three debts, and how each closed:
+        1. A compound broke at its hyphen. `hyphenate: false` stops Typst's hyphenation only; an
+           explicit hyphen is its own break opportunity, and pdftotext's reading order drops it, so
+           `Generation-Alter` arrived as `GenerationAlter`, a word no parser matches. Both packet
+           templates box letter-only compounds, so `Job-Status`, `Generation-Alter` and
+           `Nix-Entwicklungsumgebung` arrive whole.
+        2. `cv-ats-check` could not see it: the assertion fired only on a lowercase continuation,
+           which `Alter` and `Entwicklungsumgebung` are not, and its reading order had already
+           dropped the hyphen. It now also requires every compound the template prints to arrive
+           whole. Packet dialect only: the site's German PDFs keep that break.
+        3. The letter (07:55) and the CV (08:34) came from two runs; one build stamps both.
 
-        Gates run on the shipped PDFs, not on their sources:
-        - `letter-pdf-check`: subject, salutation, closing and all 6 paragraphs are in the text, tagged.
-        - `cv-ats-check`: 5 roles, 4 projects, 2 degrees, 7 skill groups, 2 languages, name first, no
-          hyphenated line end. The selection.json beside the packet reproduces byte-identically from
-          the live corpus plus the ad, so the PDF was compiled from what is on disk.
-        - `pdfinfo`: anschreiben 1 page, lebenslauf 2, both A4 and tagged.
-        - `checks:appflow` PASS (1717 rows, 121 in prep, no duplicate or dead row).
+        The prose pass: four letter lines (deployment wording, the risk-manager clause, `kein
+        Quartalsprojekt`, `kommuniziere`) and both address blocks. Packet: 1 page letter, 2 page CV,
+        gates green, 15/39 highlights, 4/10 projects.
 
-        Site https://514b89be.matt-9pf.pages.dev carries the corrected CVs; that was the last
-        redeploy, and this note changes no artifact.
-
-        Nothing is sent: `apps:send` refuses this row before 2026-12-07. On the day, hand-submit
-        anschreiben.pdf and lebenslauf.pdf at
+        Published: `matt:deploy:prod` (03527414.matt-9pf.pages.dev), `site:check` 35/0,
+        `matt:cv:check` 14/0 with all six live PDFs hash-equal, `agents:cv:publish-check` 6/6 after
+        the blog's copies were refreshed; its push stays an operator step. Nothing is sent:
+        `apps:send` refuses before 2026-12-07. Then hand-submit both PDFs at
         https://karriere.hisolutions.com/jobs/68820855/Senior-Kubernetes-Experte-DevOps-Engineer-w-m-d-
-        then `task apps:update -- <id> --status applied` with the receipt.
+        and record it: `task apps:update -- <id> --status applied`.
       '';
     };
   };

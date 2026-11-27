@@ -235,6 +235,55 @@ for i, line in enumerate(raw[:-1]):
     if re.search(r"[A-Za-z]-$", line) and raw[i + 1][:1].islower():
         fail(f"a line ends in a hyphen and continues lowercase ({line.strip()[-30:]!r} / {raw[i + 1].strip()[:20]!r}) — a hyphenated word is the one a parser stops matching")
 
+# The assertion above only fires when the continuation starts lowercase, so
+# `Generation-` / `Alter` and `Nix-` / `Entwicklungsumgebung` pass it — and the
+# reading order this check reads drops the hyphen at a break, arriving at one word
+# no parser matches. So ask the other question: every compound the template prints
+# with a hyphen must arrive whole. Only the fields the template emits are read, or
+# a hyphen in a row it never prints would fail the document. Scoped to the packet's
+# JSON Resume: the site's German PDFs still break these and are not this packet's.
+if resume:
+    def printed_fields(rec):
+        basics_ = rec.get("basics") or {}
+        for key in ("name", "label", "summary", "email", "phone", "url"):
+            yield basics_.get(key, "")
+        location = basics_.get("location") or {}
+        for key in ("address", "postalCode", "city", "countryCode"):
+            yield location.get(key, "")
+        for profile in basics_.get("profiles") or []:
+            yield from (profile.get("url", ""), profile.get("username", ""))
+        for job in rec.get("work") or []:
+            for key in ("name", "position", "location"):
+                yield job.get(key, "")
+            yield from job.get("highlights") or []
+        for project in rec.get("projects") or []:
+            bullets = project.get("highlights") or []
+            entity = project.get("entity", "")
+            description = project.get("description", "")
+            yield project.get("name", "")
+            # The template prints `entity` as the subtitle when there are bullets,
+            # and the description only when there is no entity or no bullets.
+            yield entity if bullets and entity else description if not bullets or not entity else ""
+            yield from bullets
+        for study in rec.get("education") or []:
+            for key in ("institution", "studyType", "area"):
+                yield study.get(key, "")
+            yield from study.get("courses") or []
+        for skill in rec.get("skills") or []:
+            yield skill.get("name", "")
+            yield from skill.get("keywords") or []
+        for spoken in rec.get("languages") or []:
+            yield from (spoken.get("language", ""), spoken.get("fluency", ""))
+
+    for token in sorted(
+        {hit for text in printed_fields(record) for hit in re.findall(r"[^\W\d_]{2,}(?:-[^\W\d_]{2,})+", text)}
+    ):
+        if token not in flat:
+            fail(
+                f"the record's {token!r} is not in the extracted text — a compound broken "
+                f"at its hyphen arrives glued, and a parser matches neither half"
+            )
+
 doc = os.path.basename(pdf_path)
 dialect = ", jsonresume" if resume else ""
 print(f"cv-ats-check: {doc} <- {os.path.basename(record_path)} ({lang}{dialect})")

@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-27T08:51:54Z",
+  "generated": "2026-11-27T10:00:37Z",
   "count": 200,
-  "pin": "33244c55e1358b9cabf9a462425083a066f45fc5047f5dafce0b8120dd792f22",
+  "pin": "05af194b5ed0d6cfaa40c7d7c6e078ec39dc951ce825ab01b317ba573c8c4958",
   "turns": [
+    {
+      "id": "26538508-dc9c-4329-b307-f0a5f7ad9f13",
+      "ts": "2026-11-27T09:54:24Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-publish",
+      "action": "jev publish p=0.95 → freebuff pane agents:2.1 driving CV-site publish",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "ec0877f83ea610fe6cf426a5beb57f81db162ced",
+      "branch": "main",
+      "frame": "03hb9ngy3uikl73yi58apb1os"
+    },
+    {
+      "id": "80a828c7-5ca4-48a9-9668-f565bc5fe861",
+      "ts": "2026-11-27T09:37:01Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-cv-prose-review",
+      "action": "jev prose-change: freebuff CV prose review gate",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "ec0877f83ea610fe6cf426a5beb57f81db162ced",
+      "branch": "main",
+      "frame": "03hb9k2r4pbjo5scyw65kfu8r"
+    },
+    {
+      "id": "cb2fb994-2522-41f3-bae6-10ca11fcf14b",
+      "ts": "2026-11-27T09:27:24Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-cv-publish-check",
+      "action": "publish-check gate done: six CVs verified hash-equal to .#sites.matt-site, download anchors resolve in _site, no failure raised, committed nothing; pane returned to idle composer",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ec0877f83ea610fe6cf426a5beb57f81db162ced",
+      "branch": "main",
+      "frame": "03hb9i739ogb1tkfffcuk55bu"
+    },
+    {
+      "id": "f6b880f9-19b4-45ba-b5ab-d752dc4e09bf",
+      "ts": "2026-11-27T09:26:02Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-cv-publish-check",
+      "action": "drove agents:2.1 freebuff: CV publish-check gate via agents:cv:publish-check; verify six CVs hash-equal to .#sites.matt-site and download anchors resolve in _site; report drift, commit nothing",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "ec0877f83ea610fe6cf426a5beb57f81db162ced",
+      "branch": "main",
+      "frame": "03hb9hxjh5hsbcgjpxg4wrk9n"
+    },
+    {
+      "id": "aa3752fb-83cc-4d9b-bb49-822fdabc7ce7",
+      "ts": "2026-11-27T08:57:52Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-2-vendor-sweep",
+      "action": "landed: vendor-lead sweep 2026-11-27 — read Giant Swarm/SUSE/LINBIT/B1/Univention/Open-Xchange/Proxmox careers pages, apps:search first each. No new employer: GSW+LINBIT state no openings, SUSE 71007910 still live, B1/U/OX/Proxmox tracked with stronger reqs. Recorded in followups/2026-11-27-employer-lead-sweep-freebuff.md; no row minted, nothing sent. Declared antigravity/wallpaper-worker/hermes capabilities and the 12 skill budgets so checks:quick goes green | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ec0877f83ea610fe6cf426a5beb57f81db162ced",
+      "branch": "main",
+      "frame": "03hb9cfekina7wk24g2t3iljm"
+    },
     {
       "id": "50193663-e097-43d1-a780-de18a47aef1f",
       "ts": "2026-11-27T08:49:33Z",
@@ -2977,77 +3042,6 @@
       "base_commit": "74b8018a3fe51284fc8bc4448899120e605ebcb5",
       "branch": "main",
       "frame": "03hb44h590pm1b2gwuom1lljt"
-    },
-    {
-      "id": "6dfdc1bc-ea8b-4b31-bba3-c71fcf42d94a",
-      "ts": "2026-11-26T16:54:12Z",
-      "source": "devin",
-      "subject": "nixconfig:clanker-runner-presets",
-      "action": "landed validated job presets and sqlite recurring schedules | gate: checks:host delphi PASS; go test/vet PASS; node/alejandra PASS; delphi toplevel build PASS; mock instabox smoke PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c43989da3e5780c15882362820b576e6bff8d287",
-      "branch": "main",
-      "frame": "03hb446fipkhkg8glnw6zwshj"
-    },
-    {
-      "id": "c87609aa-294c-4f54-a7ae-e25b8a9d99fd",
-      "ts": "2026-11-26T16:52:08Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-and-atlas-docs",
-      "action": "claim: read the landed routes before writing a word (batch/scoring/alerts, asset_events, qr.svg, atlas-senders), then update both pages inside proseBudget and commit through a temp index",
-      "outcome": "in_progress",
-      "claims": [
-        "docs/portfolio-services.md",
-        "docs/mail-atlas.md"
-      ],
-      "files": [],
-      "base_commit": "e576524e7c4ec19a01f067bc1e63a8d0243403e7",
-      "branch": "main",
-      "frame": "03hb43ryomhwxyo8nhxlm2iuu"
-    },
-    {
-      "id": "3cdb8a2c-f75d-4f3e-b15e-3ac41cfbdbf1",
-      "ts": "2026-11-26T16:50:14Z",
-      "source": "buffy",
-      "subject": "nixconfig:mail-atlas-analytics-ui",
-      "action": "atlas-senders.sql: domain rollup (letters, addresses, untagged, oldest/newest), domain from the address not the display name; run live (github 648, kleinanzeigen 443, google 87 with 80 untagged). Sources drawer: S opens it before any query, volume bars, gold untagged count, sort toggle, click searches that shore; 源 added to the font subset. Browser smoke serves the derivation with a canned API.| gate: node --check, derivation builds, smoke PASS, delphi eval 2184, comments 6493/6495",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e576524e7c4ec19a01f067bc1e63a8d0243403e7",
-      "branch": "main",
-      "frame": "03hb43eoc0a1bnu44v8vs5p51"
-    },
-    {
-      "id": "5d1903b3-0626-4fe4-badf-fb2f33b14c71",
-      "ts": "2026-11-26T16:43:44Z",
-      "source": "buffy",
-      "subject": "nixconfig:mail-atlas-analytics-ui",
-      "action": "claim: inspect endpoints/schema/site, add a top-senders/domains analytics endpoint plus a UI drawer and quick filter, verify wiring + node --check + a canned smoke, commit through a temp index",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/mail-atlas/endpoints",
-        "modules/services/mail-atlas/site"
-      ],
-      "files": [],
-      "base_commit": "ba30f1bb033ab0c25da98471ae9494c16766155e",
-      "branch": "main",
-      "frame": "03hb424w4xmlk8xlc3rr6y5zk"
-    },
-    {
-      "id": "737c88e4-9deb-4f46-97fb-21ae015f2d20",
-      "ts": "2026-11-26T16:41:58Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-endpoints-smoke",
-      "action": "checks:delphi:endpoints + scripts/task/endpoints-smoke.py: probes all 23 mounts from services.servicePortal.mounts; 5xx/refused/timeout fail, 4xx passes, EXPECT= narrows. Found one at once: dsh :8443 is 502 while dsh-free-models is active and its dashboard port 18900 has no listener - a portal card pointing at the retired dsh-web. 10 unit tests, documented beside the port table.| gate: checks:tasks 843 no hard violations, unittest 10 OK, ran live",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ba30f1bb033ab0c25da98471ae9494c16766155e",
-      "branch": "main",
-      "frame": "03hb41sgks4qzmmbrq4fpda3q"
     }
   ]
 }

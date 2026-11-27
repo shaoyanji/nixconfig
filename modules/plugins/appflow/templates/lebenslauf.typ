@@ -33,6 +33,12 @@
 // match. Ragged-but-whole words are worth the loose right edge.
 #set text(font: ("Libertinus Serif", "New Computer Modern"), size: 9.5pt, fill: rgb("#111827"), lang: lang, hyphenate: false)
 #set par(leading: 0.5em, justify: true)
+// `hyphenate: false` stops Typst's own hyphenation, not the break an explicit
+// hyphen already offers: `Generation-Alter` still becomes `Generation-` / `Alter`,
+// and pdftotext's reading order drops that hyphen, so an ATS reads the one word
+// `GenerationAlter` and matches neither half. A box removes the break opportunity;
+// letters only, so a date range or a URL keeps its own breaks.
+#show regex("[A-Za-zÄÖÜäöüß]{2,}(?:-[A-Za-zÄÖÜäöüß]{2,})+"): it => box(it)
 
 // ---- header, from `basics` ------------------------------------------------
 #let location = basics.at("location", default: (:))
@@ -53,7 +59,6 @@
   for profile in profiles { parts.push(profile.at("url", default: profile.at("username", default: ""))) }
   // The German corpus carries no `profiles`: keep one link rather than none.
   if profiles.len() == 0 and basics.at("url", default: "") != "" { parts.push(basics.url) }
-  if place != "" { parts.push(place) }
   parts.join(" • ")
 }
 
@@ -63,8 +68,14 @@
     #v(1pt)
     #text(size: 9pt, fill: rgb("#4b5563"))[#basics.label]
   ]
-  #v(2pt)
+  #v(4pt)
   #text(size: 8.5pt, fill: rgb("#374151"))[#contact]
+  // The address is its own line: at the end of the wrapped contact line it left
+  // a trailing ` •` hanging above it, which reads as a missing field.
+  #if place != "" [
+    #v(1pt)
+    #text(size: 8.5pt, fill: rgb("#374151"))[#place]
+  ]
 ]
 
 #v(6pt)

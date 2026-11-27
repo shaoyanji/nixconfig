@@ -13,11 +13,16 @@
 #let strings = all-strings.at(lang, default: all-strings.at("de"))
 #let months = strings.at("months", default: ())
 #let location = basics.at("location", default: (:))
+// Postleitzahl und Ort sind ein Feld, nicht zwei: `79261, Gutach im Breisgau`
+// ist keine deutsche Adresse. Street, then `PLZ Ort`, then the country.
 #let address = {
+  let street = location.at("address", default: "")
+  let postcode = location.at("postalCode", default: "")
+  let city = location.at("city", default: "")
+  let town = if postcode != "" and city != "" { postcode + " " + city } else { postcode + city }
   let parts = ()
-  if location.at("address", default: "") != "" { parts.push(location.address) }
-  if location.at("postalCode", default: "") != "" { parts.push(location.postalCode) }
-  if location.at("city", default: "") != "" { parts.push(location.city) }
+  if street != "" { parts.push(street) }
+  if town != "" { parts.push(town) }
   if location.at("countryCode", default: "") != "" { parts.push(location.countryCode) }
   parts.join(", ")
 }
@@ -30,8 +35,11 @@
 }
 
 #set page(paper: "a4", margin: (top: 2cm, bottom: 2cm, left: 2.2cm, right: 2.2cm))
-#set text(font: ("Libertinus Serif", "New Computer Modern"), size: 10pt, fill: rgb("#111827"), lang: lang)
+#set text(font: ("Libertinus Serif", "New Computer Modern"), size: 10pt, fill: rgb("#111827"), lang: lang, hyphenate: false)
 #set par(leading: 0.58em, justify: true, spacing: 1.1em)
+// A compound must not break at its own hyphen: reading order then drops the hyphen
+// and the word a parser reads is one it can match nowhere. Same rule as the CV's.
+#show regex("[A-Za-zÄÖÜäöüß]{2,}(?:-[A-Za-zÄÖÜäöüß]{2,})+"): it => box(it)
 
 // Sender block: who is writing, in the shape a German letter expects.
 #text(size: 9pt, fill: rgb("#374151"))[

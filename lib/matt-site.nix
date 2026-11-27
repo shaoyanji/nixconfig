@@ -951,24 +951,30 @@
       !(lib.any (w: (w.org or "") == "EWE Trading" && (w.period or "") != "2023") (cvJson.work or []))
       && !(lib.any (p: (p.resumeName or (p.name or "")) == "bountystash" && (p.period or "") == "2020 — 2025") (cvJson.projects or []))
     )
-    "matt-site: EWE Trading is a three-month 2023 engagement; refusing another period";
-      pkgs.runCommand "matt-cv-${name}" {
-        nativeBuildInputs = [pkgs.typst pkgs.jq pkgs.poppler-utils pkgs.python3];
-      } ''
-        mkdir -p $out work
-        cp ${./matt/cv.typ} work/cv.typ
-        cp ${pkgs.writeText "cv.json" (builtins.toJSON cvJson)} work/cv.json
-        # `ua-1` exports a tagged PDF: headings, lists and entries reach the structure
-        # tree, so a parser reads sections from it instead of rebuilding them from
-        # glyph positions. cv-ats-check refuses a PDF that lost the tree.
-        typst compile --pdf-standard ua-1 --root work work/cv.typ $out/cv.pdf
-        ${typeset.check {
-          source = "work/cv.typ";
-          budget = cvJson.pages;
-          doc = "cv-${name}.pdf";
-        }}
-        bash ${../scripts/task/cv-ats-check.sh} --record work/cv.json $out/cv.pdf
-      '';
+    "matt-site: EWE Trading is a three-month 2023 engagement; refusing another period"; let
+      # The exact payload the template reads, named beside the PDF: the build gate
+      # reads the finished document back against it, and `.#sites.cv-ats-site`
+      # publishes that same comparison rather than a second rendering of the data.
+      record = pkgs.writeText "cv-${name}.json" (builtins.toJSON cvJson);
+    in
+      (pkgs.runCommand "matt-cv-${name}" {
+          nativeBuildInputs = [pkgs.typst pkgs.jq pkgs.poppler-utils pkgs.python3];
+        } ''
+          mkdir -p $out work
+          cp ${./matt/cv.typ} work/cv.typ
+          cp ${record} work/cv.json
+          # `ua-1` exports a tagged PDF: headings, lists and entries reach the structure
+          # tree, so a parser reads sections from it instead of rebuilding them from
+          # glyph positions. cv-ats-check refuses a PDF that lost the tree.
+          typst compile --pdf-standard ua-1 --root work work/cv.typ $out/cv.pdf
+          ${typeset.check {
+            source = "work/cv.typ";
+            budget = cvJson.pages;
+            doc = "cv-${name}.pdf";
+          }}
+          bash ${../scripts/task/cv-ats-check.sh} --record work/cv.json $out/cv.pdf
+        '')
+      // {inherit record;};
 
   cv = cvPdf "en" (cvData "en");
   cvDe = cvPdf "de" (cvData "de");
@@ -985,26 +991,32 @@
     {
       name = "cv.pdf";
       src = cv;
+      record = cv.record;
     }
     {
       name = "cv-de.pdf";
       src = cvDe;
+      record = cvDe.record;
     }
     {
       name = "cv-energy.pdf";
       src = cvEnergy;
+      record = cvEnergy.record;
     }
     {
       name = "cv-energy-de.pdf";
       src = cvEnergyDe;
+      record = cvEnergyDe.record;
     }
     {
       name = "cv-software.pdf";
       src = cvSoftware;
+      record = cvSoftware.record;
     }
     {
       name = "cv-software-de.pdf";
       src = cvSoftwareDe;
+      record = cvSoftwareDe.record;
     }
   ];
 
@@ -1149,3 +1161,6 @@ in
       }
       echo "matt-site: $(find $out -type f | wc -l) files, $(du -sb $out | cut -f1) bytes"
     ''
+    # The CVs and the records that built them, so a consumer (`.#sites.cv-ats-site`)
+    # audits this build's PDFs instead of rebuilding a second set that could differ.
+    // {inherit cvFiles;}

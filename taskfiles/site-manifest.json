@@ -27,6 +27,16 @@
       "previewBind": "127.0.0.1",
       "previewPort": 3001
     },
+    "cv-ats": {
+      "kind": "pages",
+      "description": "CV ATS audit: the six shipped PDFs read back against the records that built them",
+      "buildCommand": "nix build --builders \"\" --out-link /tmp/cv-ats .#sites.cv-ats-site",
+      "outputPath": "/tmp/cv-ats",
+      "deployMethod": "pages",
+      "deployTarget": "cv-ats",
+      "previewBind": "127.0.0.1",
+      "previewPort": 3003
+    },
     "bountystash-mockup": {
       "kind": "pages",
       "description": "Bug-bounty concept mockup for bountystash.com, rendered from lib/bountystash-mockup/data.json",

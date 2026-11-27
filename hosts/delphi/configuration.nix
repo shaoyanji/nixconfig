@@ -332,6 +332,7 @@ in {
     self.modules."services.dsh-web"
     self.modules."services.dsh-free-models"
     self.modules."services.fleet-monitors"
+    self.modules."services.fetch-broker"
     self.modules."services.clanker-runner"
     self.modules."services.job-db-scraper"
     self.modules."services.private-deals"
@@ -383,6 +384,11 @@ in {
   services.linkVault = {
     enable = true;
     inherit tailnetHost;
+  };
+  services.fetchBroker = {
+    enable = true;
+    usProxy = "http://lumi.${hostMeta.network.tailnet_domain}:8470";
+    localProxy = "http://frieren.${hostMeta.network.tailnet_domain}:8471";
   };
 
   # --- the free-model relay, durable ---
@@ -1568,6 +1574,13 @@ in {
           title = "Link vault";
           description = "Bookmark and research archive with extracted page text, tags, collections, states and FTS5 search.";
           requires = ["link-vault.service"];
+        };
+        fetch-broker = {
+          port = config.services.fetchBroker.tailnetPort;
+          upstream = "http://127.0.0.1:${toString config.services.fetchBroker.port}";
+          title = "Fetch broker";
+          description = "Lane-aware research fetches: bulk on delphi, US through lumi, residential through frieren with conditional cache validation.";
+          requires = ["fetch-broker.service"];
         };
         # The dsh dashboard, back on its retired port — hosts/delphi/dsh-web.shadow.nix
         # named 8443 the harness's home and nothing else has taken it.

@@ -246,4 +246,47 @@
     };
     Install.WantedBy = ["default.target"];
   };
+
+  systemd.user.services.fetch-us-proxy = {
+    Unit = {
+      Description = "Tailnet-bound forward proxy for the US fetch lane";
+      StartLimitIntervalSec = 300;
+      StartLimitBurst = 5;
+    };
+    Service = {
+      ExecStart = "${pkgs.writeShellScript "fetch-us-proxy" ''
+                set -eu
+                ip=""
+                for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do
+                  ip="$(${pkgs.tailscale}/bin/tailscale ip -4 2>/dev/null | head -n 1 || true)"
+                  case "$ip" in
+                    100.*) break ;;
+                    *) ip=""; sleep 1 ;;
+                  esac
+                done
+                if [ -z "$ip" ]; then
+                  echo "fetch-us-proxy: no tailnet IPv4 address" >&2
+                  exit 1
+                fi
+                conf="''${XDG_RUNTIME_DIR:-/tmp}/fetch-us-proxy-tinyproxy.conf"
+        {
+          printf 'Port 8470\n'
+          printf 'Listen %s\n' "$ip"
+          printf 'Timeout 60\n'
+          printf 'LogLevel Error\n'
+          printf 'MaxClients 4\n'
+          printf 'DisableViaHeader Yes\n'
+          printf 'Allow 100.64.0.0/10\n'
+          printf 'ConnectPort 443\n'
+        } >"$conf"
+        exec ${pkgs.tinyproxy}/bin/tinyproxy -d -c "$conf"
+      ''}";
+      Restart = "always";
+      RestartSec = 3;
+      MemoryMax = "48M";
+      NoNewPrivileges = true;
+      PrivateTmp = true;
+    };
+    Install.WantedBy = ["default.target"];
+  };
 }

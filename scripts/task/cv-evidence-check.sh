@@ -107,7 +107,7 @@ PROVIDERS = {
         "pattern": r"\bkubernetes\b|\bk3s\b|\bk8s\b",
         "probes": [
             ("modules/profiles/impermanence.nix", r"rancher/k3s"),
-            ("modules/secrets/fullsecrets.yaml", r"\bk3s\b"),
+            ("secrets-plane:fullsecrets.yaml", r"\bk3s\b"),
         ],
         "why": "",
     },
@@ -142,6 +142,13 @@ def load(rel):
 
 
 def digest(tree, rel):
+    if rel.startswith("secrets-plane:"):
+        helper = os.path.join(tree, "scripts", "task", "lib", "paths.sh")
+        out = subprocess.run([helper, "secrets-dir"], capture_output=True, text=True)
+        sdir = out.stdout.strip()
+        if out.returncode != 0 or not sdir:
+            return None
+        rel = os.path.join(sdir, rel.split(":", 1)[1])
     path = os.path.join(tree, rel)
     if not os.path.isfile(path):
         return None

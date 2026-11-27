@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-27T21:33:32Z",
+  "generated": "2026-11-27T21:35:54Z",
   "count": 200,
-  "pin": "8bf4a30c7e590a21cc6d40f1220b6d73435199f8a960ae962e19de229a37b0b2",
+  "pin": "6db996a497856a6e37014e7e402cc93479bf9092e0ec0ba726e5e1829a465c98",
   "turns": [
+    {
+      "id": "0e75996e-d4d3-4659-8841-bc6cc37ba4ab",
+      "ts": "2026-11-27T21:34:54Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-cv-drift-audit-2026-11-27",
+      "action": "landed: target prose in both languages named 'Terraform and GitOps on GCP or Azure' — the last provider words in any shipped CV; rewritten to the fleet stack, rebuilt, deployed | gate: matt:build + matt:cv:evidence PASS, 6/6 live PDFs sha-match build with 0 provider words | blog: dev:blog:cv:check PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbdgb8qb8dkhliv4njq5xyc"
+    },
     {
       "id": "ecb402ff-ed03-46ba-b53e-9f54e252c4c4",
       "ts": "2026-11-27T21:30:01Z",
@@ -2909,19 +2922,6 @@
       "base_commit": "f77ec7fab0ddd4b47f43bb9de1fb9e8cccc122a0",
       "branch": "main",
       "frame": "03hb90ew9uwjvcoor34wv39hd"
-    },
-    {
-      "id": "75d4bff4-8876-4096-81eb-7b74955d6c55",
-      "ts": "2026-11-27T07:51:51Z",
-      "source": "freebuff",
-      "subject": "nixconfig:strata-inkling-note",
-      "action": "landed: strata-inkling-mini-2-eisen experiment note in AGENTS.nix; blob gate refused the commit (AGENTS.nix 531KiB in HEAD, >512KiB), committed with the documented ALLOW=AGENTS.nix exception; file still needs a trim | gate: repo-blobs --index allowed-by-exception, nix fmt/census PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fb91f74fa1d045a787502ea8ee2ecf6e5e70b7e2",
-      "branch": "main",
-      "frame": "03hb8zj8umnk99r5a6a2c4cof"
     }
   ]
 }

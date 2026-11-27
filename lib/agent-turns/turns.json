@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-27T21:58:12Z",
+  "generated": "2026-11-27T22:05:43Z",
   "count": 200,
-  "pin": "86f6bc94fa2f3c70c03df929aafe49b35ba0351fae86a4c00ca26ee357bc8c40",
+  "pin": "b1582e4449ad08ed96022c148daf66ddc223752ede662eea82d784c7cd76c78e",
   "turns": [
+    {
+      "id": "4f2f6f7c-e09a-4953-ade7-e6ab6c5cc568",
+      "ts": "2026-11-27T22:01:20Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-sentinel-ledger-gate-2026-11-27",
+      "action": "gate-change 1.0/1.0: add checks:host gate, active host missing from sentinel ledger fails; prove it fires",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbdlh504p33eswp0hf8j8y2"
+    },
+    {
+      "id": "55b3f3e3-233c-45d9-856b-0d7796ce25f1",
+      "ts": "2026-11-27T22:00:19Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-cv-packet-gate-2026-11-27",
+      "action": "landed: evidence gate gains a packet leg (DevOps skills line of each public packet CV must name only rendered stack items); Flink + Pentland copies withdrawn (builds gone from store, skills line still claimed AWS/Azure/GCP); blog page keeps HiSolutions | gate: matt:cv:evidence PASS (1 packet), cv-blog-check PASS, negative test FAIL 6 claims before withdrawal, checks:tasks clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbdl9xg0s90c5s71wcxvl22"
+    },
     {
       "id": "dceadc4c-dcd5-4de5-bcb2-2acfcd93a39b",
       "ts": "2026-11-27T21:54:52Z",
@@ -2895,32 +2921,6 @@
       "base_commit": "9b284f018a1dfdf501fd504f96d75cd90077fbb4",
       "branch": "main",
       "frame": "03hb95k0za3asnfbd11ue2ede"
-    },
-    {
-      "id": "99435d74-23cb-48bb-a429-1879fb706f33",
-      "ts": "2026-11-27T08:18:07Z",
-      "source": "freebuff",
-      "subject": "nixconfig:hisolutions-cv-prose-note",
-      "action": "landed: opened hisolutions-cv-prose-review-2026-11-27 (decision/OPEN: what was reviewed, three prose debts, 2026-12-07 portal submit as next step); AGENTS.nix trimmed 533,819 -> 522,636 B, first time under the 512 KiB gate, ceiling lowered to match | gate: agents-notes-schema issues [] PASS, repo-blobs --index PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "51665a8f9d1b685c059e84854d9f0320bab7c702",
-      "branch": "main",
-      "frame": "03hb94nwqe9s1zaxae5b215eu"
-    },
-    {
-      "id": "1dec0b4d-2f16-4706-b7dc-a918b4584136",
-      "ts": "2026-11-27T08:11:15Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-note-change",
-      "action": "freebuff p2: CV packet note-change started",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "f77ec7fab0ddd4b47f43bb9de1fb9e8cccc122a0",
-      "branch": "main",
-      "frame": "03hb93bk3i01uohlpw8cdcjwc"
     }
   ]
 }

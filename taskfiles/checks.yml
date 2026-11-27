@@ -797,6 +797,21 @@ tasks:
       Exit 0 = passed, 1 = assertion failed, 2 = watchdog abort.
     cmds:
       - bash scripts/task/host-check-sweep.sh --hosts "{{.HOST}}" --mode {{.MODE | default "build"}} --arch "{{.ARCH}}" --timeout {{.TIMEOUT | default "240"}}
+      - bash scripts/task/sentinel-ledger-check.sh --for-host "{{.HOST}}"
+
+  checks:sentinel:ledger:
+    desc: "[gate] Every active inventory host has a sentinel ledger row (hub-local)"
+    summary: >
+      scripts/task/sentinel-ledger-check.sh against the hub's ledger: an active
+      nixos host with no row in ledger.jsonl and no incoming/<host>.json is a
+      missing row — the failure the sentinel rollout (note p1-sentinel-push)
+      exists to eliminate, since a powered-off host should read stale, never be
+      absent. Red until first contact per host; rows are pushed, never typed.
+
+      checks:host HOST=frieren runs the same probe scoped to the hub. Exit 0 =
+      every active nixos host present, 1 = missing rows (named), 2 = not the hub.
+    cmds:
+      - bash scripts/task/sentinel-ledger-check.sh
 
   checks:drv-equality:
     desc: "[gate] Every configuration's derivation is unchanged against a baseline (MODE=snapshot|compare)"

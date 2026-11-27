@@ -19,6 +19,7 @@
     "checks:caldav" = "leaf";
     "checks:career" = "leaf";
     "checks:closure:budget" = "cache";
+    "checks:sentinel:ledger" = "leaf";
     "checks:codespace" = "leaf";
     "checks:codespace:sync" = "leaf";
     "checks:counts" = "leaf";

@@ -62,17 +62,30 @@
       then "- None defined"
       else p.allowed_tasks |> bullets;
 
-    constraints =
+    constraintBullets =
       if (p.constraints or []) == []
       then ""
-      else "\n## Constraints\n\n" + (p.constraints |> bullets) + "\n";
+      else p.constraints |> bullets;
+
+    constraints =
+      if constraintBullets == ""
+      then ""
+      else "\n## Constraints\n\n" + constraintBullets + "\n";
+
+    resourceAlert = lib.optionalString ((p.compute_tier or "") == "strictly-constrained" && constraintBullets != "") ''
+      # Host resource alert — read first
+
+      - **RAM**: ${hw.ram or "unknown"}
+      ${constraintBullets}
+
+    '';
 
     notes =
       if (h.notes or []) == []
       then ""
       else "\n## Notes\n\n" + (h.notes |> bullets) + "\n";
   in ''
-    ${preamble}
+    ${resourceAlert}${preamble}
 
     ---
 

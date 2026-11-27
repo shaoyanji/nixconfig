@@ -1,8 +1,125 @@
 {
-  "generated": "2026-11-27T12:04:37Z",
+  "generated": "2026-11-27T12:35:26Z",
   "count": 200,
-  "pin": "38c7ec3cf44f367ac24d909dbe927600eff5d5c465a2e2458797bf4e414fdb75",
+  "pin": "a440d79ccfa26909b97ea39f2f1c2568596c6568ef24731421bd0ef438d84b4f",
   "turns": [
+    {
+      "id": "a4ba589a-6fa3-43da-beb3-ae75522501f9",
+      "ts": "2026-11-27T12:21:27Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-2-freebuff-cv-scout-2026-11-27",
+      "action": "landed: blog 4d05b35 publishes the five CVs rebuilt from lib/matt (PSI not memory pressure, SOPS, German sentence periods, 'CI aus der Inventardatei'); all six PDFs are byte-identical to the live site. | gate: agents:cv:publish-check PASS 6/6",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
+      "branch": "main",
+      "frame": "03hbag7359mj85zk4y508cih9"
+    },
+    {
+      "id": "38d1930d-8d03-4047-88f8-2d0d8b233f8f",
+      "ts": "2026-11-27T12:20:18Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-27: 0 plate(s) kept of 0 spent, 0 roster row(s) waiting, 789 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": null,
+      "branch": null,
+      "frame": "03hbafz1gxpzsqev42w6lf8gr"
+    },
+    {
+      "id": "e7cecede-ea66-427c-9b19-e3117a377e56",
+      "ts": "2026-11-27T12:19:24Z",
+      "source": "devin",
+      "subject": "nixconfig:feature-chain-module-refactor",
+      "action": "start: audit shared feature-chain duplication and host module-check failures; isolate work in a temp worktree; bounded checks only",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/global",
+        "modules/profiles",
+        "modules/services",
+        "flake/host-inventory.nix",
+        "hosts"
+      ],
+      "files": [],
+      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
+      "branch": "main",
+      "frame": "03hbafsp1vlzi44wu13wrvyfr"
+    },
+    {
+      "id": "8b0cac77-e635-4fd5-bf5b-9341e8c2b420",
+      "ts": "2026-11-27T12:19:15Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff",
+      "action": "route publish CV site work",
+      "outcome": "in_progress",
+      "claims": [
+        "blog-cv-pdfs"
+      ],
+      "files": [],
+      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
+      "branch": "main",
+      "frame": "03hbafrmb25qezw1hnfbbc0bw"
+    },
+    {
+      "id": "d9d0600d-0fcd-449e-8ffd-3629fa4802ca",
+      "ts": "2026-11-27T12:19:15Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-1-devin",
+      "action": "route chain-change refactor feature-chain modules",
+      "outcome": "in_progress",
+      "claims": [
+        "feature-chain-modules"
+      ],
+      "files": [],
+      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
+      "branch": "main",
+      "frame": "03hbafrlsty56xn6sxaf3fwcu"
+    },
+    {
+      "id": "9c05642b-6684-4ebf-8e9e-469e250735ec",
+      "ts": "2026-11-27T12:11:52Z",
+      "source": "devin",
+      "subject": "nixconfig:lumi-hardening-agent-workflow",
+      "action": "claim: finish Traefik activation, preserve lumi SSH keys, harden within 1 GB RAM, and add tmux/devin prompt context",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/lumi.nix",
+        "modules/config/authorized-keys.nix"
+      ],
+      "files": [],
+      "base_commit": "979a8f1a1677643d6f2fcaeff9097f6dfcecce7c",
+      "branch": "zeno-stage1",
+      "frame": "03hbaebpao6u2io5t6ylefqcv"
+    },
+    {
+      "id": "22f2078c-df8b-405e-b8aa-193d7951b136",
+      "ts": "2026-11-27T12:10:47Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-2-freebuff-cv-scout-2026-11-27",
+      "action": "landed: 3 sweeps over five boards (2026-11-27r, 0 new); mined the rejected card-markup list, filed 4 leads (AXA Köln 4, OGS Koblenz 4, JUMO Fulda 3, Hettich Tuttlingen 3); CV job-search table 146 rows; blog 5a59a35 pushed, Pages 45996313000 success, all four names live. Gate: agents:cv:publish-check PASS (6/6 hash-equal, 6/6 anchors resolve). checks:appflow red on mail-lane row discovered-wongdoody, untouched here.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
+      "branch": "main",
+      "frame": "03hbae43sbe99yrt6n3xlb2np"
+    },
+    {
+      "id": "45b478d5-2288-4055-a31f-7f94b8a5abfb",
+      "ts": "2026-11-27T12:05:51Z",
+      "source": "devin",
+      "subject": "nixconfig:lumi-stage1",
+      "action": "landed: merged origin/zeno-stage1 into origin/main as 69e7bf8f; lumi VPS setup reproducible in repo (inventory, sops recipient, zeno scaffold, tailnet/Cloudflare ingress) | gate: checks:sops:drift PASS + checks:host HOST=lumi eval PASS + nixcachix CI run 45991578137 PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
+      "branch": "main",
+      "frame": "03hbad5e9zcmj6hxm8qpw6uiq"
+    },
     {
       "id": "7f8b3aa1-3758-41bd-822e-8e045e3bc707",
       "ts": "2026-11-27T12:03:58Z",
@@ -2900,151 +3017,6 @@
       "base_commit": "936ba60a4540cd715d9fe0978c450a7d3b26feb0",
       "branch": "main",
       "frame": "03hb4mkhmmdmr1kcb04stu18q"
-    },
-    {
-      "id": "3966b682-2fa6-440e-916a-9fc047091f75",
-      "ts": "2026-11-26T18:27:45Z",
-      "source": "buffy",
-      "subject": "nixconfig:add-apps-scout-dynamic-sweep-cycle-and-dedupe",
-      "action": "claim: dynamic UTC sweep default, URL/dedupe validation in the scout writer, offline fixtures",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/apps.yml",
-        "scripts/task/apps-scout.sh",
-        "scripts/task/jobs-ingest.py",
-        "tests/apps-scout",
-        "tests/jobs-ingest"
-      ],
-      "files": [],
-      "base_commit": "936ba60a4540cd715d9fe0978c450a7d3b26feb0",
-      "branch": "main",
-      "frame": "03hb4mgdn2yxa578d9xmoywq2"
-    },
-    {
-      "id": "86d27cea-7dc1-4094-b502-0f4228ee9780",
-      "ts": "2026-11-26T18:26:24Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-pass-and-deals-ingest",
-      "action": "landed: arbeitnow pp.1-4 scout pass: 58 in-lane titles, 13 new companies, 1 filed — weflow Senior Platform Engineer (Berlin/EU remote, fit 4, scout-2026-11-25s); rest already held or London-only/no description. deals: 6/6 created via firecrawl mydealz/new into delphi:8465 (176 deals). Fixed: sweep text said stage scouted, writer stages lead; tests/apps-scout (11 cases) in checks:appflow | gate: checks:tasks, checks:prose, checks:appflow, deals-ingest 26, jobs-ingest 28",
-      "outcome": "done",
-      "claims": [
-        "tests/apps-scout",
-        "taskfiles/checks.yml",
-        "taskfiles/apps.yml"
-      ],
-      "files": [],
-      "base_commit": "7cb607b78ac3c9edea2a32278461dcd935191873",
-      "branch": "main",
-      "frame": "03hb4m6x1jroegxg1s55nq3qf"
-    },
-    {
-      "id": "a32d25fa-1b46-400a-a256-983336b28b1d",
-      "ts": "2026-11-26T18:20:39Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout-pass-and-deals-ingest",
-      "action": "claim: run a scout pass and a deals ingest, then fix small rough edges in scripts/task or tests (no modules/services/link-vault*)",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task",
-        "tests"
-      ],
-      "files": [],
-      "base_commit": "70311198c5434d651a8c28f9b8aa6d5d4cd1fbfc",
-      "branch": "main",
-      "frame": "03hb4l2gwaf9djfnrfbe4xral"
-    },
-    {
-      "id": "35b2e31f-18ee-4a6b-945f-c9e19b2d54ff",
-      "ts": "2026-11-26T18:19:35Z",
-      "source": "devin",
-      "subject": "nixconfig:gemini-api-cli-package",
-      "action": "landed: gemini-api 0.5.0 in cli.ai and x86_64-linux env home.packages | gate: checks:hosts aristotle+clanker PASS",
-      "outcome": "done",
-      "claims": [
-        "flake/cli.nix",
-        "modules/env.nix"
-      ],
-      "files": [
-        "flake/cli.nix",
-        "modules/env.nix",
-        "lib/agent-turns/turns.json"
-      ],
-      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
-      "branch": "main",
-      "frame": "03hb4kuz4w4y1tq7b75mhju6l"
-    },
-    {
-      "id": "df07ee1f-3bb8-48d1-b839-e90e8e87713b",
-      "ts": "2026-11-26T18:19:24Z",
-      "source": "buffy",
-      "subject": "nixconfig:clanker-hygiene-and-remote-browser-smoke",
-      "action": "landed: --clanker-browser sends open/eval to clanker via scripts/task/clanker-browser.sh (double-quoted argv: %q arrives as a shell syntax error), tests 52 OK | gate: unittest 52, py_compile, checks:tasks, checks:prose, budget 275/400, checks:docs:links PASS; live: real link-vault UI on clanker via stub, dom read '#metrics = 3bookmarks...' | clanker: / 92% 1.2G before and after, GC -d freed 0 KiB (8.5G store fully live), /data 6.8G free, no zombies, agent-browser 0.45.0",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/clanker-browser.sh",
-        "scripts/task/portfolio-smoke.py",
-        "tests/portfolio-smoke",
-        "taskfiles/agents.yml",
-        "docs/portfolio-services.md"
-      ],
-      "files": [],
-      "base_commit": "70311198c5434d651a8c28f9b8aa6d5d4cd1fbfc",
-      "branch": "main",
-      "frame": "03hb4ktlhyqcp760ow2sclutf"
-    },
-    {
-      "id": "a2c4f41f-acbb-4103-93d0-999493df603a",
-      "ts": "2026-11-26T18:08:50Z",
-      "source": "buffy",
-      "subject": "nixconfig:clanker-hygiene-and-remote-browser-smoke",
-      "action": "claim: wake clanker, measure disk/nix/process hygiene, prove agent-browser there, then a --clanker-browser lane in portfolio-smoke with tests and docs",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/portfolio-smoke.py",
-        "tests/portfolio-smoke",
-        "docs/portfolio-services.md",
-        "taskfiles/agents.yml"
-      ],
-      "files": [],
-      "base_commit": "2b0a2bbc3dca7a3661bf61535c3797d5471fb929",
-      "branch": "main",
-      "frame": "03hb4iraggxmt2e225tetgyg6"
-    },
-    {
-      "id": "0608cd2b-0e86-4427-b1cd-cf12ba1c9a7f",
-      "ts": "2026-11-26T18:07:18Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-smoke-link-vault",
-      "action": "landed: link-vault lane (health/stats/page #metrics/search /api/links//api/tags), --link-vault via dest mapping, rows_of+check_endpoint count links/tags wrappers as rows, tests 49 OK, summary+docs say five | gate: unittest 49 OK, py_compile, checks:tasks, checks:prose, budget 270/400, checks:docs:links; live run on 5 temp servers (InstaBox stub) json exit 0 all ok, toon exit 0, --expect-hit passes link-vault; servers stopped, /tmp cleaned",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/portfolio-smoke.py",
-        "tests/portfolio-smoke/test_smoke.py",
-        "taskfiles/agents.yml",
-        "docs/portfolio-services.md"
-      ],
-      "files": [],
-      "base_commit": "2b0a2bbc3dca7a3661bf61535c3797d5471fb929",
-      "branch": "main",
-      "frame": "03hb4iglg1fxyzkg9deby40h1"
-    },
-    {
-      "id": "04aa4a75-01ce-4d4e-88af-e63d4095338f",
-      "ts": "2026-11-26T18:02:23Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-smoke-link-vault",
-      "action": "claim: cover link-vault (8106: health/stats/links/tags/page) in portfolio-smoke, its --link-vault flag, task summary and docs",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/portfolio-smoke.py",
-        "tests/portfolio-smoke",
-        "taskfiles/agents.yml",
-        "docs/portfolio-services.md"
-      ],
-      "files": [],
-      "base_commit": "53eda1adbe3ead1a7888b413d824d114ad573a14",
-      "branch": "main",
-      "frame": "03hb4hhznklbcd4g27j7cctja"
     }
   ]
 }

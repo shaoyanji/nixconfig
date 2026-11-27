@@ -3,11 +3,13 @@
 #
 # Imperative Debian edge, deliberately outside this HM closure:
 #   unit:  /etc/systemd/system/cloudflared-lumi.service
-#   token: /etc/cloudflared/lumi.env
+#   drop-in: /etc/systemd/system/cloudflared-lumi.service.d/hardening.conf
+#   token: /etc/cloudflared/lumi.env (environment only, never argv)
 # cloudflared answers Cloudflare's tunnel and forwards lumi.bountystash.com to
 # Traefik on 127.0.0.1:8080. The proxy and its backend are user services here.
 {
   config,
+  lib,
   pkgs,
   ...
 }: {
@@ -16,7 +18,44 @@
   home.packages = [
     pkgs.traefik
     pkgs.darkhttpd
+    pkgs.bubblewrap
   ];
+
+  home.activation.lumiSshDirectory = lib.hm.dag.entryBefore ["linkGeneration"] ''
+    $DRY_RUN_CMD mkdir -p "$HOME/.ssh"
+    $DRY_RUN_CMD chmod 700 "$HOME/.ssh"
+  '';
+
+  home.file.".ssh/authorized_keys" = {
+    text = (lib.concatStringsSep "\n" config.ssh.authorizedKeys.keys) + "\n";
+    force = true;
+  };
+
+  home.file.".local/bin/devin".source = pkgs.writeShellScript "devin" ''
+    exe="$HOME/.local/share/devin/cli/_versions/current/bin/devin"
+    if [ ! -x "$exe" ]; then
+      echo "devin: install missing at $exe" >&2
+      exit 1
+    fi
+    export DEVIN_PERMISSION_MODE="''${DEVIN_PERMISSION_MODE:-smart}"
+    exec "$exe" "$@"
+  '';
+
+  home.file.".local/bin/lumi-agent".source = pkgs.writeShellScript "lumi-agent" ''
+    tmux=${pkgs.tmux}/bin/tmux
+    session=agent-lumi
+    if ! "$tmux" has-session -t "$session" 2>/dev/null; then
+      existing_session=$("$tmux" list-panes -a -F '#{pane_current_command} #{session_name}' 2>/dev/null | awk '$1 == "devin" { print $2; exit }')
+      if [ -n "$existing_session" ]; then
+        exec "$tmux" attach-session -t "$existing_session"
+      fi
+      "$tmux" new-session -d -s "$session" -n agent -c "$HOME" "$HOME/.local/bin/devin"
+      devin_pane=$("$tmux" display-message -p -t "$session:agent" '#{pane_id}' | head -n 1)
+      "$tmux" split-window -h -t "$devin_pane" -c "$HOME"
+      "$tmux" select-pane -t "$devin_pane"
+    fi
+    exec "$tmux" attach-session -t "$session"
+  '';
 
   home.file."public/lumi/index.html".text = ''
     <!doctype html>

@@ -1058,7 +1058,7 @@ role = "Dallas NAT VPS (Debian 12 + Standalone Home Manager)"
 category = "cloud"
 desktop_environment = "headless"
 users = ["devji"]
-notes = ["Shared IP 93.127.139.146 with NAT SSH on port 10033 -> 22.", "Debian 12 base OS/kernel/netplan kept intact; Nix + Home Manager (`roles.lean` + `sops`) layered on top with max-jobs = 0."]
+notes = ["Shared IP 93.127.139.146 with NAT SSH on port 10033 -> 22.", "Debian 12 base OS/kernel/netplan kept intact; Nix + Home Manager (`roles.lean` + `sops`) layered on top with max-jobs = 0.", "cloudflared is imperative Debian (`/etc/systemd/system/cloudflared-lumi.service` + `/etc/cloudflared/lumi.env`); its hardening drop-in passes the tunnel token through the environment, not the process command line.", "SSH hardening lives in `/etc/ssh/sshd_config.d/00-lumi-hardening.conf`; password/root login stay disabled, with X11/agent forwarding off and bounded auth retries/sessions.", "unattended-upgrades is enabled for Debian security maintenance; fail2ban is intentionally omitted because key-only SSH plus a persistent Python daemon is a poor trade on 961 MiB RAM.", "~/.ssh/authorized_keys is Home-Manager-managed from `modules/config/authorized-keys.nix`; do not hand-edit it on lumi.", "Devin CLI is an imperative user install under `~/.local/share/devin`; `lumi-agent` starts it in the first tmux pane with a smart-permission default and a shell beside it."]
 
 [hosts.lumi.hardware]
 model = "KVM NAT VPS (Dallas)"
@@ -1088,7 +1088,7 @@ title = "Dallas NAT VPS (lumi)"
 system_prompt_hint = "You are a 961 MiB RAM x86_64 Debian 12 NAT VPS in Dallas running standalone Home Manager; substitute pre-built closures from Cachix/R2 and keep memory/disk footprint minimal."
 compute_tier = "strictly-constrained"
 allowed_tasks = ["Lightweight tailnet services", "Hermes agent pipelines (Stage 2)"]
-constraints = ["961 MiB RAM: max-jobs = 0; never compile locally.", "Shared NAT IP: SSH ingress only via forwarded port 10033 -> 22; public HTTP ingress is through Cloudflare Tunnel; use Tailscale for mesh access."]
+constraints = ["961 MiB RAM: max-jobs = 0; never compile locally.", "Run at most one interactive Devin/agent session; use the adjacent shell pane for light commands and offload builds.", "Shared NAT IP: SSH ingress only via forwarded port 10033 -> 22; public HTTP ingress is through Cloudflare Tunnel; use Tailscale for mesh access."]
 
 # ------------------------------------------------------------------------------
 # 5. EMBEDDED, SECURITY & MOBILE DEVICES

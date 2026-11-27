@@ -21,6 +21,7 @@
     "checks:closure:budget" = "cache";
     "checks:sentinel:ledger" = "leaf";
     "checks:resolver:health" = "leaf";
+    "checks:resolver:loopback" = "leaf";
     "checks:codespace" = "leaf";
     "checks:codespace:sync" = "leaf";
     "checks:counts" = "leaf";

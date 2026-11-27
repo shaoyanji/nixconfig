@@ -1,8 +1,83 @@
 {
-  "generated": "2026-11-27T22:20:43Z",
+  "generated": "2026-11-27T22:32:06Z",
   "count": 200,
-  "pin": "5d3a52754567a0ee180eb99b85c18c4e5039c22449da11df0136f0e6c360d393",
+  "pin": "700a2ef39c964ade57eb2865b9b1c4f26a602de51ef047aadcc2adbf60a2c437",
   "turns": [
+    {
+      "id": "125c5ddd-257a-44da-8805-747c68a746d6",
+      "ts": "2026-11-27T22:28:30Z",
+      "source": "freebuff",
+      "subject": "nixconfig:matt-cv-publish-2026-11-27",
+      "action": "published matt.bountystash.com: 28/28 served files byte-identical to the origin/main build, six CV PDFs verified live; blog copies already match, nothing to push",
+      "outcome": "done",
+      "claims": [
+        "lib/matt/"
+      ],
+      "files": [],
+      "base_commit": "ba21634e",
+      "branch": "main",
+      "frame": "03hbdqs54ywvj8jjpq93der1y"
+    },
+    {
+      "id": "8421d4e1-1f2e-4afd-8654-b3d0de6fb667",
+      "ts": "2026-11-27T22:26:15Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-republish-verify-2026-11-27",
+      "action": "publish 0.98: republish matt CV site, verify 6 live pages, push",
+      "outcome": "in_progress",
+      "claims": [
+        "sites/matt-site",
+        "flake.nix"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbdqc9wf4alvnoi1xqhmnsz"
+    },
+    {
+      "id": "6fd208a0-91f2-4f7f-85e2-53f9285de3fb",
+      "ts": "2026-11-27T22:25:41Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-anycast-gate-2026-11-27",
+      "action": "gate-change 1.0: add checks:resolver loopback gate, prove fires, push",
+      "outcome": "in_progress",
+      "claims": [
+        "checks:resolver",
+        "flake/check-inventory.nix"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbdq8e6hoposj2y0t996f1y"
+    },
+    {
+      "id": "880cd730-8c52-4808-bff6-9697cf1b15ae",
+      "ts": "2026-11-27T22:24:55Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-hisolutions-packet-2026-11-27",
+      "action": "published: build at ba21634e matches the live row and the public copy byte-for-byte; agents:cv:publish-check PASS; no drift, nothing to commit or push",
+      "outcome": "done",
+      "claims": [
+        "lib/matt/"
+      ],
+      "files": [],
+      "base_commit": "ba21634e",
+      "branch": "main",
+      "frame": "03hbdq2z94ywwtiijjg7mh5z8"
+    },
+    {
+      "id": "8d93beb5-eae9-4c3e-ab6b-a93eb18c3fb6",
+      "ts": "2026-11-27T22:21:06Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-gate-sweep-2026-11-27",
+      "action": "landed: resolver-health-check.sh — probes the two failover endpoints clients use (LAN VIP VRRP frieren/minyx + tailnet anycast frieren/delphi). Note resolver-independence's health probe, blind to failover doing its job exactly as clients are. Proofs: real endpoints pass rc 0; dead fixture fires rc 1 naming it; mixed set fails on dead member only | gate: checks:resolver:health PASS rc 0 live; check:verify 168 rows no drift; shellcheck clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "ba21634eec422ae061ce8f77bb6abc1e344f26d7",
+      "branch": "HEAD",
+      "frame": "03hbdpc33z7u5zio9225mn9ab"
+    },
     {
       "id": "4d0bef7a-afdb-4189-a3fd-b7f0eb39910c",
       "ts": "2026-11-27T22:17:58Z",
@@ -2858,71 +2933,6 @@
       "base_commit": "52784dd8c0e9d8d087bbe4819a70598d25982765",
       "branch": "zeno-stage1",
       "frame": "03hb9q3bp0bm0tila0d20b15b"
-    },
-    {
-      "id": "1bc94c69-c5fe-4b0b-9f35-8a5f9840f33b",
-      "ts": "2026-11-27T10:00:47Z",
-      "source": "freebuff",
-      "subject": "nixconfig:hisolutions-cv-prose-review-2026-11-27",
-      "action": "landed: HiSolutions packet prose pass + site republish — 4 letter lines (Deployment von Anwendungen, darunter ein Einsatz, kein Quartalsprojekt, kommuniziere), PLZ-Ort address block in both templates, CV address on its own line; live site 03527414.matt-9pf.pages.dev serves this corpus | gate: matt:build 6 CVs ATS + 91 links PASS, site:check 35/0, matt:cv:check 14/0 sha==artifact, agents:cv:publish-check 6/6",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0c8ab0bc08608087a8c787ee591eff097b4df353",
-      "branch": "main",
-      "frame": "03hb9opwrs9dokwko92rgl44o"
-    },
-    {
-      "id": "26538508-dc9c-4329-b307-f0a5f7ad9f13",
-      "ts": "2026-11-27T09:54:24Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-publish",
-      "action": "jev publish p=0.95 → freebuff pane agents:2.1 driving CV-site publish",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "ec0877f83ea610fe6cf426a5beb57f81db162ced",
-      "branch": "main",
-      "frame": "03hb9ngy3uikl73yi58apb1os"
-    },
-    {
-      "id": "80a828c7-5ca4-48a9-9668-f565bc5fe861",
-      "ts": "2026-11-27T09:37:01Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-cv-prose-review",
-      "action": "jev prose-change: freebuff CV prose review gate",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "ec0877f83ea610fe6cf426a5beb57f81db162ced",
-      "branch": "main",
-      "frame": "03hb9k2r4pbjo5scyw65kfu8r"
-    },
-    {
-      "id": "cb2fb994-2522-41f3-bae6-10ca11fcf14b",
-      "ts": "2026-11-27T09:27:24Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-cv-publish-check",
-      "action": "publish-check gate done: six CVs verified hash-equal to .#sites.matt-site, download anchors resolve in _site, no failure raised, committed nothing; pane returned to idle composer",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ec0877f83ea610fe6cf426a5beb57f81db162ced",
-      "branch": "main",
-      "frame": "03hb9i739ogb1tkfffcuk55bu"
-    },
-    {
-      "id": "f6b880f9-19b4-45ba-b5ab-d752dc4e09bf",
-      "ts": "2026-11-27T09:26:02Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-cv-publish-check",
-      "action": "drove agents:2.1 freebuff: CV publish-check gate via agents:cv:publish-check; verify six CVs hash-equal to .#sites.matt-site and download anchors resolve in _site; report drift, commit nothing",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "ec0877f83ea610fe6cf426a5beb57f81db162ced",
-      "branch": "main",
-      "frame": "03hb9hxjh5hsbcgjpxg4wrk9n"
     }
   ]
 }

@@ -218,6 +218,30 @@
       via = "the image-daily unit";
       place = ["local-gate"];
     };
+    antigravity = {
+      what = "the agy CLI posting under its own name: image-daily rounds and host audits";
+      provides = ["gate-change" "note-change"];
+      claims = ["lib/image-daily/" "tools/os/internal/image" "scripts/task/" "tests/"];
+      floor = "resolved";
+      via = "the antigravity skill (agy dispatch)";
+      place = ["eval" "local-gate"];
+    };
+    wallpaper-worker = {
+      what = "the wallpaper cron: plans, renders and publishes plates through the image pipeline";
+      provides = ["gate-change" "publish"];
+      claims = ["lib/image-daily/"];
+      floor = "resolved";
+      via = "the wallpaper worker unit";
+      place = ["local-gate" "delphi"];
+    };
+    hermes = {
+      what = "the persona lane on frieren: steers panes, audits hosts, hardens modules";
+      provides = ["chain-change" "note-change" "drive"];
+      claims = ["modules/secrets/" "modules/profiles/" "modules/config/" "agents:panes"];
+      floor = "asserted";
+      via = "the hermes pane";
+      place = ["eval" "local-gate" "delphi"];
+    };
     micro-turn = {
       what = "turn-ledger housekeeping posts";
       provides = ["note-change"];

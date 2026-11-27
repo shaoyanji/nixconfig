@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-27T21:01:58Z",
+  "generated": "2026-11-27T21:09:53Z",
   "count": 200,
-  "pin": "aeb94287192f09a5026b74025c2bef437bff16c86e2fb653b7720f54de5778fe",
+  "pin": "baa4fcfa92a73a26c2439abd5210a03a0c239b2db19b29f79bfcbef6c37296c5",
   "turns": [
+    {
+      "id": "569d7666-0be0-47c6-9abd-064caec2bfef",
+      "ts": "2026-11-27T21:07:26Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:sentinel-push-egress",
+      "action": "chain-change: extract shared egress block into sentinel-push.nix",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/profiles/sentinel-push.nix"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbday3jeqiy2nt5eiij4fdk"
+    },
+    {
+      "id": "1f348103-4408-4e55-9bd0-2beb3f7875df",
+      "ts": "2026-11-27T21:02:25Z",
+      "source": "devin",
+      "subject": "nixconfig:sentinel-frieren-self-push",
+      "action": "landed fa3be770: frieren now posts its own sentinel event through frieren.lan/sentinel/ingest — the hub was the one host missing from its own peer aggregation (incoming/<host>.json). No extraHosts pin needed: frieren.lan resolves to loopback on the hub; bearerless probe answered 400 pre-change, proving DNS->nginx->socket->receiver end to end. 4-line diff, no module change | gate: checks:host HOST=frieren MODE=eval PASS rc=0 7.5s",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fa3be77042ec57b78a691da354cf55a46425fae7",
+      "branch": "HEAD",
+      "frame": "03hbd9yrmtvxex1d56xvhb4vs"
+    },
     {
       "id": "eb4e35e2-b01d-4829-920f-f0c29481048b",
       "ts": "2026-11-27T21:01:46Z",
@@ -2882,32 +2910,6 @@
       "base_commit": "06bff2e5c346918bb69890c2390eeea99717eee5",
       "branch": "main",
       "frame": "03hb8u5m5u9646s0qjsvaurdi"
-    },
-    {
-      "id": "57e3b1fd-8ea6-4545-9c97-11154d969d3b",
-      "ts": "2026-11-27T07:16:00Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-publish",
-      "action": "jev publish 0.8/0.66; freebuff ran cv-links-check live gate: CV packet built+gated, already landed/pushed/published, submission hold until 2026-12-07 (no new deploy), pane idle",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "06bff2e5c346918bb69890c2390eeea99717eee5",
-      "branch": "main",
-      "frame": "03hb8sj10xv7sqtdxplty8cim"
-    },
-    {
-      "id": "9745709e-56bb-4aa0-85aa-715ae0f57f9c",
-      "ts": "2026-11-27T07:15:09Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-publish",
-      "action": "jev publish 0.8/0.66; freebuff: commit CV fixes + AGENTS.nix handoff note, push origin/main, matt:deploy:prod, verify live CV builds via cv-links-check; working... confirmed",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "06bff2e5c346918bb69890c2390eeea99717eee5",
-      "branch": "main",
-      "frame": "03hb8sd0qlazegl4zg6ihpa5x"
     }
   ]
 }

@@ -170,6 +170,7 @@ in {
     self.modules."services.aria2-daemon"
     self.modules."services.harmonia"
     self.modules."services.fleet-sentinel"
+    self.modules."profiles.sentinel-push"
     self.modules."services.fleet-classification-gate"
     self.modules."services.home-assistant"
     self.modules."services.kiwix"
@@ -222,10 +223,6 @@ in {
     ];
     ingest = {
       enable = true;
-      tokenFile = config.sops.secrets."agent-turns-token".path;
-    };
-    push = {
-      url = "http://frieren.lan/sentinel/ingest";
       tokenFile = config.sops.secrets."agent-turns-token".path;
     };
   };

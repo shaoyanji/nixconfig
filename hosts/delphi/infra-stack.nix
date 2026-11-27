@@ -288,6 +288,7 @@
 in {
   imports = [
     self.modules."services.fleet-sentinel"
+    self.modules."profiles.sentinel-push"
     self.modules."services.agent-scheduler"
     ./backups.nix
   ];
@@ -299,12 +300,6 @@ in {
   systemd.tmpfiles.rules = [
     "d /var/lib/agy-system 0755 ${user.name} users -"
   ];
-
-  # `/sentinel/ingest` lives on frieren's `frieren.lan` vhost only; the bare
-  # tailnet address 404s there (measured 2026-11-26, every 15 minutes).
-  networking.extraHosts = ''
-    100.97.61.65 frieren.lan
-  '';
 
   # --- Closed-loop observation ledger & health endpoint ----------------------
   # Collects system health, unit states, disk and PSI pressure every 15 minutes.
@@ -331,10 +326,6 @@ in {
     # failed every 15 minutes for three days and a keepalive that failed 104
     # times, both invisible to a collector that only asks the system manager.
     collectUserUnits = true;
-    push = {
-      url = "http://frieren.lan/sentinel/ingest";
-      tokenFile = config.sops.secrets."agent-turns-token".path;
-    };
     # The same publisher the appflow triage uses (hosts/delphi/email-archive.nix),
     # so the push channel has one configuration and one credential on this fleet.
     notify = {

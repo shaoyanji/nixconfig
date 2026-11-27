@@ -25,16 +25,19 @@
   };
 
   # Static NAT IPv4 from provider netplan (dhcp4 is disabled on enp16s0).
+  # Disable NetworkManager (from base-node) and use systemd-networkd matching
+  # any ethernet interface so interface renaming can never drop the static IP.
   networking.useDHCP = false;
-  networking.networkmanager.unmanaged = ["enp16s0"];
-  networking.interfaces.enp16s0.ipv4.addresses = [
-    {
-      address = "192.168.122.36";
-      prefixLength = 24;
-    }
-  ];
-  networking.defaultGateway = "192.168.122.1";
-  networking.nameservers = ["1.1.1.1" "8.8.4.4"];
+  networking.networkmanager.enable = lib.mkForce false;
+  networking.useNetworkd = true;
+  systemd.network.enable = true;
+  systemd.network.networks."10-wan" = {
+    matchConfig.Type = "ether";
+    address = ["192.168.122.36/24"];
+    gateway = ["192.168.122.1"];
+    dns = ["1.1.1.1" "8.8.4.4"];
+    linkConfig.RequiredForOnline = "routable";
+  };
 
   boot.tmp.cleanOnBoot = true;
   boot.supportedFilesystems = ["ext4"];

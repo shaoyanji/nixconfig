@@ -1050,7 +1050,7 @@ constraints = ["Never the source of truth: the repo, the caches and the fleet ho
 [hosts.lumi]
 hostname = "lumi"
 status = "active"
-status_detail = "Debian 12 NAT VPS in Dallas (961 MiB RAM, 35 GiB ext4) running standalone Home Manager (`roles.lean` + `sops`) + Nix (`max-jobs = 0`) + Tailscale."
+status_detail = "Debian 12 NAT VPS in Dallas (961 MiB RAM, 35 GiB ext4) running standalone Home Manager (`roles.lean` + `sops`) + Nix (`max-jobs = 0`) + Tailscale + Cloudflare Tunnel."
 kind = "home"
 is_nix = true
 arch = "x86_64-linux"
@@ -1069,18 +1069,18 @@ storage_type = "VirtIO Disk (/dev/vda)"
 storage_layout = "35 GiB GPT ext4 + 2 GiB /swapfile + zram"
 
 [hosts.lumi.network]
-domain = ""
+domain = "lumi.bountystash.com"
 tailscale = true
 tailscale_hostname = "lumi"
 tailnet_domain = "cloudforest-kardashev.ts.net"
-tailscale_ip = ""
+tailscale_ip = "100.110.93.14"
 ssh_alias = "lumi"
 
 [hosts.lumi.software]
 module_chain = "globalModulesHome"
 impermanence = false
-key_services = ["openssh (NAT 10033 -> 22)", "tailscaled", "nix-daemon (max-jobs = 0)", "sops-nix (user)"]
-services = [{ name = "openssh", port = 22 }, { name = "tailscale" }, { name = "nix" }]
+key_services = ["openssh (NAT 10033 -> 22)", "tailscaled", "nix-daemon (max-jobs = 0)", "sops-nix (user)", "cloudflared (lumi.bountystash.com)"]
+services = [{ name = "openssh", port = 22 }, { name = "tailscale" }, { name = "nix" }, { name = "cloudflared" }, { name = "lumi-http", port = 8081 }]
 traits = ["cloud-server", "x86_64", "1gb-ram", "nat-vps", "debian-12", "standalone-home-manager", "lean-profile"]
 
 [hosts.lumi.persona]
@@ -1088,7 +1088,7 @@ title = "Dallas NAT VPS (lumi)"
 system_prompt_hint = "You are a 961 MiB RAM x86_64 Debian 12 NAT VPS in Dallas running standalone Home Manager; substitute pre-built closures from Cachix/R2 and keep memory/disk footprint minimal."
 compute_tier = "strictly-constrained"
 allowed_tasks = ["Lightweight tailnet services", "Hermes agent pipelines (Stage 2)"]
-constraints = ["961 MiB RAM: max-jobs = 0; never compile locally.", "Shared NAT IP: public ingress only via forwarded port 10033 -> 22; use Tailscale for mesh access."]
+constraints = ["961 MiB RAM: max-jobs = 0; never compile locally.", "Shared NAT IP: SSH ingress only via forwarded port 10033 -> 22; public HTTP ingress is through Cloudflare Tunnel; use Tailscale for mesh access."]
 
 # ------------------------------------------------------------------------------
 # 5. EMBEDDED, SECURITY & MOBILE DEVICES

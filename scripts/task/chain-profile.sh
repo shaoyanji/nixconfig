@@ -32,12 +32,19 @@ expr="$(
 let
   flake = builtins.getFlake "path:${root}";
   lib = flake.inputs.nixpkgs.lib;
+  hostInventory = import ${root}/flake/host-inventory.nix {
+    inherit lib;
+    inputs = flake.inputs;
+    inventory = flake.inventory;
+    moduleFiles = flake.modules;
+  };
   ms = import ${root}/flake/module-sets.nix {
     inputs = flake.inputs;
     self = flake;
     lib = lib;
     inventory = flake.inventory;
     moduleFiles = flake.modules;
+    inherit hostInventory;
   };
   stub = {
     networking.hostName = "chain-stub";

@@ -1,8 +1,52 @@
 {
-  "generated": "2026-11-27T16:57:19Z",
+  "generated": "2026-11-27T17:19:39Z",
   "count": 200,
-  "pin": "f0d887e24bfb8132e7c9574789d3a3b551d0232162d52c0a396d72dc335efd11",
+  "pin": "432ee4b9f1d0e7b44e078ec588b64bfe2a91d0a896d50a9f62f303e6ff0ad403",
   "turns": [
+    {
+      "id": "bee5502b-e772-4a06-a6bc-9c53dc93cedc",
+      "ts": "2026-11-27T17:17:32Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff-cv-publish",
+      "action": "publish 0.89|0.85",
+      "outcome": "in_progress",
+      "claims": [
+        "ryoku-cv"
+      ],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbc21ah4ubzdwq8hw4qxp26"
+    },
+    {
+      "id": "02115603-cc31-4946-8b60-edcf71834318",
+      "ts": "2026-11-27T17:17:32Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-1-devin-chain-change",
+      "action": "chain-change 1.0|1.0; gate host-eval",
+      "outcome": "in_progress",
+      "claims": [
+        "flake.nix",
+        "modules/"
+      ],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbc218vv8w05fgxu7i0qkba"
+    },
+    {
+      "id": "86cfd17a-79b4-49a9-a100-56e9f0fd6ae7",
+      "ts": "2026-11-27T16:57:39Z",
+      "source": "devin",
+      "subject": "nixconfig:pane-1-devin-flake-transitive",
+      "action": "landed: 31e0911d — transitive-sweep advanced 23 drifted lock pins (home-manager, nix-darwin, llm-agents, iets, zen-browser, niri-unstable, garnix-lib/nixpkgs et al); deliberate rev-pins netbook/nginx/nvidia relocked byte-identical as designed | gate: checks:hosts poseidon+mtfuji+cassini+penguin+minyx+frieren MODE=eval PASS 6/6, one host per affected chain",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "31e0911dc7a6f898a7ce03f34a32a9601924ebfe",
+      "branch": "HEAD",
+      "frame": "03hbby5eul1vhzfi2ttgcqc1z"
+    },
     {
       "id": "03d1b1b0-25ea-4abf-af0c-a487085a50f7",
       "ts": "2026-11-27T16:39:40Z",
@@ -2883,56 +2927,6 @@
       "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
       "branch": "main",
       "frame": "03hb6zmrzh3b0r0g0q0mapz47"
-    },
-    {
-      "id": "42f0e164-0a8a-4a24-aed2-62f850530f5e",
-      "ts": "2026-11-27T01:43:31Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-27: 0 plate(s) kept of 0 spent, 0 roster row(s) waiting, 785 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
-      "branch": "main",
-      "frame": "03hb6zktzvpgshqa1hsof8teo"
-    },
-    {
-      "id": "499cd97b-752b-4636-97e5-a79600c43d1d",
-      "ts": "2026-11-27T01:33:17Z",
-      "source": "wallpaper-worker",
-      "subject": "nixconfig:image-daily-wallpaper-2026-11-27",
-      "action": "landed: wall-neumorph-sleep recast as meadow-sleep.png, published to Cloudinary+Pages (785/785), approved in rotation.json (771e9d2f) | gate: checks:image-daily + checks:images PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/image-daily/briefs.json",
-        "lib/image-daily/rotation.json"
-      ],
-      "files": [
-        "lib/image-daily/briefs.json",
-        "lib/image-daily/rotation.json"
-      ],
-      "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
-      "branch": "main",
-      "frame": "03hb6xkvvmliox6qlf3wh2xkj"
-    },
-    {
-      "id": "0b0865cd-acf5-41d3-94ff-207153fe0917",
-      "ts": "2026-11-27T01:33:16Z",
-      "source": "wallpaper-worker",
-      "subject": "nixconfig:steward-pane5-wall-sleep-brief",
-      "action": "landed: recast wall-neumorph-sleep (rev 5, meadow-sleep.png), kept by agy, published to Cloudinary+Pages (785/785), approved in rotation.json (771e9d2f) | gate: checks:image-daily + checks:images PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/image-daily/"
-      ],
-      "files": [
-        "lib/image-daily/briefs.json",
-        "lib/image-daily/rotation.json"
-      ],
-      "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
-      "branch": "main",
-      "frame": "03hb6xkubq7uel50682eqr14e"
     }
   ]
 }

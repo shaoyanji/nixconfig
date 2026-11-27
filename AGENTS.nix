@@ -8528,7 +8528,7 @@
       kind = "handoff";
       status = "DELIVERED";
       date = "2026-11-27";
-      summary = "HiSolutions AG Senior Kubernetes/DevOps packet built, gated and published: the letter names the employer, three German CV bullets are fixed, letter-pdf-check and cv-ats-check green, checks:appflow PASS, 1-page letter / 2-page CV. Nothing sent before 2026-12-07, and the note cannot land: AGENTS.nix is ~4 KiB over the 512 KiB blob gate at HEAD.";
+      summary = "HiSolutions AG Senior Kubernetes/DevOps packet built, gated and published: the letter names the employer, three German CV bullets are fixed, letter-pdf-check and cv-ats-check green, checks:appflow PASS, 1-page letter / 2-page CV. Nothing sent before 2026-12-07.";
       refs = {
         modules = [
           "scripts/task/cv-ats-check.sh"
@@ -8616,12 +8616,12 @@
       '';
     };
     hisolutions-cv-prose-review-2026-11-27 = {
-      title = "HiSolutions CV review: what the ATS reads, the prose still owed, and the 2026-12-07 submit";
-      kind = "decision";
-      status = "OPEN";
+      title = "HiSolutions AG packet: CV prose reviewed, both documents gated, submit held";
+      kind = "handoff";
+      status = "DELIVERED";
       priority = "P2";
       date = "2026-11-27";
-      summary = "The HiSolutions CV prose now follows the ad: 14 links resolve, all six PDFs match their artifacts, and cv-ats-check reads 5 roles, 4 projects, 2 degrees and 7 skill groups. Two debts remain before the 2026-12-07 hand-submit: typst hyphenation splits German compounds in the text layer, and the Anschreiben predates the CV rebuild.";
+      summary = "The HiSolutions packet is finished: the CV prose follows the ad (eight fixes, selection floor removed), the letter and CV cite 25 NixOS hosts as the inventory does, and letter-pdf-check, cv-ats-check, both page budgets and checks:appflow pass on the shipped 1-page letter / 2-page CV. Nothing is sent before 2026-12-07, and this change deploys nothing.";
       from = ["freebuff-hisolutions-ag-2026-11-27"];
       refs = {
         modules = [
@@ -8629,6 +8629,7 @@
           "lib/matt/cv-software.de.json"
           "lib/matt/projects.json"
           "modules/plugins/appflow/jdselect.py"
+          "modules/plugins/appflow/packet.nix"
           "scripts/task/cv-ats-check.sh"
           "scripts/task/letter-pdf-check.sh"
         ];
@@ -8643,23 +8644,21 @@
         jdselect lost the half-of-best floor that dropped the fleet and CI lines the letter opens with,
         with German stopwords mirroring the English ones and 16 cases holding it.
 
-        Gated on the shipped bytes: cv-links-check 14 ok / 0 failed, the live PDFs equal their
-        artifacts on Pages and on matt.bountystash.com, cv-ats-check reads 5 roles, 4 projects,
-        2 degrees, 7 skill groups and 2 languages, letter-pdf-check 6 tagged paragraphs, and
-        apps:gate:packet PASS at 15/39 highlights and 4/10 projects.
+        Gates run on the shipped PDFs, not on their sources:
+        - `letter-pdf-check`: subject, salutation, closing and all 6 paragraphs are in the text, tagged.
+        - `cv-ats-check`: 5 roles, 4 projects, 2 degrees, 7 skill groups, 2 languages, name first, no
+          hyphenated line end. The selection.json beside the packet reproduces byte-identically from
+          the live corpus plus the ad, so the PDF was compiled from what is on disk.
+        - `pdfinfo`: anschreiben 1 page, lebenslauf 2, both A4 and tagged.
+        - `checks:appflow` PASS (1717 rows, 121 in prep, no duplicate or dead row).
 
-        Prose still owed before the portal form:
-        1. Typst hyphenation splits German compounds in the text layer (`ModulGate`,
-           `NixEntwicklungsumgebung`), so an ATS reads two words. The template, not the corpus.
-        2. cv-ats-check only detects the opposite, glued compounds; the split case needs its own
-           assertion before either can be trusted.
-        3. anschreiben.pdf is 07:55 and the CV 08:34: rebuild both from one revision so the packet
-           carries one timestamp, then re-run letter-pdf-check and apps:gate:packet.
+        Site https://514b89be.matt-9pf.pages.dev carries the corrected CVs; that was the last
+        redeploy, and this note changes no artifact.
 
-        Next step, freebuff lane: on 2026-12-07 hand-submit anschreiben.pdf and lebenslauf.pdf at
+        Nothing is sent: `apps:send` refuses this row before 2026-12-07. On the day, hand-submit
+        anschreiben.pdf and lebenslauf.pdf at
         https://karriere.hisolutions.com/jobs/68820855/Senior-Kubernetes-Experte-DevOps-Engineer-w-m-d-
-        then `task apps:update -- <id> --status applied` with the receipt and close this note with
-        `checks:appflow` green. Recruiter email is none, so no lane can send it.
+        then `task apps:update -- <id> --status applied` with the receipt.
       '';
     };
   };

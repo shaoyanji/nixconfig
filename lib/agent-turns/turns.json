@@ -1,8 +1,52 @@
 {
-  "generated": "2026-11-27T08:16:56Z",
+  "generated": "2026-11-27T08:41:55Z",
   "count": 200,
-  "pin": "95976e12c5daaa7843bb0cedab8d4ed71d2bb917327ad23bd18734b91546a3a3",
+  "pin": "ef12cb89517b2b2815efbd13da6ed23fca3e3c58d059b1349c1afb717f9e51fa",
   "turns": [
+    {
+      "id": "1c502ab2-96e4-4fae-8bbb-0bc73a39c176",
+      "ts": "2026-11-27T08:38:28Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-note-change",
+      "action": "jev note-change 1.0/1.0; freebuff p2 CV note-change; working... confirmed",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "51665a8f9d1b685c059e84854d9f0320bab7c702",
+      "branch": "main",
+      "frame": "03hb98my4cv433scq2cutstjf"
+    },
+    {
+      "id": "a259c76d-3566-4216-8c18-92a99b531f5f",
+      "ts": "2026-11-27T08:22:42Z",
+      "source": "freebuff",
+      "subject": "nixconfig:delphi-health-fix",
+      "action": "landed: delphi gen 326 (i8r15kwn) pins services.private-deals.port=8104; unit active 0 restarts on 8104, media-relay keeps 8100, tailnet 8464 answers 200, nixos-upgrade reset, no failed units. Commit 0ffca974 on branch delphi-private-deals-port is NOT pushed yet — nightly origin/main pull would revert it. | gate: checks:host HOST=delphi PASS + infra:switch:nixos SWITCH_EXIT=0",
+      "outcome": "done",
+      "claims": [
+        "hosts/delphi",
+        "docs/delphi-runtime.md"
+      ],
+      "files": [],
+      "base_commit": "9b284f018a1dfdf501fd504f96d75cd90077fbb4",
+      "branch": "main",
+      "frame": "03hb95k0za3asnfbd11ue2ede"
+    },
+    {
+      "id": "99435d74-23cb-48bb-a429-1879fb706f33",
+      "ts": "2026-11-27T08:18:07Z",
+      "source": "freebuff",
+      "subject": "nixconfig:hisolutions-cv-prose-note",
+      "action": "landed: opened hisolutions-cv-prose-review-2026-11-27 (decision/OPEN: what was reviewed, three prose debts, 2026-12-07 portal submit as next step); AGENTS.nix trimmed 533,819 -> 522,636 B, first time under the 512 KiB gate, ceiling lowered to match | gate: agents-notes-schema issues [] PASS, repo-blobs --index PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "51665a8f9d1b685c059e84854d9f0320bab7c702",
+      "branch": "main",
+      "frame": "03hb94nwqe9s1zaxae5b215eu"
+    },
     {
       "id": "1dec0b4d-2f16-4706-b7dc-a918b4584136",
       "ts": "2026-11-27T08:11:15Z",
@@ -3004,48 +3048,6 @@
       "base_commit": "28f54a28ae51abeee22abfd7422dec81009edad2",
       "branch": "main",
       "frame": "03hb41f7mq4d1nep8hhh1l7hr"
-    },
-    {
-      "id": "e82dbec6-e60e-4762-8195-474850554f50",
-      "ts": "2026-11-26T16:40:04Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward-devin",
-      "action": "drove idle pane agents:1.1 (devin): jev route bug-fix p=0.90/m=0.87 — Fix fold_umlauts call and verify, commit; pane now Thinking/working",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "28f54a28ae51abeee22abfd7422dec81009edad2",
-      "branch": "main",
-      "frame": "03hb41f48wg1ed47jykxqhcvh"
-    },
-    {
-      "id": "f7830e84-ebd2-406c-804a-90381e32183b",
-      "ts": "2026-11-26T16:39:08Z",
-      "source": "devin",
-      "subject": "nixconfig:clanker-runner-presets",
-      "action": "claim: add validated clanker job presets, SQLite recurring schedules with a background runner, web UI surfacing, and full Go/Nix/live verification",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/clanker-runner",
-        "modules/services/clanker-runner.nix"
-      ],
-      "files": [],
-      "base_commit": "befef047856483e497da0fc1e0dad09a226e2ba9",
-      "branch": "main",
-      "frame": "03hb418j8u7ca4rodwfu7fvfw"
-    },
-    {
-      "id": "58872a62-1bb8-46a3-a7e5-79b141526b8c",
-      "ts": "2026-11-26T16:37:22Z",
-      "source": "devin",
-      "subject": "nixconfig:inventory-site-audit-qr",
-      "action": "landed: asset event audit and checkout history, deduped warranty-expiry ntfy alerts, pure-Go printable SVG QR labels, and web UI surfacing | gate: go test/vet PASS, node check PASS, alejandra PASS, native delphi toplevel build PASS with Go checkPhase, live HTTP smoke PASS, checks:host delphi PASS rc=0",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "befef047856483e497da0fc1e0dad09a226e2ba9",
-      "branch": "main",
-      "frame": "03hb40w1g46p1ixsboyp5jqhh"
     }
   ]
 }

@@ -2,7 +2,8 @@
 # appflow-gate.sh — the proof that the database can replace the files.
 #
 #   appflow-gate.sh roundtrip   read-only: export vs rows vs stored text
-#   appflow-gate.sh packet ID   build a packet whose JD came from the database
+#   appflow-gate.sh packet ID   build a packet whose JD came from the database,
+#                               in a scratch dir, and judge the live row
 #
 # The deletion rule: nothing is retired until both halves pass, because a file
 # that is deleted before the workflow is verified is a file reconstructed from
@@ -73,7 +74,11 @@ if [ "$mode" = "packet" ]; then
   # The corpus stays the corpus: pinned by its own file until it moves to the
   # database (then this copy becomes a query too). Everything the packet knows
   # about *this* application comes from the row and its text.
-  for f in resume.json lebenslauf.json; do
+  #
+  # `pii.json` belongs in the set: it is the phone number and street address the
+  # real packet carries, and staged without it the build proves an address-less
+  # CV that no row holds (measured 2026-11-27 on the HiSolutions packet).
+  for f in resume.json lebenslauf.json pii.json; do
     [ -f "$HOME/.config/appflow/$f" ] && cp "$HOME/.config/appflow/$f" "$work/$f"
   done
   [ -f "$work/resume.json" ] || {
@@ -96,7 +101,11 @@ if [ "$mode" = "packet" ]; then
     exit 1
   }
 
-  out=$(APPFLOW_CONFIG="$work" bash "$repo/scripts/task/appflow-packet.sh" --id "$id" 2>&1) || {
+  # `--out` into the scratch dir: the gate proves a build, it does not install
+  # one. Writing the default target replaced the live packet with the gate's own
+  # build (and the file list the applicant sends with it).
+  out=$(APPFLOW_CONFIG="$work" bash "$repo/scripts/task/appflow-packet.sh" --id "$id" \
+    --out "$work/packet" 2>&1) || {
     echo "$out" >&2
     echo "appflow-gate: the packet build failed" >&2
     exit 1
@@ -112,6 +121,24 @@ if [ "$mode" = "packet" ]; then
   if [ ! -e "$store" ]; then
     echo "appflow-gate: $store is not in the local store" >&2
     exit 1
+  fi
+  # The row a send attaches is judged here, and only for the shape that makes a
+  # packet disappear: `ln -sfn <store path>` rows die by the hundred to one
+  # garbage collection (123 of 314 rows in the live store on 2026-11-27 were
+  # dead links). A directory is accepted whatever it holds — older rows carry
+  # `.typ` sources and a submission sheet, newer ones `selection.json` — so this
+  # widens the gate instead of pinning one file list.
+  packets=${APPFLOW_PACKETS:-${XDG_STATE_HOME:-$HOME/.local/state}/appflow/submissions}
+  live="$packets/$id"
+  if [ -L "$live" ] && [ ! -d "$live" ]; then
+    echo "appflow-gate: $live is a link whose artifact is gone — the row holds no packet" >&2
+    echo "  materialize it: bash scripts/task/appflow-packet.sh --repair" >&2
+    exit 1
+  fi
+  if [ -d "$live" ]; then
+    echo "appflow-gate: live packet at $live ($(find "$live" -maxdepth 1 -type f | wc -l) files)"
+  else
+    echo "appflow-gate: no live packet for $id — the build above is not installed"
   fi
   echo "appflow-gate: packet built from the database for $id ($store)"
   exit 0

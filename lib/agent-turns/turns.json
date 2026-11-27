@@ -1,8 +1,65 @@
 {
-  "generated": "2026-11-27T16:29:12Z",
+  "generated": "2026-11-27T16:57:19Z",
   "count": 200,
-  "pin": "7fb8fa3217fe69cafb4d43522bc11add0b9751f55e100125345f789bb70e03b1",
+  "pin": "f0d887e24bfb8132e7c9574789d3a3b551d0232162d52c0a396d72dc335efd11",
   "turns": [
+    {
+      "id": "03d1b1b0-25ea-4abf-af0c-a487085a50f7",
+      "ts": "2026-11-27T16:39:40Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-1-devin-flake-transitive",
+      "action": "flake-change 0.97|0.96 · transitive-sweep; gate reserve-eval",
+      "outcome": "in_progress",
+      "claims": [
+        "flake.lock"
+      ],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbbun0a3llrzmcct0xlluv7"
+    },
+    {
+      "id": "50998296-3e73-41bf-b714-197327312d75",
+      "ts": "2026-11-27T16:34:34Z",
+      "source": "buffy",
+      "subject": "nixconfig:wallpaper-set-anime-100",
+      "action": "publish: 23/100 anime-scene plates generated (cpg 1024x1024) and published — bountystash-assets manifest 789 -> 812, live 200; paced runner agent-walls-run continues at 24/h, midnight timer finishes the last 13",
+      "outcome": "in_progress",
+      "claims": [
+        "~/Pictures/cpg/wallpapers",
+        "/Volumes/data/pics/generated/src/wall/2026-11-27"
+      ],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbbtn38slhl40ya7hh06xty"
+    },
+    {
+      "id": "b88810a0-633c-43f1-82df-89de714141a6",
+      "ts": "2026-11-27T16:29:54Z",
+      "source": "devin",
+      "subject": "nixconfig:egress-lanes-research",
+      "action": "landed: conditional cache adopted in job-db-scraper, link-vault and private-deals; fetch broker serves POST /v1/fetch on delphi tailnet :8469 with bulk/us/local lanes, us-to-bulk transport fallback only and no local fallback; lumi proxy :8470, frieren proxy/render lane :8471 | gates: checks:quick PASS; checks:host delphi/frieren/lumi PASS; go test fetch-broker PASS; broker package build PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5aa01e488d1ae8c91e1e0fa0194c9d0e82299e06",
+      "branch": "main",
+      "frame": "03hbbsq9ad9odg7ht97j4zidg"
+    },
+    {
+      "id": "912698ef-2169-4987-a575-7fcd604c0435",
+      "ts": "2026-11-27T16:29:35Z",
+      "source": "devin",
+      "subject": "nixconfig:activate-host-stale-prose",
+      "action": "landed: b6da4652 — activate-host.sh preserved-host prose no longer names cassini as known-broken (it evals clean since the home-role fixes); rationale now stands on the general reason: no gate keeps a preserved host green, bit-rot reads as regression. Comment-only diff, bash -n PASS | gate: checks:nix:shell PASS 80 scripts 0 findings",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b6da46528ad5aaa1e8d403c57f43f2fde68cb155",
+      "branch": "HEAD",
+      "frame": "03hbbso4687a2c8cv9s776tec"
+    },
     {
       "id": "fa0bfd29-75e0-451a-a482-78a69460b7ca",
       "ts": "2026-11-27T16:28:30Z",
@@ -2876,66 +2933,6 @@
       "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
       "branch": "main",
       "frame": "03hb6xkubq7uel50682eqr14e"
-    },
-    {
-      "id": "32bd2d37-8ab9-4996-8a3e-d69a7319745f",
-      "ts": "2026-11-27T01:26:25Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-pane5-wall-sleep-brief",
-      "action": "bug-fix: resolve held wall-neumorph-sleep 502 brief; land xs",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/image-daily/"
-      ],
-      "files": [],
-      "base_commit": "ea6d8bd2bd04027aa119678e0b5184472c2dca36",
-      "branch": "main",
-      "frame": "03hb6w8lbmpg8cmafc7etu7qq"
-    },
-    {
-      "id": "00ca99fd-9187-4a7b-839f-cb0afd058c28",
-      "ts": "2026-11-27T01:00:44Z",
-      "source": "wallpaper-worker",
-      "subject": "nixconfig:steward-pane5-wallpaper-incident",
-      "action": "incident resolved (hold): cpg seedream-5.5 healthy (probe ok), 502 is prompt-specific to wall-neumorph-sleep; 0 waiting rows in plates.txt",
-      "outcome": "done",
-      "claims": [
-        "lib/image-daily/"
-      ],
-      "files": [],
-      "base_commit": "ea6d8bd2bd04027aa119678e0b5184472c2dca36",
-      "branch": "main",
-      "frame": "03hb6r7z2bfbxyvk9lreofzej"
-    },
-    {
-      "id": "8cef1d8e-07c3-4f71-b06d-a506edc7510f",
-      "ts": "2026-11-27T00:58:34Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-pane5-wallpaper-incident",
-      "action": "incident|0.99|0.98: cpg 502 check, next-plate fallback, publish or hold",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/image-daily/"
-      ],
-      "files": [],
-      "base_commit": "ea6d8bd2bd04027aa119678e0b5184472c2dca36",
-      "branch": "main",
-      "frame": "03hb6qssgwf2pavenls1hjk9s"
-    },
-    {
-      "id": "f13939bb-bbcd-4470-ae10-0db2ba6ef313",
-      "ts": "2026-11-27T00:40:31Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-pane5-wallpaper-drive",
-      "action": "pane5 wallpaper: publish daily plate, 502->next-plate fallback gate",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/image-daily/briefs.json lib/image-daily/rotation.json"
-      ],
-      "files": [],
-      "base_commit": "ea6d8bd2bd04027aa119678e0b5184472c2dca36",
-      "branch": "main",
-      "frame": "03hb6n9s0vnq6niy9obug9v9z"
     }
   ]
 }

@@ -50,6 +50,8 @@ keys:
   - &minyxhost age155uxts5lnphv7xfa39w7424k054nsunc7fpvrkjc84lg9r6d35rq7r0d0x
   # Derived from zeno /etc/ssh/ssh_host_ed25519_key (NAT VPS in Dallas)
   - &zenohost age10e696uq7nhtldcwc9pv6tqevx64749ej9zpxdtk7qdpj8fn3pcjshewlh0
+  # Standalone Debian/Home Manager user key generated on lumi
+  - &lumi age12hnepwxvawgnq347euz8kmn7xgfs08w3yajuvfujvmxye6hcxepsld3zan
 
 creation_rules:
   - path_regex: modules/.*\.(yaml|json|env|ini)$
@@ -97,3 +99,4 @@ creation_rules:
           - *minyxhost
           - *diogeneshost
           - *zenohost
+          - *lumi

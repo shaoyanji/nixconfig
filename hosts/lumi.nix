@@ -47,7 +47,7 @@
   programs.zeroclaw-user = {
     enable = true;
     envFile = toString config.sops.templates."zeroclaw-lumi.env".path;
-    telegramAllowedUsers = ["8679391100"];
+    telegramAllowedUsers = ["8679391100" "8207284912"];
   };
 
   home.file.".local/bin/devin".source = pkgs.writeShellScript "devin" ''

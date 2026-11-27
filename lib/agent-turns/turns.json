@@ -1,8 +1,144 @@
 {
-  "generated": "2026-11-27T21:09:53Z",
+  "generated": "2026-11-27T21:33:32Z",
   "count": 200,
-  "pin": "baa4fcfa92a73a26c2439abd5210a03a0c239b2db19b29f79bfcbef6c37296c5",
+  "pin": "8bf4a30c7e590a21cc6d40f1220b6d73435199f8a960ae962e19de229a37b0b2",
   "turns": [
+    {
+      "id": "ecb402ff-ed03-46ba-b53e-9f54e252c4c4",
+      "ts": "2026-11-27T21:30:01Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-drift-audit-2026-11-27",
+      "action": "deploy 0.71/0.42: CV drift audit stale PDFs/provider words; fix, deploy, verify",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/resume.cv.json",
+        "lib/matt/cv-software.json"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbdfcwetu6evha81a35o9qk"
+    },
+    {
+      "id": "a8fc7e3d-435e-4de4-a527-ded29f92904d",
+      "ts": "2026-11-27T21:30:01Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:nixcachix-ci-fix-2026-11-27",
+      "action": "bug-fix 0.92/0.84: fix nixcachix CI fail on main 16cac0cf, verify gate",
+      "outcome": "in_progress",
+      "claims": [
+        "none"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbdfcunsfxihubez27152wm"
+    },
+    {
+      "id": "41c518de-a9d9-4392-9ddd-03da10a7a0b1",
+      "ts": "2026-11-27T21:24:50Z",
+      "source": "devin",
+      "subject": "nixconfig:closure-budget-adoption-sweep",
+      "action": "landed: no-change closure, 2nd sweep — fleet state identical to df99d645: frieren+delphi remain the only online active hosts and both carry measured baselines. Everything else offline 1-33d on tailscale, LAN probes dead, nothing new to measure; baselines are never typed so there is nothing to write | gate: checks:closure:budget ALL=1 PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "16cac0cf4604373a1f142c064f17487d07ef14e4",
+      "branch": "HEAD",
+      "frame": "03hbdecctcjbiukp0e6jplf4r"
+    },
+    {
+      "id": "6225cbae-4bd2-4325-b703-0428d9ceb10e",
+      "ts": "2026-11-27T21:24:18Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-pane",
+      "action": "Drove devin pane agents:1.1: gate-change task submitted - extend closure-budget adoption to all measured hosts, gate green across 11 hosts",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbde8onnvkzy1ge7ixlwuiz"
+    },
+    {
+      "id": "f47d7039-13f6-48ff-9bda-d34287efabcb",
+      "ts": "2026-11-27T21:21:42Z",
+      "source": "devin",
+      "subject": "nixconfig:sentinel-push-audit-2026-11-27",
+      "action": "landed: audit of 16cac0cf, no findings, no diff. Env threading conditional+correct, the url/ingest-auth assertion holds, curl soft-fails and retries next run, the collector reads its auth file fine under ProtectHome, per-host declarations merge on delphi/frieren, exactly 1 pin line per host measured. frieren self-push failure is useful signal, not pathology | gate: checks:hosts poseidon eisen frieren delphi eval 4/4 PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "16cac0cf4604373a1f142c064f17487d07ef14e4",
+      "branch": "HEAD",
+      "frame": "03hbddqetko9fiw75izmoc5r1"
+    },
+    {
+      "id": "67d04a08-0ede-48fb-be00-3bcea9f1f3f9",
+      "ts": "2026-11-27T21:19:37Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:sentinel-push-audit-2026-11-27",
+      "action": "incident 0.84/0.76: audit sentinel push all hosts, fix non-pushing, gate",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/profiles/sentinel-push.nix",
+        "modules/services/fleet-sentinel.nix"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbddbqcxnbj1st4rhvut9fg"
+    },
+    {
+      "id": "56a8ce21-f4b5-45ff-a22f-940ab354fd43",
+      "ts": "2026-11-27T21:17:54Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-cv-republish-2026-11-27",
+      "action": "republished: matt-site rebuilt from origin/main 16cac0cf, Pages deploy live, blog copies pushed 88deb61; live cv-software.pdf sha fb558950, 0 provider words | gate: matt:cv:evidence PASS + cv-blog-check 6/6 PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/matt/resume.cv.json",
+        "lib/matt/cv-software.json"
+      ],
+      "files": [
+        "lib/matt/resume.cv.json",
+        "lib/matt/cv-software.json",
+        "assets/files/cv-software.pdf",
+        "assets/files/cv-software-de.pdf"
+      ],
+      "base_commit": "16cac0cf",
+      "branch": "HEAD",
+      "frame": "03hbdczp2mj85s4iy6mo3v8lq"
+    },
+    {
+      "id": "7c9cf49a-6626-46a9-9eda-eaa133b0589b",
+      "ts": "2026-11-27T21:14:21Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-republish-2026-11-27",
+      "action": "publish 0.82/0.72: matt:build + cv-evidence gate, deploy, push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/resume.cv.json",
+        "lib/matt/cv-software.json"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbdcamo4nutv932lx59dbd7"
+    },
+    {
+      "id": "12260fd3-ed78-4440-a251-76b422e9b144",
+      "ts": "2026-11-27T21:10:09Z",
+      "source": "devin",
+      "subject": "nixconfig:sentinel-push-egress",
+      "action": "landed 16cac0cf: extracted the 4-copy egress block into modules/profiles/sentinel-push.nix — pin+url+bearer in one module, hosts keep only enable+watchUnits. frieren takes the pin too (measured harmless on the hub, uniform shape). Net -35/+4 in host files | gate: checks:hosts poseidon eisen frieren delphi eval 4/4 PASS; effective push.url+pin identical on all 4",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "16cac0cf4604373a1f142c064f17487d07ef14e4",
+      "branch": "HEAD",
+      "frame": "03hbdbh502hmewqsmrulu4nzf"
+    },
     {
       "id": "569d7666-0be0-47c6-9abd-064caec2bfef",
       "ts": "2026-11-27T21:07:26Z",
@@ -2786,130 +2922,6 @@
       "base_commit": "fb91f74fa1d045a787502ea8ee2ecf6e5e70b7e2",
       "branch": "main",
       "frame": "03hb8zj8umnk99r5a6a2c4cof"
-    },
-    {
-      "id": "cbe735b5-fa86-44e6-890e-9cc0e8e53d5f",
-      "ts": "2026-11-27T07:50:04Z",
-      "source": "devin",
-      "subject": "nixconfig:zeno-reconcile",
-      "action": "reconcile scout: worktree clean; no staged/unstaged/untracked paths. zeno-stage1 b2dce86c is the only local commit. Local origin/main is stale (+1/-0); live GitHub main 06bff2e5 makes zeno +1/-4. The local commit touches flake/host-inventory.nix and hosts/zeno/*.nix. Remote main touches CV/wall/appflow/turns, not zeno scaffold. Recommend fetch+rebase zeno-stage1 onto origin/main with backup branch; regenerate/resolve turns pin. No merge or fresh clone.",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "9b284f018a1dfdf501fd504f96d75cd90077fbb4",
-      "branch": "main",
-      "frame": "03hb8z6l36t3d00g4spw3fb0l"
-    },
-    {
-      "id": "19f10c5c-8dd6-42a0-8d56-0d0da767f1fd",
-      "ts": "2026-11-27T07:46:25Z",
-      "source": "freebuff",
-      "subject": "nixconfig:delphi-health-fix",
-      "action": "claim: orchestrate panes 2(agy zeno VPS deploy)+3(devin); fix delphi private-deals/8100 collision after zeno deploy completes",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/delphi",
-        "modules/services/private-deals.nix"
-      ],
-      "files": [],
-      "base_commit": "9b284f018a1dfdf501fd504f96d75cd90077fbb4",
-      "branch": "main",
-      "frame": "03hb8ygy1fkl126msfodxt6z5"
-    },
-    {
-      "id": "1713df6c-ebd3-4af7-9983-bdced41d031d",
-      "ts": "2026-11-27T07:46:20Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-note-commit",
-      "action": "note-change: commit AGENTS.nix strata note, push origin/main",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "06bff2e5c346918bb69890c2390eeea99717eee5",
-      "branch": "main",
-      "frame": "03hb8ygbms9vqpx8g3nb9ihiw"
-    },
-    {
-      "id": "06ca3cdb-6a14-4833-b8a3-426ee3251945",
-      "ts": "2026-11-27T07:44:47Z",
-      "source": "devin",
-      "subject": "nixconfig:enhance-service-portal-telemetry-and-alerts",
-      "action": "final-report: ring history, latency percentiles and uptime in telemetry APIs; debounced webhook degradation and recovery alerts with cooldown; json/csv/markdown exports; portal latency pills, sparklines, attention filter and export links; nginx proxies full telemetry subtree; go, node, alejandra, host, mock-alert smoke and delphi toplevel gates PASS; no deployment",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9b284f018a1dfdf501fd504f96d75cd90077fbb4",
-      "branch": "main",
-      "frame": "03hb8y5f92z3jrs9aisnaa2un"
-    },
-    {
-      "id": "d3614876-f1c1-4e81-9099-45d8e6ea82f6",
-      "ts": "2026-11-27T07:38:00Z",
-      "source": "freebuff",
-      "subject": "nixconfig:hisolutions-cv-publish",
-      "action": "published: matt:deploy:prod -> 4b2c2c4f.matt-9pf.pages.dev, 6/6 CVs == artifact on pages and custom domain, fixes visible in live text | gate: cv-links-check 14 ok/0 failed PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "06bff2e5c346918bb69890c2390eeea99717eee5",
-      "branch": "main",
-      "frame": "03hb8wtsa901ebapm79351459"
-    },
-    {
-      "id": "9d5a93b0-4f99-49b8-8d54-17aa8ba53b81",
-      "ts": "2026-11-27T07:34:20Z",
-      "source": "freebuff",
-      "subject": "nixconfig:hisolutions-cv-publish",
-      "action": "verified: matt:deploy:prod live at bcb2f60b.matt-9pf.pages.dev, 6/6 CVs byte-identical to artifact; cv-links-check 14 ok/0 failed; packet 80ed54aa8dc6 == store p61wdm8a1c6kz; submission still held to 2026-12-07 | gate: cv-links-check + cv-ats-check PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "06bff2e5c346918bb69890c2390eeea99717eee5",
-      "branch": "main",
-      "frame": "03hb8w40pqnol5vuobju5fifv"
-    },
-    {
-      "id": "283445bb-2e6f-4a56-b753-616c8ff4e9af",
-      "ts": "2026-11-27T07:32:44Z",
-      "source": "devin",
-      "subject": "nixconfig:enhance-service-portal-telemetry-and-alerts",
-      "action": "landed: telemetry ring history, latency percentiles, uptime, transitions, debounced ntfy/webhook alerts, exports, attention filter/banner, sparklines | gate: go test+vet PASS; node --check juno+inline PASS; alejandra PASS; checks:host delphi PASS; mock target+ntfy live smoke PASS; delphi toplevel --no-link PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9b284f018a1dfdf501fd504f96d75cd90077fbb4",
-      "branch": "main",
-      "frame": "03hb8vsnmwm3autb2fym3z6lt"
-    },
-    {
-      "id": "c7595893-0906-4e49-8544-a02819c6d421",
-      "ts": "2026-11-27T07:32:10Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-publish",
-      "action": "jev publish; drive freebuff cv publish/verify",
-      "outcome": "in_progress",
-      "claims": [
-        "cv-packet"
-      ],
-      "files": [],
-      "base_commit": "06bff2e5c346918bb69890c2390eeea99717eee5",
-      "branch": "main",
-      "frame": "03hb8vooiqrq137hjdt9u4w58"
-    },
-    {
-      "id": "52c97d0b-dba5-49a9-9bf7-87fc04bb1bce",
-      "ts": "2026-11-27T07:24:20Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-publish",
-      "action": "jev publish 0.82/0.69; freebuff cv publish/verify started",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "06bff2e5c346918bb69890c2390eeea99717eee5",
-      "branch": "main",
-      "frame": "03hb8u5m5u9646s0qjsvaurdi"
     }
   ]
 }

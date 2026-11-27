@@ -7,7 +7,7 @@
     "subtitle": "Go · NixOS-Flotten · Betriebsdaten · Energieinfrastruktur",
     "location": "Gutach im Breisgau, Deutschland · remote (MEZ, Überlappung mit der US-Ostküste)",
     "status": "Offen für Senior- und Lead-Rollen",
-    "target": "Ziel: DevOps-, SRE-, Plattform- und Infrastruktur-Engineering — Kubernetes oder OpenShift, Terraform und GitOps auf GCP oder Azure, Linux-Umgebungen vor Ort oder in der Cloud; remote mit Zeitzone MEZ oder vor Ort in Freiburg.",
+    "target": "Ziel: DevOps-, SRE-, Plattform- und Infrastruktur-Engineering — Kubernetes und Container auf Linux und systemd, CI-Prüfungen in GitHub Actions und ein Nix-Flake als einzige Quelle der Flotte; remote mit Zeitzone MEZ oder vor Ort in Freiburg.",
     "bio": "Der größte Teil meiner Arbeit dreht sich darum, Betriebsdaten brauchbar zu machen: vier Jahre Asset Management für ein kommerzielles Solarportfolio, mit Ertragsmodellen, die Bankprüfungen bestanden, mobiler Felderfassung und Telemetrie-Abgleich, wenn Sensoren fehlten. Zwischen Anstellungen habe ich ein dreimonatiges PPA-Mandat für die EWE Trading abgeschlossen und eine NixOS-Flotte mit fünfundzwanzig Hosts aus einem Flake gebaut — eigene SSH-Zertifizierungsstelle, verschlüsselte Secrets pro Host, ein Sentinel für Disk, Speicher und Generation-Alter — dazu lokale Sprach-, Sprech- und Bildmodelle hinter einem OpenAI-kompatiblen Endpunkt. Ich suche Systemarbeit, in der Betriebsdaten vertrauenswürdig sein müssen.",
     "contacts": [
       {
@@ -266,7 +266,7 @@
   ],
   "hire": {
     "title": "Was ich suche",
-    "body": "Eine Senior- oder Lead-Rolle in DevOps, SRE, Plattform und Infrastruktur: Kubernetes mit GitOps und Infrastructure as Code, Cloud-Plattformarbeit auf GCP oder Azure oder die Linux-, Rechenzentrums- und KI-Umgebungen darunter. Remote mit Zeitzone MEZ oder vor Ort in Freiburg und am Oberrhein.",
+    "body": "Eine Senior- oder Lead-Rolle in DevOps, SRE, Plattform und Infrastruktur: Kubernetes und Container auf Linux und systemd, CI-Prüfungen in GitHub Actions und die deklarative Nix-Flotte, die handgebaute Hosts ersetzt, mit den Rechenzentrums- und KI-Umgebungen darunter. Remote mit Zeitzone MEZ oder vor Ort in Freiburg und am Oberrhein.",
     "briefsNote": "Notizen dazu, was ich in den ersten neunzig Tagen tun würde:",
     "wants": [
       "Go, Python, PostgreSQL, NixOS — und gewohnt, einen Dienst von Anfang bis Ende zu verantworten",

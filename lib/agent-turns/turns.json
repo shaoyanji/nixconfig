@@ -1,8 +1,27 @@
 {
-  "generated": "2026-11-27T05:07:41Z",
+  "generated": "2026-11-27T05:10:43Z",
   "count": 200,
-  "pin": "0c0f5c3e4ef21a3cc78f6e0a1f0e8a61b464506afb82bc544a96e7a24144dbe2",
+  "pin": "d8ff9fde7c15a2f0f05a98ade09d07729ae300373937f70820f226b00e77d902",
   "turns": [
+    {
+      "id": "a3b65e49-e48b-484a-9814-609fa08211ba",
+      "ts": "2026-11-27T05:08:13Z",
+      "source": "wallpaper-worker",
+      "subject": "nixconfig:wall-plates",
+      "action": "landed: wall-nixconfig-aurora variant (nixconfig-aurora.png) kept by agy, published to Cloudinary+Pages (786/786), approved in rotation.json (8fcfc085) | gate: checks:images + checks:image-daily PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/image-daily/briefs.json",
+        "lib/image-daily/rotation.json"
+      ],
+      "files": [
+        "lib/image-daily/briefs.json",
+        "lib/image-daily/rotation.json"
+      ],
+      "base_commit": "8fcfc08531fdc7ecd7d999f4e350ade6d711bb25",
+      "branch": "main",
+      "frame": "03hb83kesk5o532c2hf9k1tr6"
+    },
     {
       "id": "98027ecc-f121-44b4-b228-c72e7baca573",
       "ts": "2026-11-27T05:05:26Z",
@@ -3086,23 +3105,6 @@
       "base_commit": "d6203e48a89db2403a2659d794f309e34f0c2ffe",
       "branch": "main",
       "frame": "03hb3t979r39c6n9z47joxudw"
-    },
-    {
-      "id": "d304fff9-9afc-46a7-a103-6ed29e8390a0",
-      "ts": "2026-11-26T15:55:53Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-nudge-gate",
-      "action": "gate-change|0.99|0.98: pane_nudge_test_gate (take over)",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/pane-nudge.sh",
-        "tests/pane-nudge",
-        "taskfiles/checks.yml"
-      ],
-      "files": [],
-      "base_commit": "cebe6bddad364a8a9a39883788cd5dc00458490d",
-      "branch": "main",
-      "frame": "03hb3ssfh7nto6e08q86dg4x4"
     }
   ]
 }

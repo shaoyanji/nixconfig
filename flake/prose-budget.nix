@@ -41,7 +41,7 @@
     ".agents/skills/infra/SKILL.md" = 61;
     ".agents/skills/instabox/SKILL.md" = 106;
     ".agents/skills/iventoy/SKILL.md" = 110;
-    ".agents/skills/job-scout-lane/SKILL.md" = 64;
+    ".agents/skills/job-scout-lane/SKILL.md" = 84;
     ".agents/skills/jobsearch-pipeline/SKILL.md" = 81;
     ".agents/skills/jev-email-cleansing/SKILL.md" = 12;
     ".agents/skills/jevdecide/SKILL.md" = 170;

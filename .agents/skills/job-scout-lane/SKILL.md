@@ -46,6 +46,26 @@ sits at `prep`, its next action names a date that has passed, and a recipient ex
 `replies` proves what the archive holds, which for an unsent row is nothing.
 `cv` proves the site publishes this build and every published CV is linked.
 
+## Claims carry their evidence
+
+Every load-bearing sentence in a packet needs one command that settles it. The
+Hisolutions packet (2026-11-27) is the worked example: three lines died because
+nothing backed them.
+
+| Claim | What settles it |
+| :--- | :--- |
+| "25 NixOS hosts" | `nix eval --json .#inventory.hosts \| jq '[.[]\|select(.kind=="nixos")]\|length'` |
+| "the same module gate per host in CI" | `task check:list KIND=host`, `.github/workflows/` |
+| "gatus, alert bridge, sentinel ledger" | `hosts/delphi/configuration.nix`, `modules/services/fleet-alert-bridge/`, `task ops:health` |
+| "SOPS secrets behind an SSH CA" | `modules/secrets.yaml`, `.sops.yaml` |
+| "Terraform not run in production" | `find . -name '*.tf'` answers nothing |
+| "no Prometheus/Grafana stack" | `hosts/gok/instance.nix` holds node_exporter only |
+
+A claim with no row is deleted, not softened — "Prometheus und Grafana" and
+"Helm-nahe Definitionen" both went that way. A claim the repo disproves becomes
+the limit it is, in the letter's own words ("Terraform nicht im Produktivbetrieb
+geführt").
+
 ## The traps that cost a real sweep
 
 Fetching a Stepstone ad needs `Referer: https://www.stepstone.de/jobs/devops-engineer`

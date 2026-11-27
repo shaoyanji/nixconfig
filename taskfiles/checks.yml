@@ -799,6 +799,21 @@ tasks:
       - bash scripts/task/host-check-sweep.sh --hosts "{{.HOST}}" --mode {{.MODE | default "build"}} --arch "{{.ARCH}}" --timeout {{.TIMEOUT | default "240"}}
       - bash scripts/task/sentinel-ledger-check.sh --for-host "{{.HOST}}"
 
+  checks:resolver:health:
+    desc: "[gate] The resolver endpoints clients use answer a query"
+    summary: >
+      scripts/task/resolver-health-check.sh probes the two failover endpoints
+      clients are actually configured with — the LAN VIP (VRRP frieren/minyx)
+      and the tailnet anycast address (frieren/delphi, docs/dns-failover.md) —
+      for an answer to the zone. This is the service layer sentinel cannot
+      see: a host can be green while its resolver role is dead, and the probe
+      is blind to failover doing its job because clients are too.
+
+      Note resolver-independence. Exit 0 = every endpoint answers, 1 = at
+      least one dead (named). Runtime probe, not a config eval.
+    cmds:
+      - bash scripts/task/resolver-health-check.sh
+
   checks:sentinel:ledger:
     desc: "[gate] Every active inventory host has a sentinel ledger row (hub-local)"
     summary: >

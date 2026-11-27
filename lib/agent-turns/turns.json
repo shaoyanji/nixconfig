@@ -1,8 +1,51 @@
 {
-  "generated": "2026-11-27T22:10:51Z",
+  "generated": "2026-11-27T22:20:43Z",
   "count": 200,
-  "pin": "dffd6f3a64ec5256c686aa5fe5561a92db063ca7f6ca7fb4ab676c54efcda295",
+  "pin": "5d3a52754567a0ee180eb99b85c18c4e5039c22449da11df0136f0e6c360d393",
   "turns": [
+    {
+      "id": "4d0bef7a-afdb-4189-a3fd-b7f0eb39910c",
+      "ts": "2026-11-27T22:17:58Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-hisolutions-packet-2026-11-27",
+      "action": "publish 0.91/0.85: build Hisolutions packet, cv gates, deploy, push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbdoq38qyvljlys5i1myyr6"
+    },
+    {
+      "id": "795d637f-a2ee-4e85-afb3-b13e0c671b29",
+      "ts": "2026-11-27T22:17:57Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-gate-sweep-2026-11-27",
+      "action": "gate-change 0.9/0.84: add next check gate, prove it fires, push",
+      "outcome": "in_progress",
+      "claims": [
+        "checks/"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbdopzbbv71addaia8ux486"
+    },
+    {
+      "id": "bd3f5e35-b185-4be6-8dfc-bfd80af2801b",
+      "ts": "2026-11-27T22:11:10Z",
+      "source": "freebuff",
+      "subject": "nixconfig:appflow-packet-gate-2026-11-27",
+      "action": "landed: appflow packet gate proves the real packet — pii.json staged so the build carries the phone/address, --out into scratch so the live row is never overwritten, and a link whose artifact is gone now fails (123 of 314 rows in the live store are dead links). HiSolutions accepted exit 0 with the row byte-identical; advantest-ai-platform-engineer rejected exit 1 | gate: apps:gate:packet ACCEPT/REJECT PASS, tests/appflow-packet 8/8 PASS, shellcheck PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fdd59b7448a01036249640bf5953dbf32c9410e8",
+      "branch": "HEAD",
+      "frame": "03hbdne8mqqaergeqb3nc3cc6"
+    },
     {
       "id": "ea290402-bc83-4a34-b384-20a7265bab85",
       "ts": "2026-11-27T22:06:27Z",
@@ -2880,45 +2923,6 @@
       "base_commit": "ec0877f83ea610fe6cf426a5beb57f81db162ced",
       "branch": "main",
       "frame": "03hb9hxjh5hsbcgjpxg4wrk9n"
-    },
-    {
-      "id": "aa3752fb-83cc-4d9b-bb49-822fdabc7ce7",
-      "ts": "2026-11-27T08:57:52Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-2-vendor-sweep",
-      "action": "landed: vendor-lead sweep 2026-11-27 — read Giant Swarm/SUSE/LINBIT/B1/Univention/Open-Xchange/Proxmox careers pages, apps:search first each. No new employer: GSW+LINBIT state no openings, SUSE 71007910 still live, B1/U/OX/Proxmox tracked with stronger reqs. Recorded in followups/2026-11-27-employer-lead-sweep-freebuff.md; no row minted, nothing sent. Declared antigravity/wallpaper-worker/hermes capabilities and the 12 skill budgets so checks:quick goes green | gate: checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ec0877f83ea610fe6cf426a5beb57f81db162ced",
-      "branch": "main",
-      "frame": "03hb9cfekina7wk24g2t3iljm"
-    },
-    {
-      "id": "50193663-e097-43d1-a780-de18a47aef1f",
-      "ts": "2026-11-27T08:49:33Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-freebuff-sweep",
-      "action": "note-change 0.58/0.37; freebuff employer-lead sweep",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "49d914f7b8049fe3b629f30457caa38440357c9d",
-      "branch": "main",
-      "frame": "03hb9asuouvc32bbi1fz0zsyv"
-    },
-    {
-      "id": "22de435f-b8dd-4559-8fad-de2205762f17",
-      "ts": "2026-11-27T08:44:13Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-2-note-change",
-      "action": "landed: closed hisolutions-cv-prose-review-2026-11-27 as the packet handoff (DELIVERED). Gates on the shipped PDFs: letter-pdf-check ok (6 paragraphs, tagged), cv-ats-check ok (5 roles/4 projects/2 degrees/7 skills), selection.json byte-identical to a fresh jdselect run, 1p/2p, checks:appflow PASS. Site redeploy was the last; this change deploys nothing; submit held to 2026-12-07. AGENTS.nix 522636->522396 B, ceiling lowered | gate: notes issues [] + repo-blobs --index + alejandra PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "49d914f7b8049fe3b629f30457caa38440357c9d",
-      "branch": "main",
-      "frame": "03hb99rh423svfpk9b9v2ftj1"
     }
   ]
 }

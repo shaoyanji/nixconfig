@@ -2,6 +2,7 @@
   "_comment": "Which wall plates may rotate onto a session, and in what order. `in` is approval AND priority: `task images:wallpaper` installs the first id there that resolves, so the head of the list is what the screen shows and moving a line changes the order. `out` is a rejection and carries the reason; it wins over `in`, so a plate in both lists never rotates. Ids are `<day>/<name>.png` under published/wall, falling back to src/wall; a `taste/<day>/<name>.png` id reads the palette-test folder beside the bank (../taste-test). A plate in neither list is unjudged: not rejected, just not in rotation yet — that is how a fresh generation waits for a look instead of going straight onto a screen.",
   "wall": {
     "in": [
+      "2026-11-27/nixconfig-aurora.png",
       "2026-11-27/meadow-sleep.png",
       "2026-11-26/vending-snow.png",
       "2026-11-26/diver-cathedral.png",

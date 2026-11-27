@@ -251,6 +251,16 @@
       "rev": 1
     },
     {
+      "id": "wall-nixconfig-aurora",
+      "lane": "wall",
+      "every": 30,
+      "size": "1536x1024",
+      "name": "nixconfig-aurora.png",
+      "prompt": "A solitary basalt observatory dome on a snow-dusted Nordic ridge beneath an emerald and cyan aurora borealis ribbon, a warm amber window glowing inside against deep slate midnight peaks, illustrated scene, one clear focal point, no text.",
+      "expect": "an observatory dome on a snowy ridge under green-cyan aurora light, never an abstract emblem or UI panel",
+      "rev": 1
+    },
+    {
       "id": "fleet-docs-hero",
       "lane": "fleet",
       "every": 60,

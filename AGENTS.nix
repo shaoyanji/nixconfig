@@ -5660,11 +5660,11 @@
     };
     job-scout-next-sweep-freebuff = {
       title = "The next idle freebuff lane task is one more employer-lead sweep";
-      kind = "open";
-      status = "OPEN";
+      kind = "handoff";
+      status = "DELIVERED";
       priority = "P3";
-      date = "2026-11-24";
-      summary = "Next idle freebuff lane task: one more employer-lead sweep across the DevOps/SRE/Platform/Infrastructure families, prep-only to 2026-12-07 with nothing sent. The five ranked packets stay untouched and no `apps:scout` row is minted before the hold lifts.";
+      date = "2026-11-27";
+      summary = "The named vendor sweep ran 2026-11-27: SUSE's Premium Support req 71007910 is still live and Giant Swarm and LINBIT state no openings, while B1, Univention, Open-Xchange and Proxmox each hold a tracked row with a stronger live req. No new employer, no row minted, nothing sent.";
       refs = {
         modules = [
           "taskfiles/apps.yml"
@@ -5687,15 +5687,13 @@
         only once the hold lifts. The five ranked packets (netcup 1, Eficode 2,
         mogenius 3, KHS 4, Advantest 5) stay `stage lead` and stay untouched.
 
-        Where to look: Giant Swarm and SUSE earn a recheck, both closed on
-        2026-11-24. The last round read ATS APIs only, so the EU vendors posting
-        solely on their own careers pages — LINBIT, B1 Systems, Univention,
-        Open-Xchange, Proxmox — are the likeliest source of a new employer; an
-        empty Greenhouse or Ashby feed proves nothing there.
-
-        Exit: every employer checked is recorded as a new lead carrying a real
-        `--family`, a `--summary` and a `next_action` naming its route, or as
-        already tracked or with no live req — and `task checks:quick` green.
+        Ran 2026-11-27: all seven vendor pages re-read live, `apps:search` first
+        for each. No new employer — Giant Swarm and LINBIT state no openings,
+        SUSE's req 71007910 is still live and already carried by the 2026-11-25t
+        file, and B1, Univention, Open-Xchange and Proxmox each hold a tracked
+        row with a stronger live req on the same thread. Verdicts and routes:
+        `~/.local/state/appflow/followups/2026-11-27-employer-lead-sweep-freebuff.md`.
+        Exit met: `checks:quick` green, no row minted, nothing sent.
       '';
     };
     job-scout-sre-platform-sweep-2026-11-24 = {

@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-27T08:41:55Z",
+  "generated": "2026-11-27T08:51:54Z",
   "count": 200,
-  "pin": "ef12cb89517b2b2815efbd13da6ed23fca3e3c58d059b1349c1afb717f9e51fa",
+  "pin": "33244c55e1358b9cabf9a462425083a066f45fc5047f5dafce0b8120dd792f22",
   "turns": [
+    {
+      "id": "50193663-e097-43d1-a780-de18a47aef1f",
+      "ts": "2026-11-27T08:49:33Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff-sweep",
+      "action": "note-change 0.58/0.37; freebuff employer-lead sweep",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "49d914f7b8049fe3b629f30457caa38440357c9d",
+      "branch": "main",
+      "frame": "03hb9asuouvc32bbi1fz0zsyv"
+    },
+    {
+      "id": "22de435f-b8dd-4559-8fad-de2205762f17",
+      "ts": "2026-11-27T08:44:13Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-2-note-change",
+      "action": "landed: closed hisolutions-cv-prose-review-2026-11-27 as the packet handoff (DELIVERED). Gates on the shipped PDFs: letter-pdf-check ok (6 paragraphs, tagged), cv-ats-check ok (5 roles/4 projects/2 degrees/7 skills), selection.json byte-identical to a fresh jdselect run, 1p/2p, checks:appflow PASS. Site redeploy was the last; this change deploys nothing; submit held to 2026-12-07. AGENTS.nix 522636->522396 B, ceiling lowered | gate: notes issues [] + repo-blobs --index + alejandra PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "49d914f7b8049fe3b629f30457caa38440357c9d",
+      "branch": "main",
+      "frame": "03hb99rh423svfpk9b9v2ftj1"
+    },
     {
       "id": "1c502ab2-96e4-4fae-8bbb-0bc73a39c176",
       "ts": "2026-11-27T08:38:28Z",
@@ -3022,32 +3048,6 @@
       "base_commit": "ba30f1bb033ab0c25da98471ae9494c16766155e",
       "branch": "main",
       "frame": "03hb41sgks4qzmmbrq4fpda3q"
-    },
-    {
-      "id": "55f063ca-3fd6-4fa2-a6ed-20f08189d729",
-      "ts": "2026-11-26T16:41:54Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-tree-reconcile",
-      "action": "Note landed after trimming: distilled devin-lane-refactoring-2026-11-25 (38->24 lines) and open-frieren-offload (35->26), which also cleared agents-notes-schema, and added delphi-host-clone-not-authority as kind=open P2 with refs host delphi + infra:deploy:host:delphi. AGENTS.nix now 522,958/524,288 bytes, agentsNotes.issues [] .| gate: issues clean, comments 6493/6495 (x86_64 schema build cannot run on this aarch64 host)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ba30f1bb033ab0c25da98471ae9494c16766155e",
-      "branch": "main",
-      "frame": "03hb41ryglw6vf07ikllltq1i"
-    },
-    {
-      "id": "04b76393-d994-46d1-a613-8ae2df9cf9a2",
-      "ts": "2026-11-26T16:40:05Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-steward-delphi",
-      "action": "drove idle pane agents:3.1 (delphi/freebuff): jev route note-change p=0.97/m=0.95 — Trim AGENTS.nix notes to fit 512 KiB gate and commit open note; pane now working...",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "28f54a28ae51abeee22abfd7422dec81009edad2",
-      "branch": "main",
-      "frame": "03hb41f7mq4d1nep8hhh1l7hr"
     }
   ]
 }

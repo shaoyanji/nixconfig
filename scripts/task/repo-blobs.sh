@@ -41,7 +41,7 @@ ALLOW="${ALLOW:-}"
 # the bytes, nothing raises it. History is the record, not drift, so --history
 # skips AGENTS.nix entirely and leaves the legacy binaries to MAX: only what
 # lands is bounded.
-AGENTS_CEILING="${AGENTS_CEILING:-522396}"
+AGENTS_CEILING="${AGENTS_CEILING:-522370}"
 self="scripts/task/repo-blobs.sh"
 
 mode=""

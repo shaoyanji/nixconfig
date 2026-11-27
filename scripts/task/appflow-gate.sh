@@ -81,6 +81,14 @@ if [ "$mode" = "packet" ]; then
     exit 2
   }
 
+  # The letter is still a file (`letters/<id>.json`), and it is read from
+  # APPFLOW_CONFIG, which this script points at $work. Without the copy a
+  # packet here silently builds the CV only — the packet builder defaults to
+  # the CV when no letter resolves.
+  mkdir -p "$work/letters"
+  [ -f "$HOME/.config/appflow/letters/$id.json" ] &&
+    cp "$HOME/.config/appflow/letters/$id.json" "$work/letters/$id.json"
+
   get "/api/application-document?applicationId=$(enc "$id")" |
     jq -j '[.[] | select(.kind == "jd") | .body][0] // empty' >"$work/jd/$id.txt"
   [ -s "$work/jd/$id.txt" ] || {

@@ -295,6 +295,12 @@ in
       hmModules = ["roles.lean"];
     };
 
+    lumi = {
+      features = ["home"];
+      modules = [../hosts/lumi.nix];
+      hmModules = ["roles.lean" "sops"];
+    };
+
     cassini = {
       features = ["base" "macos"];
       # darwin has no systemd: the `systemd-policy` feature reads

@@ -297,11 +297,12 @@
       "keywords": [
         "Kubernetes",
         "NixOS",
-        "AWS",
-        "Azure",
-        "Google Cloud"
+        "Linux / systemd",
+        "Container",
+        "GitHub Actions",
+        "Monitoring & Alerting"
       ],
-      "level": "Master",
+      "level": "Advanced",
       "name": "DevOps"
     },
     {

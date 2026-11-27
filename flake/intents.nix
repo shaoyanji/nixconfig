@@ -250,6 +250,14 @@
       via = "the wallpaper worker unit";
       place = ["local-gate" "delphi"];
     };
+    frieren-host = {
+      what = "the wallpaper round posted from frieren's own shell: renders a shortfall, gates it, publishes";
+      provides = ["gate-change" "publish"];
+      claims = ["lib/image-daily/"];
+      floor = "asserted";
+      via = "the wallpaper round run on frieren, posting under the host's name";
+      place = ["local-gate" "delphi"];
+    };
     hermes = {
       what = "the persona lane on frieren: steers panes, audits hosts, hardens modules";
       provides = ["chain-change" "note-change" "drive"];

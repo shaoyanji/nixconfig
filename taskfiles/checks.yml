@@ -1655,19 +1655,20 @@ tasks:
       an address: a path that exists, a `task` the recipe book has, a policy id,
       a flake attribute. `nix eval .#nixComments` classifies every comment line
       and `flake/policies.nix#nix-comments-are-pointers` holds the ceiling; this
-      task adds what Nix cannot answer — it resolves each cited `task` name
-      against go-task's live set, so a pointer at a recipe nobody can run fails
-      here. ~1.5 s, no host eval.
+      task compares the ratchet and resolves each cited `task` name against
+      go-task's live set, so prose past the ceiling and a pointer at a recipe
+      nobody can run both fail here, without a build or a host eval. ~2.7 s.
     cmds:
       - bash scripts/task/nix-comments.sh
 
   checks:nix:comments:test:
-    desc: "Regression fixture for checks:nix:comments (seeded dangling task pointer)"
+    desc: "Regression fixture for checks:nix:comments (dangling pointer, replayed drift)"
     summary: >
-      A worktree's check-inventory.nix gains a comment citing `nope:zzz`
-      — a pointer to a recipe the task plane never had. The worktree's own
-      census must refuse it, pointer named; HEAD stays clean. No such break is
-      on record, so the mistake is seeded on a tracked file.
+      A worktree's check-inventory.nix gains a comment citing `nope:zzz` — a
+      pointer to a recipe the task plane never had — and then 18 prose lines,
+      the drift 2ca9a316 landed while the gate printed `6513/6495` and exited 0.
+      The census must refuse both, naming the pointer and the breach; HEAD stays
+      clean.
     cmds:
       - bash tests/nix-comments/run.sh
 

@@ -1,8 +1,83 @@
 {
-  "generated": "2026-11-27T23:43:42Z",
+  "generated": "2026-11-27T23:57:56Z",
   "count": 200,
-  "pin": "da235f9829df270c610c8ad0934f2ec9a7cc7cf10413dd6c7c1d8d73190b9e0f",
+  "pin": "1bed742a3a8bc30143b5e1c70028171847024b7cd83cb0d686decda50f9c4f3e",
   "turns": [
+    {
+      "id": "9b19f101-b4dc-4bc4-aab2-dba3d669b305",
+      "ts": "2026-11-27T23:54:41Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-egress-note",
+      "action": "note-change: egress-lanes-research note landed; census repaired",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbe7m7eybvvirc4abdixjeu"
+    },
+    {
+      "id": "b33c8582-1cf3-4350-ba4f-5f0ac4385afb",
+      "ts": "2026-11-27T23:54:17Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-census-gate-2026-11-28",
+      "action": "gate-change 1.0: add census gate, prove fires on past drift, push",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbe7jfqm3vx5isg3ma7hu7c"
+    },
+    {
+      "id": "d9e5c95c-4b0c-4bdf-beb2-159b4602d2bf",
+      "ts": "2026-11-27T23:45:51Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-intents-gate-2026-11-28",
+      "action": "flake-change: declared frieren-host in flake/intents.nix (provides gate-change+publish, claims lib/image-daily/, floor asserted, place local-gate+delphi — mirrors wallpaper-worker); checks:intents and checks:intents:test PASS; commit e01eb48f on local main, not pushed (main 5 ahead/133 behind). | gate: checks:intents PASS",
+      "outcome": "done",
+      "claims": [
+        "flake/intents.nix"
+      ],
+      "files": [
+        "flake/intents.nix"
+      ],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbe5w35yy6h0d74zho91bgl"
+    },
+    {
+      "id": "6edffb00-2b55-4464-b27f-fc2ca3b6b6f0",
+      "ts": "2026-11-27T23:44:21Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-intents-gate-2026-11-28",
+      "action": "flake-change: declare frieren-host xs capability; checks:intents green",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/intents.nix"
+      ],
+      "files": [],
+      "base_commit": "db40d4fa3519d1e1ca48af45b302d9fa0f62f85f",
+      "branch": "main",
+      "frame": "03hbe5lhshn1mnz938wf0t2nu"
+    },
+    {
+      "id": "1715a490-ed0f-4232-ab95-9790069c2a9c",
+      "ts": "2026-11-27T23:44:18Z",
+      "source": "buffy",
+      "subject": "nixconfig:egress-note-final-2026-11-28",
+      "action": "landed: note finished — order stated (cache then broker), cold p50 154->152 ms at 1.40 MB, warm 46->41 ms at 0.085 MB, direct 165->256 ms, bulk identity 92.5.115.103 AS31898 Frankfurt; paid the blob ceiling inside the note (522073/522082) and repaired a pre-existing census regression (6513/6495 from 2ca9a316) so .nix commits work again | gate: agents-notes-schema PASS + census 6495/6495",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "3c2d9f55910f7a2226b93f4855517dcb8268642d",
+      "branch": "main",
+      "frame": "03hbe5l4gl0qx0ljiu93jfapo"
+    },
     {
       "id": "3aefb5f4-a133-4c04-b1d1-2bb27c2d847d",
       "ts": "2026-11-27T23:40:38Z",
@@ -2897,84 +2972,6 @@
       "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
       "branch": "main",
       "frame": "03hbag7359mj85zk4y508cih9"
-    },
-    {
-      "id": "38d1930d-8d03-4047-88f8-2d0d8b233f8f",
-      "ts": "2026-11-27T12:20:18Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-27: 0 plate(s) kept of 0 spent, 0 roster row(s) waiting, 789 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hbafz1gxpzsqev42w6lf8gr"
-    },
-    {
-      "id": "e7cecede-ea66-427c-9b19-e3117a377e56",
-      "ts": "2026-11-27T12:19:24Z",
-      "source": "devin",
-      "subject": "nixconfig:feature-chain-module-refactor",
-      "action": "start: audit shared feature-chain duplication and host module-check failures; isolate work in a temp worktree; bounded checks only",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/global",
-        "modules/profiles",
-        "modules/services",
-        "flake/host-inventory.nix",
-        "hosts"
-      ],
-      "files": [],
-      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
-      "branch": "main",
-      "frame": "03hbafsp1vlzi44wu13wrvyfr"
-    },
-    {
-      "id": "8b0cac77-e635-4fd5-bf5b-9341e8c2b420",
-      "ts": "2026-11-27T12:19:15Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-freebuff",
-      "action": "route publish CV site work",
-      "outcome": "in_progress",
-      "claims": [
-        "blog-cv-pdfs"
-      ],
-      "files": [],
-      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
-      "branch": "main",
-      "frame": "03hbafrmb25qezw1hnfbbc0bw"
-    },
-    {
-      "id": "d9d0600d-0fcd-449e-8ffd-3629fa4802ca",
-      "ts": "2026-11-27T12:19:15Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin",
-      "action": "route chain-change refactor feature-chain modules",
-      "outcome": "in_progress",
-      "claims": [
-        "feature-chain-modules"
-      ],
-      "files": [],
-      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
-      "branch": "main",
-      "frame": "03hbafrlsty56xn6sxaf3fwcu"
-    },
-    {
-      "id": "9c05642b-6684-4ebf-8e9e-469e250735ec",
-      "ts": "2026-11-27T12:11:52Z",
-      "source": "devin",
-      "subject": "nixconfig:lumi-hardening-agent-workflow",
-      "action": "claim: finish Traefik activation, preserve lumi SSH keys, harden within 1 GB RAM, and add tmux/devin prompt context",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/lumi.nix",
-        "modules/config/authorized-keys.nix"
-      ],
-      "files": [],
-      "base_commit": "979a8f1a1677643d6f2fcaeff9097f6dfcecce7c",
-      "branch": "zeno-stage1",
-      "frame": "03hbaebpao6u2io5t6ylefqcv"
     }
   ]
 }

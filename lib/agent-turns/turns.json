@@ -1,8 +1,34 @@
 {
-  "generated": "2026-11-27T13:31:54Z",
+  "generated": "2026-11-27T13:35:24Z",
   "count": 200,
-  "pin": "a217d51acb58a707ee05513b5701bbdb41f02ca648dcdcc5ed9176d9ec19251f",
+  "pin": "f72918fba2449a952d9c2ca1d723a26798de11507abdc7dd106838e9694b6e42",
   "turns": [
+    {
+      "id": "ee9932a2-e9a9-465a-8cbc-d77adcc10430",
+      "ts": "2026-11-27T13:33:44Z",
+      "source": "buffy",
+      "subject": "nixconfig:pane-3-lumi-harness-steer",
+      "action": "steered pane 3 (devin, lumi-lightweight-agent-harness): verified pkgs.llm-agents.zeroclaw exists at locked rev a8e2ca87, morrow-telegram key + lumi recipient still present, sops template placeholders render values (mirrors profiles/hermes.nix), linger already on; flagged rebase merge trap on lumi-http naming and missing config.authorized-keys in main | gate: none (no tree change)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "257e96b649d2ec2632a6624b109cd644f75fd336",
+      "branch": "main",
+      "frame": "03hbaubetmp6shtsv1tchnn0g"
+    },
+    {
+      "id": "44d4625d-26ea-44aa-9cf0-439628dd3c78",
+      "ts": "2026-11-27T13:32:18Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-1-freebuff-cv-jobscout",
+      "action": "publish: CV site republished to GitHub Pages run 46007781128 success; 6 PDFs byte-identical to .#sites.matt-site; 8 routes + 8 pdfs return 200 | gate: live route sweep",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbau1cts81r5tc21d8rlib4"
+    },
     {
       "id": "5b9e5580-4bbb-4d79-87c7-6239e4f41ee8",
       "ts": "2026-11-27T13:30:26Z",
@@ -2954,42 +2980,6 @@
       "base_commit": "f0d4d8c20095b380c40bb6b2552ee1db06e27c52",
       "branch": "main",
       "frame": "03hb4sgby7h2bgdmx9oq4e5g7"
-    },
-    {
-      "id": "a513e21c-100f-4b06-8c14-07082e6e7bc3",
-      "ts": "2026-11-26T18:57:21Z",
-      "source": "devin",
-      "subject": "nixconfig:enhance-job-db-scraper-dedupe-and-interview-tracker",
-      "action": "landed: cross-source canonical merge metadata, append-only application/interview journal, stage filters/stats, export packet endpoints, and UI controls | gate: go test+vet, node, alejandra, checks:host, delphi toplevel, live smoke PASS",
-      "outcome": "done",
-      "claims": [
-        "modules/services/job-db-scraper",
-        "modules/services/job-db-scraper.nix"
-      ],
-      "files": [
-        "modules/services/job-db-scraper",
-        "modules/services/job-db-scraper.nix"
-      ],
-      "base_commit": "f0d4d8c20095b380c40bb6b2552ee1db06e27c52",
-      "branch": "main",
-      "frame": "03hb4s8j2sagamqvesf4rjc1a"
-    },
-    {
-      "id": "91dc312a-3855-4d3a-a56f-09d4efe400b7",
-      "ts": "2026-11-26T18:53:53Z",
-      "source": "buffy",
-      "subject": "nixconfig:wire-clanker-browser-into-mail-atlas-site-test",
-      "action": "claim: add an opt-in clanker-browser lane to the mail-atlas drawer smoke, keeping the local path intact",
-      "outcome": "in_progress",
-      "claims": [
-        "tests/mail-atlas-site",
-        "scripts/task/clanker-browser.sh",
-        "taskfiles/checks.yml"
-      ],
-      "files": [],
-      "base_commit": "c1ca96cb04064e3d34af3ca81fb584a28c7412cb",
-      "branch": "main",
-      "frame": "03hb4rk65zkprkcejtwkxnv99"
     }
   ]
 }

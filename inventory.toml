@@ -1079,8 +1079,8 @@ ssh_alias = "lumi"
 [hosts.lumi.software]
 module_chain = "globalModulesHome"
 impermanence = false
-key_services = ["openssh (NAT 10033 -> 22)", "tailscaled", "nix-daemon (max-jobs = 0)", "sops-nix (user)", "cloudflared (lumi.bountystash.com)", "traefik (127.0.0.1:8080)", "lumi-web (127.0.0.1:8081)", "zeroclaw-telegram (user daemon)"]
-services = [{ name = "openssh", port = 22 }, { name = "tailscale" }, { name = "nix" }, { name = "cloudflared" }, { name = "traefik", port = 8080 }, { name = "lumi-web", port = 8081 }, { name = "zeroclaw-telegram" }]
+key_services = ["openssh (NAT 10033 -> 22)", "tailscaled", "nix-daemon (max-jobs = 0)", "sops-nix (user)", "cloudflared (lumi.bountystash.com)", "traefik (127.0.0.1:8080)", "lumi-http (127.0.0.1:8081)", "zeroclaw-telegram (user daemon)"]
+services = [{ name = "openssh", port = 22 }, { name = "tailscale" }, { name = "nix" }, { name = "cloudflared" }, { name = "traefik", port = 8080 }, { name = "lumi-http", port = 8081 }, { name = "zeroclaw-telegram" }]
 traits = ["cloud-server", "x86_64", "1gb-ram", "nat-vps", "debian-12", "standalone-home-manager", "lean-profile"]
 
 [hosts.lumi.persona]

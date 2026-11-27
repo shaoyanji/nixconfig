@@ -1,8 +1,258 @@
 {
-  "generated": "2026-11-27T18:54:58Z",
+  "generated": "2026-11-27T20:06:07Z",
   "count": 200,
-  "pin": "64170172f98e7236bb2f6a878941f82e34893c080569648d3884017671f15f49",
+  "pin": "5c9e97afe5ec8bf32ca4a8df910080462a33cc6841c67bdae0bab11630466b39",
   "turns": [
+    {
+      "id": "b2ff3a53-d1a2-406b-b9a3-901fe1d3ab5b",
+      "ts": "2026-11-27T20:05:26Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:cv-republish-links-2026-11-27",
+      "action": "publish 0.95: republish CV site, verify live links 200, gate",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/cv.typ",
+        "lib/matt/cv-software.json",
+        "lib/matt/cv-energy.json"
+      ],
+      "files": [],
+      "base_commit": "74a215b9760999ef3fe88600d0c1707ce4f056a6",
+      "branch": "main",
+      "frame": "03hbcytydh1mw7ti0nryd8sgk"
+    },
+    {
+      "id": "87755a1d-b394-44e9-8974-1417831a8c53",
+      "ts": "2026-11-27T20:01:48Z",
+      "source": "freebuff",
+      "subject": "nixconfig:hisolutions-cv-packet",
+      "action": "landed: HiSolutions packet refined (gatus/alert-bridge replaces unsupported Prometheus-Grafana claim; Terraform stated as not in production; DevOps skills name CI, Linux, containers) and republished redacted to /cv/ — live 200 + sha256 match | gate: check-cv-links PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "74a215b9760999ef3fe88600d0c1707ce4f056a6",
+      "branch": "main",
+      "frame": "03hbcy4g4kse6168tnb4ebave"
+    },
+    {
+      "id": "92f717df-95bb-4952-a649-1b5a0363b993",
+      "ts": "2026-11-27T20:00:09Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:xs-turn-post-commits-guard-2026-11-27",
+      "action": "gate-change 0.98/0.96: restore COMMITS comma-sep guard + fail-on-space gate; drive agents:1",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/xs-turn-post.sh"
+      ],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbcxsvqw28buxrcc7skkj70"
+    },
+    {
+      "id": "0d127ff0-a34e-4bcb-bc82-2db77aad93be",
+      "ts": "2026-11-27T19:53:18Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-packet-2026-11-27",
+      "action": "jev route publish (0.94/0.92); drive agents:2 Hisolutions CV packet publish",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbcwgofcdjli521iha0rp3n"
+    },
+    {
+      "id": "af0a1953-0616-49f3-a737-f0bc44a6d128",
+      "ts": "2026-11-27T19:53:14Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-gemini-api-cli-2026-11-27",
+      "action": "jev route flake-change (0.85/0.80); drive agents:1 gemini-api CLI packaging verify",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbcwg5o38ppoz6t3zkv0rue"
+    },
+    {
+      "id": "b5151629-83f5-4f8a-b626-dc4460fac7f1",
+      "ts": "2026-11-27T19:51:58Z",
+      "source": "devin",
+      "subject": "nixconfig:gemini-api-packaging-turn",
+      "action": "landed: no-change closure — turn already completed in this session at 7f65eacb (nested trees moved to legacyPackages, full gate record on the ledger). Re-verified at current origin/main df99d645: gemini-api v0.5.0 evaluates and builds rc 0; pinned binary block unchanged since 2099a85a | gate: nix build .#cli.ai.gemini-api PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "df99d6455bda7d721e33efeca1a7edda18b29171",
+      "branch": "HEAD",
+      "frame": "03hbcw7ce7ge01johv9xyi1bp"
+    },
+    {
+      "id": "501f8783-cd52-4aef-8da4-005d73ffbe76",
+      "ts": "2026-11-27T19:43:44Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "chain-change drive done: blast-radius survey, no diff; pane idle",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbcule0s7gbyqwoi0zqxol0"
+    },
+    {
+      "id": "d6d49e79-7cb6-4cff-97b9-ef93a3c2a736",
+      "ts": "2026-11-27T19:39:07Z",
+      "source": "devin",
+      "subject": "nixconfig:chain-blast-radius-survey",
+      "action": "landed: read-only blast-radius survey at df99d645. Radius per edit: inventoryModules injection = all 32 hosts; user.nix constants = 29 consumer modules; base = 23 hosts; nixosSupport/linuxSupport = 20 Linux hosts; nixos+dms = 11 desktops; containers/noDE = 9; home = 5; disko 5+2, impermanence/microvm 2, demo/macos 1. Rule: radius 20+ gates one host per feature combo, never whole-fleet builds | gate: survey only, no diff",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "df99d6455bda7d721e33efeca1a7edda18b29171",
+      "branch": "HEAD",
+      "frame": "03hbctowxpy02in9uzdcpizzb"
+    },
+    {
+      "id": "94a4c706-57ca-4fce-a295-ac702ea99376",
+      "ts": "2026-11-27T19:37:53Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-lane",
+      "action": "jev route chain-change; drive agents:1 devin refactoring",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbctgaazyheuxtc2kg25f78"
+    },
+    {
+      "id": "04faeb79-d0de-41cf-9e49-0823af613454",
+      "ts": "2026-11-27T19:24:48Z",
+      "source": "freebuff-pane-2",
+      "subject": "nixconfig:cv-live-link-gate",
+      "action": "landed: check-links.sh --live fetches each anchor from Pages, requires 200 + sha256 match; deploy job gates on it. gate: run 46056437913 success, live gate PASS (2 links byte-identical)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbcqw98dusozlusju9cthld"
+    },
+    {
+      "id": "06a953e5-5212-4569-a6fe-0acc633d17e2",
+      "ts": "2026-11-27T19:21:29Z",
+      "source": "devin",
+      "subject": "nixconfig:policies-prose-budget-jevdecide",
+      "action": "landed: no-change closure — already correct at df99d645. jevdecide SKILL.md measures 182 raw lines minus 12 frontmatter = body 170, and flake/prose-budget.nix already records exactly 170 (commit 9d73570e earlier today). Measured, not quoted: frontmatter stripped per the budget rule, counts match, no drift | gate: checks:policies PASS rc=0 at current head",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "df99d6455bda7d721e33efeca1a7edda18b29171",
+      "branch": "HEAD",
+      "frame": "03hbcq8zkkg31y8hrqhdjl122"
+    },
+    {
+      "id": "5799fd67-733a-49a5-972f-0694c49f85bd",
+      "ts": "2026-11-27T19:19:03Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:cv-live-link-gate",
+      "action": "gate-change: check-links --live, 200 + sha256 vs Pages",
+      "outcome": "in_progress",
+      "claims": [
+        "ryoku-cv/check-links.sh"
+      ],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbcprtjyqfgpom8vnv9hd4a"
+    },
+    {
+      "id": "cef2c5d6-4536-4240-aca3-4e60282d07df",
+      "ts": "2026-11-27T19:19:02Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:policies-prose-budget-jevdecide",
+      "action": "gate-change: record jevdecide body 170 (was 156), policies green",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/prose-budget.nix"
+      ],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbcprre6wg3wsfexndgbctk"
+    },
+    {
+      "id": "e0c0a4ae-fb72-4422-9e48-1555a32a3a7c",
+      "ts": "2026-11-27T19:01:35Z",
+      "source": "freebuff-pane-2",
+      "subject": "nixconfig:freebuff-cv-publish-2026-11-27z",
+      "action": "landed: /cv/ republished at 1c5bcce (run 46053559724, deploy success); gate: check-cv-links PASS, 6 CVs download+resolve, 10/10 live links 200, hashes match build",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbcmcznsbmhdjjzwocrz5dm"
+    },
+    {
+      "id": "2b2c73b3-5a82-4b2e-8c0d-4246450d54eb",
+      "ts": "2026-11-27T19:00:30Z",
+      "source": "devin",
+      "subject": "nixconfig:feature-chain-refactor-finish",
+      "action": "landed: no-change closure, 6th consecutive. Mechanical proof: diff 41e2c30d..df99d645 over module-sets+host-inventory+modules+hosts is EMPTY — zero chain-structure change since the exhaustive audit; only documented single-host exceptions remain. drv-equality has nothing to compare when no refactor exists | gate: checks:hosts all-32 MODE=eval PASS 32/32 same-structure, plus structural diff empty",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "df99d6455bda7d721e33efeca1a7edda18b29171",
+      "branch": "HEAD",
+      "frame": "03hbcm5f6chy5dj9hbuuvd8qy"
+    },
+    {
+      "id": "b981c58b-c64e-439c-8e4e-8d0d92f2cda8",
+      "ts": "2026-11-27T18:59:34Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:feature-chain-refactor-finish",
+      "action": "chain-change: extract shared chain, prove drv-equality + checks:hosts",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/module-sets.nix",
+        "modules",
+        "hosts"
+      ],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbclysvnfe6uzy4jyf5f6z9"
+    },
+    {
+      "id": "5d84ffbf-4e83-4fd5-a493-c922f05b97ca",
+      "ts": "2026-11-27T18:58:02Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-publish-2026-11-27z",
+      "action": "publish: republish CV site, verify live links, gate + push origin/main",
+      "outcome": "in_progress",
+      "claims": [
+        "_tabs/cv.md"
+      ],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbclo2c9wdjvjgfknhojnww"
+    },
+    {
+      "id": "cc477736-3c73-4b2b-8204-9e8f5a535766",
+      "ts": "2026-11-27T18:55:20Z",
+      "source": "devin",
+      "subject": "nixconfig:closure-budget-adoption",
+      "action": "landed: df99d645 — delphi baseline adopted 17.2GiB measured over ssh against its own store DB. frieren+delphi are the only measurable active hosts: tailscale shows the fleet offline, LAN probes to eisen/aristotle/diogenes/netbook all time out, tailnet-delphi needs Tailscale-SSH browser auth so measurement used the public DNS name. 11 remaining active hosts skipped unreachable — no baseline is ever typed | gate: checks:closure:budget ALL=1 PASS both hosts under",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "df99d6455bda7d721e33efeca1a7edda18b29171",
+      "branch": "HEAD",
+      "frame": "03hbcl50otugr7q4ustv4kkh8"
+    },
     {
       "id": "3dc6f0d9-5ec4-4438-b06a-31bca991da5d",
       "ts": "2026-11-27T18:50:50Z",
@@ -2641,269 +2891,6 @@
       "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
       "branch": "main",
       "frame": "03hb8b9wh1hx53y1ll0aupoam"
-    },
-    {
-      "id": "1ac89efc-f233-4165-8029-3d6ea674cfa2",
-      "ts": "2026-11-27T05:43:08Z",
-      "source": "wallpaper-worker",
-      "subject": "nixconfig:wallpaper-plan-check",
-      "action": "verified: design record + image-daily-plan (due 0 across all 5 lanes, 94 left); wallpaper-worker idle at 8fcfc085",
-      "outcome": "done",
-      "claims": [
-        "lib/image-daily/"
-      ],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb8ae055ttoyhzhry2sgr7m"
-    },
-    {
-      "id": "203ce812-7739-48ac-9995-7561210c648b",
-      "ts": "2026-11-27T05:36:50Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:wallpaper-plan-check",
-      "action": "novel|0.55|0.10 check image-daily design record plan plates",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/image-daily/"
-      ],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb895lo3z09y4mqz8cqncv9"
-    },
-    {
-      "id": "6dcf88b8-0c9a-4ba1-adcd-2d91af00445b",
-      "ts": "2026-11-27T05:36:44Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-handoff-note",
-      "action": "note-change|1.00|1.00 freebuff AGENTS.nix handoff note",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/cv-ats-check.sh",
-        "scripts/task/letter-pdf-check.sh"
-      ],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb894zs04nxjzlj5x8i6jc2"
-    },
-    {
-      "id": "e793869e-e75c-4650-bb27-6bd48415a552",
-      "ts": "2026-11-27T05:35:39Z",
-      "source": "wallpaper-worker",
-      "subject": "nixconfig:wallpaper-plan-check",
-      "action": "verified: design record (image-daily-queue, wall-prompt-family, wall-plate-rounds) + image-daily-plan (due 0 across all 5 lanes, 94 left); found unexported IMAGES_ROOT in image-daily-lib.sh & cmd_publish/cmd_approve in image-daily-run.sh",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb88xc6qt87dblhc8wi8l4h"
-    },
-    {
-      "id": "c1b1ea9c-f7a3-495b-beb4-4e80d7bdb0a9",
-      "ts": "2026-11-27T05:27:25Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-handoff-note",
-      "action": "note-change|1.00|1.00 freebuff AGENTS.nix handoff note",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb87besffte6mvatujewq9a"
-    },
-    {
-      "id": "70ad0627-17ad-4559-9b1e-41a9605436d4",
-      "ts": "2026-11-27T05:18:38Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:wallpaper-plan-check",
-      "action": "novel: check image-daily design record, plan due plates",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb85lnrmxhb0xt9cpadht86"
-    },
-    {
-      "id": "b8f777c7-43d4-4c4c-9ab7-f33d4b8eb671",
-      "ts": "2026-11-27T05:18:37Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-handoff-note",
-      "action": "note-change: freebuff AGENTS.nix handoff note",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb85lkx3qsf6ejptcmqrc3s"
-    },
-    {
-      "id": "407a3771-f891-4f18-add0-d7f23a35acf7",
-      "ts": "2026-11-27T05:17:45Z",
-      "source": "wallpaper-worker",
-      "subject": "nixconfig:wallpaper-6-publish-plate",
-      "action": "landed: wall-nixconfig-aurora (nixconfig-aurora.png) kept, published to Cloudinary+Pages (786/786), approved in rotation.json (8fcfc085); images:plan due 0 (94 remaining) | gate: checks:images + checks:image-daily PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/image-daily/"
-      ],
-      "files": [
-        "lib/image-daily/briefs.json",
-        "lib/image-daily/rotation.json"
-      ],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb85fgyu6op5t2d5i30y2un"
-    },
-    {
-      "id": "42243762-f25a-441e-ad70-074f5da8e751",
-      "ts": "2026-11-27T05:11:56Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-hisolutions-ag-cv",
-      "action": "landed: hiSolutions letter + German CV tightened, packet rebuilt — letter now names the employer, English=Muttersprache matches the CV, k8s/Helm stated as use not architecture; CV bullets fixed (SOPS casing, final stops, CI aus der Inventardatei); packet 1p letter/2p CV with letter-pdf-check + cv-ats-check PASS; checks:appflow PASS; site redeployed, matt:cv:check 14 ok 0 failed (cv-software-de 787d1d89). Nothing sent, hold to 2026-12-07 | gate: checks:appflow PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/matt"
-      ],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb84aiyy67ixz4j25f0u7i2"
-    },
-    {
-      "id": "a3b65e49-e48b-484a-9814-609fa08211ba",
-      "ts": "2026-11-27T05:08:13Z",
-      "source": "wallpaper-worker",
-      "subject": "nixconfig:wall-plates",
-      "action": "landed: wall-nixconfig-aurora variant (nixconfig-aurora.png) kept by agy, published to Cloudinary+Pages (786/786), approved in rotation.json (8fcfc085) | gate: checks:images + checks:image-daily PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/image-daily/briefs.json",
-        "lib/image-daily/rotation.json"
-      ],
-      "files": [
-        "lib/image-daily/briefs.json",
-        "lib/image-daily/rotation.json"
-      ],
-      "base_commit": "8fcfc08531fdc7ecd7d999f4e350ade6d711bb25",
-      "branch": "main",
-      "frame": "03hb83kesk5o532c2hf9k1tr6"
-    },
-    {
-      "id": "98027ecc-f121-44b4-b228-c72e7baca573",
-      "ts": "2026-11-27T05:05:26Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:cv-hisolutions-packet",
-      "action": "drive freebuff CV prose via jev (0.86)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
-      "branch": "main",
-      "frame": "03hb830ufe6w1xpt3bodju51u"
-    },
-    {
-      "id": "dd991332-0469-4c7f-9388-05ae1fb6018c",
-      "ts": "2026-11-27T05:05:26Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:wallpaper-6-publish-plate",
-      "action": "drive wallpaper publish via jev (0.76)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
-      "branch": "main",
-      "frame": "03hb830twemzg1jw03gryv8qg"
-    },
-    {
-      "id": "37902092-b6f8-40b6-94ff-835272d351f2",
-      "ts": "2026-11-27T05:01:40Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-2-publish-cv",
-      "action": "landed: CV site republished — matt:build same store 5kx31c1; matt:deploy:prod live https://160c5204.matt-9pf.pages.dev (0 new/28 uploaded); matt:cv:check 14 ok 0 failed, all 6 CV PDFs application/pdf and sha == artifact (cv fc8f7b9fe0f7 43352B, cv-de 3f801d2bb89b); agents:cv:publish-check 6/6 linked; site:check PASS. Packet intact: anschreiben 43ae2250 24851B, lebenslauf af897c74 42442B, 700/600 | gate: matt:cv:check PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/matt",
-        "lib/matt-site.nix"
-      ],
-      "files": [],
-      "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
-      "branch": "main",
-      "frame": "03hb82abmjte9px0c0r2lejsm"
-    },
-    {
-      "id": "f42653d5-46f4-4c3a-babd-f6cb771d81b0",
-      "ts": "2026-11-27T04:59:58Z",
-      "source": "wallpaper-worker",
-      "subject": "nixconfig:wallpaper-5-publish-plate",
-      "action": "verified: 0 waiting non-held plates in plates.txt (501 kept, 3 held) and 0 due in briefs.json; latest 2026-11-27/meadow-sleep.png on origin/main 771e9d2f; gate: checks:images (785/785) + checks:image-daily PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/image-daily/"
-      ],
-      "files": [],
-      "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
-      "branch": "main",
-      "frame": "03hb81yf4gbttgmwhmh78tj6s"
-    },
-    {
-      "id": "1c16cdf6-fa5e-478a-8709-2210a49fa76c",
-      "ts": "2026-11-27T04:59:21Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:wallpaper-5-publish-plate",
-      "action": "publish next wallpaper plate from roster",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/image-daily/"
-      ],
-      "files": [],
-      "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
-      "branch": "main",
-      "frame": "03hb81u0rqtt12jr0z9oep4as"
-    },
-    {
-      "id": "2c5835ce-6ad4-4441-b8c5-f9b925b2c290",
-      "ts": "2026-11-27T04:59:21Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-2-publish-cv",
-      "action": "publish CV and application packet to site",
-      "outcome": "in_progress",
-      "claims": [
-        "Documents/ryoku-cv/"
-      ],
-      "files": [],
-      "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
-      "branch": "main",
-      "frame": "03hb81tz60trtjhb1gkohxtqi"
-    },
-    {
-      "id": "beea627b-45ee-43b2-960c-26c7e19a4519",
-      "ts": "2026-11-27T04:53:15Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-pane5-wall-hold-clean",
-      "action": "jev hold-clean 0.95/0.90; wall caught up, pane 5 idle",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
-      "branch": "main",
-      "frame": "03hb80n3pp4og93lv5hyx51kg"
-    },
-    {
-      "id": "b5fe2d7c-1b0a-48ad-bb38-6c1eb51680f2",
-      "ts": "2026-11-27T04:51:07Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-hisolutions-ag-cv",
-      "action": "landed: hiSolutions letter reviewed vs the ad (3y consulting requirement answered from the Bountystash record; pinning claim corrected); packet rebuilt with letter, anschreiben 1p/24.8KB + lebenslauf 2p; letter-pdf-check + typst page gate PASS; row applyUrl set to karriere.hisolutions.com/jobs/68820855, stage prep, send held to 2026-12-07 | gate: checks:appflow PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
-      "branch": "main",
-      "frame": "03hb8086q55vg4rfh3mgqkx1t"
     }
   ]
 }

@@ -5,6 +5,7 @@
 {
   # name -> kind
   byName = {
+    "checks:agents:xs-post" = "leaf";
     "checks:appflow" = "leaf";
     "checks:appflow:gate" = "leaf";
     "checks:appflow:resolve" = "leaf";

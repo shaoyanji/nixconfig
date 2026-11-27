@@ -83,6 +83,7 @@ tasks:
       - task: checks:ports:test
       - task: checks:images
       - task: checks:images:test
+      - task: checks:agents:xs-post
       - task: checks:counts
       - task: checks:counts:test
       - task: checks:inventory:compiled:test
@@ -551,6 +552,22 @@ tasks:
       did not.
     cmds:
       - bash scripts/task/codespace-sync-test.sh
+
+  checks:agents:xs-post:
+    desc: "[gate] xs-turn-post COMMITS validation: space-separated list exits 2"
+    summary: >
+      Offline cases for the COMMITS guard in scripts/task/xs-turn-post.sh
+      (scripts/task/xs-turn-post-test.sh): a space-separated list is refused at
+      validation before anything is queued, comma-separated input lands in the
+      offline queue with the hashes intact, and a copy with the guard stripped
+      must stop refusing — the negative control.
+
+      The regression it locks: "abc1234 def5678" is one element to the shim,
+      which 400s, and a 400 is poison in the queue replay — the turn is parked
+      in queue.rejected.jsonl, never sent (incident 2026-11-26). Exit 0 = every
+      case held, 1 = one did not.
+    cmds:
+      - bash scripts/task/xs-turn-post-test.sh
 
   checks:kg:
     desc: "[gate] Knowledge-graph schema and all six query patterns still agree"

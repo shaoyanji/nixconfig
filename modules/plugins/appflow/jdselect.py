@@ -58,6 +58,7 @@ STOPWORDS = frozenset(
     aufgaben aufgabenbereich kenntnisse erfahrung team teams bereich stellen mitarbeit
     unterstützung verantwortung umsetzung entwicklung betreuung sicherstellung
     mitwirkung anforderungen profil aufgabengebiet
+    kunde kunden projekt projekte projekten unternehmen optional
     """.split()
 )
 
@@ -273,17 +274,22 @@ def select(resume, jd_text, budget, glossary=None):
         if not highlights:
             continue
         ranked = rank(highlights, lambda h: ranker.score(h, weights))
-        best = ranked[0][0] if ranked else 0.0
+        positive = [index for score, index, _ in ranked if score > 0.0]
         # A role with no line about this job keeps its lead lines. That is a
         # visible fallback, not a guess: the audit records `matched: false` and
         # the reader can see the role carried nothing the description asked for.
-        if best <= 0.0:
+        #
+        # Every line that matches is material up to the cap. It used to keep only
+        # those above half the best score, which one outlier silently decided: the
+        # HiSolutions Kubernetes packet scored its CI line at 13.2 and every other
+        # match below 6.6, so the CV carried one bullet and dropped the fleet the
+        # letter opens with. The scores stay in the audit, so a weak match is
+        # visible rather than hidden by a threshold.
+        if not positive:
             chosen = list(range(min(FALLBACK_HIGHLIGHTS, budget["maxHighlights"], len(highlights))))
             matched = False
         else:
-            floor = best * 0.5
-            strong = [index for score, index, _ in ranked if score > 0.0 and score >= floor]
-            chosen = sorted(strong[: budget["maxHighlights"]])
+            chosen = sorted(positive[: budget["maxHighlights"]])
             while len(chosen) < budget["minHighlights"]:
                 for _, index, _ in ranked:
                     if index not in chosen:

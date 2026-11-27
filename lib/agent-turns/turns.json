@@ -1,8 +1,47 @@
 {
-  "generated": "2026-11-27T06:42:32Z",
+  "generated": "2026-11-27T07:08:29Z",
   "count": 200,
-  "pin": "a29b96baa5062058e6f0aadadbf7dd276764377a99612792e790b5654c6f8c5d",
+  "pin": "03c981459819011c2d42cbc406fafed90441ee38220c83cbd1ac3b1112c26fc4",
   "turns": [
+    {
+      "id": "2ee17380-95ad-47fa-a0dc-482904924f61",
+      "ts": "2026-11-27T07:06:37Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-packet",
+      "action": "freebuff cv-packet done: Hisolutions packet reviewed, cv-links and cv-ats checks run, lib/matt CV fixes applied; pane idle at prompt",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5ff0947f2bd9e0d38bad74b298dbef3c3de5ecd7",
+      "branch": "main",
+      "frame": "03hb8qozjs2uhz4n0ajaww386"
+    },
+    {
+      "id": "0ecb05c7-2a8a-4e6e-9091-636d638e7125",
+      "ts": "2026-11-27T06:51:42Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-packet",
+      "action": "freebuff: review Hisolutions CV packet; run cv-links and cv-ats checks",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "5ff0947f2bd9e0d38bad74b298dbef3c3de5ecd7",
+      "branch": "main",
+      "frame": "03hb8ns6689nrjjgowtila280"
+    },
+    {
+      "id": "c1866836-1f6e-4f87-af63-d448502d807b",
+      "ts": "2026-11-27T06:43:01Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-hisolutions-ag-2026-11-27",
+      "action": "landed: AGENTS.nix handoff note freebuff-hisolutions-ag-2026-11-27 (HiSolutions packet: letter names employer, German CV bullets fixed, letter-pdf-check + cv-ats-check + checks:appflow PASS, 1p letter / 2p CV, site redeployed, send held to 2026-12-07). Committed via the documented ALLOW=AGENTS.nix exception in scripts/task/repo-blobs.sh (index blob 519KiB, printed as allowed), pushed to origin/main. | gate: checks:nix:format PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "5ff0947f2bd9e0d38bad74b298dbef3c3de5ecd7",
+      "branch": "main",
+      "frame": "03hb8m30yxqlk0wivj7zysmcq"
+    },
     {
       "id": "7c8cd4ea-8495-4a8c-94d2-42a37e303c55",
       "ts": "2026-11-27T06:42:23Z",
@@ -3026,49 +3065,6 @@
       "base_commit": "016b644c88d44f996207a286ecaa601fb223b367",
       "branch": "main",
       "frame": "03hb3xsz36nkmg8k5hjurqkj6"
-    },
-    {
-      "id": "927d2547-e117-4cc8-b137-60f9a595ca90",
-      "ts": "2026-11-26T16:21:10Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:restic-drill-unit",
-      "action": "host-change|0.58|0.33999999999999997: restic_drill_through_unit (take…",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/frieren/infra-stack.nix"
-      ],
-      "files": [],
-      "base_commit": "016b644c88d44f996207a286ecaa601fb223b367",
-      "branch": "main",
-      "frame": "03hb3xq7ahglrhz4l5x60079t"
-    },
-    {
-      "id": "d561ec3b-f57d-41d0-9f06-68c854c1e8a1",
-      "ts": "2026-11-26T16:20:22Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-packet-pdf-audit",
-      "action": "landed: packet letter now gets a read-back (subject, salutation, every paragraph, closing, tagged) instead of page count only; proven on the shipped hisolutions packet (passes) and against the CV text (fails with 5 named defects); packet rebuilt, 1p/2p, same bytes | gate: checks:quick PASS + packet build PASS",
-      "outcome": "done",
-      "claims": [
-        "modules/plugins/appflow"
-      ],
-      "files": [],
-      "base_commit": "016b644c88d44f996207a286ecaa601fb223b367",
-      "branch": "main",
-      "frame": "03hb3xkkwk9pr8fbwlrfemabo"
-    },
-    {
-      "id": "b54922b3-82e0-4364-a40f-6b873b811b5a",
-      "ts": "2026-11-26T16:19:31Z",
-      "source": "devin",
-      "subject": "nixconfig:intents-test-green",
-      "action": "landed: censusVerbOf accepts epistemic markers (piped kind prefixes no longer fall to ? noise); verbAuditOf makes the audit a corpus function — fixture pins logic on a fixed corpus, live snapshot gets structural assertions only | gate: checks:intents:test all cases ok + checks:quick PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6e5d12c3da45dac59859dc6523673500ff52cf61",
-      "branch": "main",
-      "frame": "03hb3xemsuupkhbfdpd022985"
     }
   ]
 }

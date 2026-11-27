@@ -11,9 +11,9 @@
     {
       "name": "Bountystash",
       "highlights": [
-        "Built and runs a twenty-five-host NixOS fleet as one flake: a feature list per host, a module per service, secrets encrypted with sops behind the fleet's own SSH certificate authority",
+        "Built and runs a twenty-five-host NixOS fleet as one flake: a feature list per host, a module per service, secrets encrypted with SOPS behind the fleet's own SSH certificate authority",
         "Gated infrastructure changes with inventory-driven CI and a per-host module check, so a broken host definition fails before a deploy",
-        "Wrote a sentinel that logs job status, generation age, disk and memory pressure every 15 minutes and pages when a service fails",
+        "Wrote a sentinel that logs job status, generation age, disk and PSI pressure every 15 minutes and pages when a service fails",
         "Built a Go service, still in development; no external users yet: Postgres work_versions, exact hashes over canonical JSON, a quotient hash over the fields a reviewer sees, append-only events, and Go tests (github.com/shaoyanji/bountystash)"
       ]
     },

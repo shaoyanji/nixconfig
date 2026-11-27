@@ -45,6 +45,7 @@ EXPECTED=(
   "a projection says it is one"
   "highlights are capped"
   "a matching role keeps matching lines"
+  "the cap, not a threshold, decides which matching lines survive"
   "a role with no overlap keeps its lead line"
   "kept lines come from the corpus"
   "kept lines keep the role's order"
@@ -138,8 +139,19 @@ assert "a matching role keeps matching lines" '
   [.work[] | select(.name == "Acme") | .highlights[] | test("Kubernetes")] | any
 ' jd.json "the Kubernetes role kept no Kubernetes line"
 
-assert "a role with no overlap keeps its lead line" '
-  (.work[] | select(.name == "Boxtop") | .highlights) == $corpus[0].work[1].highlights
+# The cap is what narrows a role, not a score cut-off. It used to keep only the
+# lines above half the best score, which let one outlier decide: on the
+# HiSolutions Kubernetes packet the CI line scored 13.2, every other match fell
+# below 6.6, and the CV dropped the fleet line its letter opens with. A line that
+# matches at all is material while the cap has room, and the audit keeps the
+# scores so a weak one stays visible.
+run cap.json --resume "$corpus" --jd "$here/fixtures/jd-kubernetes.txt" \
+  --audit "$work/cap.report" --max-highlights 5 --max-projects 3
+assert "the cap, not a threshold, decides which matching lines survive" '
+  [ $report[0].work[] | select(.name == "Acme") | .dropped[] | select(.score > 0) ] | length == 0
+' cap.json "a line that matched the description was dropped while the cap had room" "$work/cap.report"
+
+assert "a role with no overlap keeps its lead line" '  (.work[] | select(.name == "Boxtop") | .highlights) == $corpus[0].work[1].highlights
   and ($report[0].work[] | select(.name == "Boxtop") | .matched == false)
 ' jd.json "the unrelated role was scored as matched or lost a line" "$work/jd.report"
 

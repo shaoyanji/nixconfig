@@ -13,8 +13,8 @@
       "highlights": [
         "Baute und betrieb eine NixOS-Flotte, die als ein Flake deklariert ist: jeder Host eine Feature-Liste, jeder Dienst ein Modul, Secrets mit SOPS verschlüsselt hinter der eigenen SSH-Zertifizierungsstelle der Flotte.",
         "Sicherte Infrastrukturänderungen mit CI aus der Inventardatei und einem Modul-Check je Host ab, sodass eine fehlerhafte Host-Definition vor dem Deploy scheitert.",
-        "Schrieb einen Sentinel-Job, der Job-Status, Generation-Alter, Disk- und PSI-Druck alle 15 Minuten protokolliert und alarmiert, wenn ein Dienst ausfällt",
-        "Baute einen Go-Dienst, noch in Entwicklung und ohne externe Nutzer: Postgres-work_versions, exakte Hashes über kanonisches JSON, ein Quotienten-Hash über die Felder, die eine prüfende Person sieht, append-only Ereignisse und Go-Tests (github.com/shaoyanji/bountystash)"
+        "Schrieb einen Sentinel-Job, der Job-Status, Generation-Alter, Disk- und PSI-Druck alle 15 Minuten protokolliert und alarmiert, wenn ein Dienst ausfällt.",
+        "Baute einen Go-Dienst, noch in Entwicklung und ohne externe Nutzer: Postgres-work_versions, exakte Hashes über kanonisches JSON, ein Quotienten-Hash über die Felder, die eine prüfende Person sieht, append-only Ereignisse und Go-Tests (github.com/shaoyanji/bountystash)."
       ]
     },
     {
@@ -58,7 +58,7 @@
         "SSH-Zertifizierungsstelle",
         "SOPS und age",
         "GitHub Actions",
-        "inventargetriebene CI",
+        "CI aus der Inventardatei",
         "Binary-Cache",
         "Remote-Builder"
       ]

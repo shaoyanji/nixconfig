@@ -1,8 +1,108 @@
 {
-  "generated": "2026-11-27T07:45:35Z",
+  "generated": "2026-11-27T08:00:42Z",
   "count": 200,
-  "pin": "f898ce2ab07c62afcedb826c16d57d8bbe4ee077aa94d13701f6e0b4e6f56e33",
+  "pin": "da5348954b11c108e9153f2b74730a63841c8eaac0fa925c92dcafdb21662424",
   "turns": [
+    {
+      "id": "abfdc52f-a401-4796-b16f-b5c90dfc8fce",
+      "ts": "2026-11-27T07:57:11Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-note-change",
+      "action": "done freebuff note-change: f77ec7fa skills + e1131a45 AGENTS.nix ceiling, pushed origin/main",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "f77ec7fab0ddd4b47f43bb9de1fb9e8cccc122a0",
+      "branch": "main",
+      "frame": "03hb90kqxblwiukp6m3bhavu7"
+    },
+    {
+      "id": "644a6c7c-6a9e-40d6-9c66-6847b601aa49",
+      "ts": "2026-11-27T07:56:39Z",
+      "source": "freebuff",
+      "subject": "nixconfig:agents-nix-ceiling-skills",
+      "action": "landed: committed the 12 untracked skills (f77ec7fa) and gave AGENTS.nix a shrink-only ceiling in repo-blobs.sh (e1131a45); trim plan measured: 36 sweep notes hold 104.6KB, compressing the 8 largest frees 29.7KB | gate: repo-blobs --index PASS, kg-check PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f77ec7fab0ddd4b47f43bb9de1fb9e8cccc122a0",
+      "branch": "main",
+      "frame": "03hb90gwbv470std9qnd3oh1q"
+    },
+    {
+      "id": "1ab8af9b-9b4a-4c3c-984d-839b9a200824",
+      "ts": "2026-11-27T07:56:22Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-note-change",
+      "action": "drive freebuff note-change: gate the ceiling, commit untracked skills, push origin/main",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "f77ec7fab0ddd4b47f43bb9de1fb9e8cccc122a0",
+      "branch": "main",
+      "frame": "03hb90ew9uwjvcoor34wv39hd"
+    },
+    {
+      "id": "75d4bff4-8876-4096-81eb-7b74955d6c55",
+      "ts": "2026-11-27T07:51:51Z",
+      "source": "freebuff",
+      "subject": "nixconfig:strata-inkling-note",
+      "action": "landed: strata-inkling-mini-2-eisen experiment note in AGENTS.nix; blob gate refused the commit (AGENTS.nix 531KiB in HEAD, >512KiB), committed with the documented ALLOW=AGENTS.nix exception; file still needs a trim | gate: repo-blobs --index allowed-by-exception, nix fmt/census PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fb91f74fa1d045a787502ea8ee2ecf6e5e70b7e2",
+      "branch": "main",
+      "frame": "03hb8zj8umnk99r5a6a2c4cof"
+    },
+    {
+      "id": "cbe735b5-fa86-44e6-890e-9cc0e8e53d5f",
+      "ts": "2026-11-27T07:50:04Z",
+      "source": "devin",
+      "subject": "nixconfig:zeno-reconcile",
+      "action": "reconcile scout: worktree clean; no staged/unstaged/untracked paths. zeno-stage1 b2dce86c is the only local commit. Local origin/main is stale (+1/-0); live GitHub main 06bff2e5 makes zeno +1/-4. The local commit touches flake/host-inventory.nix and hosts/zeno/*.nix. Remote main touches CV/wall/appflow/turns, not zeno scaffold. Recommend fetch+rebase zeno-stage1 onto origin/main with backup branch; regenerate/resolve turns pin. No merge or fresh clone.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "9b284f018a1dfdf501fd504f96d75cd90077fbb4",
+      "branch": "main",
+      "frame": "03hb8z6l36t3d00g4spw3fb0l"
+    },
+    {
+      "id": "19f10c5c-8dd6-42a0-8d56-0d0da767f1fd",
+      "ts": "2026-11-27T07:46:25Z",
+      "source": "freebuff",
+      "subject": "nixconfig:delphi-health-fix",
+      "action": "claim: orchestrate panes 2(agy zeno VPS deploy)+3(devin); fix delphi private-deals/8100 collision after zeno deploy completes",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi",
+        "modules/services/private-deals.nix"
+      ],
+      "files": [],
+      "base_commit": "9b284f018a1dfdf501fd504f96d75cd90077fbb4",
+      "branch": "main",
+      "frame": "03hb8ygy1fkl126msfodxt6z5"
+    },
+    {
+      "id": "1713df6c-ebd3-4af7-9983-bdced41d031d",
+      "ts": "2026-11-27T07:46:20Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-note-commit",
+      "action": "note-change: commit AGENTS.nix strata note, push origin/main",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "06bff2e5c346918bb69890c2390eeea99717eee5",
+      "branch": "main",
+      "frame": "03hb8ygbms9vqpx8g3nb9ihiw"
+    },
     {
       "id": "06ca3cdb-6a14-4833-b8a3-426ee3251945",
       "ts": "2026-11-27T07:44:47Z",
@@ -2945,110 +3045,6 @@
       "base_commit": "46e401129415e0f79b19af06a7b93b3e7fe52634",
       "branch": "main",
       "frame": "03hb40rqxgxjzb97ij0q7pcfp"
-    },
-    {
-      "id": "5422230b-2f20-410f-b2a2-476acdd67eca",
-      "ts": "2026-11-26T16:35:27Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:frieren-gates-audit",
-      "action": "incident|0.66|0.5: checks_quick_and_hosts_audit (take over)",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/frieren",
-        "taskfiles/checks.yml"
-      ],
-      "files": [],
-      "base_commit": "28f54a28ae51abeee22abfd7422dec81009edad2",
-      "branch": "main",
-      "frame": "03hb40ilv1mkrta4dpisygk74"
-    },
-    {
-      "id": "da005584-fed0-48b5-afca-849e186b0b6b",
-      "ts": "2026-11-26T16:35:04Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-endpoints-smoke",
-      "action": "task-change|0.27|0.05000000000000002: delphi_services_endpoints_smoke…",
-      "outcome": "in_progress",
-      "claims": [
-        "docs/delphi-runtime.md"
-      ],
-      "files": [],
-      "base_commit": "28f54a28ae51abeee22abfd7422dec81009edad2",
-      "branch": "main",
-      "frame": "03hb40fzbchvti8rqney2ctkw"
-    },
-    {
-      "id": "ce17caf7-d2c3-4d97-a758-932240ebff07",
-      "ts": "2026-11-26T16:35:02Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:skills-sync-backport",
-      "action": "bug-fix|0.71|0.62: skills_sync_backport (take over)",
-      "outcome": "in_progress",
-      "claims": [
-        ".agents/skills"
-      ],
-      "files": [],
-      "base_commit": "28f54a28ae51abeee22abfd7422dec81009edad2",
-      "branch": "main",
-      "frame": "03hb40fqmeoc84abexvgd92sw"
-    },
-    {
-      "id": "3c11575f-fe1e-4dab-9282-e86f9e592d13",
-      "ts": "2026-11-26T16:34:55Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-smoke-taskfile",
-      "action": "claim: wire portfolio-smoke.py as agents:portfolio:smoke, doc clanker-runner + the task, commit via temp index so Pane 3's staged inventory-site work is untouched",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/agents.yml",
-        "docs/portfolio-services.md"
-      ],
-      "files": [],
-      "base_commit": "21d12437b1dca3ecdae827c49811b33cfa12a7ca",
-      "branch": "main",
-      "frame": "03hb40ezp78vaqq7sh6nwk2g9"
-    },
-    {
-      "id": "cc5c3bd3-e5c9-4434-b503-48789453cb50",
-      "ts": "2026-11-26T16:34:45Z",
-      "source": "buffy",
-      "subject": "nixconfig:nix-comments-headroom",
-      "action": "landed: dropped 22 label-only comments in modules/config/shells and modules/profiles/boot.nix; header 6492 -> 6470 against the unchanged 6495 ceiling, headroom 3 -> 25. No pointer, measurement or date was removed; ceiling untouched | gate: checks:quick PASS (checks:nix:comments + fixture) and devShells still evaluate",
-      "outcome": "done",
-      "claims": [
-        "modules",
-        "flake"
-      ],
-      "files": [],
-      "base_commit": "28f54a28ae51abeee22abfd7422dec81009edad2",
-      "branch": "main",
-      "frame": "03hb40dpqqo5b853bj0uuxeal"
-    },
-    {
-      "id": "7fcbde2b-f47d-4136-979c-dfc6a88dba28",
-      "ts": "2026-11-26T16:33:21Z",
-      "source": "devin",
-      "subject": "nixconfig:clanker-disk-cleanup",
-      "action": "landed: incident analysis — disk full of deliberate live workload, not waste; gc dry-run 0 dead, optimise 25MiB; root 94-92 after safe cleans; cause: imperative profile-7 pins torch/triton/chromium (~4G ML+TTS) over the lean hm generation, squatter services dsh:18900 + hilbert svc-demo; drift accepted by operator, monitor at 97 | gate: instabox:exec firsthand",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "8cf3f324e5639265f2cfc706e0cf8170a1b5ce97",
-      "branch": "main",
-      "frame": "03hb403ut4int0p8iws11px4s"
-    },
-    {
-      "id": "0260a51e-f393-4713-81cc-1b56141bebb6",
-      "ts": "2026-11-26T16:33:08Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-tree-reconcile",
-      "action": "delphi /root/Documents/nixconfig: clean main at e1216fa2 (10-26), never fetched, secrets submodule uninitialised, named by no unit or /etc/nixos file. Different history from here (same subject as 57679c54), so it cannot fast-forward to what runs; a rebuild there would run October. Runbook now says the switch reads only an archived source. Local main also holds the deployed commits with no remote. No AGENTS.nix note: 678 bytes under the blob gate.| gate: docs budget 114/400, blobs --index clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "21d12437b1dca3ecdae827c49811b33cfa12a7ca",
-      "branch": "main",
-      "frame": "03hb402bsn474of440t4xz0ic"
     }
   ]
 }

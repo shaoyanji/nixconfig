@@ -1,8 +1,89 @@
 {
-  "generated": "2026-11-27T23:35:59Z",
+  "generated": "2026-11-27T23:43:42Z",
   "count": 200,
-  "pin": "b15be4cb10e9f4fe9a37cb46a13d6f2f18a72f9a06388a1eab3ff8bf4945e099",
+  "pin": "da235f9829df270c610c8ad0934f2ec9a7cc7cf10413dd6c7c1d8d73190b9e0f",
   "turns": [
+    {
+      "id": "3aefb5f4-a133-4c04-b1d1-2bb27c2d847d",
+      "ts": "2026-11-27T23:40:38Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-cv-ats-publish-1-0-2026-11-28",
+      "action": "publish 1.0: no drift — origin/main 494c8a17 builds .#sites.cv-ats-site 6/6 (index sha f5ada59c, report ok), and all 9 live files at cv-ats-8lh.pages.dev byte-match that build; surface already landed as 2ca9a316, still in history, so no new commit or push was needed. | gate: nix build .#sites.cv-ats-site PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/matt",
+        ".#sites.cv-ats-site"
+      ],
+      "files": [
+        "lib/cv-ats-site.nix",
+        "lib/cv-ats-report.py",
+        "lib/matt-site.nix",
+        "flake/packages.nix",
+        "taskfiles/site-manifest.json"
+      ],
+      "base_commit": "db40d4fa3519d1e1ca48af45b302d9fa0f62f85f",
+      "branch": "main",
+      "frame": "03hbe4vfowqr1v5ufyvi8vv02"
+    },
+    {
+      "id": "32998e61-afe5-473e-95be-db27d0087644",
+      "ts": "2026-11-27T23:40:37Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-egress-note",
+      "action": "note-change: finish egress-lanes-research note, pay AGENTS.nix ceiling, schema gate, push",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "db40d4fa3519d1e1ca48af45b302d9fa0f62f85f",
+      "branch": "main",
+      "frame": "03hbe4v89uduntax7984y3xf3"
+    },
+    {
+      "id": "c5f6dec1-1157-45d3-bdac-88c07120a6d1",
+      "ts": "2026-11-27T23:40:36Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-ats-publish",
+      "action": "publish 1.0: expose CV ATS audit as static surface (.#sites.cv-ats-site), verify live pages, push",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/sites",
+        "lib/matt"
+      ],
+      "files": [],
+      "base_commit": "db40d4fa3519d1e1ca48af45b302d9fa0f62f85f",
+      "branch": "main",
+      "frame": "03hbe4v73b854zved8b4vyckw"
+    },
+    {
+      "id": "0cbe9ad6-2bc1-4377-a7c8-f88879447eba",
+      "ts": "2026-11-27T23:40:21Z",
+      "source": "buffy",
+      "subject": "nixconfig:egress-note-final-2026-11-28",
+      "action": "claim: finish the egress note (order, cold/warm/direct numbers, lane identity), pay the shrink-only ceiling, gate, push",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "494c8a1798a8bfff303412f5f431978c60f118f6",
+      "branch": "main",
+      "frame": "03hbe4tg04jfgoffs1zuigo26"
+    },
+    {
+      "id": "570e7c8b-ae69-4116-a160-76eafa980327",
+      "ts": "2026-11-27T23:36:29Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-egress-ips-2026-11-28",
+      "action": "landed: lane identities verified from delphi — bulk reflects 92.5.115.103 (AS31898 Frankfurt; ifconfig.co disagrees, AS13285/GB), frieren answers tailscale ping direct at 79.215.107.59 (AS3320 Telekom, Waldkirch), lumi has no direct path (DERP dfw only) so 93.127.139.146 (AS401479 Database Mart, Kansas City) stays a lookup not an observation; note records both and why the US lane is untestable | gate: agents-notes-schema PASS + repo-blobs --index clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "494c8a1798a8bfff303412f5f431978c60f118f6",
+      "branch": "main",
+      "frame": "03hbe4289h6li7zz2divi0wuo"
+    },
     {
       "id": "efdab6cb-6402-4dcc-8f97-55fbb9bc533c",
       "ts": "2026-11-27T23:35:11Z",
@@ -2894,73 +2975,6 @@
       "base_commit": "979a8f1a1677643d6f2fcaeff9097f6dfcecce7c",
       "branch": "zeno-stage1",
       "frame": "03hbaebpao6u2io5t6ylefqcv"
-    },
-    {
-      "id": "22f2078c-df8b-405e-b8aa-193d7951b136",
-      "ts": "2026-11-27T12:10:47Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-2-freebuff-cv-scout-2026-11-27",
-      "action": "landed: 3 sweeps over five boards (2026-11-27r, 0 new); mined the rejected card-markup list, filed 4 leads (AXA Köln 4, OGS Koblenz 4, JUMO Fulda 3, Hettich Tuttlingen 3); CV job-search table 146 rows; blog 5a59a35 pushed, Pages 45996313000 success, all four names live. Gate: agents:cv:publish-check PASS (6/6 hash-equal, 6/6 anchors resolve). checks:appflow red on mail-lane row discovered-wongdoody, untouched here.",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
-      "branch": "main",
-      "frame": "03hbae43sbe99yrt6n3xlb2np"
-    },
-    {
-      "id": "45b478d5-2288-4055-a31f-7f94b8a5abfb",
-      "ts": "2026-11-27T12:05:51Z",
-      "source": "devin",
-      "subject": "nixconfig:lumi-stage1",
-      "action": "landed: merged origin/zeno-stage1 into origin/main as 69e7bf8f; lumi VPS setup reproducible in repo (inventory, sops recipient, zeno scaffold, tailnet/Cloudflare ingress) | gate: checks:sops:drift PASS + checks:host HOST=lumi eval PASS + nixcachix CI run 45991578137 PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
-      "branch": "main",
-      "frame": "03hbad5e9zcmj6hxm8qpw6uiq"
-    },
-    {
-      "id": "7f8b3aa1-3758-41bd-822e-8e045e3bc707",
-      "ts": "2026-11-27T12:03:58Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-freebuff-cv-scout-2026-11-27",
-      "action": "publish: freebuff 2.1 CV scout sweep, job-search page + push",
-      "outcome": "in_progress",
-      "claims": [
-        "CV job-search page; publish-check gate; origin/main push"
-      ],
-      "files": [],
-      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
-      "branch": "main",
-      "frame": "03hbacs640zqyrtkatpoen1g1"
-    },
-    {
-      "id": "0c9f0e31-0ba2-41d0-9192-f598aafbc10f",
-      "ts": "2026-11-27T11:57:49Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-3-delphi-rate-limited",
-      "action": "drove pane3 via jev classify=publish p=0.94; task started (Thought 7.4s, explored 4 files, ran cmd) then free Gemini quota exhausted ~142h reset; backed off per skill",
-      "outcome": "blocked: free Gemini quota exhausted ~142h reset; pane idle at composer",
-      "claims": [],
-      "files": [],
-      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
-      "branch": "main",
-      "frame": "03hbabkvk8mz8u3mwdjmenkti"
-    },
-    {
-      "id": "338df7ff-1d97-4bc9-82f5-c727ef76d0cc",
-      "ts": "2026-11-27T11:56:28Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout",
-      "action": "Sweep 2026-11-27q: the five-board pipeline returned 1381 postings / 0 new employers, so the pass read the Stepstone arrows whose card markup hides the name — 3 untracked German leads filed as lead (Löwenstein Medical, New Monday, PerFact) and folded into the CV job-search table as their own block | gate: checks:appflow PASS (1737 applications)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
-      "branch": "main",
-      "frame": "03hbabbd44xp1hmw6cwq8ha30"
     }
   ]
 }

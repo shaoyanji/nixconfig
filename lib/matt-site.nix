@@ -952,9 +952,8 @@
       && !(lib.any (p: (p.resumeName or (p.name or "")) == "bountystash" && (p.period or "") == "2020 — 2025") (cvJson.projects or []))
     )
     "matt-site: EWE Trading is a three-month 2023 engagement; refusing another period"; let
-      # The exact payload the template reads, named beside the PDF: the build gate
-      # reads the finished document back against it, and `.#sites.cv-ats-site`
-      # publishes that same comparison rather than a second rendering of the data.
+      # The payload the template reads, named beside the PDF (`lib/cv-ats-site.nix`
+      # re-reads the same file through `scripts/task/cv-ats-check.sh`).
       record = pkgs.writeText "cv-${name}.json" (builtins.toJSON cvJson);
     in
       (pkgs.runCommand "matt-cv-${name}" {
@@ -963,9 +962,8 @@
           mkdir -p $out work
           cp ${./matt/cv.typ} work/cv.typ
           cp ${record} work/cv.json
-          # `ua-1` exports a tagged PDF: headings, lists and entries reach the structure
-          # tree, so a parser reads sections from it instead of rebuilding them from
-          # glyph positions. cv-ats-check refuses a PDF that lost the tree.
+          # `ua-1` exports a tagged PDF; `scripts/task/cv-ats-check.sh` refuses one
+          # that lost its structure tree (`lib/cv-ats-site.nix` builds this).
           typst compile --pdf-standard ua-1 --root work work/cv.typ $out/cv.pdf
           ${typeset.check {
             source = "work/cv.typ";
@@ -1161,6 +1159,5 @@ in
       }
       echo "matt-site: $(find $out -type f | wc -l) files, $(du -sb $out | cut -f1) bytes"
     ''
-    # The CVs and the records that built them, so a consumer (`.#sites.cv-ats-site`)
-    # audits this build's PDFs instead of rebuilding a second set that could differ.
+    # The CVs and their records, so `.#sites.cv-ats-site` audits these PDFs.
     // {inherit cvFiles;}

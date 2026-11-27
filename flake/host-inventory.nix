@@ -92,6 +92,15 @@ in
         (import ../hosts/delphi/disko.nix {device = "/dev/sda";})
       ];
     };
+
+    zeno = {
+      features = ["base" "containers" "disko"];
+      modules = [
+        ../hosts/zeno/configuration.nix
+        (import ../hosts/zeno/disko.nix {device = "/dev/vda";})
+      ];
+    };
+
     eisen = {
       features = ["base" "nixos" "dms"];
       modules = [../hosts/eisen/configuration.nix];

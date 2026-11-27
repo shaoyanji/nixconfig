@@ -16,8 +16,8 @@ title = "Fleet Device & Host Inventory"
 description = "Canonical hardware, operational status, network, and agent persona registry for all fleet devices."
 version = "1.1.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
-total_devices = 38
-active_nix_devices = 15
+total_devices = 39
+active_nix_devices = 16
 active_external_devices = 7
 wip_devices = 0
 preserved_devices = 16
@@ -306,6 +306,49 @@ system_prompt_hint = "You are the primary cloud outpost and ARM64 offload worker
 compute_tier = "cloud-lite"
 allowed_tasks = ["ARM64 compilation and package builds", "Offload task delegation from low-power nodes", "Tailscale exit node and network proxying", "Remote health monitoring"]
 constraints = ["Cloud security posture; only ports 22/80/443 and WireGuard direct ports allowed through the host firewall — OCI's security list gates 80/443 separately.", "2 OCPU / 11 GiB: never start a large nix build here; build on a builder and substitute."]
+
+[hosts.zeno]
+hostname = "zeno"
+status = "active"
+status_detail = "Low-resource x86_64 NAT VPS in Dallas (Stage 1 base NixOS + Tailscale + SOPS)."
+kind = "nixos"
+is_nix = true
+arch = "x86_64-linux"
+role = "Dallas NAT VPS (Stage 1 Base Landing)"
+category = "cloud"
+desktop_environment = "headless"
+users = ["devji"]
+notes = ["Shared IP 93.127.139.146 with NAT SSH on port 10033 -> 22.", "961 MiB RAM: never build locally (max-jobs = 0); substitute from GitHub CI Cachix or Cloudflare R2 edge."]
+
+[hosts.zeno.hardware]
+model = "KVM NAT VPS (Dallas)"
+cpu = "x86_64 KVM"
+gpu = "None"
+ram = "961 MiB RAM"
+storage_type = "VirtIO Disk (/dev/vda)"
+storage_layout = "35 GiB GPT (1M EF02 BIOS boot + ext4 / with 2 GiB swapfile)"
+
+[hosts.zeno.network]
+domain = ""
+tailscale = true
+tailscale_hostname = "zeno"
+tailnet_domain = "cloudforest-kardashev.ts.net"
+tailscale_ip = ""
+ssh_alias = "zeno"
+
+[hosts.zeno.software]
+module_chain = "globalModulesContainers"
+impermanence = false
+key_services = ["openssh (NAT 10033 -> 22)", "tailscaled"]
+services = [{ name = "openssh", port = 22 }, { name = "tailscale" }]
+traits = ["cloud-server", "x86_64", "1gb-ram", "nat-vps"]
+
+[hosts.zeno.persona]
+title = "Dallas NAT VPS (1 GB RAM)"
+system_prompt_hint = "You are a 1 GB RAM x86_64 NAT VPS in Dallas; substitute pre-built closures from Cachix/R2 and keep memory/disk footprint minimal."
+compute_tier = "strictly-constrained"
+allowed_tasks = ["Lightweight tailnet services", "Hermes agent pipelines (Stage 2)"]
+constraints = ["961 MiB RAM: max-jobs = 0; never compile locally.", "Shared NAT IP: public ingress only via forwarded port 10033 -> 22; use Tailscale for mesh access."]
 
 # ------------------------------------------------------------------------------
 # 2. PRIMARY DESKTOP WORKSTATIONS

@@ -2839,23 +2839,21 @@
         is how the OCI range gets blocklisted, which takes the exit node and DNS
         failover with it.
 
-        **Ranked (Jev 1.14.0).** Conditional cache 57%, broker 30%, research sink 7%,
-        the rest 1% each; cache-then-broker 61% on a second pass, at 0.52 confidence.
+        **Built, and ranked (Jev 1.14.0).** Cache 57%, broker 30%, sink 7%, the rest
+        1%; cache-then-broker 61% on a second pass at 0.52 confidence. `fetchcache`
+        keys a page by SHA-256 of the normalised URL, stores body, ETag,
+        Last-Modified and fetched-at, turns a stored validator into
+        `If-None-Match`, and moves fetched-at on a 304 at zero upstream bytes; the
+        three services adopt it with their caps intact. `fetch-broker` answers
+        `POST /v1/fetch` on the tailnet, owns the lanes through
+        `tailnet-forward-proxy`, and enforces the fallback rule itself.
 
-        **Top increment, built.** `modules/services/fetchcache` keys a page by
-        SHA-256 of the normalised URL and stores body, ETag, Last-Modified and
-        fetched-at; a stored validator becomes `If-None-Match`, and a 304 moves
-        fetched-at at zero upstream bytes. All three services adopt it with their
-        timeout and cap intact, so one URL is paid once instead of three times.
-
-        **Then the broker.** `modules/services/fetch-broker` answers `POST /v1/fetch`
-        on the tailnet and owns the lanes through `tailnet-forward-proxy`; mount and
-        portal card come from `profiles.serviceExposure`, and the fallback rule is
-        enforced in the broker rather than in each caller.
-
-        **Missing.** No lane has 20 URLs of measured MB-crossed and seconds-per-page,
-        no production repeat fetch has shown zero bytes, and the three commits were
-        never rebuilt or pushed, so "levered" is still a claim about shape.
+        **Measured (2026-11-28, delphi, 20 URLs).** Cold p50 154 ms, p95 823 ms,
+        1.40 MB upstream, 0.154 s a page; the set warm p50 46 ms, 0.085 MB, so a
+        repeat crosses 94% fewer bytes 3.3x faster; direct is p50 165 ms, so a miss
+        is free. Proxies are undeployed: `us` fell back 4/4, +150 ms over cold at a
+        112 ms hop; `local` 502s in 13 ms, no fallback, as designed. gnu.org timed
+        out (30 s bulk, 60 s direct) — the block the local lane exists for, unmeasured.
       '';
     };
     exp-120 = {

@@ -17,6 +17,8 @@
 # that host alone; the `globalModules*` names live only as `chainFeatures`
 # data, not something a host composes from.
 let
+  user = import moduleFiles."global.user";
+
   # The container floor, named leaf by leaf: base toolbox + shell + the
   # skills materialization (the only unconditional piece of user.ai) —
   # nine `containers` hosts share it. roles.minimal's user.ai wrapper is
@@ -26,9 +28,8 @@ let
   # The desktop HM chain — ten `nixos`+`dms` desktops share it; fern and
   # cassini deliberately fork a leaf each. Base and suite stay named so those
   # forks cannot drift from the chain they subtract from.
-  hmDesktopBase = ["minimal" "systemd-policy"];
-  hmDesktopSuite = ["shell" "dev" "ai" "browser" "media"];
-  hmDesktop = hmDesktopBase ++ hmDesktopSuite ++ ["desktop"];
+  inherit (user) hmDesktopBase hmDesktopSuite;
+  hmDesktop = user.hmFeatures;
 in
   # `kind` and `system` come from the compiled inventory — a registered host
   # must have an inventory.toml row, and its fields cannot drift from this

@@ -1,8 +1,91 @@
 {
-  "generated": "2026-11-27T13:53:20Z",
+  "generated": "2026-11-27T14:26:12Z",
   "count": 200,
-  "pin": "7b0546ceb0ef5c39cced9174de65a581c7bb33e00140cf4bc40161d4f115a72a",
+  "pin": "a1f938ec76775ee7cf6d883a5abe4d8b20eb7853faf846080a6ff5e584a7d79f",
   "turns": [
+    {
+      "id": "d2c11ee4-9046-4b68-81ea-f4c3f3ffe53e",
+      "ts": "2026-11-27T14:13:40Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-1-freebuff-cv-jobscout",
+      "action": "sweep: 2026-11-27w five boards 1381 parsed/59 fresh/0 new, arbeitnow 12 pages 78 in-lane/0 new (record 1747); sweep note published from 2abff58, Pages run 46013828265 success; 8 routes + 6 CV pdfs + 4 packet pdfs 200 | gate: live route sweep",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbb24b3eqf02prf3gz1fid8"
+    },
+    {
+      "id": "7e6ea05e-9bcc-43dd-9a79-d8e866364b4d",
+      "ts": "2026-11-27T14:11:11Z",
+      "source": "devin",
+      "subject": "nixconfig:feature-chain-closure",
+      "action": "start: audit all hosts for chain leaves still duplicated after the desktop-HM, microvm, linux/disko, and tailscale folds",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/module-sets.nix",
+        "flake/host-inventory.nix",
+        "modules",
+        "hosts"
+      ],
+      "files": [],
+      "base_commit": "4422d5e9f94cce3c9a33df1a2ce1a709dbe2e7af",
+      "branch": "HEAD",
+      "frame": "03hbb1msjkde989x64ptxsxwk"
+    },
+    {
+      "id": "423c9f9a-66e6-4e4c-8389-74c64b9b12a9",
+      "ts": "2026-11-27T14:11:06Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-1-devin",
+      "action": "re-drove agents:1.1 devin (prev 4422d5e9 landed): flake-change p=0.83 m=0.69; Thinking 3s confirmed",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
+      "branch": "HEAD",
+      "frame": "03hbb1m6hdx199ydcm495gjdc"
+    },
+    {
+      "id": "feee6bd9-3444-4386-93e9-745761ce282a",
+      "ts": "2026-11-27T14:09:33Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff",
+      "action": "drove agents:2.1 freebuff: publish p=0.86 m=0.76; working... 49s confirmed",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
+      "branch": "HEAD",
+      "frame": "03hbb1b9sqtq2j2g58et59ez1"
+    },
+    {
+      "id": "e6b49f86-aaf7-4213-ba12-929b9335a60c",
+      "ts": "2026-11-27T14:09:33Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-1-devin",
+      "action": "drove agents:1.1 devin: chain-change p=1.0 m=1.0; fresh Thinking 4s spinner confirmed",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
+      "branch": "HEAD",
+      "frame": "03hbb1b8qrpwuq8s0juk1zlys"
+    },
+    {
+      "id": "fcccf40b-68c8-4d7c-bcf3-5e1cbcbfdf91",
+      "ts": "2026-11-27T13:54:33Z",
+      "source": "devin",
+      "subject": "nixconfig:feature-chain-refactor-audit",
+      "action": "landed: named the shared desktop-HM base/suite and the microvm input feature; corrected stale chain comments | gate: drv-equality poseidon/fern/cassini 3/3 identical and testvm/frieren-canary 2/2 identical; checks:hosts poseidon+cassini+testvm PASS; checks:nix:lint PASS; docs:build PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "4422d5e9f94cce3c9a33df1a2ce1a709dbe2e7af",
+      "branch": "HEAD",
+      "frame": "03hbaydt5y1a56v41pi423o8a"
+    },
     {
       "id": "cfce21b0-5667-4cee-b825-2d187c26dca0",
       "ts": "2026-11-27T13:48:29Z",
@@ -2864,106 +2947,6 @@
       "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
       "branch": "main",
       "frame": "03hb4vw2e5lpcva52l2o7cq2a"
-    },
-    {
-      "id": "3f7e9aa5-654d-418e-b6da-1a80b4f7a85c",
-      "ts": "2026-11-26T19:15:59Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-devin-chain",
-      "action": "Route chain-change to devin: refactor host modules into feature chains",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/hosts"
-      ],
-      "files": [],
-      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
-      "branch": "main",
-      "frame": "03hb4vvj6rsv6ere28uvhyv96"
-    },
-    {
-      "id": "9c541357-a152-4e1d-8fb9-7b669e4b113d",
-      "ts": "2026-11-26T19:15:29Z",
-      "source": "buffy",
-      "subject": "nixconfig:add-inventory-sync-and-service-port-audit",
-      "action": "claim: audit inventory-sync coverage, add a service-port/endpoint check with offline tests",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/inventory-sync.py",
-        "tests/inventory-sync",
-        "taskfiles"
-      ],
-      "files": [],
-      "base_commit": "9025ac95b65a2c399aa36c80704e94071582631d",
-      "branch": "main",
-      "frame": "03hb4vs0eymon4oz28fqx4j6e"
-    },
-    {
-      "id": "46751923-1969-439b-8408-3d2146e45b6d",
-      "ts": "2026-11-26T19:14:41Z",
-      "source": "buffy",
-      "subject": "nixconfig:add-extract-on-push-to-web-research",
-      "action": "landed: --extract-on-push (+--extract-provider) sends extract:true on the same POST /api/links, counts extracted/extract_failed beside pushed/skipped/failed; 59 unit tests. Live: real binary + Firecrawl key -> 1 link, extraction_status ok provider firecrawl, 12311 chars, stats extracted 1; rerun skipped 1 + extracted 1 | gate: unittest 59 OK, checks:tasks PASS, checks:prose PASS (174), checks:docs:links PASS (189), budget 288/400",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/web-research.py",
-        "tests/web-research",
-        "taskfiles/agents.yml",
-        "docs/portfolio-services.md"
-      ],
-      "files": [],
-      "base_commit": "9025ac95b65a2c399aa36c80704e94071582631d",
-      "branch": "main",
-      "frame": "03hb4vmfq8h6wj6hibwjamcum"
-    },
-    {
-      "id": "bb6211ee-dc10-45c1-bfc5-dd7669e8f02e",
-      "ts": "2026-11-26T19:12:59Z",
-      "source": "devin",
-      "subject": "nixconfig:enhance-clanker-runner-job-templates-and-artifacts",
-      "action": "claim: clanker-runner artifacts, expanded templates, UI, tests",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/clanker-runner modules/services/clanker-runner.nix"
-      ],
-      "files": [],
-      "base_commit": "980d5096a6a5a99b2162bd527ada4469abd3dfeb",
-      "branch": "main",
-      "frame": "03hb4vai8xenwdtj5l9o43oui"
-    },
-    {
-      "id": "d56c1bad-1f58-4524-a8b7-b2672da1bbb4",
-      "ts": "2026-11-26T19:12:51Z",
-      "source": "buffy",
-      "subject": "nixconfig:add-extract-on-push-to-web-research",
-      "action": "claim: add extract-on-push to the link-vault push with status per link",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/web-research.py",
-        "tests/web-research",
-        "taskfiles/agents.yml"
-      ],
-      "files": [],
-      "base_commit": "980d5096a6a5a99b2162bd527ada4469abd3dfeb",
-      "branch": "main",
-      "frame": "03hb4v9gavwbjfqj3vfdzxb9y"
-    },
-    {
-      "id": "80cc6c4d-d5e7-4373-817f-0ab1de3d3b5a",
-      "ts": "2026-11-26T19:11:12Z",
-      "source": "buffy",
-      "subject": "nixconfig:build-web-research-to-link-vault-pipe",
-      "action": "landed: search --link-vault BASE (+--collection/--tags/--link-vault-token, LINK_VAULT_TOKEN) counts pushed/skipped/failed, 51 unit tests. Live: built link-vault CGO_ENABLED=0 in 3.7s, temp sqlite, real Tavily search 2 hits -> pushed 2, stats bookmarks 2 collections 1 tags 2, rerun skipped 2, server stopped | gate: unittest 51 OK, checks:tasks PASS, checks:prose PASS (174), checks:docs:links PASS (189), budget 283/400",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/web-research.py",
-        "tests/web-research",
-        "taskfiles/agents.yml",
-        "docs/portfolio-services.md"
-      ],
-      "files": [],
-      "base_commit": "980d5096a6a5a99b2162bd527ada4469abd3dfeb",
-      "branch": "main",
-      "frame": "03hb4uxviqfvmtmt0cvmagk5j"
     }
   ]
 }

@@ -117,11 +117,15 @@
     wants = ["network-online.target"];
   };
 
-  # Subnet router plus SNAT for the LAN portal, and `--accept-dns=false` so the
+  # Subnet router plus SNAT for the LAN portal, and no accepted DNS so the
   # resolver never queries through the address it serves. Why:
   # .agents/deploy/hosts/frieren.md §"Resolver networking".
+  fleet.tailscale = {
+    clientPolicy = true;
+    acceptDns = false;
+    acceptRoutes = false;
+  };
   services.tailscale.extraSetFlags = [
-    "--accept-dns=false"
     "--ssh=true"
   ];
   # The advertised routes (`192.168.3.0/24` + the DNS /32) are composed by

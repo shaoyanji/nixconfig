@@ -28,9 +28,9 @@ in {
   };
 
   config = lib.optionalAttrs hasExtraSetFlags {
-    services.tailscale.extraSetFlags = lib.mkIf cfg.clientPolicy (lib.mkDefault [
+    services.tailscale.extraSetFlags = lib.mkIf cfg.clientPolicy [
       "--accept-dns=${lib.boolToString cfg.acceptDns}"
       "--accept-routes=${lib.boolToString cfg.acceptRoutes}"
-    ]);
+    ];
   };
 }

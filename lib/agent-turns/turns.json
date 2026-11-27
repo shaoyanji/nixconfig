@@ -1,8 +1,69 @@
 {
-  "generated": "2026-11-27T06:15:46Z",
+  "generated": "2026-11-27T06:42:32Z",
   "count": 200,
-  "pin": "f6feb126f543a2aa4383cce10bf9625132c196177a92e7a73dbf115af1054626",
+  "pin": "a29b96baa5062058e6f0aadadbf7dd276764377a99612792e790b5654c6f8c5d",
   "turns": [
+    {
+      "id": "7c8cd4ea-8495-4a8c-94d2-42a37e303c55",
+      "ts": "2026-11-27T06:42:23Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-note-commit",
+      "action": "freebuff a2.1: commit AGENTS.nix handoff note; push origin/main",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "1081bdf9e874b7878e4fa991a86aa73158b580f9",
+      "branch": "main",
+      "frame": "03hb8lyntukhz8g50d0yhg6i1"
+    },
+    {
+      "id": "3cec22cd-61d7-4c56-93dc-074b94de46ab",
+      "ts": "2026-11-27T06:30:08Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:agy-image-daily-lane",
+      "action": "agy image-daily: continue wallpaper generation and publish",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/image-daily/"
+      ],
+      "files": [],
+      "base_commit": "1081bdf9e874b7878e4fa991a86aa73158b580f9",
+      "branch": "main",
+      "frame": "03hb8jkhh7ih7vi2ootvcdy4g"
+    },
+    {
+      "id": "ef25e608-50c5-4991-a0f0-53bfc1287791",
+      "ts": "2026-11-27T06:23:51Z",
+      "source": "antigravity",
+      "subject": "nixconfig:agy-image-daily-publish",
+      "action": "claim: review plates/rotation and add next wall-nixconfig variant, render, checks:images, publish, push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/image-daily/"
+      ],
+      "files": [],
+      "base_commit": "1081bdf9e874b7878e4fa991a86aa73158b580f9",
+      "branch": "main",
+      "frame": "03hb8ic8qujqq6zoi4s0drk23"
+    },
+    {
+      "id": "08c4abf2-cb71-4b06-99fe-8e959afb7a55",
+      "ts": "2026-11-27T06:16:14Z",
+      "source": "antigravity",
+      "subject": "nixconfig:agy-image-daily-publish",
+      "action": "landed: alpine-chalet-balcony plate kept (1536x1024), uploaded to Cloudinary + Pages (787/787), approved in rotation.json, pushed to origin/main | gate: checks:images + checks:image-daily PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "lib/image-daily/plates.txt",
+        "lib/image-daily/rotation.json"
+      ],
+      "base_commit": "1081bdf9e874b7878e4fa991a86aa73158b580f9",
+      "branch": "main",
+      "frame": "03hb8guqeljj4rnlijydicpb4"
+    },
     {
       "id": "952bfb67-cf03-465d-9199-0b3b8385e68b",
       "ts": "2026-11-27T06:14:55Z",
@@ -3008,65 +3069,6 @@
       "base_commit": "6e5d12c3da45dac59859dc6523673500ff52cf61",
       "branch": "main",
       "frame": "03hb3xemsuupkhbfdpd022985"
-    },
-    {
-      "id": "f902283e-31f4-47bd-b67b-3bc6effa7e4c",
-      "ts": "2026-11-26T16:19:13Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-timers-audit",
-      "action": "claim: taking over from tmux-pane-steward; incident|0.82|0.73 delphi timers and backup verify — auditing every timer's last run, failed units, and whether the postgres dump is real and on the restic chain",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/delphi/backups.nix"
-      ],
-      "files": [],
-      "base_commit": "dfb88cbde6e4191d1a0b6c59a80dfa9eb64730aa",
-      "branch": "main",
-      "frame": "03hb3xce4yp7x44buw6w6rzln"
-    },
-    {
-      "id": "48bf0937-a36a-4a9e-967c-e888748e4914",
-      "ts": "2026-11-26T16:19:05Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-timers-audit",
-      "action": "incident|0.82|0.73: delphi_timers_and_backup_verify (take over)",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/delphi/backups.nix"
-      ],
-      "files": [],
-      "base_commit": "40b7d1226bf1cf6a44e869382925541cf47ab4b1",
-      "branch": "main",
-      "frame": "03hb3xbltgh70q4sc7qocps5g"
-    },
-    {
-      "id": "ff74a707-9ebe-447a-b370-96d1e84f5543",
-      "ts": "2026-11-26T16:17:58Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-gdrive-sync-fix",
-      "action": "Cause: the mirror needs a Drive token only a browser consent mints; sops has the client pair, not the token, so ConditionPathExists was unmet on 55 ticks and each reported Result=success while 241/3530 messages' 24 MB tree (474 files) had one copy. Fix: gdrive.enable=false on delphi, tree joins offloadBridge beside the postgres dump -> frieren restic. Not deployed.| gate: checks:host delphi eval 2184 PASS, comments 6493/6495, docs 398/400, eval shows no gdrive unit and the new set",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "dfb88cbde6e4191d1a0b6c59a80dfa9eb64730aa",
-      "branch": "main",
-      "frame": "03hb3x3naecvgebfx6eljr25r"
-    },
-    {
-      "id": "bbbec9cf-299e-483a-915b-886678539dc8",
-      "ts": "2026-11-26T16:15:41Z",
-      "source": "devin",
-      "subject": "nixconfig:inventory-site-audit-qr",
-      "action": "claim: add inventory asset event audit history, warranty-expiry alerts with deduped ntfy delivery, printable SVG QR labels, UI surfacing, and full Go/Nix/live verification",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/inventory-site",
-        "modules/services/inventory-site.nix"
-      ],
-      "files": [],
-      "base_commit": "59bf181dfd8f34359d138c6b46137e5c28654244",
-      "branch": "main",
-      "frame": "03hb3wnjwkozhvr2nx78a79py"
     }
   ]
 }

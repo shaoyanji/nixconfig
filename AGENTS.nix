@@ -8667,5 +8667,52 @@
         with HTTP 200) and `task checks:images` passed (`784 row(s), 784 asset(s)`).
       '';
     };
+    freebuff-hisolutions-ag-2026-11-27 = {
+      title = "HiSolutions AG Senior Kubernetes packet: built, gated, nothing sent";
+      kind = "handoff";
+      status = "DELIVERED";
+      date = "2026-11-27";
+      summary = "HiSolutions AG Senior Kubernetes/DevOps packet built, gated and published: the letter names the employer, three German CV bullets are fixed, letter-pdf-check and cv-ats-check green, checks:appflow PASS, 1-page letter / 2-page CV. Nothing sent before 2026-12-07, and the note cannot land: AGENTS.nix is ~4 KiB over the 512 KiB blob gate at HEAD.";
+      refs = {
+        modules = [
+          "scripts/task/cv-ats-check.sh"
+          "scripts/task/letter-pdf-check.sh"
+          "scripts/task/repo-blobs.sh"
+          "lib/matt/lebenslauf.json"
+          "lib/matt/cv-software.de.json"
+        ];
+        tasks = ["checks:appflow" "matt:build" "matt:cv:check"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Landed in `0d4e0d42` (not pushed):
+        - `lib/matt/lebenslauf.json` — three Bountystash bullets: final stops,
+          `sops` -> `SOPS`, "inventargetriebener CI" -> "CI aus der Inventardatei",
+          rebuilds stated as reproducible rather than as history.
+        - `lib/matt/cv-software.de.json` — the two highlights quoting those bullets,
+          in lockstep; drift fails the build with `cv-variant: not in the de corpus`.
+        - `~/.config/appflow/lebenslauf.json` (live copy) took the same three fixes.
+          Never `matt:gist:sync-de`: it overwrites the PII block the packet renders.
+
+        Letter `~/.config/appflow/letters/hisolutions-ag-senior-kubernetes-expert-devops-engineer.json`:
+        employer named in P5, "Beratung ist mein Handwerk", the fleet as "eine
+        Deklaration: 25 NixOS-Hosts", "72.000 EUR Jahresgehalt brutto", English native;
+        the Kubernetes and Terraform limits stay stated rather than dropped.
+
+        Packet `~/.local/state/appflow/submissions/hisolutions-ag-senior-kubernetes-expert-devops-engineer`:
+        anschreiben.pdf 1 page, lebenslauf.pdf 2 pages, both tagged; dir 700, files 600.
+        Gates on the shipped bytes: `letter-pdf-check` ("the letter matches the record"),
+        `cv-ats-check`, typst page budget, `checks:appflow` PASS. Site
+        https://514b89be.matt-9pf.pages.dev redeployed; `matt:cv:check` 14 ok / 0 failed.
+
+        Blocker: this note cannot land yet. `AGENTS.nix` is 528,459 B at HEAD, ~4 KiB over
+        the 512 KiB gate in `scripts/task/repo-blobs.sh`, so pre-commit refuses every commit
+        that stages it. `ALLOW=AGENTS.nix` is the documented exception — a real trim or split
+        is the fix, not a permanent bypass.
+
+        Nothing is sent: `apps:send` refuses this row before 2026-12-07; hand-submit at
+        https://karriere.hisolutions.com/jobs/68820855/Senior-Kubernetes-Experte-DevOps-Engineer-w-m-d-
+      '';
+    };
   };
 }

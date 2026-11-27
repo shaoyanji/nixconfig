@@ -1,8 +1,51 @@
 {
-  "generated": "2026-11-27T23:22:27Z",
+  "generated": "2026-11-27T23:28:17Z",
   "count": 200,
-  "pin": "962ec48df92064332b67651611e7eb7c3e10e2ee92bcb022b7a5c9dd566003c4",
+  "pin": "dae1c70f8c95a9035ae12eb70207ba9279c2954d7df08fc0aad44d14cb60e1a3",
   "turns": [
+    {
+      "id": "8b225c82-02f0-4a19-a1a6-5f42fc9ba3be",
+      "ts": "2026-11-27T23:25:47Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-egress-perf-2026-11-28",
+      "action": "claim: record egress lane timings in the note, verify against live lane endpoints, push",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "734a4f4364ef482cb45829594fce7dfda73d384a",
+      "branch": "main",
+      "frame": "03hbe1z0ekdlrzzuf3s06u8xh"
+    },
+    {
+      "id": "3fc2c72f-5844-4c40-ab7c-9878a7d4f1e4",
+      "ts": "2026-11-27T23:25:28Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-egress-perf-2026-11-28",
+      "action": "record egress lane timings in note, verify vs live endpoints, push",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbe1wp6d932umm1bm7xojbr"
+    },
+    {
+      "id": "04888a31-3ad1-4bf1-8972-1b5cc81b6750",
+      "ts": "2026-11-27T23:22:46Z",
+      "source": "buffy",
+      "subject": "nixconfig:egress-bench-2026-11-28",
+      "action": "landed: 20-URL broker bench on delphi — cold p50 154 ms / 1.40 MB, warm p50 46 ms / 0.085 MB (94% fewer bytes, 3.3x), direct p50 165 ms; us fell back 4/4 (+150 ms at a 112 ms hop), local 502 at CONNECT in 13 ms, gnu.org datacenter-blocked. Recorded in the egress note | gate: agents-notes-schema PASS + repo-blobs --index clean (510 KiB/522082)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "734a4f4364ef482cb45829594fce7dfda73d384a",
+      "branch": "main",
+      "frame": "03hbe1drmytizwcjbruu90a6x"
+    },
     {
       "id": "5eb90822-6bd0-44ff-85a7-82ffb88e6622",
       "ts": "2026-11-27T23:21:26Z",
@@ -2891,45 +2934,6 @@
       "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
       "branch": "main",
       "frame": "03hba7ya4v3m7xzhu79lvv9sx"
-    },
-    {
-      "id": "fd36c02b-8186-4974-b934-ce44da8dc08d",
-      "ts": "2026-11-27T11:38:34Z",
-      "source": "buffy",
-      "subject": "nixconfig:reconcile-main",
-      "action": "landed: jevdecide rewrite pushed to origin/main (6f95f207); merged origin into main across 21 conflicts — the three duplicated delphi services keep the local line, AGENTS.nix prose takes origin's. Unblocked: intents falls back to impure eval (no aarch64 task-list builder), six checks:* got inventory rows, probe ref gained ?submodules=1#, jevdecide budget 170 | gate: checks:quick PASS, checks:host delphi PASS (2197 assertions)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "65c5165a40449e5292ee2768e43c0179dc674f7d",
-      "branch": "main",
-      "frame": "03hba7tgk1ku9s1hxq1fu3u01"
-    },
-    {
-      "id": "081e6045-97db-44f7-939d-a288bfedb2be",
-      "ts": "2026-11-27T11:22:33Z",
-      "source": "freebuff",
-      "subject": "nixconfig:job-scout",
-      "action": "landed: pushed b0784ddc to origin/main (Workerbase submit note) and swept the open lanes — appflow queue 11 items all deferred off-delphi (model batch disabled, ssh needs Tailscale check); ledger repaired: HWI duplicate closed, Qdrant canonical moved to rejected on the 2026-11-27 mail, abtis placeholder role named, untracked ETC Deutschland/Enritec application added; gate: checks:appflow PASS (1730 rows, 120 prep)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
-      "branch": "main",
-      "frame": "03hba4oxwz07498r1obbs19a5"
-    },
-    {
-      "id": "ba022ae9-e448-4644-9548-bf630bb702e7",
-      "ts": "2026-11-27T11:17:12Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:job-scout",
-      "action": "drove freebuff pane via jev route; job-scout follow-up started",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "b0784ddca8f5f6ee71d94a19721a5a4bdda1ef31",
-      "branch": "main",
-      "frame": "03hba3n70mpc6uyky59jn8jy7"
     }
   ]
 }

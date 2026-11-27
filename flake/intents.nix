@@ -202,6 +202,22 @@
       via = "freebuff-headless dispatch";
       place = ["eval" "local-gate"];
     };
+    freebuff-pane-2 = {
+      what = "the steward-driven freebuff pane: republishes /cv/ and gates the live links";
+      provides = ["publish"];
+      claims = ["lib/matt/" ".agents/skills/"];
+      floor = "resolved";
+      via = "the freebuff pane driven by tmux-pane-steward";
+      place = ["eval" "local-gate" "delphi"];
+    };
+    pane-2-freebuff-cv-sync = {
+      what = "the same pane posting under its subject name: wallpaper and image rounds";
+      provides = ["publish"];
+      claims = ["lib/image-daily/"];
+      floor = "asserted";
+      via = "the freebuff pane driven by tmux-pane-steward";
+      place = ["local-gate" "delphi"];
+    };
     agy = {
       what = "the delegated antigravity lane (agy CLI; Tier 1 cascade)";
       provides = ["chain-change" "gate-change" "note-change"];

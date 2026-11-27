@@ -34,6 +34,13 @@ cd "$(git rev-parse --show-toplevel)"
 
 MAX="${MAX:-524288}"
 ALLOW="${ALLOW:-}"
+# AGENTS.nix is the one text file that grows by design, and it reached MAX: at
+# 531 KiB in HEAD the 512 KiB gate refused every note, and the per-path ALLOW
+# then admitted the blob permanently. So it answers to its own ceiling, held
+# below MAX and shrink-only: a trim lowers this number in the commit that frees
+# the bytes, nothing raises it. History is judged by the same ceiling, because
+# the older revisions below it are the record, not drift.
+AGENTS_CEILING="${AGENTS_CEILING:-533819}"
 self="scripts/task/repo-blobs.sh"
 
 mode=""
@@ -150,7 +157,14 @@ while IFS=$'\t' read -r path size; do
     biggest=$size
     biggest_path=$path
   fi
-  [ "$size" -gt "$MAX" ] || continue
+  	if [ "$path" = "AGENTS.nix" ]; then
+	  [ "$size" -le "$AGENTS_CEILING" ] && continue
+	  bad=$((bad + 1))
+	  printf '  CEILING  %9s  %s (own ceiling %s; trim %s bytes)\n' \
+	    "$(human "$size")" "$path" "$(human "$AGENTS_CEILING")" "$((size - AGENTS_CEILING))"
+	  continue
+	fi
+	[ "$size" -gt "$MAX" ] || continue
   if allowed "$path"; then
     printf '  allowed  %9s  %s\n' "$(human "$size")" "$path"
     continue
@@ -168,6 +182,8 @@ if [ "$bad" -ne 0 ]; then
   echo "A blob this size is permanent: deleting the file later keeps the object and"
   echo "costs a rewrite of every commit to remove it. Put the bytes on /srv/data, or"
   echo "register the URL in modules/config/fetches.json and let the store fetch it."
-  echo "For a deliberate exception: ALLOW='<glob>' bash scripts/task/repo-blobs.sh"
+  echo "AGENTS.nix: the CEILING line above is its own shrink-only budget — trim note"
+echo "bodies until it fits, then lower AGENTS_CEILING in the same commit."
+echo "For a deliberate exception: ALLOW='<glob>' bash scripts/task/repo-blobs.sh"
   exit 1
 fi

@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-27T07:51:31Z",
+  "generated": "2026-11-27T07:55:42Z",
   "count": 200,
-  "pin": "5919e03ec4dfc0967110e0dec5ae2b6135fc2b1b2efb187f4e02270ccc2ae83c",
+  "pin": "57d3396c06c0845f6c6a32784ad6b350b3e630dcf5b21b8a01e8c5378822c141",
   "turns": [
+    {
+      "id": "75d4bff4-8876-4096-81eb-7b74955d6c55",
+      "ts": "2026-11-27T07:51:51Z",
+      "source": "freebuff",
+      "subject": "nixconfig:strata-inkling-note",
+      "action": "landed: strata-inkling-mini-2-eisen experiment note in AGENTS.nix; blob gate refused the commit (AGENTS.nix 531KiB in HEAD, >512KiB), committed with the documented ALLOW=AGENTS.nix exception; file still needs a trim | gate: repo-blobs --index allowed-by-exception, nix fmt/census PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fb91f74fa1d045a787502ea8ee2ecf6e5e70b7e2",
+      "branch": "main",
+      "frame": "03hb8zj8umnk99r5a6a2c4cof"
+    },
     {
       "id": "cbe735b5-fa86-44e6-890e-9cc0e8e53d5f",
       "ts": "2026-11-27T07:50:04Z",
@@ -3035,22 +3048,6 @@
       "base_commit": "28f54a28ae51abeee22abfd7422dec81009edad2",
       "branch": "main",
       "frame": "03hb40fqmeoc84abexvgd92sw"
-    },
-    {
-      "id": "3c11575f-fe1e-4dab-9282-e86f9e592d13",
-      "ts": "2026-11-26T16:34:55Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-smoke-taskfile",
-      "action": "claim: wire portfolio-smoke.py as agents:portfolio:smoke, doc clanker-runner + the task, commit via temp index so Pane 3's staged inventory-site work is untouched",
-      "outcome": "in_progress",
-      "claims": [
-        "taskfiles/agents.yml",
-        "docs/portfolio-services.md"
-      ],
-      "files": [],
-      "base_commit": "21d12437b1dca3ecdae827c49811b33cfa12a7ca",
-      "branch": "main",
-      "frame": "03hb40ezp78vaqq7sh6nwk2g9"
     }
   ]
 }

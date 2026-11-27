@@ -1,8 +1,209 @@
 {
-  "generated": "2026-11-27T20:06:07Z",
+  "generated": "2026-11-27T20:45:49Z",
   "count": 200,
-  "pin": "5c9e97afe5ec8bf32ca4a8df910080462a33cc6841c67bdae0bab11630466b39",
+  "pin": "d56d7ed36b9192fd117ec69acb66df854851c7e5000baa41678400013db8dbe7",
   "turns": [
+    {
+      "id": "8ed25bef-a5a1-4af5-a609-3592870e76e6",
+      "ts": "2026-11-27T20:41:17Z",
+      "source": "frieren-host",
+      "subject": "nixconfig:wallpaper-round-2026-11-27b",
+      "action": "publish 0.93/0.90: render shortfall, gate, publish, push — detail on the ledger",
+      "outcome": "in_progress",
+      "claims": [
+        "rotation.json",
+        "wallpapers"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbd5u6f7evlm8ob19zt9dxv"
+    },
+    {
+      "id": "3797d356-439f-4ca3-ba16-ea9621e426f0",
+      "ts": "2026-11-27T20:40:53Z",
+      "source": "micro-turn",
+      "subject": "nixconfig:wallpaper-round-2026-11-27b",
+      "action": "publish 0.93/0.90: render shortfall to 100, gate, publish Pages, push",
+      "outcome": "in_progress",
+      "claims": [
+        "rotation.json",
+        "wallpapers"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbd5rbq3fcu1402wyphd1y4"
+    },
+    {
+      "id": "acb4be29-10e8-4e18-afc0-7b4b4b9a4a68",
+      "ts": "2026-11-27T20:40:29Z",
+      "source": "micro-turn",
+      "subject": "nixconfig:freebuff-cv-publish-2026-11-27b",
+      "action": "publish 0.86/0.76: refine Hisolutions CV prose, run publish gate, pus…",
+      "outcome": "in_progress",
+      "claims": [
+        "site/cv",
+        "content/cv"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbd5ojmmyetmyyj3qu62kpg"
+    },
+    {
+      "id": "c89e8250-3538-4308-a10d-2d7ba8e8fe4a",
+      "ts": "2026-11-27T20:37:23Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-cassini-darwin-chain-2026-11-27",
+      "action": "landed: no-change closure, 2nd issuance — fault 3 disproven at 0352a0a9 with post-sweep inputs: deep-forced cassini HM activationPackage.drvPath resolves rc=0, so the nested HM module system evaluates fully and no recursion exists. dankShell HAS a darwin provider (fleet.dankShell.enable default true via home-manager-shared extraSpecialArgs, measured). Note is DELIVERED in-tree, not IN FLIGHT | gate: netbook eval PASS rc=0; no diff",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0352a0a9d493b67859582b6164ef598e729a0319",
+      "branch": "HEAD",
+      "frame": "03hbd52qmde1vo0c7p3682yvf"
+    },
+    {
+      "id": "dc2d0dec-1bfa-4348-9a08-e56e5b0395dd",
+      "ts": "2026-11-27T20:36:54Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-freebuff-drive-2026-11-27-2133",
+      "action": "steward drove freebuff (publish jev 0.95/0.93): continue Hisolutions CV packet, refine materials, publish static site from repo",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbd4z8v00n8asgwfbggrliq"
+    },
+    {
+      "id": "60cdabd0-1388-464c-84bc-aff8cdcf91a1",
+      "ts": "2026-11-27T20:36:54Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-cassini-darwin-chain-2026-11-27",
+      "action": "steward drove devin (chain-change jev 0.98/0.97): re-verify cassini darwin-chain at HEAD; module-sets.nix moved 0352a0a9 to a2f2932d after the 20:30 closure",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/module-sets.nix",
+        "modules/roles/home.nix"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbd4z8c0gqmeoyo7foq7e0v"
+    },
+    {
+      "id": "80696944-a604-47cf-a5bb-2fe7ad0cc45a",
+      "ts": "2026-11-27T20:30:39Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-cassini-darwin-chain-2026-11-27",
+      "action": "landed: no-change closure — fault 3 does not reproduce at 0352a0a9. cassini extraSpecialArgs.dankShell=true and hmUserFeatures eval clean (darwin HAS the provider: fleet.dankShell.enable default true via home-manager-shared); chain files byte-identical since 41e2c30d where cassini drvPaths deep-resolved; note is DELIVERED in-tree, not IN FLIGHT | gate: checks:host netbook eval PASS rc=0; no diff",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0352a0a9d493b67859582b6164ef598e729a0319",
+      "branch": "HEAD",
+      "frame": "03hbd3rexokxu9sony7nlkw7l"
+    },
+    {
+      "id": "0bb67944-3399-41bb-88fb-a9fef34beaf0",
+      "ts": "2026-11-27T20:27:26Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-cassini-darwin-chain-2026-11-27",
+      "action": "chain-change 0.78/0.62; fix cassini fault-3 home-role recursion",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/module-sets.nix",
+        "modules/roles/home.nix"
+      ],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbd34qnrb90izgz7mlw49l5"
+    },
+    {
+      "id": "ea8ca4ea-2ef5-4794-b44b-ee1c2735c964",
+      "ts": "2026-11-27T20:18:49Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-claim-evidence-skill",
+      "action": "note-change: job-scout-lane carries the claim→evidence table from the Hisolutions review (NixOS host count, per-host module gate, gatus/alert-bridge/sentinel, SOPS+SSH CA, empty .tf, node_exporter only) and the rule that an unbacked claim is deleted; budget 64→84 body lines; two pane-scoped xs sources declared so intents resolves | gate: checks:prose PASS, checks:intents PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
+      "branch": "main",
+      "frame": "03hbd1g6geqdaa3utojw6kqvl"
+    },
+    {
+      "id": "e1e51773-8dfa-4939-80f0-12b37b29c92b",
+      "ts": "2026-11-27T20:11:50Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:cv-skill-claim-evidence-2026-11-27",
+      "action": "prose-change 1.0: document CV claim-to-evidence map in site skill",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "74a215b9760999ef3fe88600d0c1707ce4f056a6",
+      "branch": "main",
+      "frame": "03hbd0303tiajndctodzyy3fq"
+    },
+    {
+      "id": "475f0d7f-8d86-4c06-906e-8a623d1d0590",
+      "ts": "2026-11-27T20:11:28Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:xs-turn-post-gate-proof-2026-11-27",
+      "action": "gate-change 1.0: prove xs-post gate rejects space-separated COMMITS",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/check-inventory.nix",
+        "scripts/task/xs-turn-post.sh",
+        "checks:agents:xs-post"
+      ],
+      "files": [],
+      "base_commit": "74a215b9760999ef3fe88600d0c1707ce4f056a6",
+      "branch": "main",
+      "frame": "03hbd00dmuh9v8a5slxrgc6lu"
+    },
+    {
+      "id": "0afea65c-6544-4309-b865-a4fe3d07cc1d",
+      "ts": "2026-11-27T20:11:12Z",
+      "source": "devin",
+      "subject": "nixconfig:xs-post-gate-both-ways-proof",
+      "action": "landed: ran the real mistake both ways at b80c2817 — COMMITS='abc1234 def5678' (space-separated, the 2026-11-26 incident input) exits 2 with the comma-separated reason and nothing reaches the queue; COMMITS='abc1234,def5678' passes validation (exit 4 only because the test URL is a closed port) and the queued body carries commits as two distinct hashes. Gate task itself green | gate: checks:agents:xs-post PASS; exit codes 2 (bad) vs 4-transport (good, validation passed)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b80c2817788098164e914c8f4304534c151992bf",
+      "branch": "HEAD",
+      "frame": "03hbczyml9k4lm7bu3pw41bmg"
+    },
+    {
+      "id": "9f95f184-9dfa-4c89-be02-db8c3142b058",
+      "ts": "2026-11-27T20:07:30Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-republish-links-2026-11-27",
+      "action": "verified: no republish needed — fresh .#sites.matt-site build is byte-identical to the blog assets, the live blog (6/6 200 + sha256) and matt.bountystash.com pages/PDF; 6 CV anchors carry download, 3 packets 200; check-cv-links PASS, CI htmlproofer green in run 46060648872 | gate: check-cv-links PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "74a215b9760999ef3fe88600d0c1707ce4f056a6",
+      "branch": "main",
+      "frame": "03hbcz8id3ttrd5vhfh2sfrl1"
+    },
+    {
+      "id": "ee7589e7-0d53-4c94-ba60-7f526e596852",
+      "ts": "2026-11-27T20:06:31Z",
+      "source": "devin",
+      "subject": "nixconfig:xs-turn-post-commits-guard-2026-11-27",
+      "action": "landed: guard restored in working tree (uncommitted removal discarded); new gate checks:agents:xs-post in checks:quick — space-separated COMMITS exits 2 pre-queue, comma-separated queues intact, stripped-copy negative control. Only test+wiring committed, no dirty-tree files | gate: checks:agents:xs-post PASS, check:verify 166 rows clean",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "b80c2817788098164e914c8f4304534c151992bf",
+      "branch": "HEAD",
+      "frame": "03hbcz1nzvgmfoaru7bn3ofmt"
+    },
     {
       "id": "b2ff3a53-d1a2-406b-b9a3-901fe1d3ab5b",
       "ts": "2026-11-27T20:05:26Z",
@@ -2693,204 +2894,6 @@
       "base_commit": "5ff0947f2bd9e0d38bad74b298dbef3c3de5ecd7",
       "branch": "main",
       "frame": "03hb8m30yxqlk0wivj7zysmcq"
-    },
-    {
-      "id": "7c8cd4ea-8495-4a8c-94d2-42a37e303c55",
-      "ts": "2026-11-27T06:42:23Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-note-commit",
-      "action": "freebuff a2.1: commit AGENTS.nix handoff note; push origin/main",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "1081bdf9e874b7878e4fa991a86aa73158b580f9",
-      "branch": "main",
-      "frame": "03hb8lyntukhz8g50d0yhg6i1"
-    },
-    {
-      "id": "3cec22cd-61d7-4c56-93dc-074b94de46ab",
-      "ts": "2026-11-27T06:30:08Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:agy-image-daily-lane",
-      "action": "agy image-daily: continue wallpaper generation and publish",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/image-daily/"
-      ],
-      "files": [],
-      "base_commit": "1081bdf9e874b7878e4fa991a86aa73158b580f9",
-      "branch": "main",
-      "frame": "03hb8jkhh7ih7vi2ootvcdy4g"
-    },
-    {
-      "id": "ef25e608-50c5-4991-a0f0-53bfc1287791",
-      "ts": "2026-11-27T06:23:51Z",
-      "source": "antigravity",
-      "subject": "nixconfig:agy-image-daily-publish",
-      "action": "claim: review plates/rotation and add next wall-nixconfig variant, render, checks:images, publish, push",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/image-daily/"
-      ],
-      "files": [],
-      "base_commit": "1081bdf9e874b7878e4fa991a86aa73158b580f9",
-      "branch": "main",
-      "frame": "03hb8ic8qujqq6zoi4s0drk23"
-    },
-    {
-      "id": "08c4abf2-cb71-4b06-99fe-8e959afb7a55",
-      "ts": "2026-11-27T06:16:14Z",
-      "source": "antigravity",
-      "subject": "nixconfig:agy-image-daily-publish",
-      "action": "landed: alpine-chalet-balcony plate kept (1536x1024), uploaded to Cloudinary + Pages (787/787), approved in rotation.json, pushed to origin/main | gate: checks:images + checks:image-daily PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "lib/image-daily/plates.txt",
-        "lib/image-daily/rotation.json"
-      ],
-      "base_commit": "1081bdf9e874b7878e4fa991a86aa73158b580f9",
-      "branch": "main",
-      "frame": "03hb8guqeljj4rnlijydicpb4"
-    },
-    {
-      "id": "952bfb67-cf03-465d-9199-0b3b8385e68b",
-      "ts": "2026-11-27T06:14:55Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-27: 1 plate(s) kept of 1 spent, 0 roster row(s) waiting, 787 asset(s) published",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb8gli1uzbmy92z8kmstf5l"
-    },
-    {
-      "id": "f0f69002-0586-4777-93cf-7e618cbf8a4a",
-      "ts": "2026-11-27T06:11:54Z",
-      "source": "antigravity",
-      "subject": "nixconfig:agy-image-daily-publish",
-      "action": "claim: append new plate/brief, render, checks:images, publish, commit/push",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/image-daily/"
-      ],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb8g09pdvjmbrvpwhpuf76z"
-    },
-    {
-      "id": "20f80789-ca58-47a6-9e00-04a145e58c9e",
-      "ts": "2026-11-27T06:11:40Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:agy-image-daily-publish",
-      "action": "jev publish @0.88/0.82; drive image-daily publish cycle",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb8fynr6tawf5xt0e5obsnk"
-    },
-    {
-      "id": "785785f6-e174-4f30-9cef-83adacd65537",
-      "ts": "2026-11-27T06:01:52Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:agy-image-daily-publish",
-      "action": "jev-decide publish @0.83/0.74; drove image-daily plan; agy ran git status/log, explored plates.txt rotation.json, grep plates; now presents publish options (re-cast wildflower-meadow-wind or append plate row + render/checks/publish), awaiting decision",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/image-daily",
-        "scripts/task/image-daily-*.sh"
-      ],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb8e1p3b0c69hu93icpflli"
-    },
-    {
-      "id": "aab9279b-375b-403b-b668-65a100a80f64",
-      "ts": "2026-11-27T06:01:40Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-agents-nix-note",
-      "action": "jev-decide note-change @1.0/1.0; wrote AGENTS.nix handoff note freebuff-hisolutions-ag-2026-11-27 at line 8670; uncommitted, 512 KiB blob gate blocks staging AGENTS.nix",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb8e09zi84ii1904yejcvt7"
-    },
-    {
-      "id": "700e867c-cdc5-41f4-8654-1a592f05c59a",
-      "ts": "2026-11-27T06:00:18Z",
-      "source": "image-daily",
-      "subject": "nixconfig:wall-plates",
-      "action": "2026-11-27: 0 plate(s) kept of 0 spent, 0 roster row(s) waiting, 786 asset(s) published",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hb8dqpe0q3gzjfks8iyt9l0"
-    },
-    {
-      "id": "44d81b12-6773-4c48-8300-f2f2cb398ce2",
-      "ts": "2026-11-27T05:50:37Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-handoff-note",
-      "action": "freebuff: AGENTS.nix handoff note freebuff-hisolutions-ag-2026-11-27 written; 512 KiB gate blocks commit",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb8bujqi7acl5rfrvbz6fnp"
-    },
-    {
-      "id": "f0612bb9-f2b5-4ce1-816c-925a1b51e311",
-      "ts": "2026-11-27T05:49:46Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:wallpaper-images-fix",
-      "action": "wallpaper-worker: IMAGES_ROOT + cmd_publish/approve fixes applied, shellcheck passed, changes uncommitted",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb8bol274td9n4meki1rkb8"
-    },
-    {
-      "id": "8b162e05-8e26-4fc4-950d-6bf6e4b21686",
-      "ts": "2026-11-27T05:47:42Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:wallpaper-images-fix",
-      "action": "drove agents:5 wallpaper-worker: IMAGES_ROOT + cmd_publish/approve fix, Working... confirmed",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb8b9zkjbjk8a29sfe3puf2"
-    },
-    {
-      "id": "dd208be2-8362-4d71-9836-b84c3e6c6ab0",
-      "ts": "2026-11-27T05:47:41Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-handoff-note",
-      "action": "drove agents:2.1 freebuff: AGENTS.nix handoff note, working... confirmed",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "0d4e0d424446f0ba008c8edaf1c630f3251afd08",
-      "branch": "main",
-      "frame": "03hb8b9wh1hx53y1ll0aupoam"
     }
   ]
 }

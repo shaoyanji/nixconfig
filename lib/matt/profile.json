@@ -228,19 +228,21 @@
       "items": [
         "NixOS",
         "Nix flakes",
-        "AWS Lambda (small agent project)",
+        "Linux and systemd",
+        "containers",
+        "Kubernetes (foundations)",
+        "GitHub Actions",
+        "CI gates",
         "SSH certificate authority",
         "SOPS and age",
         "Tailscale",
-        "systemd",
-        "CI gates",
-        "Salesforce",
-        "Microsoft 365",
-        "networking and Wi-Fi",
+        "gatus health checks",
+        "alert bridge and sentinel ledger",
         "MCP servers",
         "local model endpoints",
-        "Prometheus-series metrics",
-        "alerting"
+        "Salesforce",
+        "Microsoft 365",
+        "networking and Wi-Fi"
       ]
     },
     {

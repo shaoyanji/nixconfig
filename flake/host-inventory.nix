@@ -17,15 +17,19 @@
 # that host alone; the `globalModules*` names live only as `chainFeatures`
 # data, not something a host composes from.
 let
+  user = import moduleFiles."global.user";
+
   # The container floor, named leaf by leaf: base toolbox + shell + the
   # skills materialization (the only unconditional piece of user.ai) —
-  # eight `containers` hosts share it. roles.minimal's user.ai wrapper is
+  # nine `containers` hosts share it. roles.minimal's user.ai wrapper is
   # skipped, so profiles.ai has no surface to disable.
   hmContainerFloor = ["user.base" "shell" "user.ai.skills"];
 
   # The desktop HM chain — ten `nixos`+`dms` desktops share it; fern and
-  # cassini deliberately fork a leaf each and spell their own.
-  hmDesktop = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media" "desktop"];
+  # cassini deliberately fork a leaf each. Base and suite stay named so those
+  # forks cannot drift from the chain they subtract from.
+  inherit (user) hmDesktopBase hmDesktopSuite;
+  hmDesktop = user.hmFeatures;
 in
   # `kind` and `system` come from the compiled inventory — a registered host
   # must have an inventory.toml row, and its fields cannot drift from this
@@ -153,7 +157,7 @@ in
       # fleet chain and the session comes from profiles.dwl-desktop, the same profile
       # netbook and scratch adopt.
       features = ["base" "nixos" "dms" "disko"];
-      hmFeatures = ["minimal" "systemd-policy" "shell" "dev" "ai" "browser" "media"];
+      hmFeatures = hmDesktopBase ++ hmDesktopSuite;
       modules = [
         ../hosts/fern/configuration.nix
         (import ../hosts/fern/disko.nix {device = "/dev/nvme0n1";})
@@ -222,9 +226,8 @@ in
 
     minyx = {
       # Its own chain, not globalModulesContainers: that one imports noDE.nix,
-      # which wires Home Manager — for a host deliberately built without it — and
-      # carries the impermanence/disko pair that an sd-image root filesystem
-      # makes meaningless. The tunnel role needs native NixOS options only.
+      # which wires Home Manager — for a host deliberately built without it.
+      # The tunnel role needs native NixOS options only.
       features = ["base"];
       modules = [
         moduleFiles."global.determinate-nix"
@@ -246,9 +249,8 @@ in
     };
 
     testvm = {
-      features = ["inventory"];
+      features = ["inventory" "microvm"];
       modules = [
-        inputs.microvm.nixosModules.microvm
         (import ../hosts/microvms/testvm.nix {})
         ({pkgs, ...}: {
           environment.systemPackages = with pkgs; [
@@ -260,9 +262,8 @@ in
     };
 
     frieren-canary = {
-      features = ["inventory"];
+      features = ["inventory" "microvm"];
       modules = [
-        inputs.microvm.nixosModules.microvm
         ../hosts/microvms/frieren-canary.nix
       ];
     };
@@ -305,7 +306,7 @@ in
       features = ["base" "macos"];
       # darwin has no systemd: the `systemd-policy` feature reads
       # `osConfig.systemd.services`, which is not an option there.
-      hmFeatures = ["minimal" "shell" "dev" "ai" "browser" "media" "desktop"];
+      hmFeatures = ["minimal"] ++ hmDesktopSuite ++ ["desktop"];
       modules = [../hosts/cassini/configuration.nix];
     };
   }

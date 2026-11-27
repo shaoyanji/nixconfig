@@ -460,15 +460,17 @@ in {
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "both";
-    extraSetFlags = [
-      "--accept-routes=true"
-      # The resolver must never resolve through the address it serves:
-      # [[flake/policies.nix#resolver-never-through-served-address]] (outage
-      # loop — the host could not reach the tailnet it serves).
-      "--accept-dns=false"
-      # `--advertise-exit-node` and the `/32` route are emitted by
-      # net/dns/tailnet-address.nix (`exitNode = true`), not here.
-    ];
+    # `--advertise-exit-node` and the `/32` route are emitted by
+    # net/dns/tailnet-address.nix (`exitNode = true`), not here.
+  };
+
+  fleet.tailscale = {
+    clientPolicy = true;
+    acceptRoutes = true;
+    # The resolver must never resolve through the address it serves:
+    # [[flake/policies.nix#resolver-never-through-served-address]] (outage
+    # loop — the host could not reach the tailnet it serves).
+    acceptDns = false;
   };
 
   # The lo bind itself lives in net/dns/tailnet-address.nix (shared with

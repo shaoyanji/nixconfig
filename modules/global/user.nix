@@ -1,5 +1,5 @@
 # Canonical user constants for this flake.
-{
+rec {
   # System account username & paths
   name = "devji";
   home = "/home/devji";
@@ -21,16 +21,9 @@
   # sets nothing keeps its closure. A headless or lean host sets
   # `fleet.hmUserFeatures` to a subset (nixos) and drops the module, not just its
   # config — which is the point, since option surface is what a gate pays for.
-  hmFeatures = [
-    "minimal"
-    "systemd-policy"
-    "shell"
-    "dev"
-    "ai"
-    "browser"
-    "media"
-    "desktop"
-  ];
+  hmDesktopBase = ["minimal" "systemd-policy"];
+  hmDesktopSuite = ["shell" "dev" "ai" "browser" "media"];
+  hmFeatures = hmDesktopBase ++ hmDesktopSuite ++ ["desktop"];
   # The leaf lists inside `user.base` and `user.ai`, one name per import so a
   # host can trim the option surface its HM eval pays for. Containers skip
   # user.ai entirely (hmModules names user.ai.skills directly); the default

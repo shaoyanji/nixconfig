@@ -79,9 +79,8 @@ target="${2:-$1}"
 command -v yq >/dev/null 2>&1 || { echo "yq required" >&2; exit 2; }
 
 # Active hosts only. A preserved/dormant host is not part of the deploy surface:
-# evaluating its config is how a known-broken preserved host (cassini: a
-# homeDirectory conflict that predates any of this) gets mistaken for a
-# regression, and deploying it is not a normal operation.
+# no gate keeps its config green, so evaluating one can surface bit-rot that
+# reads as a regression, and deploying it is not a normal operation.
 #
 # This is a WARNING-level gate, not a failure: naming a preserved host sets off
 # no build, no cache query, no ssh, and exits 0 with the reason. Reviving one is

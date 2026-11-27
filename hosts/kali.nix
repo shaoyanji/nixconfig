@@ -84,11 +84,11 @@
     # pwntools — Python framework for exploit dev and CTF. Huge dependency tree
     #   but worth it if you write exploits on-device.
     # ropgadget — find ROP chains in binaries.
-    # checksec — quick binary hardening check (NX, PIE, Canary, RELRO).
+    # checksec comes with pwntools; the standalone package installs the same
+    # bin/checksec path and makes home-manager-path fail buildEnv.
     # nasm — assembler for writing shellcode.
     pwntools
     ropgadget
-    checksec
     nasm
 
     # === MOBILE / ANDROID ===

@@ -1,8 +1,73 @@
 {
-  "generated": "2026-11-27T17:19:39Z",
+  "generated": "2026-11-27T17:34:57Z",
   "count": 200,
-  "pin": "432ee4b9f1d0e7b44e078ec588b64bfe2a91d0a896d50a9f62f303e6ff0ad403",
+  "pin": "6b834b1c7d909ed5c75ee836e62b86da453f28831b04f607015512c9d2b5c560",
   "turns": [
+    {
+      "id": "7bf11ff2-b634-4697-9c5f-1400a01b8ce1",
+      "ts": "2026-11-27T17:31:10Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-2-freebuff-cv-sync",
+      "action": "landed: cv-sync, no drift, committed nothing. Fresh nix build .#sites.matt-site at HEAD 2ce0e313 gives six CVs; blog assets/files are hash-equal to it; live is-a.dev serves all six 200 hash-equal (cv 91a2900 43350B, cv-de c5e610d 43440B) and /cv/ carries six download anchors; ryoku-cv 4357b43 clean, origin equal, live index 11042B with cv/cv-de 200 hash-equal. Local _site PDFs are a build behind, gitignored, CI rebuilds them | gate: agents:cv:publish-check PASS 6/6 (ARTIFACT=fresh)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbc4p5iphvr73dxf4vnaa9k"
+    },
+    {
+      "id": "0d7d442c-33e0-45c7-bcf1-7b5ff48a0d86",
+      "ts": "2026-11-27T17:29:21Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-1-devin-closure-budgets",
+      "action": "gate-change 0.97|0.95; gate no-budget-host fails",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbc4cf1cnnokerxd0010he2"
+    },
+    {
+      "id": "9863ede9-e763-47f8-ae48-a4c634ebb989",
+      "ts": "2026-11-27T17:29:21Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff-cv-sync",
+      "action": "publish 0.82|0.74; gate cv-publish-check",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbc4cck6oxk7si0aeqju8rv"
+    },
+    {
+      "id": "635a7452-8db8-4d1d-a39f-9a93150936c3",
+      "ts": "2026-11-27T17:21:20Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-2-freebuff-cv-publish",
+      "action": "landed: ryoku-cv served the 2026-11-23 build (13-host copy, 36 KB PDFs). Synced to blog: three host counts now twenty-five (inventory kind=nixos=25), cv.pdf/cv-de.pdf replaced with the 2026-11-27 builds (43,350/43,440 B, 2pp). Push 4357b43, Pages run 46041030539 success. Live: index sha256-equal to commit, both PDFs hash-equal live/repo/blog, no thirteen served, 4/4 routes 200 | gate: check-links PASS + Pages success",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbc2s1ixmibis6ybi4fe1ci"
+    },
+    {
+      "id": "c9085a7b-4062-4f3d-a113-e8e69a250654",
+      "ts": "2026-11-27T17:19:52Z",
+      "source": "devin",
+      "subject": "nixconfig:pane-1-devin-chain-change",
+      "action": "landed: c6524f95 — chain-change lane produced one real repair: chain-profile.sh (the eval-cost-ladder measuring tool) was broken since module-sets gained the hostInventory param; now imports host-inventory.nix same as outputs.nix. Re-measured: base 484MiB, base+nixos+dms 1200MiB — matches the ladder. No chain refactor existed to make (3 prior audits) | gate: checks:host mtfuji MODE=eval PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c6524f9587f65cfa992a915eb5090dda5b5fe64f",
+      "branch": "HEAD",
+      "frame": "03hbc2hnry67utklb02c0yl03"
+    },
     {
       "id": "bee5502b-e772-4a06-a6bc-9c53dc93cedc",
       "ts": "2026-11-27T17:17:32Z",
@@ -2848,85 +2913,6 @@
       "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
       "branch": "main",
       "frame": "03hb7d8winwnr2pxzijlfzkpo"
-    },
-    {
-      "id": "69dd8054-9ee5-4937-b482-ba4d01a4bd91",
-      "ts": "2026-11-27T02:52:33Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:wall-plates",
-      "action": "note-change|0.64|0.28 wall: next plate cycle, gate images-check",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/image-daily/"
-      ],
-      "files": [],
-      "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
-      "branch": "main",
-      "frame": "03hb7d2cv8bn7hb4q8j6s6r5o"
-    },
-    {
-      "id": "b89682af-a562-4671-b109-027e1bd27359",
-      "ts": "2026-11-27T02:16:33Z",
-      "source": "wallpaper-worker",
-      "subject": "nixconfig:wall-plates",
-      "action": "verified: next plate cycle has 0 waiting rows in plates.txt (501 kept, 3 held) and 0 due briefs in briefs.json; origin/main 771e9d2f; gate: checks:images (785/785) + checks:image-daily PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/image-daily/plates.txt",
-        "lib/image-daily/briefs.json",
-        "lib/image-daily/rotation.json"
-      ],
-      "files": [],
-      "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
-      "branch": "main",
-      "frame": "03hb7615kn45lubm2oo0rq8dy"
-    },
-    {
-      "id": "58e06c1b-0da2-48d0-b28f-382a5233c7c0",
-      "ts": "2026-11-27T02:15:35Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:wall-plates",
-      "action": "publish|0.82|0.71 wall: next plate cycle, gate images-check",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/image-daily/plates.txt",
-        "lib/image-daily/briefs.json",
-        "lib/image-daily/rotation.json"
-      ],
-      "files": [],
-      "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
-      "branch": "main",
-      "frame": "03hb75ufpgydptxq91m72iu47"
-    },
-    {
-      "id": "33df386b-2e41-4e9d-9666-77a08841e500",
-      "ts": "2026-11-27T01:50:12Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:steward-pane5-wall-plates",
-      "action": "publish|0.84|0.78 pane5 images:plates wall: 0 wait, 501/3, gate ok",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
-      "branch": "main",
-      "frame": "03hb70vu5g1hgyj7by410x0v7"
-    },
-    {
-      "id": "a79418ba-1761-4844-8e78-331daf3fe960",
-      "ts": "2026-11-27T01:43:47Z",
-      "source": "wallpaper-worker",
-      "subject": "nixconfig:wall-plates",
-      "action": "verified: 0 waiting non-held plates in plates.txt (501 kept, 3 held); latest plate 2026-11-27/meadow-sleep.png on origin/main 771e9d2f; images-check 785/785 PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/image-daily/plates.txt",
-        "lib/image-daily/briefs.json",
-        "lib/image-daily/rotation.json"
-      ],
-      "files": [],
-      "base_commit": "771e9d2fa66b8d8dd8f34cd8cf4d1ae6e8d8e8a6",
-      "branch": "main",
-      "frame": "03hb6zmrzh3b0r0g0q0mapz47"
     }
   ]
 }

@@ -8714,5 +8714,52 @@
         https://karriere.hisolutions.com/jobs/68820855/Senior-Kubernetes-Experte-DevOps-Engineer-w-m-d-
       '';
     };
+    strata-inkling-mini-2-eisen = {
+      title = "Strata with Inkling Mini 2 on eisen's RX 5700";
+      kind = "experiment";
+      status = "PROPOSED";
+      date = "2026-11-26";
+      summary = "Test whether strata-engine/Inkling-2-Mini-Strata from HuggingFace loads and serves under Strata on eisen's AMD Radeon RX 5700 (gfx1010, 8 GiB VRAM) without displacing the resident Qwen3.8-Flash-Next MoE pack, and whether it beats the 19.4 tok/s decode baseline at smaller context sizes.";
+      refs = {
+        hosts = ["eisen"];
+        modules = [
+          "hosts/eisen/strata.nix"
+          "hosts/eisen/llm-server.nix"
+        ];
+        tasks = ["checks:host"];
+        docs = [
+          "docs/eisen-llm-architecture.md"
+          "hosts/eisen/MANUAL.md"
+        ];
+      };
+      body = ''
+        Hypothesis: strata-engine/Inkling-2-Mini-Strata
+        (https://huggingface.co/strata-engine/Inkling-2-Mini-Strata) is a
+        smaller MoE pack that fits in eisen's remaining page cache alongside the
+        resident IQ1_M Coder (58.41 GB) at the 62.7 GiB RAM ceiling, and decodes
+        faster at short context because it touches fewer experts per token.
+
+        What to try:
+        1. Pull the Inkling Mini 2 pack shards through frieren's aria2 RPC
+           (same route as the Qwen3.8 pack — HF CDN throttles eisen directly,
+           so fetch on frieren, copy over the tailnet).
+        2. Verify shard SHA-256 against HF SHA256SUMS before any load.
+        3. Add an Inkling Mini 2 serving block to hosts/eisen/strata.nix on a
+           separate port (:8086) so the resident :8085 service stays up while
+           the experiment runs.
+        4. Benchmark with tools/strata_bench.py --runs 3 on a warm server,
+           comparing chat median tok/s, 4K prompt read, and per-turn first
+           token against the 2026-11-04 baseline (14.6 tok/s warm IQ1_M,
+           19.4 tok/s MTP decode).
+        5. Confirm the llama-swap-gaming-guard still stops strata.service on
+           Steam launch — both ports must yield VRAM to Proton/Gamescope.
+
+        Exit: tools/strata_bench.py beats the baseline on short context
+        (≤4K prompt) without increasing the per-turn prefill stall count, and
+        strata.service on :8085 continues serving Qwen3.8-Flash-Next unchanged.
+        If the pack does not fit in remaining page cache or decode is slower,
+        mark REJECTED with the number that killed it.
+      '';
+    };
   };
 }

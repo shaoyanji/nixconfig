@@ -1,3 +1,5 @@
+//go:build ignore
+
 // HTTP API and the single-page UI. Everything is JSON in/JSON out except /,
 // which is the operator's search panel.
 package main

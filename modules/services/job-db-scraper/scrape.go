@@ -8,12 +8,15 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
 	"sync"
 	"time"
+
+	"nixconfig.local/fetchcache"
 )
 
 var defaultSources = []string{"germantechjobs", "weworkremotely", "remoteok", "berlinstartupjobs", "arbeitnow", "web-search"}
@@ -32,10 +35,11 @@ type providerConfig struct {
 }
 
 type scraper struct {
-	store  *Store
-	client *http.Client
-	cfg    providerConfig
-	alerts *alertManager
+	store       *Store
+	client      *http.Client
+	fetchClient *http.Client
+	cfg         providerConfig
+	alerts      *alertManager
 
 	mu      sync.Mutex
 	running bool
@@ -64,7 +68,7 @@ type rssItem struct {
 	Region      string `xml:"region"`
 }
 
-func newScraper(store *Store, cfg providerConfig) *scraper {
+func newScraper(store *Store, cfg providerConfig, cacheDirs ...string) *scraper {
 	if cfg.FirecrawlBase == "" {
 		cfg.FirecrawlBase = "https://api.firecrawl.dev/v2"
 	}
@@ -84,10 +88,15 @@ func newScraper(store *Store, cfg providerConfig) *scraper {
 			"Platform Engineer Kubernetes Germany jobs",
 		}
 	}
+	cacheDir := ""
+	if len(cacheDirs) > 0 {
+		cacheDir = cacheDirs[0]
+	}
 	return &scraper{
-		store:  store,
-		cfg:    cfg,
-		client: &http.Client{Timeout: 45 * time.Second},
+		store:       store,
+		cfg:         cfg,
+		client:      &http.Client{Timeout: 45 * time.Second},
+		fetchClient: &http.Client{Timeout: 45 * time.Second, Transport: fetchcache.New(cacheDir, 8<<20, nil, log.Printf)},
 	}
 }
 
@@ -235,7 +244,7 @@ func (s *scraper) fetch(ctx context.Context, rawurl string) ([]byte, error) {
 	}
 	req.Header.Set("User-Agent", "job-db-scraper/0.1 (+https://delphi.cloudforest-kardashev.ts.net:8464)")
 	req.Header.Set("Accept", "application/rss+xml, application/xml, application/json, text/html;q=0.8, */*;q=0.5")
-	res, err := s.client.Do(req)
+	res, err := s.fetchClient.Do(req)
 	if err != nil {
 		return nil, err
 	}

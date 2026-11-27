@@ -11,7 +11,13 @@
     pname = "private-deals";
     version = "0.2.0";
     src = ./private-deals;
-    vendorHash = "sha256-n+WU7qcF6NauBw9DFU4VG1fnDQ387+nibJ/uzApqehk=";
+    postPatch = ''
+      cp -r ${./fetchcache} ./fetchcache
+      chmod -R u+w ./fetchcache
+      sed -i 's#\.\./fetchcache#./fetchcache#' go.mod
+    '';
+    vendorHash = "sha256-rpghWA8x9bNIS9lJe66043jQB4ILV0uTJSDXJByEMZQ=";
+    subPackages = ["."];
     env.CGO_ENABLED = 0;
     meta = {
       description = "Private deal, product, watchlist and price-history search service";
@@ -47,6 +53,8 @@
     (lib.concatStringsSep "," cfg.searchQueries)
     "-origin"
     "https://${cfg.tailnetHost}:${toString cfg.tailnetPort}"
+    "-fetch-cache-dir"
+    "${stateDir}/fetch-cache"
     "-ntfy-url"
     cfg.ntfyUrl
   ];

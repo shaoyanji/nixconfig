@@ -49,6 +49,7 @@ func main() {
 	ntfyFlag := flag.String("ntfy-url", "", "ntfy/webhook URL for watchlist alerts; PRIVATE_DEALS_NTFY_URL is the fallback")
 	adminToken := flag.String("admin-token-env", "PRIVATE_DEALS_ADMIN_TOKEN", "environment variable naming the optional write bearer token")
 	expectedOrigin := flag.String("origin", "", "expected browser Origin for state-changing requests; empty disables the check")
+	fetchCacheDir := flag.String("fetch-cache-dir", "", "directory for the conditional fetch cache; empty disables validation caching")
 	flag.Parse()
 
 	if *envFile != "" {
@@ -75,7 +76,7 @@ func main() {
 		ScrapeURLs:    splitCSV(firstNonEmpty(*scrapeFlag, os.Getenv("PRIVATE_DEALS_SCRAPE_URLS"))),
 		AllowKeyless:  os.Getenv("PRIVATE_DEALS_ALLOW_KEYLESS") == "1",
 	}
-	ingest := newIngester(store, cfg)
+	ingest := newIngester(store, cfg, *fetchCacheDir)
 	alerts := newAlertManager(store, firstNonEmpty(*ntfyFlag, os.Getenv("PRIVATE_DEALS_NTFY_URL")))
 	ingest.alerts = alerts
 	s := &server{

@@ -17,6 +17,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"nixconfig.local/fetchcache"
 )
 
 //go:embed web/*
@@ -45,6 +47,7 @@ func main() {
 	adminTokenEnv := flag.String("admin-token-env", "LINK_VAULT_ADMIN_TOKEN", "environment variable naming the optional write bearer token")
 	expectedOrigin := flag.String("origin", "", "expected browser Origin for state-changing requests; empty disables the check")
 	feedInterval := flag.Duration("feed-interval", 15*time.Minute, "background feed poll interval; 0 disables automatic polling")
+	fetchCacheDir := flag.String("fetch-cache-dir", "", "directory for the conditional fetch cache; empty disables validation caching")
 	flag.Parse()
 
 	if *envFile != "" {
@@ -68,8 +71,8 @@ func main() {
 	}
 	s := &server{
 		store:          store,
-		extractor:      newExtractor(cfg),
-		feedClient:     &http.Client{Timeout: 15 * time.Second},
+		extractor:      newExtractor(cfg, *fetchCacheDir),
+		feedClient:     &http.Client{Timeout: 15 * time.Second, Transport: fetchcache.New(*fetchCacheDir, 8<<20, nil, log.Printf)},
 		adminToken:     strings.TrimSpace(os.Getenv(*adminTokenEnv)),
 		expectedOrigin: strings.TrimRight(*expectedOrigin, "/"),
 		extractOnAdd:   *extractOnAdd,

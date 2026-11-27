@@ -11,7 +11,13 @@
     pname = "job-db-scraper";
     version = "0.2.0";
     src = ./job-db-scraper;
-    vendorHash = "sha256-n+WU7qcF6NauBw9DFU4VG1fnDQ387+nibJ/uzApqehk=";
+    postPatch = ''
+      cp -r ${./fetchcache} ./fetchcache
+      chmod -R u+w ./fetchcache
+      sed -i 's#\.\./fetchcache#./fetchcache#' go.mod
+    '';
+    vendorHash = "sha256-rpghWA8x9bNIS9lJe66043jQB4ILV0uTJSDXJByEMZQ=";
+    subPackages = ["."];
     env.CGO_ENABLED = 0;
     meta = {
       description = "Job posting scraper, deduplicator and SQLite FTS5 search service";
@@ -48,6 +54,8 @@
     (toString cfg.minAlertScore)
     "-origin"
     "https://${cfg.tailnetHost}:${toString cfg.tailnetPort}"
+    "-fetch-cache-dir"
+    "${stateDir}/fetch-cache"
   ];
 in {
   options.services.jobDbScraper = {

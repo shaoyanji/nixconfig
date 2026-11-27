@@ -1,3 +1,5 @@
+//go:build ignore
+
 // HTTP API and the score-sorted UI. JSON in/JSON out except /, which is the
 // operator's ranked surface.
 package main

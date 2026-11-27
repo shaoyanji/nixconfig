@@ -48,6 +48,7 @@ func main() {
 	minAlertScore := flag.Int("min-alert-score", 80, "minimum deterministic role-match score that triggers an ntfy alert")
 	adminToken := flag.String("admin-token-env", "JOB_DB_ADMIN_TOKEN", "environment variable naming the optional write bearer token")
 	expectedOrigin := flag.String("origin", "", "expected browser Origin for state-changing requests; empty disables the check")
+	fetchCacheDir := flag.String("fetch-cache-dir", "", "directory for the conditional fetch cache; empty disables validation caching")
 	flag.Parse()
 
 	if *envFile != "" {
@@ -74,7 +75,7 @@ func main() {
 		MaxEnrich:     *maxEnrich,
 		AllowKeyless:  os.Getenv("JOB_DB_ALLOW_KEYLESS") == "1",
 	}
-	sc := newScraper(store, cfg)
+	sc := newScraper(store, cfg, *fetchCacheDir)
 	alertURL := *ntfyURL
 	if alertURL == "" {
 		alertURL = os.Getenv("JOB_DB_NTFY_URL")

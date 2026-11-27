@@ -8,11 +8,14 @@ import (
 	"fmt"
 	"html"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
 	"time"
+
+	"nixconfig.local/fetchcache"
 )
 
 type providerConfig struct {
@@ -38,7 +41,7 @@ type extractor struct {
 	client *http.Client
 }
 
-func newExtractor(cfg providerConfig) *extractor {
+func newExtractor(cfg providerConfig, cacheDirs ...string) *extractor {
 	if cfg.FirecrawlBase == "" {
 		cfg.FirecrawlBase = "https://api.firecrawl.dev/v2"
 	}
@@ -48,7 +51,11 @@ func newExtractor(cfg providerConfig) *extractor {
 	if cfg.ContextBase == "" {
 		cfg.ContextBase = "https://api.context.dev/v1"
 	}
-	return &extractor{cfg: cfg, client: &http.Client{Timeout: 20 * time.Second}}
+	cacheDir := ""
+	if len(cacheDirs) > 0 {
+		cacheDir = cacheDirs[0]
+	}
+	return &extractor{cfg: cfg, client: &http.Client{Timeout: 20 * time.Second, Transport: fetchcache.New(cacheDir, 8<<20, nil, log.Printf)}}
 }
 
 func (e *extractor) providers() map[string]bool {

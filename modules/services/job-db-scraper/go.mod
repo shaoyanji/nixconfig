@@ -2,7 +2,12 @@ module job-db-scraper
 
 go 1.26.0
 
-require modernc.org/sqlite v1.62.0
+require (
+	modernc.org/sqlite v1.62.0
+	nixconfig.local/fetchcache v0.0.0
+)
+
+replace nixconfig.local/fetchcache => ../fetchcache
 
 require (
 	github.com/dustin/go-humanize v1.1.0 // indirect

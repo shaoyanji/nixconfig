@@ -8,12 +8,15 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
 	"sync"
 	"time"
+
+	"nixconfig.local/fetchcache"
 )
 
 var defaultSources = []string{"rss", "json-feeds", "web-search", "scrape-urls"}
@@ -52,7 +55,7 @@ type ingestSummary struct {
 	Message string    `json:"message"`
 }
 
-func newIngester(store *Store, cfg providerConfig) *ingester {
+func newIngester(store *Store, cfg providerConfig, cacheDirs ...string) *ingester {
 	if cfg.FirecrawlBase == "" {
 		cfg.FirecrawlBase = "https://api.firecrawl.dev/v2"
 	}
@@ -71,7 +74,11 @@ func newIngester(store *Store, cfg providerConfig) *ingester {
 	if len(cfg.RSSFeeds) == 0 {
 		cfg.RSSFeeds = []string{"https://feeds.feedburner.com/SlickdealsnetFP", "https://feeds.feedburner.com/DealNews"}
 	}
-	return &ingester{store: store, cfg: cfg, client: &http.Client{Timeout: 45 * time.Second}}
+	cacheDir := ""
+	if len(cacheDirs) > 0 {
+		cacheDir = cacheDirs[0]
+	}
+	return &ingester{store: store, cfg: cfg, client: &http.Client{Timeout: 45 * time.Second, Transport: fetchcache.New(cacheDir, 8<<20, nil, log.Printf)}}
 }
 
 func (s *ingester) status() ingestSummary {

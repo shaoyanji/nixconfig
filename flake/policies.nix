@@ -1446,8 +1446,10 @@
 
     resolver-never-through-served-address = {
       rule = "A host that serves a tailnet resolver address must not resolve through it: tailscaled starts with `--accept-dns=false`, or a resolver outage becomes a dependency outage (host cannot look up its own peer) — the loop the dns-failover doc names.";
-      proof = "hosts/delphi/configuration.nix sets services.tailscale.extraSetFlags with --accept-dns=false";
-      holds = has "hosts/delphi/configuration.nix" ''"--accept-dns=false"'';
+      proof = "hosts/delphi/configuration.nix sets fleet.tailscale.acceptDns = false; modules/global/tailscale-policy.nix renders the tailscaled flag";
+      holds =
+        has "hosts/delphi/configuration.nix" "acceptDns = false"
+        && has "modules/global/tailscale-policy.nix" "--accept-dns=";
       detail = "tailscaled would take MagicDNS from the tailnet resolver address the host itself serves";
     };
 

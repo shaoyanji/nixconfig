@@ -279,6 +279,14 @@ words. After a job-ad selection `work/resume.json` is the selected record, so a
 project `select.py` dropped is not a defect while a row the template dropped is
 still one.
 
+## The audit as a published page
+
+`.#sites.cv-ats-site` repeats the same read-back over `matt-site`'s own six PDFs
+and records, and publishes what it found as one page plus `report.json`. It is a
+flake output, not an edit on a host: `task dev:site:build:cv-ats` builds it and
+`task dev:site:deploy:cv-ats` publishes it to the `cv-ats` Pages project. A
+defect fails that derivation, so the page only ever lists CVs that passed.
+
 ## Downstream: `task apps:build` compiles another template
 
 `task apps:build` drives the workflow checkout, and that checkout keeps its own

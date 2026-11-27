@@ -147,6 +147,14 @@ run_deploy() {
       echo "Deploying '$target' to Neocities site '$deploy_target' from '$output_path/'"
       bash "$SCRIPT_DIR/neocities-push.sh" "$output_path"
       ;;
+    pages)
+      # A Pages project is its own target: `deployTarget` is the project name, and
+      # the branch is production unless PAGES_BRANCH says otherwise. pages-deploy.sh
+      # waits for the deployment to actually answer, so exit 0 means served.
+      echo "Deploying '$target' to Cloudflare Pages project '$deploy_target' from '$output_path/'"
+      bash "$SCRIPT_DIR/pages-deploy.sh" "$output_path" \
+        --project-name="$deploy_target" --branch="${PAGES_BRANCH:-main}"
+      ;;
     *)
       error "Unsupported deployMethod '$deploy_method' for target '$target'"
       exit 1

@@ -2010,10 +2010,8 @@
       date = "2026-10-19";
       summary = "Mode: dynamic remote inference bridge pairing local host agents (Hermes, crush) with ephemeral cloud accelerators (Kaggle TPU VM v3-8 / RunPod / Colab) over an ephemeral Tailscale mesh node (tailscale0), with automatic fallback to hosted APIs. Status: design study. Motivated by the analysis of cloud inference economics and agent prefill limits (see…";
       body = ''
-        **Mode:** dynamic remote inference bridge pairing local host agents (Hermes, crush) with ephemeral
-        cloud accelerators (Kaggle TPU v3-8 / RunPod / Colab) over an ephemeral Tailscale mesh node, with
-        automatic fallback to hosted APIs. Design study; frieren (4c/8t, UHD 620, 11 GiB) cannot run Qwen
-        27B/32B locally at usable precision, so burst inference comes from free cloud accelerator hours.
+        Frieren (4c/8t, UHD 620, 11 GiB) cannot run Qwen 27B/32B at usable precision, so burst inference comes
+        from free cloud accelerator hours over an ephemeral tailnet node, with fallback to hosted APIs.
 
         **Why tutorial implementations break (measured):**
         1. Layer split: Qwen 27B 4-bit (~17 GB) exceeds one T4's 15.3 GiB usable VRAM; Ollama splits layers
@@ -2027,10 +2025,6 @@
         chip; vLLM (>= 0.28.0, Kaggle TPU Lab) runs Qwen 27B at full FP16/BF16 (55.6 GB, 262k context):
         ~130 tok/s generation (8x), ~10,300 tok/s prefill (30x — 30k prompt in 3 s). An ephemeral Tailscale
         auth key replaces tunnels entirely: zero public exposure, no timeout, stable tailnet hostname.
-
-        **Module shape.** `profiles.ai.remoteInference` probes the tailnet endpoint with instant fallback to
-        hosted APIs (OpenRouter / Nous) when the notebook is offline: endpoint, model, apiKeyFile from the
-        sops plane, timeout, fallbackProviders list.
 
         **Why not prod.** Headless daemon tunnels on free-tier Kaggle are gray-area under the June 2025 AUP;
         the notebook lifecycle is non-durable; a week of Kaggle quota is worth ~$4.31 at $1.49/1M tokens on
@@ -2187,36 +2181,20 @@
       date = "2026-10-19";
       summary = "Mode: automated agent-to-agent WebSocket JSON-RPC coordination bridge across the NixOS fleet. Status: design study. Motivated by enabling autonomous peer-to-peer task dispatching between frieren, eisen, stark, and mobile nodes.";
       body = ''
-        **Mode:** automated agent-to-agent WebSocket JSON-RPC coordination bridge across the NixOS fleet.
-        **Status:** design study. Motivated by enabling autonomous peer-to-peer task dispatching between frieren, eisen, stark, and mobile nodes.
+        SimpleX is already the fleet's encrypted bus: SMP on frieren `:5223`, the client daemon on `:5225`.
+        What is missing is a declarative way for agents to dispatch work between hosts —
+        frieren handing a compile to `eisen`, or pulling telemetry from `schneeeule` — without a central relay.
 
-        **Use case.** frieren runs the fleet SimpleX SMP relay server (`:5223`) and client daemon (`:5225`). Currently, operator agents communicate
-        with human operators in `#Fleet`, but cannot autonomously negotiate workloads between hosts (e.g. frieren dispatching a heavy compile job
-        to `eisen` or pulling sensor telemetry from `schneeeule`). A declarative agent mesh profile standardizes the WebSocket JSON-RPC protocol
-        interface across all fleet nodes: agents exchange signed, end-to-end encrypted dispatch messages over SimpleX, automatically authenticating
-        peer agent identities via pre-shared public signing keys without centralized API relays or external internet dependency.
+        **Shape.** A profile standardising the WebSocket JSON-RPC dispatch protocol across nodes: a peer list
+        with roles, an allowed-command set (`ping`, `build-closure`, `query-telemetry`) and an audit log, with
+        peers authenticated by pre-shared signing keys and messages carried end-to-end encrypted over SimpleX.
 
-        **Module shape.**
+        **Evidence.** `simplex-chat.service` runs on frieren and `simplex-rpc.py` already exists in the
+        `simplex-admin` skill, so only the profile and its policy are missing.
 
-        ```nix
-        profiles.interAgentMesh = {
-          enable = true;
-          localDaemonPort = 5225;
-          peerAgents = [
-            { host = "eisen"; role = "build-accelerator"; }
-            { host = "stark"; role = "gpu-inference-worker"; }
-          ];
-          allowedCommands = [ "ping" "build-closure" "query-telemetry" ];
-          auditLog = "/var/log/agents/mesh-dispatch.log";
-        };
-        ```
-
-        **Evidence.** `simplex-chat.service` is active on frieren. Inter-agent coordination skill `simplex-admin` (`simplex-rpc.py`) is already
-        deployed and operational in `~/.agents/skills/simplex-admin/`.
-
-        **Why it is not prod.** Unrestricted command dispatching between autonomous agents introduces privilege escalation risks if an edge
-        node is compromised. Requires cryptographic command whitelisting and strict argument sandboxing. Exit criteria: successful automated
-        ping and telemetry dispatch between frieren and a secondary node over SimpleX with 0 human intervention and full signature verification.
+        **Why not prod.** Unrestricted dispatch between autonomous agents is privilege escalation if one edge
+        node is compromised. Exit: a ping and a telemetry dispatch between frieren and a second node with no
+        human intervention and full signature verification.
       '';
     };
     exp-058 = {
@@ -2359,27 +2337,18 @@
       date = "2026-10-19";
       summary = "Mode: Julia-1 DNS resolution latency & ARP table triage triggering Nemotron-3-Ultra to arbitrate VRRP VIP failover and prevent split-brain states. Status: proposed design study. Motivated by resolving HC-3 (DNS failover resolver gap between frieren and secondary resolver).";
       body = ''
-        **Mode:** Julia-1 DNS resolution latency & ARP table triage triggering Nemotron-3-Ultra to arbitrate VRRP VIP failover and prevent split-brain states.
-        **Status:** proposed design study. Motivated by resolving HC-3 (DNS failover resolver gap between frieren and secondary resolver).
+        frieren runs the fleet resolver, and a VRRP VIP can go split-brain — two hosts answering the same
+        address — during interface transitions or when a secondary resolver returns (`hc3-check`).
 
-        **Use case.** Frieren runs Pi-hole and Unbound as primary fleet DNS. When network interface transitions occur or when a secondary resolver comes online, keepalived VRRP VIPs can enter split-brain where two hosts answer for the same IP (`hc3-check`). `services.dnsHealthArbiter`:
-        * Julia-1 runs microsecond ARP and DNS resolution probes across `enp1s0` and `wlp2s0`.
-        * If two answering MACs are detected for the VIP, Nemotron-3-Ultra analyzes interface states, decides the authoritative primary node based on upstream latency, and synthesizes `arping` gratuitous ARP announcements to force clean convergence.
+        **Shape.** Microsecond ARP and DNS probes across both interfaces, a decision on which node is primary
+        from upstream latency, and gratuitous ARP to force convergence, driven by the resolver's own state
+        rather than by a human.
 
-        **Module shape.**
+        **Evidence.** `task checks:dns:failover` (HC-3) already probes the VIP for two answering MACs, so the
+        detector exists; the arbiter and its action do not.
 
-        ```nix
-        services.dnsHealthArbiter = {
-          enable = true;
-          vrrpVip = "192.168.3.10";
-          resolvers = [ "127.0.0.1" "192.168.3.25" ];
-          splitBrainAction = "assert-primary";
-        };
-        ```
-
-        **Evidence.** `task checks:dns:failover` (HC-3) actively probes VRRP VIP for two answering MACs.
-
-        **Why it is not prod.** Requires testing under simulated Ethernet cable disconnections and WiFi roaming. Exit criteria: simulated dual-master VRRP conflict resolved to a single authoritative resolver in < 2 seconds.
+        **Why not prod.** Untested under cable disconnection and WiFi roaming. Exit: a simulated dual-master
+        conflict resolves to one authoritative resolver in under 2 seconds.
       '';
     };
     exp-081 = {
@@ -2439,30 +2408,18 @@
       date = "2026-10-19";
       summary = "Mode: Julia-1 snapshot tree and differential extent size triage triggering Nemotron-3-Ultra to calculate stream chunking, compression (zstd), and rate-limited wireguard transfer manifests. Status: proposed design study. Motivated by off-site disaster recovery between frieren's 2TB HDD pool (/Volumes/data) and remote fleet storage (poseidon).";
       body = ''
-        **Mode:** Julia-1 snapshot tree and differential extent size triage triggering Nemotron-3-Ultra to calculate stream chunking, compression (zstd), and rate-limited wireguard transfer manifests.
-        **Status:** proposed design study. Motivated by off-site disaster recovery between frieren's 2TB HDD pool (`/Volumes/data`) and remote fleet storage (`poseidon`).
+        Restic keeps file-level state, but bare-metal recovery from frieren's Btrfs subvolumes (`data`,
+        `private`, `transmission`) wants `btrfs send -p | btrfs receive` over the tailnet, which moves extents
+        rather than rereading millions of files.
 
-        **Use case.** While nightly Restic backups preserve file-level state, Btrfs subvolumes (`data`, `private`, `transmission`) have extensive subvolume metadata and immutability flags. Streaming raw differential snapshots (`btrfs send -p ... | btrfs receive ...`) over Tailscale provides byte-for-byte bare-metal recovery without re-reading millions of files. `services.tailscaleBackupReplicator`:
-        * Julia-1 identifies parent-child subvolume generation deltas in < 0.2 ms.
-        * Nemotron-3-Ultra drafts a piped streaming manifest (`btrfs send -p @snap_prev @snap_curr | zstd -3 | pv -L 15m | ssh poseidon btrfs receive /srv/backup/frieren`), enforcing bandwidth limits during active user hours.
+        **Shape.** A service that walks the subvolume parent-child generations, streams a differential to a
+        remote peer (`btrfs send -p @prev @curr | zstd -3 | pv -L 15m | ssh poseidon btrfs receive ...`) and
+        rate-limits the wire during user hours, with a schedule confined to the backup window.
 
-        **Module shape.**
+        **Evidence.** `btrfs send`/`receive` are on the system path and `poseidon` is a connected tailnet peer.
 
-        ```nix
-        services.tailscaleBackupReplicator = {
-          enable = true;
-          sourceSubvolumes = [ "/Volumes/data" "/srv/private" ];
-          remotePeer = "poseidon";
-          remoteMount = "/srv/backup/frieren";
-          maxBandwidthMbps = 50;
-          compression = "zstd";
-          schedule = "03:45:00"; # strictly within backup window
-        };
-        ```
-
-        **Evidence.** Btrfs send/receive tools are in system path. Tailscale peer `poseidon` is connected.
-
-        **Why it is not prod.** Requires testing incremental snapshot re-anchoring when a middle snapshot is pruned. Exit criteria: 50 GB differential snapshot successfully transmitted and mounted on remote peer with 0 stream checksum errors.
+        **Why not prod.** Re-anchoring when a middle snapshot is pruned is untested. Exit: a 50 GB
+        differential transmitted and mounted on the peer with zero checksum errors.
       '';
     };
     exp-095 = {
@@ -2844,6 +2801,61 @@
         **Exit.** With the line quiet, 8 parallel streams fix the home ceiling; a source
         within 1.5x of it is not a seam and stays direct. First artifact: one ZIM
         queried from the sandbox microVM, which needs no home bytes at all.
+      '';
+    };
+    egress-lanes-research = {
+      title = "Three egress lanes: delphi for bulk, frieren for identity, lumi for US geo";
+      kind = "proposal";
+      status = "IN FLIGHT";
+      date = "2026-11-27";
+      summary = "Route each research fetch by what its link is good at — delphi's gigabit for bulk, frieren's residential IP for hostile sources, lumi's US address for geography — through one fetch broker, so a crawl is charged to the tailnet once and the home line spends trust rather than bytes.";
+      from = ["gigabit-seams"];
+      refs = {
+        hosts = ["delphi" "frieren" "lumi"];
+        modules = [
+          "modules/services/fetchcache/fetchcache.go"
+          "modules/services/fetch-broker.nix"
+          "modules/services/tailnet-forward-proxy.nix"
+          "modules/services/link-vault.nix"
+          "modules/services/job-db-scraper.nix"
+          "modules/services/private-deals.nix"
+          "hosts/delphi/configuration.nix"
+          "hosts/lumi.nix"
+          "modules/net/dns/tailnet-address.nix"
+        ];
+        tasks = ["checks:ports" "checks:host" "ops:notes"];
+        docs = ["docs/media-relay.md" "docs/storage-taxonomy.md"];
+      };
+      body = ''
+        **The rule.** Pick the lane by identity before bandwidth: delphi 1.38 Gbps down
+        and 10 TB/month free on a datacenter IP, frieren 50/20 on the only residential
+        IP, lumi ~50 Mbps on a shared US NAT IP and 961 MiB — home is trust, not bytes.
+
+        **Lanes.** `bulk` (delphi): RSS, sitemaps, HF, GitHub, corpora,
+        many-connection pulls. `us` (lumi): US-only pricing, retail and APIs — JSON
+        and text only, four connections, no Chrome. `local` (frieren): sources that
+        only trust a residential IP, plus the JS door at :3002. Fallback is
+        `us -> bulk`, never `local -> bulk`: a datacenter retry on a blocked source
+        is how the OCI range gets blocklisted, which takes the exit node and DNS
+        failover with it.
+
+        **Ranked (Jev 1.14.0).** Conditional cache 57%, broker 30%, research sink 7%,
+        the rest 1% each; cache-then-broker 61% on a second pass, at 0.52 confidence.
+
+        **Top increment, built.** `modules/services/fetchcache` keys a page by
+        SHA-256 of the normalised URL and stores body, ETag, Last-Modified and
+        fetched-at; a stored validator becomes `If-None-Match`, and a 304 moves
+        fetched-at at zero upstream bytes. All three services adopt it with their
+        timeout and cap intact, so one URL is paid once instead of three times.
+
+        **Then the broker.** `modules/services/fetch-broker` answers `POST /v1/fetch`
+        on the tailnet and owns the lanes through `tailnet-forward-proxy`; mount and
+        portal card come from `profiles.serviceExposure`, and the fallback rule is
+        enforced in the broker rather than in each caller.
+
+        **Missing.** No lane has 20 URLs of measured MB-crossed and seconds-per-page,
+        no production repeat fetch has shown zero bytes, and the three commits were
+        never rebuilt or pushed, so "levered" is still a claim about shape.
       '';
     };
     exp-120 = {

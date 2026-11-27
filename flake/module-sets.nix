@@ -146,13 +146,16 @@ in rec {
   # derivation of all 30 configurations did not move.
   featureModules = {
     # Only the inventory/user/systemdJobs injection — the floor every host
-    # stands on. Hosts that take no chain at all (garnixMachine, netbook, the
-    # microVM guests) name this one feature so `features` is never empty.
+    # stands on. Hosts that take no chain at all (garnixMachine and netbook)
+    # name this one feature so `features` is never empty.
     inventory = inventoryModules;
 
     # inventory injection + configurationRevision + modules/global/global.nix +
     # the nixpkgs overlays (simplex-chat, molly-brown, llm-agents).
     base = globalModules;
+
+    # The MicroVM guest input, shared by the canary and test guests.
+    microvm = [inputs.microvm.nixosModules.microvm];
 
     # The NixOS kernel of a desktop or VM host, over the shared support list.
     nixos = [moduleFiles."global.nixos"] ++ nixosSupport;

@@ -1,8 +1,59 @@
 {
-  "generated": "2026-11-27T11:01:40Z",
+  "generated": "2026-11-27T11:08:20Z",
   "count": 200,
-  "pin": "30a5510912b508896bebaaa51b5baac3f220d72f48be0adf07ad32134a04318d",
+  "pin": "bfa19abaa5213b7d83f4c3a36fab715bb57d9564e3b90f0d927f020588f2fe24",
   "turns": [
+    {
+      "id": "13f95eaa-ac98-4505-9ba1-283a8b8e05b4",
+      "ts": "2026-11-27T11:03:38Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-job-scout-finish",
+      "action": "jev job-scout-finish p=0.88 margin=0.82 -> drove freebuff agents:2.1 to complete Arbeitnow application packet + AGENTS.nix note",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "27f754bf43ce1026e30326534991e61dd39d0177",
+      "branch": "main",
+      "frame": "03hba0zvvv4g11dwhk3u9v0fe"
+    },
+    {
+      "id": "7b7c7721-f6dd-422f-b420-66cb46b6d9ce",
+      "ts": "2026-11-27T11:02:00Z",
+      "source": "devin",
+      "subject": "nixconfig:desktop-facts-one-module",
+      "action": "landed: shared desktop facts own greeter, tailscale policy, NAS extras, Haswell graphics and ssh.ca defaults",
+      "outcome": "done",
+      "claims": [
+        "modules/profiles",
+        "modules/global",
+        "hosts"
+      ],
+      "files": [
+        "AGENTS.nix",
+        "flake/module-sets.nix",
+        "modules/global/dms.nix",
+        "modules/global/tailscale-policy.nix",
+        "modules/profiles/base-desktop-environment.nix",
+        "modules/profiles/desktop-client.nix",
+        "modules/profiles/haswell-graphics.nix",
+        "modules/profiles/nas-client.nix",
+        "hosts/aristotle/configuration.nix",
+        "hosts/diogenes/configuration.nix",
+        "hosts/poseidon/configuration.nix",
+        "hosts/stark/configuration.nix",
+        "hosts/fern/configuration.nix",
+        "hosts/eisen/configuration.nix",
+        "hosts/frieren/configuration.nix",
+        "hosts/frieren/desktop.nix",
+        "hosts/schneeeule/configuration.nix",
+        "hosts/scratch/configuration.nix",
+        "hosts/ancientace/configuration.nix",
+        "hosts/aceofspades/configuration.nix"
+      ],
+      "base_commit": "27f754bf43ce1026e30326534991e61dd39d0177",
+      "branch": "main",
+      "frame": "03hba0ogp0xwu7aqucmqv8giq"
+    },
     {
       "id": "0a1a1a66-ac97-4e2e-b758-94be1bf0b065",
       "ts": "2026-11-27T10:57:35Z",
@@ -3010,38 +3061,6 @@
       "base_commit": "febdaf8a672d1a24f2d9aacfd67087f295212d0f",
       "branch": "main",
       "frame": "03hb4c5asawawl3bibpq863bz"
-    },
-    {
-      "id": "f516c8ff-be64-4280-b4ec-c2de605f58d8",
-      "ts": "2026-11-26T17:30:48Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-docs-analytics-telemetry",
-      "action": "claim: document /api/analytics + UI panels on jobs/deals/inventory, clanker presets+schedules, service-portal /api/telemetry badges, and the 4-service smoke in docs/portfolio-services.md",
-      "outcome": "in_progress",
-      "claims": [
-        "docs/portfolio-services.md"
-      ],
-      "files": [],
-      "base_commit": "cfa5113da8159ef216655657587a8d3f2db5d374",
-      "branch": "main",
-      "frame": "03hb4bbw4dsy7mzstgf6vmrxw"
-    },
-    {
-      "id": "f0ca6c7d-ba5a-4e9e-9bd3-c0c356c78eb3",
-      "ts": "2026-11-26T17:29:30Z",
-      "source": "buffy",
-      "subject": "nixconfig:portfolio-smoke-clanker-analytics",
-      "action": "landed: smoke covers clanker-runner (health, stats, page, machines, presets, schedules), /api/analytics on jobs/deals/inventory, and inventory's QR label (said skipped when the register is empty); DOM check re-reads a JS-filled container before calling it empty | gate: checks:tasks PASS, unittest 47 OK, py_compile, live run on 4 temp instances exit 0 plain and with --browser",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/portfolio-smoke.py",
-        "tests/portfolio-smoke",
-        "taskfiles/agents.yml"
-      ],
-      "files": [],
-      "base_commit": "cfa5113da8159ef216655657587a8d3f2db5d374",
-      "branch": "main",
-      "frame": "03hb4b2p6xbs4vk9k13n4nzv2"
     }
   ]
 }

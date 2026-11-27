@@ -8649,5 +8649,21 @@
         and record it: `task apps:update -- <id> --status applied`.
       '';
     };
+
+    workerbase-devops-submitted-2026-11-27 = {
+      title = "Workerbase Senior DevOps Engineer submitted via Arbeitnow";
+      kind = "handoff";
+      status = "DELIVERED";
+      priority = "P2";
+      date = "2026-11-27";
+      summary = "Arbeitnow's apply button is an Ashby form, not a mailbox, so appflow-send dies on 'names no recipient'. The 1p/2p packet went out through agent-browser on 2026-11-27, ahead of the 2026-12-07 lane hold on operator instruction; ledger applied, follow-up 2026-12-11.";
+      refs = {
+        modules = ["scripts/task/appflow-send.sh" "scripts/task/appflow-packet.sh"];
+        tasks = ["checks:appflow"];
+      };
+      body = ''
+        Ashby c14264f0; CV and letter attached, 72k, start 07.12.2026; Ashby confirmed.
+      '';
+    };
   };
 }

@@ -191,8 +191,12 @@ in {
         };
 
         memory = {
-          backend = "sqlite";
+          backend = "sqlite.default";
           search_mode = "bm25";
+        };
+
+        storage.sqlite.default = {
+          open_timeout_secs = 30;
         };
 
         channels.telegram.home = {

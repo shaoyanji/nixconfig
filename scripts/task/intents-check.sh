@@ -15,7 +15,12 @@ cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 if [ $# -ge 1 ]; then
   report="$(cat "$1")"
 else
-  report="$(nix eval --json .#intents.gateReport 2>/dev/null)"
+  # A pure eval cannot see `builtins.currentSystem`, so flake/outputs.nix takes
+  # the x86_64 work system for task-list.json, and an aarch64 host with no
+  # builder has nothing to build it with. Same fallback as lib/kg-graph.sh.
+  if ! report="$(nix eval --json .#intents.gateReport 2>/dev/null)"; then
+    report="$(nix eval --impure --json .#intents.gateReport)"
+  fi
 fi
 
 ok="$(jq -r '.ok' <<<"$report")"

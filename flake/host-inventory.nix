@@ -298,7 +298,7 @@ in
     lumi = {
       features = ["home"];
       modules = [../hosts/lumi.nix];
-      hmModules = ["roles.lean" "sops" "config.authorized-keys"];
+      hmModules = ["roles.lean" "sops" "config.authorized-keys" "user.ai.zeroclaw"];
     };
 
     cassini = {

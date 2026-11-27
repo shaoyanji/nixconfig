@@ -31,6 +31,25 @@
     force = true;
   };
 
+  # No lumi-specific Telegram bot exists in the secrets plane. Reuse the
+  # otherwise unused Morrow bot for the first incarnation; rotate this secret name
+  # when a purpose-built @lumi bot is created.
+  sops.secrets."ai-services-shared-env" = {};
+  sops.secrets."morrow-telegram" = {};
+  sops.templates."zeroclaw-lumi.env" = {
+    mode = "0400";
+    content = ''
+      ${config.sops.placeholder."ai-services-shared-env"}
+      ZEROCLAW_TELEGRAM_BOT_TOKEN=${config.sops.placeholder."morrow-telegram"}
+    '';
+  };
+
+  programs.zeroclaw-user = {
+    enable = true;
+    envFile = toString config.sops.templates."zeroclaw-lumi.env".path;
+    telegramAllowedUsers = ["8679391100"];
+  };
+
   home.file.".local/bin/devin".source = pkgs.writeShellScript "devin" ''
     exe="$HOME/.local/share/devin/cli/_versions/current/bin/devin"
     if [ ! -x "$exe" ]; then
@@ -45,11 +64,16 @@
     tmux=${pkgs.tmux}/bin/tmux
     session=agent-lumi
 
+    pane_is_devin() {
+      [ "$1" = "devin" ] && return 0
+      [ -n "$2" ] && pgrep -x -P "$2" devin >/dev/null 2>&1
+    }
+
     target=$session
     if ! "$tmux" has-session -t "$session" 2>/dev/null; then
       existing_session=
       while read -r pane_session pane_pid pane_cmd; do
-        if [ "$pane_cmd" = "devin" ] || ps --ppid "$pane_pid" -o comm= 2>/dev/null | grep -qx "devin"; then
+        if pane_is_devin "$pane_cmd" "$pane_pid"; then
           existing_session=$pane_session
           break
         fi
@@ -68,7 +92,7 @@
     devin_count=0
     shell_count=0
     while read -r pane_id pane_cmd pane_pid; do
-      if [ "$pane_cmd" = "devin" ] || ps --ppid "$pane_pid" -o comm= 2>/dev/null | grep -qx "devin"; then
+      if pane_is_devin "$pane_cmd" "$pane_pid"; then
         devin_count=$((devin_count + 1))
         if [ -z "$devin_pane" ]; then
           devin_pane=$pane_id

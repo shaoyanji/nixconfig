@@ -1058,7 +1058,7 @@ role = "Dallas NAT VPS (Debian 12 + Standalone Home Manager)"
 category = "cloud"
 desktop_environment = "headless"
 users = ["devji"]
-notes = ["Shared IP 93.127.139.146 with NAT SSH on port 10033 -> 22.", "Debian 12 base OS/kernel/netplan kept intact; Nix + Home Manager (`roles.lean` + `sops`) layered on top with max-jobs = 0.", "cloudflared is imperative Debian (`/etc/systemd/system/cloudflared-lumi.service` + `/etc/cloudflared/lumi.env`); its hardening drop-in passes the tunnel token through the environment, not the process command line.", "SSH hardening lives in `/etc/ssh/sshd_config.d/00-lumi-hardening.conf`; password/root login stay disabled, with X11/agent forwarding off and bounded auth retries/sessions.", "unattended-upgrades is enabled for Debian security maintenance; fail2ban is intentionally omitted because key-only SSH plus a persistent Python daemon is a poor trade on 961 MiB RAM.", "~/.ssh/authorized_keys is Home-Manager-managed from `modules/config/authorized-keys.nix`; do not hand-edit it on lumi.", "Devin CLI is an imperative user install under `~/.local/share/devin`; `lumi-agent` starts it in the first tmux pane with a smart-permission default and a shell beside it."]
+notes = ["Shared IP 93.127.139.146 with NAT SSH on port 10033 -> 22.", "Debian 12 base OS/kernel/netplan kept intact; Nix + Home Manager (`roles.lean` + `sops`) layered on top with max-jobs = 0.", "cloudflared is imperative Debian (`/etc/systemd/system/cloudflared-lumi.service` + `/etc/cloudflared/lumi.env`); its hardening drop-in passes the tunnel token through the environment, not the process command line.", "SSH hardening lives in `/etc/ssh/sshd_config.d/00-lumi-hardening.conf`; password/root login stay disabled, with X11/agent forwarding off and bounded auth retries/sessions.", "unattended-upgrades is enabled for Debian security maintenance; fail2ban is intentionally omitted because key-only SSH plus a persistent Python daemon is a poor trade on 961 MiB RAM.", "~/.ssh/authorized_keys is Home-Manager-managed from `modules/config/authorized-keys.nix`; do not hand-edit it on lumi.", "Devin CLI is an imperative user install under `~/.local/share/devin`; `lumi-agent` starts it in the first tmux pane with a smart-permission default and a shell beside it.", "ZeroClaw is the always-on lightweight Telegram agent; it mirrors the Hermes provider fallback order through the shared AI secret plane and currently reuses the otherwise unused Morrow bot token until a purpose-built lumi bot is created."]
 
 [hosts.lumi.hardware]
 model = "KVM NAT VPS (Dallas)"
@@ -1079,8 +1079,8 @@ ssh_alias = "lumi"
 [hosts.lumi.software]
 module_chain = "globalModulesHome"
 impermanence = false
-key_services = ["openssh (NAT 10033 -> 22)", "tailscaled", "nix-daemon (max-jobs = 0)", "sops-nix (user)", "cloudflared (lumi.bountystash.com)", "traefik (127.0.0.1:8080)", "lumi-web (127.0.0.1:8081)"]
-services = [{ name = "openssh", port = 22 }, { name = "tailscale" }, { name = "nix" }, { name = "cloudflared" }, { name = "traefik", port = 8080 }, { name = "lumi-web", port = 8081 }]
+key_services = ["openssh (NAT 10033 -> 22)", "tailscaled", "nix-daemon (max-jobs = 0)", "sops-nix (user)", "cloudflared (lumi.bountystash.com)", "traefik (127.0.0.1:8080)", "lumi-web (127.0.0.1:8081)", "zeroclaw-telegram (user daemon)"]
+services = [{ name = "openssh", port = 22 }, { name = "tailscale" }, { name = "nix" }, { name = "cloudflared" }, { name = "traefik", port = 8080 }, { name = "lumi-web", port = 8081 }, { name = "zeroclaw-telegram" }]
 traits = ["cloud-server", "x86_64", "1gb-ram", "nat-vps", "debian-12", "standalone-home-manager", "lean-profile"]
 
 [hosts.lumi.persona]

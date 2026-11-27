@@ -1,8 +1,129 @@
 {
-  "generated": "2026-11-27T12:56:37Z",
+  "generated": "2026-11-27T13:31:54Z",
   "count": 200,
-  "pin": "bcbea0b110d6e613f32dcf46d8bb58b67585e8edd8f157a426fdacc4dceb6e3c",
+  "pin": "a217d51acb58a707ee05513b5701bbdb41f02ca648dcdcc5ed9176d9ec19251f",
   "turns": [
+    {
+      "id": "5b9e5580-4bbb-4d79-87c7-6239e4f41ee8",
+      "ts": "2026-11-27T13:30:26Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff-cv-publish",
+      "action": "drove pane-2 freebuff: publish CV site to GitHub Pages and confirm routes 200; classify publish 0.95|0.91 exit 0; fresh working line confirmed",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbato9ne8lkcz9zvej28wlm"
+    },
+    {
+      "id": "075d0083-ee71-426f-a192-7fb3ab40ec55",
+      "ts": "2026-11-27T13:25:09Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-1-freebuff-cv-jobscout",
+      "action": "landed: 3 infra leads filed + packets (anschreiben+lebenslauf) built from DB text via apps:gate:packet; site deploy confirmed GitHub Pages (no Vercel), all routes 200 | gate: apps:gate:packet PASS x3",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbasn358zrcf6bj8x9o5yz4"
+    },
+    {
+      "id": "80796ea2-99e5-48d0-a25d-c7e2da10a20b",
+      "ts": "2026-11-27T13:21:37Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-1-freebuff-cv-jobscout",
+      "action": "scout: sweep 2026-11-27s filed 3 new infra leads (Loewenstein Medical cloud infra, H. Gautzsch senior Linux, SSI Solutions cloud architect) with JD imported and packets built; site deploy verified 200 on all routes",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
+      "branch": "main",
+      "frame": "03hbary8okwijjv1xr43dx1hr"
+    },
+    {
+      "id": "7b15a7cb-441f-4f73-9404-f3fbb938a337",
+      "ts": "2026-11-27T13:21:15Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:image-daily-wallpaper",
+      "action": "agents:3.1 wallpaper round blocked: free Gemini quota exhausted (resets ~140h); survey prompt showing",
+      "outcome": "blocked: free Gemini tier quota exhausted (~140h reset)",
+      "claims": [],
+      "files": [],
+      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
+      "branch": "main",
+      "frame": "03hbarvmwo6gu8xqbavs71800"
+    },
+    {
+      "id": "98173343-9c2b-4a41-b58b-1b4113c3501e",
+      "ts": "2026-11-27T13:20:42Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:image-daily-wallpaper",
+      "action": "drove agents:3.1 wallpaper-worker (publish); Running command started",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
+      "branch": "main",
+      "frame": "03hbarrqimgbic6xd6b345uc2"
+    },
+    {
+      "id": "b4fe220d-facb-4ac2-93ea-2249e74cd9db",
+      "ts": "2026-11-27T13:17:35Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-rebase-origin",
+      "action": "landed: rebased delphi main onto origin/main (76 commits; origin lumi/zeno/kali kept, delphi delphi ports 8464-8468 kept). Also fixed lumi port prose and aligned modules/secrets worktree to pinned f47b0a6 | gate: checks:quick PASS, checks:policies PASS, checks:host delphi PASS 2197 assertions",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "257e96b649d2ec2632a6624b109cd644f75fd336",
+      "branch": "main",
+      "frame": "03hbar5vtxodelcagz1a7lwsl"
+    },
+    {
+      "id": "389beaff-c628-41fe-a401-de0f7c12e30c",
+      "ts": "2026-11-27T13:08:07Z",
+      "source": "devin",
+      "subject": "nixconfig:netbook-dwl-ci",
+      "action": "landed: confirmed the existing dwl 0.9 graft fixes netbook CI; no new source edit required | gate: nix build -L --rebuild --no-link .#nixosConfigurations.netbook.config.programs.dwl.package PASS; CI netbook job 140513461028 in run 46001318317 success",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "89f19a89b2dd0f6e491ce49a70692e5f92eecb5a",
+      "branch": "HEAD",
+      "frame": "03hbapb9vn8p364hqgkm7cg96"
+    },
+    {
+      "id": "57d8d5c8-7b4b-43d2-9364-3cd986167c41",
+      "ts": "2026-11-27T13:05:30Z",
+      "source": "devin",
+      "subject": "nixconfig:netbook-dwl-ci",
+      "action": "start: investigate netbook dwl CI build path and reproduce the failing derivation before editing",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/netbook",
+        "flake",
+        "modules"
+      ],
+      "files": [],
+      "base_commit": "89f19a89b2dd0f6e491ce49a70692e5f92eecb5a",
+      "branch": "HEAD",
+      "frame": "03hbaosuflwlchcrh0sb6uupq"
+    },
+    {
+      "id": "7682e3b6-4fba-4b96-8b59-2b5a592665ce",
+      "ts": "2026-11-27T12:58:32Z",
+      "source": "devin",
+      "subject": "nixconfig:feature-chain-module-refactor",
+      "action": "landed: shared linux/disko support chains, Linux-only tailscale leaf gate, and kali checksec dedupe | gate: checks:host eval sweep PASS for every module-system host; drv-equality ares/delphi/demo/lumi 4/4 identical",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "89f19a89b2dd0f6e491ce49a70692e5f92eecb5a",
+      "branch": "HEAD",
+      "frame": "03hbanfw4r3jdty1ajzucnpkw"
+    },
     {
       "id": "a8991830-72b0-4f0e-a7ae-fae28c326872",
       "ts": "2026-11-27T12:54:57Z",
@@ -2869,160 +2990,6 @@
       "base_commit": "c1ca96cb04064e3d34af3ca81fb584a28c7412cb",
       "branch": "main",
       "frame": "03hb4rk65zkprkcejtwkxnv99"
-    },
-    {
-      "id": "2697b076-92ef-43dc-aef0-147b80a4190e",
-      "ts": "2026-11-26T18:51:49Z",
-      "source": "buffy",
-      "subject": "nixconfig:add-mail-atlas-cli-and-smoke-tests",
-      "action": "landed: agents:mail:atlas:probe (probe|stats|recent|search|routes, read-only) + tests/mail-atlas-api 10 cases; check: checks:mail-atlas (also gates the 10 orphan drain tests). Live: ok, letters 3930 tagged 2686, newest 1h, openAction 20, queued 0m, 53 routes, search 50 rows. Trap measured: ?q=x&lim=2 = 404 while ?q=x = 200 | gate: checks:mail-atlas PASS, checks:tasks PASS (847), checks:prose PASS (174); site test needs agent-browser, not run",
-      "outcome": "done",
-      "claims": [
-        "scripts/task",
-        "tests/mail-atlas-api",
-        "taskfiles"
-      ],
-      "files": [],
-      "base_commit": "c1ca96cb04064e3d34af3ca81fb584a28c7412cb",
-      "branch": "main",
-      "frame": "03hb4r5mlvbdy9y8xijzma11m"
-    },
-    {
-      "id": "5667597d-40e7-4ca0-b49a-ba2177d0764e",
-      "ts": "2026-11-26T18:49:09Z",
-      "source": "buffy",
-      "subject": "nixconfig:add-mail-atlas-cli-and-smoke-tests",
-      "action": "claim: inspect mail-atlas/email-archive coverage, add a CLI/health probe with offline fixtures where the gap is",
-      "outcome": "in_progress",
-      "claims": [
-        "tests/mail-atlas-site",
-        "scripts/task",
-        "taskfiles"
-      ],
-      "files": [],
-      "base_commit": "ddd5c94738e358219c835f84621667605a6eceda",
-      "branch": "main",
-      "frame": "03hb4qmvdg83azp17l9mgzggc"
-    },
-    {
-      "id": "8d573fbe-6bce-4f47-aaa7-528821bc2ff4",
-      "ts": "2026-11-26T18:48:03Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-service-health-and-resource-audit",
-      "action": "audit: delphi / 92G/195G 50%, RAM 3.9/11Gi (avail 7.7), swap 1.8/5.8, load 2.78/4.09/4.80, PSI cpu avg300 47.7, 0 failed units, journal 297.6M, store 78.6G/2971 roots, /tmp 2.0G->1.6G (-368MiB sweep scratch), sentinel ok 3m, endpoints 8464-8467/8450/8455/8456 200, xs ok; service-portal+link-vault not in deployed gen 83b8ed8b. Fix: ops:health refuses a stale ok (>45m) | gate: checks:tasks, checks:prose, checks:ops:health",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/ops-health.sh",
-        "tests/ops-health",
-        "taskfiles/ops.yml",
-        "taskfiles/checks.yml"
-      ],
-      "files": [],
-      "base_commit": "ddd5c94738e358219c835f84621667605a6eceda",
-      "branch": "main",
-      "frame": "03hb4qf2et1wf9ebxo4a5ip5l"
-    },
-    {
-      "id": "1c5c0eb6-c9db-463f-8f09-c00ea26bbfb6",
-      "ts": "2026-11-26T18:46:46Z",
-      "source": "devin",
-      "subject": "nixconfig:enhance-job-db-scraper-dedupe-and-interview-tracker",
-      "action": "claim: add cross-source canonical dedupe, application/interview stage tracking, exports, and UI controls",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/services/job-db-scraper",
-        "modules/services/job-db-scraper.nix"
-      ],
-      "files": [],
-      "base_commit": "ddd5c94738e358219c835f84621667605a6eceda",
-      "branch": "main",
-      "frame": "03hb4q642e368v9j2c6ixe24e"
-    },
-    {
-      "id": "1e01f5a3-9c47-4361-9a79-a33459c12228",
-      "ts": "2026-11-26T18:45:59Z",
-      "source": "devin",
-      "subject": "nixconfig:enhance-private-deals-price-alerts-and-scrapers",
-      "action": "landed: watchlist-aware polling, price-drop event ledger, deduped ntfy alerts, RSS/Atom/JSON exports, and UI controls | gate: go test+vet, node, alejandra, checks:host, delphi toplevel, live smoke PASS",
-      "outcome": "done",
-      "claims": [
-        "modules/services/private-deals",
-        "modules/services/private-deals.nix"
-      ],
-      "files": [
-        "modules/services/private-deals",
-        "modules/services/private-deals.nix"
-      ],
-      "base_commit": "ddd5c94738e358219c835f84621667605a6eceda",
-      "branch": "main",
-      "frame": "03hb4q0l219ra90aqu73ulba4"
-    },
-    {
-      "id": "739af2ed-a2b7-4b19-89ce-a3c0752a4aa7",
-      "ts": "2026-11-26T18:32:23Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-service-health-and-resource-audit",
-      "action": "claim: read-only delphi audit (disk/RAM/PSI/journald/failed units/7 tailnet endpoints/sentinel), fix a broken probe only if one shows",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task",
-        "taskfiles/ops.yml"
-      ],
-      "files": [],
-      "base_commit": "f0ca528efb24cf38bdbc1038b68679bb529125c3",
-      "branch": "main",
-      "frame": "03hb4nczlgh8ams4288jg60n4"
-    },
-    {
-      "id": "3f276fc5-4fdb-4023-9d34-d9104adc47e8",
-      "ts": "2026-11-26T18:31:43Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:closure-budget-coverage",
-      "action": "task-change: baseline all host closures; checks:closure:budget ALL=1",
-      "outcome": "in_progress",
-      "claims": [
-        "closure-budgets.toml"
-      ],
-      "files": [],
-      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
-      "branch": "main",
-      "frame": "03hb4n88a31tt1wcbxljki0o6"
-    },
-    {
-      "id": "e4f62920-f7db-4994-a1b1-c66fa5bac262",
-      "ts": "2026-11-26T18:30:19Z",
-      "source": "hermes",
-      "subject": "nixconfig:security-hardening",
-      "action": "start: steer panes toward security hardening (sops/age-key audit, host hardening review, cert expiry, fallback liveness)",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/secrets/",
-        "modules/profiles/",
-        "modules/config/"
-      ],
-      "files": [],
-      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
-      "branch": "main",
-      "frame": "03hb4myfivaorsxsvwd1k0rbw"
-    },
-    {
-      "id": "47be0a1f-f344-441d-9262-07cea796a20e",
-      "ts": "2026-11-26T18:30:18Z",
-      "source": "buffy",
-      "subject": "nixconfig:add-apps-scout-dynamic-sweep-cycle-and-dedupe",
-      "action": "landed: apps:scout:sweep SWEEP defaults to (now | date \"2006-01-02\") in UTC (2026-11-26 today), prints the next-letter rule, override still wins; apps-scout refuses a relative/mailto: --url (trims first); jobs-ingest skips a non-http(s) url by name so --company cannot file one | gate: checks:tasks, checks:prose, checks:appflow (13 scout cases), jobs-ingest 31 tests",
-      "outcome": "done",
-      "claims": [
-        "taskfiles/apps.yml",
-        "scripts/task/apps-scout.sh",
-        "scripts/task/jobs-ingest.py",
-        "tests/apps-scout",
-        "tests/jobs-ingest"
-      ],
-      "files": [],
-      "base_commit": "f0ca528efb24cf38bdbc1038b68679bb529125c3",
-      "branch": "main",
-      "frame": "03hb4myb4szil1airyc12bv6j"
     }
   ]
 }

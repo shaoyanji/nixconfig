@@ -1,6 +1,6 @@
 ---
 name: jevdecide
-description: Jev decisions for hermes — classify or choose with jev-decide, route a lane on calibrated probabilities, pick between Jev and Laya, never let a model authorise an action.
+description: Jev decisions for hermes — TypeSafe Jev first, with openrouter, Laya and the in-repo scorer only as fallbacks; classify or choose with jev-decide, route a lane on calibrated probabilities, never let a model authorise an action.
 version: 3.0.0
 author: Shaoyan Ji (shaoyanji), Hermes Agent
 license: MIT
@@ -25,15 +25,13 @@ Do not use it to write, summarise, plan or explain: it returns a label.
 `~/.local/bin/jev-decide` wraps the upstream CLI: the default provider is
 **typesafe** (`JEV_PROVIDER` overrides), an explicit `--provider` wins, and a
 transport failure (HTTP/dns/tls/timeout/connection/missing key) retries once on
-the other provider. Request-side errors never retry.
+the openrouter lane. Request-side errors never retry.
 
-The **openrouter fallback lane uses `perplexity/pplx-decider-v1.3:free`**
-(probed 2026-11-24: exit 0, selected @ 0.87, ~0.35 s, zero cost). When the
-primary (typesafe) fails and the retry lands on openrouter, the wrapper pins
-that model unless the caller passed `--model` explicitly. Override the model
-with `JEV_OPENROUTER_MODEL`; an explicit `--model` in argv always wins. The
-missing-key error string is `Set <NAME>_API_KEY …` (underscore) — the wrapper prose-tell-ok: names the character
-matches `Set *API*` so a missing primary key triggers the openrouter retry.
+The openrouter lane pins `perplexity/pplx-decider-v1.3:free`
+(probed 2026-11-24: exit 0, selected @ 0.87, ~0.35 s, zero cost) unless the
+caller passed `--model`; `JEV_OPENROUTER_MODEL` overrides the pin. A missing key
+prints `Set <NAME>_API_KEY …`, which the wrapper matches as `Set *API*` and
+therefore treats as a transport failure worth one retry.
 
 ```bash
 # 1. Classify one text against described labels
@@ -81,30 +79,47 @@ cpg chat -m gpt-6-luna -s advice-review "…" \
 
 ## Which model answers a decision
 
-Two models can, and the router on Eisen (:8000) already picks between them:
+One ladder, TypeSafe first. A step is reached only when the one above it cannot
+answer, and every answer names the step that produced it.
 
-| Model | Where | Input limit | When |
+| Step | Lane | Invocation | Trigger |
 | :--- | :--- | :--- | :--- |
-| **TypeSafe Jev** (cloud) | api.typesafe.ai, via the router | large | default; most accurate (0.966 macro on the public benchmark) |
-| **Laya** (local) | `127.0.0.1:8090`, on demand | **512 tokens**, hard | Jev unreachable — the only local lane |
+| 1 | **TypeSafe Jev** (cloud, most accurate at 0.966 macro on the public benchmark) | `jev-decide … --provider typesafe`, or `POST api.typesafe.ai/v1/systemone` | every call |
+| 2 | openrouter `pplx-decider-v1.3:free` | the wrapper's single automatic retry | transport, auth, 402 or timeout from step 1 |
+| 3 | **Laya** (local, `127.0.0.1:8090`) via the Eisen router `:8000` | `decide local …` | TypeSafe and openrouter both unreachable; input ≤ **512 tokens** |
+| 4 | in-repo scorer (`systemone-decision`, `:8091`) | `systemone-decision …`, `task ops:categorize` fallback | no network path at all |
 
-1. **Jev first**, 25 s timeout; the router forwards the client's auth.
-2. **On provider failure, Laya.** Provider failure means transport errors,
-   5xx, auth, payment and rate limits — the router stamps `X-Decision-Provider`
-   on every answer so a silent switch is visible. A request-side error
-   (4xx) returns TypeSafe's own response; it is not re-asked of a weaker model.
-   Inputs beyond Laya's 512-token limit have no local lane: Jev stays the only
-   answer, so retry or hand the residue to a reasoner instead of truncating.
-3. **A first-request 502 is working behaviour.** After idle, Laya's cold start
-   can exceed the 25 s timeout, so the first decision 502s and the second
-   succeeds. Retry; do not lengthen the timeout.
+`jev-decide` is missing on some hosts (delphi has no copy on PATH). That is not a
+reason to start at step 3 — call TypeSafe over HTTP instead:
 
-**Laya's `confidence` is `1 − normalized entropy`**, so a Jev cutoff does not
-transfer, and it is not a drop-in: on large option sets it falls to ~0.43 where
-Jev holds 0.87. **Kev-4B is deliberately not a lane**: the merged GGUF works in
-stock llama.cpp (tested 2026-10-17 on :8092), but the operator's recorded
-decision is no endpoint and no router wiring — its long-context accuracy is
-unvalidated. It exists on disk for direct tests only.
+```bash
+set -a; . ~/.hermes/.env; set +a                       # TYPESAFE_API_KEY
+jq -n --arg s "$STATE" --argjson q "$QUESTIONS" '{state: $s, questions: $q}' \
+  | curl -fsS --max-time 25 -H 'content-type: application/json' \
+      -H "authorization: Bearer $TYPESAFE_API_KEY" --data @- \
+      https://api.typesafe.ai/v1/systemone
+```
+
+Details that bite:
+
+- The Eisen router forwards the client's auth with a 25 s TypeSafe timeout and
+  stamps `X-Decision-Provider` on every answer, so a switch is visible. A
+  request-side error (4xx) returns TypeSafe's own response and is not re-asked of
+  a weaker model.
+- **A first-request 502 is working behaviour.** After idle, Laya's cold start can
+  exceed 25 s, so the first decision 502s and the second succeeds. Retry; do not
+  lengthen the timeout.
+- **Laya's `confidence` is `1 − normalized entropy`**, so a Jev cutoff does not
+  transfer, and it is not a drop-in: on large option sets it falls to ~0.43 where
+  Jev holds 0.87. Inputs beyond its 512-token limit have no local lane: retry
+  TypeSafe or hand the residue to a reasoner instead of truncating.
+- Step 4 scores by lexical overlap (hash embeddings + softmax), not the 421M
+  checkpoint; its confidence is low signal and it is offline-only.
+  `/v1/systemone` on `:8091` is the self-hosted service; delphi answers it on 8444.
+- **Kev-4B is deliberately not a lane**: the merged GGUF works in stock llama.cpp
+  (tested 2026-10-17 on :8092), but the operator's recorded decision is no
+  endpoint and no router wiring — its long-context accuracy is unvalidated. It
+  exists on disk for direct tests only.
 
 From a nushell shell (`modules/config/nu/decision.nu`) the same lane, with the
 provider failure printed to stderr so a silent switch to the weaker local model
@@ -117,10 +132,6 @@ decide yes "the upstream is degraded" --state {msg: "502"}
 decide score "rate severity" --criteria [ok degraded down]
 decide jev …   ·   decide local …                    # force one side
 ```
-
-The `local` CLI in this repo scores by lexical overlap (hash embeddings +
-softmax), not the 421M checkpoint — its confidence is low signal, so treat it as
-an offline fallback.
 
 **For graph-intent routing ("what touches frieren") no model is used at all.**
 When no keyword rule matches, `ops:ask` returns the context bundle of the node the
@@ -148,8 +159,11 @@ there is no hook for it.
 
 - A paywall, a 402, a timeout or an unparseable body is a refusal, never a
   partial result. Report it; do not act on a defaulted label.
-- No CLI or no key: say so and mark the judgement as simulation
-  (`jev_called: false`, `probability: null`). Never invent Jev output.
+- No CLI on PATH: call the API directly (the curl above) before considering a
+  fallback. No key either: say so and mark the judgement as simulation
+  (`jev_called: false`, `provider: null`, `probability: null`). Never invent Jev
+  output, and never let a step-3 or step-4 answer stand in for a TypeSafe one
+  without saying that it did.
 - Keys live in `~/.hermes/.env`, which a hermes turn already loads. In a bare
   shell: `set -a; . ~/.hermes/.env; set +a`.
 - `jev-decide setup` reports key presence without a network call. Check presence,

@@ -5,22 +5,26 @@
   argueAbove = 200;
   pages = {
     ".agents/skills/agent-browser/SKILL.md" = 134;
+    ".agents/skills/agent-pane-session-recovery/SKILL.md" = 81;
     ".agents/skills/agents-notes/SKILL.md" = 229;
     ".agents/skills/agents/SKILL.md" = 19;
     ".agents/skills/ai-memory/SKILL.md" = 68;
     ".agents/skills/antigravity/SKILL.md" = 185;
     ".agents/skills/apisfreellm/SKILL.md" = 147;
     ".agents/skills/apps/SKILL.md" = 121;
+    ".agents/skills/aria2-queue-download/SKILL.md" = 73;
     ".agents/skills/atuin/SKILL.md" = 155;
     ".agents/skills/bountystash/SKILL.md" = 73;
     ".agents/skills/brainstorm/SKILL.md" = 81;
     ".agents/skills/burgernas/SKILL.md" = 116;
     ".agents/skills/calendar/SKILL.md" = 221;
     ".agents/skills/checks/SKILL.md" = 82;
+    ".agents/skills/ci-failure-triage/SKILL.md" = 56;
     ".agents/skills/codespace/SKILL.md" = 99;
     ".agents/skills/confirm-before-destructive/SKILL.md" = 45;
     ".agents/skills/correct/SKILL.md" = 48;
     ".agents/skills/cpg/SKILL.md" = 310;
+    ".agents/skills/cpg-image-publish/SKILL.md" = 121;
     ".agents/skills/crush/SKILL.md" = 15;
     ".agents/skills/data/SKILL.md" = 39;
     ".agents/skills/dev/SKILL.md" = 53;
@@ -32,12 +36,14 @@
     ".agents/skills/google-drive/SKILL.md" = 55;
     ".agents/skills/home-assistant/SKILL.md" = 91;
     ".agents/skills/host-facts/SKILL.md" = 82;
+    ".agents/skills/hermes-pane-context-restore/SKILL.md" = 79;
     ".agents/skills/image-generate/SKILL.md" = 58;
     ".agents/skills/infra/SKILL.md" = 61;
     ".agents/skills/instabox/SKILL.md" = 106;
     ".agents/skills/iventoy/SKILL.md" = 110;
     ".agents/skills/job-scout-lane/SKILL.md" = 64;
     ".agents/skills/jobsearch-pipeline/SKILL.md" = 81;
+    ".agents/skills/jev-email-cleansing/SKILL.md" = 12;
     ".agents/skills/jevdecide/SKILL.md" = 156;
     ".agents/skills/knowledge-base/SKILL.md" = 197;
     ".agents/skills/mail-alias/SKILL.md" = 83;
@@ -47,6 +53,7 @@
     ".agents/skills/moto/SKILL.md" = 29;
     ".agents/skills/neocities/SKILL.md" = 55;
     ".agents/skills/nix-eval/SKILL.md" = 109;
+    ".agents/skills/nixos-best-practices/SKILL.md" = 149;
     ".agents/skills/nixos-deploy/SKILL.md" = 55;
     ".agents/skills/no-comments/SKILL.md" = 41;
     ".agents/skills/officecli/SKILL.md" = 43;
@@ -60,12 +67,17 @@
     ".agents/skills/qmd/SKILL.md" = 155;
     ".agents/skills/reasonix/SKILL.md" = 68;
     ".agents/skills/router/SKILL.md" = 68;
+    ".agents/skills/self-driving-cron/SKILL.md" = 45;
     ".agents/skills/serv00/SKILL.md" = 50;
     ".agents/skills/services/SKILL.md" = 22;
     ".agents/skills/simplex-admin/SKILL.md" = 13;
+    ".agents/skills/steward-cron/SKILL.md" = 116;
     ".agents/skills/stt/SKILL.md" = 74;
+    ".agents/skills/subagent-orchestration/SKILL.md" = 149;
     ".agents/skills/task-plane/SKILL.md" = 157;
     ".agents/skills/tmux/SKILL.md" = 147;
+    ".agents/skills/tmux-pane-driving/SKILL.md" = 44;
+    ".agents/skills/tmux-pane-steward/SKILL.md" = 292;
     ".agents/skills/unslop/SKILL.md" = 69;
     ".agents/skills/voice-loop/SKILL.md" = 71;
     ".agents/skills/wikisearch/SKILL.md" = 149;
@@ -82,6 +94,7 @@
     ".agents/skills/agents-notes/SKILL.md" = "the note contract, the status table, and the promotion ladder that keeps a note code-shaped";
     ".agents/skills/calendar/SKILL.md" = "two calendars and a consent flow with three documented dead ends";
     ".agents/skills/cpg/SKILL.md" = "four lanes over one client, one auth story, two budgets, one shared failure table";
+    ".agents/skills/tmux-pane-steward/SKILL.md" = "the steward's decision table, recovery order and nudge wording — one page an on-call pane actually re-reads mid-incident";
   };
 in {
   inherit argueAbove pages notes;

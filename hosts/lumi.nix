@@ -44,17 +44,60 @@
   home.file.".local/bin/lumi-agent".source = pkgs.writeShellScript "lumi-agent" ''
     tmux=${pkgs.tmux}/bin/tmux
     session=agent-lumi
+
+    target=$session
     if ! "$tmux" has-session -t "$session" 2>/dev/null; then
-      existing_session=$("$tmux" list-panes -a -F '#{pane_current_command} #{session_name}' 2>/dev/null | awk '$1 == "devin" { print $2; exit }')
+      existing_session=
+      while read -r pane_session pane_pid pane_cmd; do
+        if [ "$pane_cmd" = "devin" ] || ps --ppid "$pane_pid" -o comm= 2>/dev/null | grep -qx "devin"; then
+          existing_session=$pane_session
+          break
+        fi
+      done < <("$tmux" list-panes -a -F '#{session_name} #{pane_pid} #{pane_current_command}' 2>/dev/null)
       if [ -n "$existing_session" ]; then
-        exec "$tmux" attach-session -t "$existing_session"
+        target=$existing_session
       fi
-      "$tmux" new-session -d -s "$session" -n agent -c "$HOME" "$HOME/.local/bin/devin"
-      devin_pane=$("$tmux" display-message -p -t "$session:agent" '#{pane_id}' | head -n 1)
+    fi
+
+    devin_pane=
+    if ! "$tmux" has-session -t "$target" 2>/dev/null; then
+      devin_pane=$("$tmux" new-session -d -P -F '#{pane_id}' -s "$session" -n agent -c "$HOME" "$HOME/.local/bin/devin")
+      target=$session
+    fi
+
+    devin_count=0
+    shell_count=0
+    while read -r pane_id pane_cmd pane_pid; do
+      if [ "$pane_cmd" = "devin" ] || ps --ppid "$pane_pid" -o comm= 2>/dev/null | grep -qx "devin"; then
+        devin_count=$((devin_count + 1))
+        if [ -z "$devin_pane" ]; then
+          devin_pane=$pane_id
+        fi
+      else
+        shell_count=$((shell_count + 1))
+      fi
+    done < <("$tmux" list-panes -s -t "$target" -F '#{pane_id} #{pane_current_command} #{pane_pid}' 2>/dev/null)
+
+    if [ "$devin_count" -eq 0 ] && [ -z "$devin_pane" ]; then
+      devin_pane=$("$tmux" new-window -d -P -F '#{pane_id}' -t "$target" -n agent -c "$HOME" "$HOME/.local/bin/devin")
+    fi
+
+    if [ "$shell_count" -eq 0 ] && [ -n "$devin_pane" ]; then
       "$tmux" split-window -h -t "$devin_pane" -c "$HOME"
       "$tmux" select-pane -t "$devin_pane"
     fi
-    exec "$tmux" attach-session -t "$session"
+
+    if [ -n "''${TMUX:-}" ]; then
+      current_session=$("$tmux" display-message -p '#S')
+      if [ "$current_session" != "$target" ]; then
+        exec "$tmux" switch-client -t "$target"
+      fi
+      echo "lumi-agent: already in tmux session $target"
+    elif [ -t 0 ] && [ -t 1 ]; then
+      exec "$tmux" attach-session -t "$target"
+    else
+      echo "lumi-agent: tmux session $target is ready; attach with: tmux attach -t $target"
+    fi
   '';
 
   home.file."public/lumi/index.html".text = ''

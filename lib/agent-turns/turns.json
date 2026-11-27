@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-27T14:41:14Z",
+  "generated": "2026-11-27T14:56:41Z",
   "count": 200,
-  "pin": "386275a6c4cfc26f27fa5acc8c3be209c5e098f6f67104842030c72aaf26f33a",
+  "pin": "6ee92f5128bc20eb3cbfe0f78c8788d74c2d1ef152a17bd533836116fce62f13",
   "turns": [
+    {
+      "id": "8dd2d108-55c5-4cde-80d8-54b1bdf162b6",
+      "ts": "2026-11-27T14:46:53Z",
+      "source": "buffy",
+      "subject": "nixconfig:job-scout",
+      "action": "Sweep 2026-11-27x: five boards parsed 1382 / fresh 115 / new 0; arbeitnow 2914 postings, 156 in-lane, 14 employers new to the record, 2 filed (VOLENTUM, DOMUS Consult), table at 150 rows | gate: Pages run 46018841892 success, 8 routes + 10 PDFs 200",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
+      "branch": "main",
+      "frame": "03hbb8lund0kka7z301ow8yvv"
+    },
     {
       "id": "63f5b3b8-5c04-449e-ad50-2a711d5b30de",
       "ts": "2026-11-27T14:40:20Z",
@@ -2926,23 +2939,6 @@
       "base_commit": null,
       "branch": null,
       "frame": "03hb59s6fwp247q4nctrj9dah"
-    },
-    {
-      "id": "b765bdea-8b3e-4e42-9118-080c214fb761",
-      "ts": "2026-11-26T20:10:06Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:image-daily-wallpaper",
-      "action": "drove agents:5.1 wallpaper-worker agy: submit commit nixconfig-dark.png + lib/image-daily/briefs.json + rotation.json, push origin/main; jev note-change 0.83/0.66; restarted pane on plain agy Pro route (Google AI Pro); immediate individual quota reached, resets ~25m, no working line; pane left idle",
-      "outcome": "blocked: Individual quota reached on agents:5.1, resets ~25m35s, no working line confirmed",
-      "claims": [
-        "wallpapers/nixconfig-dark.png",
-        "lib/image-daily/briefs.json",
-        "lib/image-daily/rotation.json"
-      ],
-      "files": [],
-      "base_commit": "2099a85a412a75096e56ffca4e82024a8a5fa10e",
-      "branch": "main",
-      "frame": "03hb56g3ota4285p7dgqf85ko"
     }
   ]
 }

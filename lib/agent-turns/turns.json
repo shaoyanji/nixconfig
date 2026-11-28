@@ -1,8 +1,36 @@
 {
-  "generated": "2026-11-28T14:17:29Z",
+  "generated": "2026-11-28T14:20:14Z",
   "count": 200,
-  "pin": "56e4e267b1714bc7670d3547740b3c2496252e85bae5843d81c670396da4d4f5",
+  "pin": "0ce335d77523858695a4cf9d6d0dd244d5f961e5093b8f396568dca42facc4df",
   "turns": [
+    {
+      "id": "5288072b-b547-4964-a788-be0b416f5eb6",
+      "ts": "2026-11-28T14:19:58Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-site-a11y-20261128-1620",
+      "action": "claim: filter-field contrast on matt.bountystash.com; border 1.24:1 and placeholder 3.51:1; fix CSS, build site, push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/style.css"
+      ],
+      "files": [],
+      "base_commit": "6bb3733acc3e44fc819a1f4f867ce7b5e3c0f087",
+      "branch": "main",
+      "frame": "03hbiwn88jacj6vxl5tj5qy8i"
+    },
+    {
+      "id": "759dfb56-8389-43e0-a04b-7444e2b09a15",
+      "ts": "2026-11-28T14:17:44Z",
+      "source": "devin",
+      "subject": "nixconfig:manual-audit-20261128-1445",
+      "action": "landed: MANUAL.md audited against live state — postgres/paperless/plex/aria2/mosquitto/kuma/gatus/iventoy/delphi-services/sentinel/cassini/llm-router rows corrected, note-record refs replace ARCHITECTURE.md stub | gate: checks:services:ports PASS (41 records), checks:prose PASS, docs-budget PASS; checks:quick red only at checks:infron — pre-existing HEAD breakage from lane re-add commits 69288a7c/923fe029/cc8471cb, unrelated to this audit, owned by the hermes-fallback goal",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "6bb3733acc3e44fc819a1f4f867ce7b5e3c0f087",
+      "branch": "main",
+      "frame": "03hbiw7jocu4sla5t3tr3sclm"
+    },
     {
       "id": "4ee678b9-0308-4078-8f49-b9ad381c284e",
       "ts": "2026-11-28T14:15:57Z",
@@ -2981,32 +3009,6 @@
       "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
       "branch": "main",
       "frame": "03hbf9papybfazmf28rgaqwd7"
-    },
-    {
-      "id": "b9a2c6be-f54e-4dea-b0dc-eab533a6a911",
-      "ts": "2026-11-28T03:09:39Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-publish-2026-11-28",
-      "action": "drove agents:2 (freebuff) after jev route publish (1.0/1.0): land the CV/ATS audit static surface, gate, push to origin main",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbf9pa7kmz05ri1yu5cz30z"
-    },
-    {
-      "id": "def738f8-d606-4bd3-a05e-99f48e8e55d4",
-      "ts": "2026-11-28T02:58:40Z",
-      "source": "buffy",
-      "subject": "nixconfig:freebuff-cv-ats-2026-11-28",
-      "action": "landed: cv-ats now publishes the six records it audited (they were copied to the build dir and dropped) and links each from the page; deployed 15 files to cv-ats-8lh | gate: matt:cv:ats:drift PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9742d291",
-      "branch": "main",
-      "frame": "03hbf7k404eb7tws8h7izrfo4"
     }
   ]
 }

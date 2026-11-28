@@ -1,8 +1,135 @@
 {
-  "generated": "2026-11-28T12:43:51Z",
+  "generated": "2026-11-28T13:08:22Z",
   "count": 200,
-  "pin": "f9c28f920530faed695919b16de445d20b80a71cb1c7743c6c208fec59071dec",
+  "pin": "49e8776fd94d2cab22513fd565fd14ea3f6a3ac688dad61651bab36bb494f077",
   "turns": [
+    {
+      "id": "6b089fef-b7ed-4caf-9053-e2418d45ad96",
+      "ts": "2026-11-28T13:07:40Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-gate-blog-20261128-1402",
+      "action": "landed: nothing to land — checks:site:published:blog is already in the tree at abc9c394 and passes: blog checkout clean at c629d10 == origin/main, production rebuild 117 files, 117/117 served files byte-equal (clock, sitemap lastmod, ruby path normalised only). nixconfig 0 commits ahead of origin/main, blog repo clean, so no push was needed | gate: checks:site:published:blog PASS, checks:quick PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "abc9c394d0c88f8caa3f9cffa2e63f46c89056a8",
+      "branch": "main",
+      "frame": "03hbiiisnen6krt8rjimdwlnd"
+    },
+    {
+      "id": "5d5f1ed9-8aa5-4943-9e18-bb4c732cd0cc",
+      "ts": "2026-11-28T13:04:00Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-gate-blog-20261128-1402",
+      "action": "claim: re-issue of the landed blog gate; run checks:site:published:blog (byte-for-byte rebuild of blog main vs shaoyanji.is-a.dev) and push if anything is pending",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/checks.nix",
+        "taskfiles/check.yml"
+      ],
+      "files": [],
+      "base_commit": "abc9c394d0c88f8caa3f9cffa2e63f46c89056a8",
+      "branch": "main",
+      "frame": "03hbiht2njcvxn3wqz95gudb8"
+    },
+    {
+      "id": "e406e0e5-b86b-4c55-bfb0-29092f6847f8",
+      "ts": "2026-11-28T13:03:42Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-next-gate-20261128-1402",
+      "action": "claim: gate-change — extend projected-host chain validation to feature-base chains",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/checks.nix",
+        "taskfiles/check.yml"
+      ],
+      "files": [],
+      "base_commit": "abc9c394d0c88f8caa3f9cffa2e63f46c89056a8",
+      "branch": "main",
+      "frame": "03hbihqwa587jkzzv9n1dl1jw"
+    },
+    {
+      "id": "ba8af37d-c175-47ea-b485-76ee50ae575f",
+      "ts": "2026-11-28T13:03:28Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-gate-blog-20261128-1402",
+      "action": "gate-change 1.0: verify blog build byte-for-byte, push",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/checks.nix",
+        "taskfiles/check.yml"
+      ],
+      "files": [],
+      "base_commit": "abc9c394d0c88f8caa3f9cffa2e63f46c89056a8",
+      "branch": "main",
+      "frame": "03hbihpjo9hjglvfz4l15xqvv"
+    },
+    {
+      "id": "93ca859b-7f2e-4cfd-96fa-3ac39296da45",
+      "ts": "2026-11-28T13:02:42Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:devin-next-gate-20261128-1402",
+      "action": "gate-change 1.0: add+prove next missing check, push",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/checks.nix",
+        "taskfiles/check.yml"
+      ],
+      "files": [],
+      "base_commit": "abc9c394d0c88f8caa3f9cffa2e63f46c89056a8",
+      "branch": "main",
+      "frame": "03hbihjxz58v7s1sd7is509aq"
+    },
+    {
+      "id": "49c58ca0-7fc8-4198-b2fc-cdf6f08f85fc",
+      "ts": "2026-11-28T12:45:06Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-link-audit-20261128",
+      "action": "researched: /cv/ is not a route on cv-ats — no such dir in build r83jw9cm, so Pages soft-404s it to the root index (same sha as /), and its 6 relative records/*.json return HTML 200, not JSON. Zero real 404/5xx. From / the same 6 records + report.json are 200 application/json, valid. matt:cv:ats:drift PASS 15/15. Report only: no file, commit or deploy.",
+      "outcome": "done",
+      "claims": [
+        "lib/matt"
+      ],
+      "files": [],
+      "base_commit": "abc9c394d0c88f8caa3f9cffa2e63f46c89056a8",
+      "branch": "main",
+      "frame": "03hbie445f8mpsw7hfsp83f0o"
+    },
+    {
+      "id": "2eb63eb4-87e8-4101-a9e7-c1f9b41f3aa1",
+      "ts": "2026-11-28T12:44:22Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-next-gate-20261128-1332",
+      "action": "landed: inventory-chain-features now parses canonical chain suffixes, rejects non-feature suffixes, and covers ares impermanence | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [
+        "flake/policies.nix",
+        "checks:quick"
+      ],
+      "files": [
+        "flake/checks.nix",
+        "inventory.toml",
+        "lib/agent-turns/turns.json"
+      ],
+      "base_commit": "abc9c394d0c88f8caa3f9cffa2e63f46c89056a8",
+      "branch": "main",
+      "frame": "03hbidyxsb4v4pawkpornqs3s"
+    },
+    {
+      "id": "6fdee48f-5031-4812-a8f1-2a409fb87c07",
+      "ts": "2026-11-28T12:44:02Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-link-audit-20261128",
+      "action": "research 0.92 - crawl /cv/ outbound links, report dead 404/5xx",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt"
+      ],
+      "files": [],
+      "base_commit": "abc9c394d0c88f8caa3f9cffa2e63f46c89056a8",
+      "branch": "main",
+      "frame": "03hbidwkp5i19erxvn25fovkq"
+    },
     {
       "id": "6e0cd436-7810-455c-8deb-2a8f83a723ca",
       "ts": "2026-11-28T12:35:51Z",
@@ -2889,128 +3016,6 @@
       "base_commit": "9263460a",
       "branch": "main",
       "frame": "03hbetwh0zzj5uzaviutpn2li"
-    },
-    {
-      "id": "5fd11299-5444-4849-8160-1643a5813ce3",
-      "ts": "2026-11-28T01:44:47Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-bulk-egress-lane-2026-11-28",
-      "action": "host-change 0.55/0.10: bulk lane, verify exit IP, push",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/config/tailnet-policy.hujson",
-        "hosts/delphi/configuration.nix"
-      ],
-      "files": [],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbet4ibq297ck66weyh8k1q"
-    },
-    {
-      "id": "78479db9-4191-46e0-a70e-897f31328f2e",
-      "ts": "2026-11-28T01:44:47Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-gate-battery-2026-11-28",
-      "action": "novel 0.93/0.86 duel: CV gate battery vs origin/main, push",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/matt/resume.json",
-        "lib/matt/lebenslauf.json"
-      ],
-      "files": [],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbet4h8u59iyllfv5wxopv7"
-    },
-    {
-      "id": "68ce1721-3508-4bfd-ad6e-3ce6e33b56bd",
-      "ts": "2026-11-28T01:36:25Z",
-      "source": "buffy",
-      "subject": "nixconfig:freebuff-cv-de-gist-2026-11-28",
-      "action": "landed: published German CV gist 541b117a from lib/matt/lebenslauf.json (was stale 2026-11-09: 13->25 fleet hosts, B2->C1, missing fleet/CI bullets, wrong project order); live raw sha a69f6d47 17128B, email+location+profiles intact, no phone; en gist unchanged (8248a6cb); corpus already upstream 937306b7 so no commit owed. gate: matt:gist:drift PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/matt/resume.json"
-      ],
-      "files": [],
-      "base_commit": "3da73b6c",
-      "branch": "main",
-      "frame": "03hberhod4i5e5xjd4nerises"
-    },
-    {
-      "id": "3ffe33b7-0d61-4ec4-acba-ab0b46516fe5",
-      "ts": "2026-11-28T01:32:08Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-de-gist-2026-11-28",
-      "action": "publish 0.95/0.93: publish German CV gist, verify live, push",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/matt/resume.json"
-      ],
-      "files": [],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbeqng1qckv92gmd5pt2jad"
-    },
-    {
-      "id": "37f5018a-ed30-429d-9625-5ce2b357bd5d",
-      "ts": "2026-11-28T01:25:31Z",
-      "source": "buffy",
-      "subject": "nixconfig:freebuff-cv-verify-2026-11-28",
-      "action": "verified: origin/main 3da73b6c builds .#sites.cv-ats-site 9/9 byte-identical to cv-ats-8lh.pages.dev (index f5ada59c, report 6/6 ok) and all 6 live PDFs hash-match the build; zero drift, so no redeploy and no commit to push | gate: checks:site:links PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/matt",
-        "sites/cv-ats"
-      ],
-      "files": [],
-      "base_commit": "3da73b6c",
-      "branch": "main",
-      "frame": "03hbepd1vx55q0v2rifv4oju4"
-    },
-    {
-      "id": "785ca826-422b-4280-ba36-3cc76c8fb95c",
-      "ts": "2026-11-28T01:24:36Z",
-      "source": "buffy",
-      "subject": "nixconfig:egress-architecture-note-2026-11-28",
-      "action": "landed: egress-architecture reference note (broker on delphi:8469, lanes bulk/us/local, validator before lane) + AGENTS_CEILING 522082->522000 | gate: checks:aarch64-linux.agents-notes-schema PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "9263460a89267e7a3d6985502ecd1006be6be933",
-      "branch": "main",
-      "frame": "03hbep6kzzao33av2r95bauho"
-    },
-    {
-      "id": "58b92d1a-f8a8-436a-b552-a7009000dbbf",
-      "ts": "2026-11-28T01:23:52Z",
-      "source": "buffy",
-      "subject": "nixconfig:egress-architecture-note-2026-11-28",
-      "action": "claim: land the egress architecture as an AGENTS.nix reference note (broker placement, lane policy, caching order)",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix scripts/task/repo-blobs.sh"
-      ],
-      "files": [],
-      "base_commit": "3da73b6c6c6c9162d7eec546a049d2ed2ba746a8",
-      "branch": "main",
-      "frame": "03hbep1coi6uac9crkiwk428k"
-    },
-    {
-      "id": "307dd3bf-1832-4918-b226-d5e2a47dd536",
-      "ts": "2026-11-28T01:22:50Z",
-      "source": "micro-turn",
-      "subject": "nixconfig:freebuff-cv-verify-2026-11-28",
-      "action": "publish 0.54/0.08 duel: verify CVs vs origin/main, gate, push",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/matt/resume.json",
-        "sites/cv-ats"
-      ],
-      "files": [],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbeou226ktg86cvk794otaj"
     }
   ]
 }

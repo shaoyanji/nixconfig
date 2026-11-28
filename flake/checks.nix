@@ -82,9 +82,13 @@ lib.genAttrs systems.work (
             parts = lib.splitString " + " chain;
             base = builtins.head parts;
             extra = builtins.tail parts;
-            baseKnown = builtins.hasAttr base moduleSets.chainFeatures;
+            baseKnown = builtins.hasAttr base moduleSets.chainFeatures || builtins.hasAttr base moduleSets.featureModules;
+            baseFeatures =
+              if builtins.hasAttr base moduleSets.chainFeatures
+              then builtins.getAttr base moduleSets.chainFeatures
+              else [base];
             unknownExtras = builtins.filter (f: !builtins.hasAttr f moduleSets.featureModules) extra;
-            expected = (builtins.getAttr base moduleSets.chainFeatures) ++ extra;
+            expected = baseFeatures ++ extra;
           in
             baseKnown && (unknownExtras != [] || (hostInventory.${name}.features or []) != expected)
         );
@@ -694,8 +698,8 @@ lib.genAttrs systems.work (
           ''
         else
           builtins.throw ''
-            these hosts name a canonical module chain but their features differ
-            (a canonical chain may carry only feature names after ` + `;
+            these hosts name a module-chain expression but their features differ
+            (a chain expression may carry only feature names after ` + `;
             update inventory.toml module_chain, or the host feature list if the
             inventory is what is correct): ${builtins.toString chainFeatureDrift}
           '';

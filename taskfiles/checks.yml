@@ -1174,6 +1174,25 @@ tasks:
     cmds:
       - bash scripts/task/site-published-check.sh
 
+  checks:site:published:blog:
+    desc: "[gate] The live is-a.dev site is byte for byte the build of blog main"
+    summary: >
+      `checks:site:published` for the blog: Pages names no tree, and the
+      checkout's `_site` is the last local build. This refuses a dirty checkout
+      or a HEAD that is not origin/main (`git ls-remote`), rebuilds in production
+      mode (chirpy compresses HTML only there), and compares every file the build
+      carries byte for byte. The build clock, the sitemap's mtime `<lastmod>` and
+      the sourcemap's ruby path are placeholders; every other byte is strict.
+      Vars: BLOG_REPO=, HOST=, TIMEOUT=, BUNDLE=. Live, so absent from
+      `checks:quick`. Exit 0 in sync, 1 divergence, 2 cannot tell.
+    env:
+      BLOG_REPO: '{{.BLOG_REPO | default ""}}'
+      HOST: '{{.HOST | default ""}}'
+      TIMEOUT: '{{.TIMEOUT | default ""}}'
+      BUNDLE: '{{.BUNDLE | default ""}}'
+    cmds:
+      - bash scripts/task/blog-published-check.sh
+
   checks:site:orphans:
     desc: "[gate] Nothing the live Pages site serves is a file the build origin/main does not make"
     summary: >

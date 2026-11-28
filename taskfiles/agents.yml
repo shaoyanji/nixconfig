@@ -285,17 +285,17 @@ tasks:
   agents:cv:publish-check:
     desc: "[gate] CV lane: the is-a.dev site publishes this build's CVs and links every one"
     summary: >
-      scripts/task/cv-blog-check.sh: the six published PDFs — cv, cv-de,
-      cv-energy, cv-energy-de, cv-software, cv-software-de — must hash equal to
-      `.#sites.matt-site` and, in `_site`, be the target of an anchor with
-      `download` that resolves. `matt:cv:evidence` runs first, so the published
-      hash also carries claims a built PDF and an artifact back, and it fails a
-      public packet copy whose DevOps skills line names a stack item the CVs no
-      longer render. Exit 0 linked, 1 drift, 2 cannot tell. Deploys, sends and
-      commits nothing.
+      The six published PDFs must hash equal to `.#sites.matt-site` and be the
+      target of a `download` anchor that resolves in a production build of the
+      blog checkout — never its stale `_site`. `matt:cv:evidence` runs first, so
+      the hash also carries CV claims back to a built PDF and an artifact.
+      `checks:site:published:blog` is the last word: the checkout is clean at
+      origin/main and every file the build carries is what Pages serves. Exit 0
+      linked, 1 drift, 2 cannot tell. Deploys, sends and commits nothing.
     cmds:
       - bash scripts/task/cv-evidence-check.sh
       - bash scripts/task/cv-blog-check.sh
+      - bash scripts/task/blog-published-check.sh
 
   agents:agy:
     desc: "agy through the nix-tool shim: PATH first, else the flake.lock pin built once — no closure needed"

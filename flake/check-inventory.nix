@@ -153,6 +153,7 @@
     "checks:site:path" = "leaf";
     "checks:site:published" = "leaf";
     "checks:site:published:ats" = "leaf";
+    "checks:site:published:blog" = "leaf";
     "checks:skills:mirror" = "leaf";
     "checks:skills:mirror:test" = "leaf";
     "checks:sops:drift" = "leaf";

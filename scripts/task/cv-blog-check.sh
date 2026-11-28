@@ -23,9 +23,10 @@
 # theme's `{url}` search templates as dead links.
 #
 # Env: BLOG_REPO (default ~/Documents/shaoyanji.is-a.dev), ARTIFACT (default
-# /tmp/matt-site), SITE (default $BLOG_REPO/_site), REQUIRED (default "cv.pdf
-# cv-de.pdf"). `bundle exec jekyll build` in BLOG_REPO is the blog's build; this
-# gate reads `_site` and never spends it.
+# /tmp/matt-site), SITE (a caller's build; default: this commit's, built into a
+# temp dir by `blog-build.sh`), REQUIRED (default "cv.pdf cv-de.pdf"). The
+# checkout's `_site` is deliberately not the default: it is whichever build was
+# last run there, so reading it lets a stale render satisfy the gate.
 #
 # EXIT
 #   0  every published CV is this build, linked, with its target present
@@ -36,9 +37,17 @@ set -uo pipefail
 
 BLOG_REPO="${BLOG_REPO:-$HOME/Documents/shaoyanji.is-a.dev}"
 ARTIFACT="${ARTIFACT:-/tmp/matt-site}"
-site="${SITE:-$BLOG_REPO/_site}"
 files="$BLOG_REPO/assets/files"
 REQUIRED="${REQUIRED:-cv.pdf cv-de.pdf}"
+
+tmp=""
+if [ -n "${SITE:-}" ]; then
+  site=$SITE
+else
+  tmp=$(mktemp -d)
+  trap 'rm -rf "$tmp"' EXIT
+  site=$tmp/_site
+fi
 
 [ -d "$ARTIFACT" ] || {
   echo "cv-blog-check: no artifact at $ARTIFACT — run task matt:build first" >&2
@@ -54,12 +63,18 @@ COPIES="$ARTIFACT=.#sites.matt-site" bash "$(dirname "${BASH_SOURCE[0]}")/site-c
   echo "cv-blog-check: $files missing (BLOG_REPO names the checkout)" >&2
   exit 2
 }
+if [ -z "${SITE:-}" ]; then
+  bash "$(dirname "${BASH_SOURCE[0]}")/blog-build.sh" "$site" || {
+    echo "cv-blog-check: the blog checkout did not build" >&2
+    exit 2
+  }
+fi
 [ -d "$site" ] || {
-  echo "cv-blog-check: $site missing — build the blog first (bundle exec jekyll build)" >&2
+  echo "cv-blog-check: $site is not a build directory" >&2
   exit 2
 }
 
-exec python3 - "$site" "$files" "$ARTIFACT" "$REQUIRED" <<'PY'
+python3 - "$site" "$files" "$ARTIFACT" "$REQUIRED" <<'PY'
 import hashlib
 import os
 import posixpath
@@ -176,3 +191,4 @@ print(
     f"from {site} ({', '.join(published)})"
 )
 PY
+exit $?

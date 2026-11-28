@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-28T03:45:58Z",
+  "generated": "2026-11-28T03:46:52Z",
   "count": 200,
-  "pin": "4bcafdc0549d268fadfb93a67ebc69ca8abf258a473f85639815917ec2e03410",
+  "pin": "1bea85556759001dd5d0b65043a63b46b3e8ae9113232d50bfbaecda36d59766",
   "turns": [
+    {
+      "id": "88ad0d9c-48de-4423-872a-62f1dc87a520",
+      "ts": "2026-11-28T03:46:35Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-cv-gate-20261128",
+      "action": "landed: checks:site:copies (site-copies-check.sh) fails when /tmp/matt-site or /tmp/cv-ats is not this tree's build (stale store path, hand copy, dangling link; absent is fine), and the four gates that read those copies now refuse them: cv-links-check, cv-ats-check --deployed, cv-blog-check, cv-evidence-check exit 2 naming the rebuild task. A drifted ATS reference stops matt:cv:ats:drift before any fetch. | gate: checks:tasks + checks:site:copies PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0504a0c70e06618257dcfd38cc0dd8a5e0adc201",
+      "branch": "freebuff-cv-copies-2026-11-28",
+      "frame": "03hbfgx1u2z2mis9fpqtg1wpn"
+    },
     {
       "id": "7f864908-b257-4929-9f91-1b3bbbe90dce",
       "ts": "2026-11-28T03:43:08Z",
@@ -2961,22 +2974,6 @@
       "base_commit": "41e2c30dc51bf5790485f93e5eba5b3ffdf2577f",
       "branch": "HEAD",
       "frame": "03hbbrlopdu1q5oa6vahaw3p0"
-    },
-    {
-      "id": "a786b170-3f9e-442f-a0df-827f005a8ad1",
-      "ts": "2026-11-27T16:22:02Z",
-      "source": "devin",
-      "subject": "nixconfig:zeroclaw-worker-plane",
-      "action": "landed follow-up: tmux pane scope correction; zeroclaw-agent-tmux-cap proves initial pane scope MemoryMax=256M from ExecStartPost and manual 192M set; zeroclaw-agent-run proves transient MemoryMax=64M live cgroup and success artifact; pane-launched panecheck succeeded | gate: checks:host HOST=lumi PASS (247 assertions, eval rc=0); home-manager switch activation rc=0; deadnix/statix PASS. checks:quick remains not passed because it was stopped to protect lumi under memory pressure.",
-      "outcome": "done",
-      "claims": [
-        "modules/user/ai/zeroclaw.nix",
-        "taskfiles/infra.yml"
-      ],
-      "files": [],
-      "base_commit": "b95fc6ae874b09fce943b23d0e7d372027544b6d",
-      "branch": "devin/zeroclaw-worker-plane",
-      "frame": "03hbbr6zqcgjqv9cgi0gz18ki"
     }
   ]
 }

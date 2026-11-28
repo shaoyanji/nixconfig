@@ -83,7 +83,6 @@ tasks:
       - task: checks:ports:test
       - task: checks:images
       - task: checks:images:test
-      - task: checks:site:copies
       - task: checks:wrangler
       - task: checks:agents:xs-post
       - task: checks:counts

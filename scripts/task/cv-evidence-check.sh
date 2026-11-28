@@ -50,6 +50,15 @@ root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 ARTIFACT="${ARTIFACT:-/tmp/matt-site}"
 PACKETS="${PACKETS:-$HOME/Documents/shaoyanji.is-a.dev/assets/files/packets}"
 
+# The render leg asks whether a stack item reaches a built PDF, so an artifact
+# from another tree answers for claims this one may already have dropped.
+if [ -d "$ARTIFACT" ]; then
+  COPIES="$ARTIFACT=.#sites.matt-site" bash "$root/scripts/task/site-copies-check.sh" || {
+    echo "cv-evidence-check: $ARTIFACT is not this tree's build — run task matt:build" >&2
+    exit 2
+  }
+fi
+
 exec python3 - "$root" "$ARTIFACT" "$PACKETS" <<'PY'
 import json
 import os

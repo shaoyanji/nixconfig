@@ -44,6 +44,12 @@ REQUIRED="${REQUIRED:-cv.pdf cv-de.pdf}"
   echo "cv-blog-check: no artifact at $ARTIFACT — run task matt:build first" >&2
   exit 2
 }
+# The comparison is blog copy against this artifact, so the artifact has to be
+# this tree's build or the verdict is about a past tree.
+COPIES="$ARTIFACT=.#sites.matt-site" bash "$(dirname "${BASH_SOURCE[0]}")/site-copies-check.sh" || {
+  echo "cv-blog-check: $ARTIFACT is not this tree's build — run task matt:build" >&2
+  exit 2
+}
 [ -d "$files" ] || {
   echo "cv-blog-check: $files missing (BLOG_REPO names the checkout)" >&2
   exit 2

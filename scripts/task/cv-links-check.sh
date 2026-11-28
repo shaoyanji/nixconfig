@@ -24,6 +24,16 @@ AB="${AGENT_BROWSER:-$(command -v 'agent-browser' || true)}"
 [ -n "$AB" ] || { echo "cv-links-check: agent-browser is not on PATH" >&2; exit 1; }
 command -v pdfinfo >/dev/null 2>&1 || { echo "cv-links-check: pdfinfo (poppler) missing" >&2; exit 1; }
 
+# A reference built from another tree answers the wrong question: the live bytes
+# would match yesterday's site, or disagree with a build nobody deployed. Refuse
+# it before a request is made.
+if [ -n "$ARTIFACT" ] && [ -e "$ARTIFACT" ]; then
+  COPIES="$ARTIFACT=.#sites.matt-site" bash "$(dirname "${BASH_SOURCE[0]}")/site-copies-check.sh" || {
+    echo "cv-links-check: $ARTIFACT is not this tree's build — run task matt:build" >&2
+    exit 2
+  }
+fi
+
 dir=$(mktemp -d)
 trap 'rm -rf "$dir"; "$AB" close >/dev/null 2>&1 || true' EXIT
 

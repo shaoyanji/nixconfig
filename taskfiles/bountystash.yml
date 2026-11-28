@@ -245,19 +245,15 @@ tasks:
   matt:cv:ats:drift:
     desc: "[gate] the published CV ATS audit is this build, file for file"
     summary: >
-      `cv-ats-check.sh --deployed` against the host named by `deployHostname` in
+      `cv-ats-check.sh --deployed` against `deployHostname` in
       taskfiles/site-manifest.json: every file the artifact carries is fetched
       and compared byte for byte (`/` for index.html, which Pages redirects).
-      Build the reference at the commit under test first —
-      `task dev:site:build:cv-ats` leaves it at `/tmp/cv-ats`, and ARTIFACT=
-      points elsewhere. The host is recorded, not derived, because Pages
-      suffixed the project `cv-ats` to `cv-ats-8lh`, while the bare name serves
-      an unrelated ATS site. Exit 0 = every file matches, 1 = drift, 2 = no
-      artifact or no host recorded.
+      Build the reference at the commit under test first — `task
+      dev:site:build:cv-ats` writes `/tmp/cv-ats`, and ARTIFACT= points
+      elsewhere. The host is recorded, not derived: Pages suffixed `cv-ats` to
+      `cv-ats-8lh`, and the bare name serves an unrelated ATS site. Exit 0 =
+      match, 1 = drift, 2 = no artifact, no host, or a stale artifact.
     cmds:
-      # A copy of another build would make this gate prove the wrong thing, so
-      # the reference is checked as this tree's before any byte is compared.
-      - COPIES="/tmp/cv-ats=.#sites.cv-ats-site" bash scripts/task/site-copies-check.sh
       - bash scripts/task/cv-ats-check.sh --deployed
 
   matt:gist:pull:

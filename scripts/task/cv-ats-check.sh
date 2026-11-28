@@ -103,6 +103,13 @@ if [ "$deployed" = 1 ]; then
     echo "cv-ats-check: no built audit at $artifact — build .#sites.cv-ats-site at the commit under test (task dev:site:build:cv-ats) first" >&2
     exit 2
   }
+  # The audit is published by hand, so its artifact is the copy most likely to
+  # be another build: comparing the host against it would answer for that build
+  # rather than this one.
+  COPIES="$artifact=.#sites.cv-ats-site" bash "$(dirname "${BASH_SOURCE[0]}")/site-copies-check.sh" || {
+    echo "cv-ats-check: $artifact is not this tree's build — run task dev:site:build:cv-ats" >&2
+    exit 2
+  }
 
   work=$(mktemp -d)
   trap 'rm -rf "$work"' EXIT

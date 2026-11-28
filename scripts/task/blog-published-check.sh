@@ -18,8 +18,10 @@
 #     service worker's `chirpy-<epoch>` cache name;
 #   * the sitemap's `<lastmod>`, which jekyll-sitemap takes from each file's
 #     mtime, so a fresh checkout writes a different value for the same source;
-#   * the CSS sourcemap's `sources`, which names the ruby the gems were vendored
-#     under (`vendor/bundle/ruby/3.2.0` on CI, another here).
+#   * the CSS sourcemap's `sources`, which names the build machine's vendored
+#     gems: the hop from the CSS to them and the ruby they were installed under
+#     (`../../vendor/bundle/ruby/3.2.0/` on CI, an absolute-ish path to another
+#     here). Both halves collapse to one placeholder.
 # Each is compared as a placeholder while every other byte stays strict, so a
 # moved post date, a changed template or a stale PDF still fails.
 #
@@ -63,7 +65,7 @@ norm() { # STAMP FILE
   sed "${stamps[@]}" \
     -e 's|chirpy-[0-9][0-9]*|chirpy-@BUILD_TIME@|g' \
     -e 's|<lastmod>[^<]*</lastmod>|<lastmod>@LASTMOD@</lastmod>|g' \
-    -e 's|vendor/bundle/ruby/[0-9][0-9.]*/|vendor/bundle/ruby/@RUBY@/|g' \
+    -e 's|"[^"]*vendor/bundle/ruby/[0-9][0-9.]*/|"@VENDOR@/|g' \
     "$2"
 }
 

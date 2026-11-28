@@ -1,8 +1,51 @@
 {
-  "generated": "2026-11-28T14:20:14Z",
+  "generated": "2026-11-28T14:36:03Z",
   "count": 200,
-  "pin": "0ce335d77523858695a4cf9d6d0dd244d5f961e5093b8f396568dca42facc4df",
+  "pin": "27a6bb67a9ee77d3d592080ffb8052c2a013da6fd93fcdbc04f9ab3e7606091c",
   "turns": [
+    {
+      "id": "b3bd69a5-9af9-4eba-b01f-e04befcd5099",
+      "ts": "2026-11-28T14:28:33Z",
+      "source": "freebuff",
+      "subject": "nixconfig:deploy-matt-css-20261128",
+      "action": "deployed: matt.bountystash.com serves the filter-contrast stylesheet (build xbz14wah, 1 file uploaded) | gate: checks:site:orphans PASS 24/24 paths live within build | live style.css sha256 7677811 == built; bountystash.com console already byte-equal to dist, nothing to deploy | no commit: deploy only",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9ef4ca855b586dfd025e1b8c0c488eb8520ed98e",
+      "branch": "main",
+      "frame": "03hbiyblhn6atug6purlg4odv"
+    },
+    {
+      "id": "75e5e13c-0679-4f9b-99e4-439f5d6edd36",
+      "ts": "2026-11-28T14:27:41Z",
+      "source": "freebuff",
+      "subject": "nixconfig:deploy-matt-css-20261128",
+      "action": "deploy: publish the built matt site so matt.bountystash.com serves the filter-contrast stylesheet (6d762a20/9ef4ca85); verify live bytes",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/style.css"
+      ],
+      "files": [],
+      "base_commit": "9ef4ca855b586dfd025e1b8c0c488eb8520ed98e",
+      "branch": "main",
+      "frame": "03hbiy5kfth8wm9959du05ohr"
+    },
+    {
+      "id": "c9f077bf-4aa4-4d80-8471-c262e13d9166",
+      "ts": "2026-11-28T14:21:17Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-site-a11y-20261128-1620",
+      "action": "landed: filter field on matt.bountystash.com — border --rule 1.36:1 -> --muted 5.33:1 light / 6.20:1 dark; placeholder 3.51:1 -> 5.33:1 (opacity .8 dropped) | gate: nix build .#sites.matt-site PASS (site-routing 16 pages, site-links 91 links, 6 PDFs)",
+      "outcome": "done",
+      "claims": [
+        "lib/matt/style.css"
+      ],
+      "files": [],
+      "base_commit": "9ef4ca855b586dfd025e1b8c0c488eb8520ed98e",
+      "branch": "main",
+      "frame": "03hbiwwhgf0gakn4g18po4ako"
+    },
     {
       "id": "5288072b-b547-4964-a788-be0b416f5eb6",
       "ts": "2026-11-28T14:19:58Z",
@@ -2967,48 +3010,6 @@
       "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
       "branch": "main",
       "frame": "03hbfazctmx1mowk1oi7497lq"
-    },
-    {
-      "id": "ed9515d1-7e66-4296-81e6-b8e9f76fc179",
-      "ts": "2026-11-28T03:12:05Z",
-      "source": "buffy",
-      "subject": "nixconfig:freebuff-cv-publish-2026-11-28",
-      "action": "landed: cv-ats audit surface + drift gate at origin/main (gate 9742d291, records fix 88903f52). Verified against the real artifacts: a clean worktree at 88903f52 rebuilds byte-identical to the published /tmp/cv-ats (diff -r clean), and the landed gate passes live — cv-ats-check.sh --deployed 15/15 ok at cv-ats-8lh.pages.dev, all six records linked from / and byte-identical to the artifact | gate: matt:cv:ats:drift PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbfa6g7e4rp2a6u8m6atm7d"
-    },
-    {
-      "id": "74d3a724-d417-4f23-9b3b-3decdb01beb5",
-      "ts": "2026-11-28T03:11:18Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-bulk-egress-lane-2026-11-28",
-      "action": "host-change: delphi bulk-egress exit IP verified (92.5.115.103 AS31898), both lanes serving, pushed to origin main",
-      "outcome": "done",
-      "claims": [],
-      "files": [
-        "modules/config/tailnet-policy.hujson",
-        "hosts/delphi/configuration.nix"
-      ],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbfa0w7vdzrqo87huuv28i8"
-    },
-    {
-      "id": "a013ee81-68b6-43a8-9fb6-bf35ad1c3831",
-      "ts": "2026-11-28T03:09:39Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-bulk-egress-lane-2026-11-28",
-      "action": "drove agents:3 (delphi) after jev route host-change (0.92/0.88): verify delphi bulk-egress exit IP, gate, push to origin main",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbf9papybfazmf28rgaqwd7"
     }
   ]
 }

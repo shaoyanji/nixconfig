@@ -37,10 +37,25 @@ providers:
     models:
       - qwen/qwen3.8-27b:free
       # - deepseek/deepseek-v4-flash-0731:free
+  tokenrouter:
+    api: https://api.tokenrouter.com/v1
+    key_env: TOKENROUTER_API_KEY
+    api_mode: openai
+    default_model: deepseek/deepseek-v4.1-flash-1017-free
+    discover_models: false
+    models:
+      - deepseek/deepseek-v4.1-flash-1017-free
+# Main model routes through Nous Portal OAuth, not a key_env: the credential is
+# a device-code OAuth token in hermes' auth store (`hermes auth list` shows
+# nous / device_code / oauth) and `hermes portal info` reports logged in. No
+# `providers.nous` block is needed for an OAuth route — `model.provider: nous`
+# is enough, and `tencent/hy4-flash:free` answers at cost 0 through
+# inference-api.nousresearch.com (verified 2026-11-28: one-shot returns PONG).
+# `nous` stays in model_catalog.excluded_providers so the picker never offers
+# its billed ids; the free id is pinned here instead.
 model:
-  provider: infron
-  default: qwen/qwen3.8-27b:free
-  base_url: https://llm.onerouter.pro/v1
+  provider: nous
+  default: tencent/hy4-flash:free
 agent:
   max_turns: 150
   reasoning_effort: medium

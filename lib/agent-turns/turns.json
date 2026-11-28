@@ -1,8 +1,113 @@
 {
-  "generated": "2026-11-28T04:12:27Z",
+  "generated": "2026-11-28T04:31:12Z",
   "count": 200,
-  "pin": "e8bba78412c810c93f9b45cc6fee0c9bbc405c883972cfa685b744bd01462c69",
+  "pin": "3b3f7ca0946fbec373ffb095ce5fcd6828050fdbb452db8ed2c2e9ede83ee7b8",
   "turns": [
+    {
+      "id": "1558de11-2cf7-4015-9463-c1a714c3e656",
+      "ts": "2026-11-28T04:28:17Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-cv-ats-gate-20261128",
+      "action": "claim: extend checks:site:published to cv-ats-8lh.pages.dev (ATTR=sites.cv-ats-site), prove the fire case on a real past main, push",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/checks.yml",
+        "scripts/task/site-published-check.sh",
+        "flake/check-inventory.nix"
+      ],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfp2a27bhss9u8z84gslh9"
+    },
+    {
+      "id": "90dfbee9-313f-4712-b4cd-6f0d4171d882",
+      "ts": "2026-11-28T04:27:17Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-ats-gate-20261128",
+      "action": "gate cv-ats - fail on real past drift, prove, push",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/checks.yml"
+      ],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfov81xeqr7zr1s3wzw1ej"
+    },
+    {
+      "id": "815f4a7f-86d3-4818-ad75-e8a69f0baa97",
+      "ts": "2026-11-28T04:23:56Z",
+      "source": "devji",
+      "subject": "nixconfig:site-live-drift",
+      "action": "verified: checks:site:published at origin/main a771504e — live matt.bountystash.com 28/28 byte-identical; fired on real past main 74a215b9 (6/28 differ, exit 1) and on tree!=BASE; task wiring exit 0",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfo7ocy8i0ba6ujegx9gdz"
+    },
+    {
+      "id": "2e9c573d-46ad-48be-af34-bc8eade29822",
+      "ts": "2026-11-28T04:21:13Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:site-live-drift-gate",
+      "action": "drove freebuff agents:2.1 gate task (jev gate-change 1.0/1.0); pane working",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfnomcd4g86iiy9w0hn5bk"
+    },
+    {
+      "id": "61059e26-8e92-45fa-8033-9d6ff7971773",
+      "ts": "2026-11-28T04:15:05Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-scout-cycle-close-20261128",
+      "action": "note-change: scout-close note + gate + push",
+      "outcome": "blocked: agy individual quota reached (resets ~125h), no model response",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfmhg34ob9hug17a2mg1fi"
+    },
+    {
+      "id": "68b5f464-c754-4dae-9da1-be8482af6125",
+      "ts": "2026-11-28T04:14:46Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-scout-cycle-close-20261128",
+      "action": "note-change: scout-close note + gate + push",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfmf78ie8fbb84p7jwt7xy"
+    },
+    {
+      "id": "57b5efd1-7020-4330-92f3-6851551f8e9a",
+      "ts": "2026-11-28T04:13:09Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-cv-republish-20261128",
+      "action": "landed: checks:site:published settles the reference first (tree outPath vs the attr at origin/main via git+file://?rev, so a non-main tree fails before a request) then cmp's the build's 28 files against matt.bountystash.com, following Pages' 308, skipping _headers. Fired: BASE=a7d4bc99, foreign build, unknown BASE/host (1/1/2/2); passes 28/28. 57/57 quick deps, checks:tasks clean; checks:entry needs the main checkout (iets path cache) | gate: checks:site:published PASS",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/site-published-check.sh",
+        "taskfiles/checks.yml",
+        "flake/check-inventory.nix"
+      ],
+      "files": [],
+      "base_commit": "a771504e3256162a295a01c3ae15c20fd14e466d",
+      "branch": "HEAD",
+      "frame": "03hbfm3uh3hpke5qbmt66ds3y"
+    },
     {
       "id": "3d9ebdbe-ed13-4240-8f8b-81267556ebd0",
       "ts": "2026-11-28T04:07:02Z",
@@ -2879,102 +2984,6 @@
       "base_commit": "63a4f19105211c06e94a8b066407afa873aa5298",
       "branch": "HEAD",
       "frame": "03hbc5u7p51obua5r3181s909"
-    },
-    {
-      "id": "7bf11ff2-b634-4697-9c5f-1400a01b8ce1",
-      "ts": "2026-11-27T17:31:10Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-2-freebuff-cv-sync",
-      "action": "landed: cv-sync, no drift, committed nothing. Fresh nix build .#sites.matt-site at HEAD 2ce0e313 gives six CVs; blog assets/files are hash-equal to it; live is-a.dev serves all six 200 hash-equal (cv 91a2900 43350B, cv-de c5e610d 43440B) and /cv/ carries six download anchors; ryoku-cv 4357b43 clean, origin equal, live index 11042B with cv/cv-de 200 hash-equal. Local _site PDFs are a build behind, gitignored, CI rebuilds them | gate: agents:cv:publish-check PASS 6/6 (ARTIFACT=fresh)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbc4p5iphvr73dxf4vnaa9k"
-    },
-    {
-      "id": "0d7d442c-33e0-45c7-bcf1-7b5ff48a0d86",
-      "ts": "2026-11-27T17:29:21Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin-closure-budgets",
-      "action": "gate-change 0.97|0.95; gate no-budget-host fails",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbc4cf1cnnokerxd0010he2"
-    },
-    {
-      "id": "9863ede9-e763-47f8-ae48-a4c634ebb989",
-      "ts": "2026-11-27T17:29:21Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-freebuff-cv-sync",
-      "action": "publish 0.82|0.74; gate cv-publish-check",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbc4cck6oxk7si0aeqju8rv"
-    },
-    {
-      "id": "635a7452-8db8-4d1d-a39f-9a93150936c3",
-      "ts": "2026-11-27T17:21:20Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-2-freebuff-cv-publish",
-      "action": "landed: ryoku-cv served the 2026-11-23 build (13-host copy, 36 KB PDFs). Synced to blog: three host counts now twenty-five (inventory kind=nixos=25), cv.pdf/cv-de.pdf replaced with the 2026-11-27 builds (43,350/43,440 B, 2pp). Push 4357b43, Pages run 46041030539 success. Live: index sha256-equal to commit, both PDFs hash-equal live/repo/blog, no thirteen served, 4/4 routes 200 | gate: check-links PASS + Pages success",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbc2s1ixmibis6ybi4fe1ci"
-    },
-    {
-      "id": "c9085a7b-4062-4f3d-a113-e8e69a250654",
-      "ts": "2026-11-27T17:19:52Z",
-      "source": "devin",
-      "subject": "nixconfig:pane-1-devin-chain-change",
-      "action": "landed: c6524f95 — chain-change lane produced one real repair: chain-profile.sh (the eval-cost-ladder measuring tool) was broken since module-sets gained the hostInventory param; now imports host-inventory.nix same as outputs.nix. Re-measured: base 484MiB, base+nixos+dms 1200MiB — matches the ladder. No chain refactor existed to make (3 prior audits) | gate: checks:host mtfuji MODE=eval PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c6524f9587f65cfa992a915eb5090dda5b5fe64f",
-      "branch": "HEAD",
-      "frame": "03hbc2hnry67utklb02c0yl03"
-    },
-    {
-      "id": "bee5502b-e772-4a06-a6bc-9c53dc93cedc",
-      "ts": "2026-11-27T17:17:32Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-freebuff-cv-publish",
-      "action": "publish 0.89|0.85",
-      "outcome": "in_progress",
-      "claims": [
-        "ryoku-cv"
-      ],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbc21ah4ubzdwq8hw4qxp26"
-    },
-    {
-      "id": "02115603-cc31-4946-8b60-edcf71834318",
-      "ts": "2026-11-27T17:17:32Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin-chain-change",
-      "action": "chain-change 1.0|1.0; gate host-eval",
-      "outcome": "in_progress",
-      "claims": [
-        "flake.nix",
-        "modules/"
-      ],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbc218vv8w05fgxu7i0qkba"
     }
   ]
 }

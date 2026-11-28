@@ -1126,8 +1126,30 @@ tasks:
 
       The reference costs no build: this tree's outPath against the attr at BASE
       (`git+file://<repo>?rev=<sha>`), so a tree that is not main's build fails
-      before a request. Vars: HOST=, ATTR=, BASE=, TIMEOUT=. Live, so absent
-      from `checks:quick`. Exit 0 in sync, 1 divergence, 2 cannot tell.
+      before a request. Vars: HOST=, ATTR=, BASE=, TIMEOUT=, DEPLOY=. Live, so
+      absent from `checks:quick`. Exit 0 in sync, 1 divergence, 2 cannot tell.
+    env:
+      HOST: '{{.HOST | default ""}}'
+      ATTR: '{{.ATTR | default ""}}'
+      BASE: '{{.BASE | default ""}}'
+      TIMEOUT: '{{.TIMEOUT | default ""}}'
+      DEPLOY: '{{.DEPLOY | default ""}}'
+    cmds:
+      - bash scripts/task/site-published-check.sh
+
+  checks:site:published:ats:
+    desc: "[gate] The live cv-ats audit is byte for byte the build origin/main makes"
+    summary: >
+      The same gate as `checks:site:published`, pointed at the audit surface:
+      every file under `.#sites.cv-ats-site` is fetched from
+      `cv-ats-8lh.pages.dev` and `cmp`-ed against the build origin/main makes,
+      so the nine-file tree from before `records/` landed reads as drift and not
+      as a pass. The host is recorded, not derived — Pages suffixed `cv-ats` to
+      `cv-ats-8lh`. Exit 0 in sync, 1 divergence, 2 cannot tell.
+    env:
+      HOST: cv-ats-8lh.pages.dev
+      ATTR: sites.cv-ats-site
+      DEPLOY: task dev:site:deploy:cv-ats
     cmds:
       - bash scripts/task/site-published-check.sh
 

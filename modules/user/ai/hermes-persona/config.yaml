@@ -163,6 +163,10 @@ fallback_providers:
   # laguna-xs-2.1-uncensored. deepseek-v4-flash / minimax-m3.1-flash were
   # decommissioned; qwen3-8-omni-flash no longer answers — all dropped.
   - provider: custom
+    model: deepseek-ai/DeepSeek-V4.1-Flash
+    base_url: https://api.runcrate.ai/v1
+    key_env: RUNCRATE_API_KEY
+  - provider: custom
     model: lebrel/deepseek-v4.1-flash-uncensored
     base_url: https://attested.lebrel.ai/v1
     key_env: LEBREL_API_KEY

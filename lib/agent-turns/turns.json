@@ -1,8 +1,38 @@
 {
-  "generated": "2026-11-28T13:57:03Z",
+  "generated": "2026-11-28T14:04:49Z",
   "count": 200,
-  "pin": "69e1d3f280e7d538bc4cc193f948d5bbb912ab98af9904eb2dbc054644935c1b",
+  "pin": "5783a21e5ad73bfa508fd93aa7e13a817c2d59be2cd0533a06199b913926e3dd",
   "turns": [
+    {
+      "id": "f608c9bc-8c9e-4d46-bfa7-b2f419b3ee07",
+      "ts": "2026-11-28T14:04:09Z",
+      "source": "devin",
+      "subject": "nixconfig:manual-audit-20261128-1445",
+      "action": "claim: superseding my pane-steward dispatch by operator instruction; audit MANUAL.md against compiled inventory, fix only stale facts",
+      "outcome": "in_progress",
+      "claims": [
+        "MANUAL.md"
+      ],
+      "files": [],
+      "base_commit": "982e63f82ec1325cd513e56d5ef5a363e1afb2c9",
+      "branch": "main",
+      "frame": "03hbitjzx7mbyvpta3tysc4cr"
+    },
+    {
+      "id": "7b534e1f-a1be-4076-b78b-cb4e06a4f697",
+      "ts": "2026-11-28T13:57:27Z",
+      "source": "freebuff",
+      "subject": "nixconfig:cv-ats-doc-audit-20261128-1440",
+      "action": "landed: audited the ATS page against the shipped templates, fixed 8 proven claims — five→six PDFs, the below:-2.1pt correction cv.typ no longer has, page depths re-measured from the published records (2/2/1/1/1/1; 113/117/260/267/240/234mm), the date rule, heading lines 15/50/92/101, Nix 2.35.6, the Anschreiben limit. gate: checks:docs:links + checks:prose PASS; checks:quick red only at checks:infron, pre-existing from 69288a7c",
+      "outcome": "done",
+      "claims": [
+        "docs/cv-ats-compliance.md"
+      ],
+      "files": [],
+      "base_commit": "982e63f82ec1325cd513e56d5ef5a363e1afb2c9",
+      "branch": "main",
+      "frame": "03hbis8wo9u636z9up9jd5r02"
+    },
     {
       "id": "df5d2df1-061d-4c99-beb4-706ec70403d4",
       "ts": "2026-11-28T13:55:29Z",
@@ -2976,43 +3006,6 @@
       "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
       "branch": "main",
       "frame": "03hbf7b35huvw3vu48e8bq1i7"
-    },
-    {
-      "id": "60865652-76cd-484f-95bd-0dc905e67d03",
-      "ts": "2026-11-28T02:57:16Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-gigabit-claims-2026-11-28",
-      "action": "prose-change: cleared stale gigabit claims in AGENTS.nix and docs; delphi line recorded as 50 Mbps ceiling, not gigabit",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix",
-        "docs/media-relay.md",
-        "docs/deepseek-v4-flash.md"
-      ],
-      "files": [
-        "AGENTS.nix",
-        "docs/media-relay.md",
-        "docs/deepseek-v4-flash.md"
-      ],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbf7a7m7wj3giousrufees6"
-    },
-    {
-      "id": "009e9361-4644-4bcc-ab51-efdd5a111db6",
-      "ts": "2026-11-28T02:55:14Z",
-      "source": "buffy",
-      "subject": "nixconfig:freebuff-cv-ats-2026-11-28",
-      "action": "claim: cv-ats records publish, verify vs origin/main, redeploy",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/cv-ats-site.nix",
-        "lib/cv-ats-report.py"
-      ],
-      "files": [],
-      "base_commit": "9742d29133f7804d4c6b4438d8d7e1d03865e85b",
-      "branch": "HEAD",
-      "frame": "03hbf6vv9cm6yg75gg4ph4xbi"
     }
   ]
 }

@@ -11,13 +11,14 @@ in
   pkgs.runCommand "cv-ats-site" {
     nativeBuildInputs = [pkgs.python3 pkgs.poppler-utils];
   } ''
-    mkdir -p $out records
+    mkdir -p $out/records
     cp ${./cv-ats-report.py} report.py
-    # The record is copied under its CV's name (`lib/matt-site.nix` writes it), so
-    # the page names `records/cv-de.json`, not a store hash (`lib/matt-site.nix`).
+    # The record is published under its CV's name (`lib/matt-site.nix` writes it),
+    # so the page links `records/cv-de.json`, not a store hash: under `$out`,
+    # because a bare `records/` is the build directory the store drops.
     ${lib.concatMapStringsSep "\n" (c: ''
-        cp ${c.record} records/${lib.removeSuffix ".pdf" c.name}.json
-        bash ${check} --record records/${lib.removeSuffix ".pdf" c.name}.json ${c.src}/cv.pdf >$out/${c.name}.log 2>&1 || {
+        cp ${c.record} $out/records/${lib.removeSuffix ".pdf" c.name}.json
+        bash ${check} --record $out/records/${lib.removeSuffix ".pdf" c.name}.json ${c.src}/cv.pdf >$out/${c.name}.log 2>&1 || {
           cat $out/${c.name}.log >&2
           echo "cv-ats-site: ${c.name} does not match the record that built it" >&2
           exit 1

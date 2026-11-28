@@ -1,8 +1,164 @@
 {
-  "generated": "2026-11-28T09:47:53Z",
+  "generated": "2026-11-28T10:36:41Z",
   "count": 200,
-  "pin": "7fe5dad26349488f629c0efbc236dcd8b4f93d36a0309ae10e22c59abefe956c",
+  "pin": "0ba86590c482cd8de08d1aa3616847d7c60cc1981747ee422ab638ebba334381",
   "turns": [
+    {
+      "id": "3f5a8386-5dce-41de-be32-e5159d153c81",
+      "ts": "2026-11-28T10:33:26Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-flake-projection-audit-2026-11-28",
+      "action": "claim: declare the observed freebuff-next lane so the intents gate returns green",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/intents.nix"
+      ],
+      "files": [],
+      "base_commit": "10a2712f87f536ab3930fb318e9e7764772db7af",
+      "branch": "main",
+      "frame": "03hbhoe6p8ylficy7ya3nxy0n"
+    },
+    {
+      "id": "87a8c399-cbe2-4e9b-bdb0-6e1b81e604ad",
+      "ts": "2026-11-28T10:30:21Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-flake-projection-audit-2026-11-28",
+      "action": "claim: add the shrink-only note-ledger ceiling edit needed to land the audit note",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix scripts/task/repo-blobs.sh"
+      ],
+      "files": [],
+      "base_commit": "10a2712f87f536ab3930fb318e9e7764772db7af",
+      "branch": "main",
+      "frame": "03hbhnsj39tur4ckdh5rc5wli"
+    },
+    {
+      "id": "38ad9188-0fed-445e-a741-2686700aaf38",
+      "ts": "2026-11-28T10:22:04Z",
+      "source": "devin",
+      "subject": "nixconfig:lumi-clanker-codespaces",
+      "action": "landed: API-first clanker jobs plus overlay-container Nix/devshell/closure offload; gates checks:tasks, checks:nix:shell, checks:nix:lint, checks:host HOST=lumi PASS",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/clanker.sh",
+        "scripts/task/clanker-container.sh",
+        "taskfiles/instabox.yml",
+        ".agents/skills/instabox/SKILL.md",
+        "modules/user/ai/zeroclaw.nix"
+      ],
+      "files": [
+        "scripts/task/clanker.sh",
+        "scripts/task/clanker-container.sh",
+        "scripts/task/instabox.sh",
+        "scripts/task/nix-fmt.sh",
+        "taskfiles/instabox.yml",
+        ".agents/skills/instabox/SKILL.md",
+        "modules/user/ai/zeroclaw.nix",
+        "hosts/lumi.nix"
+      ],
+      "base_commit": "f877e13acd860343f1f8d32de3a7fd24a9a3f642",
+      "branch": "devin/lumi-clanker-codespaces",
+      "frame": "03hbhm69de3ashyk2l62yrv7i"
+    },
+    {
+      "id": "e1ddabc8-9428-4878-a683-4278801d7df5",
+      "ts": "2026-11-28T09:30:30Z",
+      "source": "devin",
+      "subject": "nixconfig:lumi-clanker-codespaces",
+      "action": "continue: implement API-first clanker transport and worker-plane carry-forward after confirming origin/main lacks fixes",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/instabox.sh",
+        "scripts/task/clanker.sh",
+        "taskfiles/instabox.yml",
+        "taskfiles/clanker.yml",
+        "modules/user/ai/zeroclaw.nix",
+        "taskfiles/infra.yml"
+      ],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbhm67pzxrqj5h7sa9jkqvh"
+    },
+    {
+      "id": "5fb7f870-4ccc-4b66-947e-1ef91ce15d20",
+      "ts": "2026-11-28T10:16:30Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-flake-projection-audit-2026-11-28",
+      "action": "claim: audit every projected host configuration, record failures, then file the findings note",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "10a2712f87f536ab3930fb318e9e7764772db7af",
+      "branch": "main",
+      "frame": "03hbhl34lyujut2xe017d1q83"
+    },
+    {
+      "id": "32aec13f-ea96-4be8-a06c-9227b579a323",
+      "ts": "2026-11-28T10:14:55Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-1-devin-idle-20261128",
+      "action": "drove devin flake-change via jev duel p=0.9/m=0.8: verify all hosts project, log AGENTS.nix note",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "10a2712f87f536ab3930fb318e9e7764772db7af",
+      "branch": "main",
+      "frame": "03hbhkrwoe5o1ky7jyo3ca18v"
+    },
+    {
+      "id": "93f8133b-b649-4ba1-9f45-e086bfe39a4e",
+      "ts": "2026-11-28T10:03:31Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-3-delphi-idle-20261128",
+      "action": "agy quota exhausted ~120h — delphi left idle, back off",
+      "outcome": "blocked: agy quota exhausted ~120h — delphi left idle, back off",
+      "claims": [],
+      "files": [],
+      "base_commit": "10a2712f87f536ab3930fb318e9e7764772db7af",
+      "branch": "main",
+      "frame": "03hbhijreh4y97fg72rpwwl0a"
+    },
+    {
+      "id": "8dad9918-fa62-4778-8b12-773a58518084",
+      "ts": "2026-11-28T10:02:46Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-1-devin-idle-20261128",
+      "action": "jev task-change 0.54/0.22 below 0.8 — devin left idle, not driven",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "10a2712f87f536ab3930fb318e9e7764772db7af",
+      "branch": "main",
+      "frame": "03hbhiei6habjstcf8i97zqe2"
+    },
+    {
+      "id": "53e622b9-04b9-4c32-a73a-949d974f2c1b",
+      "ts": "2026-11-28T09:49:10Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-next-gate-2026-11-27",
+      "action": "landed: eval-time sops coverage assertion plus regression fixture | gate: checks:sops:key-coverage:test PASS; checks:host HOST=lumi MODE=eval PASS; checks:hosts HOSTS=\"demo scratch cassini\" MODE=eval PASS; check:verify PASS | commit 10a2712f",
+      "outcome": "done",
+      "claims": [
+        "checks/"
+      ],
+      "files": [
+        "modules/global/sops-key-coverage.nix",
+        "tests/sops-key-coverage/run.sh",
+        "flake/module-sets.nix",
+        "lib/hm-shared.nix",
+        "modules/global/home-manager-shared.nix",
+        "modules/global/noDE.nix",
+        "taskfiles/checks.yml",
+        "flake/check-inventory.nix"
+      ],
+      "base_commit": "10a2712f87f536ab3930fb318e9e7764772db7af",
+      "branch": "main",
+      "frame": "03hbhfquc0ugfktqcotuc4ic9"
+    },
     {
       "id": "4572b9b7-535f-44bc-bbbf-ee666a481285",
       "ts": "2026-11-28T09:44:03Z",
@@ -2843,149 +2999,6 @@
       "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
       "branch": "main",
       "frame": "03hbdyowmrykxcxj23gjwepk6"
-    },
-    {
-      "id": "a836d772-a667-43ab-adb1-032f9dfb791f",
-      "ts": "2026-11-27T23:07:35Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-egress-note-2026-11-28",
-      "action": "note-change 1.0: detail top egress increment, trim note, push",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdyf1h2dmqeu90zbn9wnph"
-    },
-    {
-      "id": "ad250d5b-b520-4514-86fe-2918a2401b50",
-      "ts": "2026-11-27T23:07:35Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-republish-2026-11-28",
-      "action": "publish 0.87: verify CV site vs origin/main, fix drift, push",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/matt",
-        ".#sites.matt-site"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdyeytz58m5nhzttdm82uu"
-    },
-    {
-      "id": "9404b750-ebe8-4651-8782-f5265bcb06fe",
-      "ts": "2026-11-27T23:05:11Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-cv-verify-2026-11-28",
-      "action": "verify vs origin/main 19a19fd6: built .#sites.matt-site (6 PDFs, byte-identical to live matt.bountystash.com), cv-evidence-check 4 legs PASS, cv-blog-check PASS, pins-refresh --check all fresh. No drift, nothing to commit or push.",
-      "outcome": "done",
-      "claims": [
-        "lib/matt/"
-      ],
-      "files": [
-        "lib/matt/resume.json",
-        "lib/matt/profile.json",
-        "lib/matt/profile.de.json"
-      ],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdxy4618kfji0kc8skyc81"
-    },
-    {
-      "id": "1de73728-e5be-4b56-942a-36fb1de6a5a3",
-      "ts": "2026-11-27T23:03:39Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-egress-research-2026-11-27",
-      "action": "research 0.94: tailnet egress, check endpoints/DNS/proxy",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/config/tailnet-policy.hujson"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdxn9rnanwok8wfnz4v785"
-    },
-    {
-      "id": "b111d515-d832-48be-bcff-8489693a18d3",
-      "ts": "2026-11-27T23:03:39Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-verify-2026-11-27",
-      "action": "publish 0.85: verify CVs vs origin/main, fix drift, push",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/matt"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdxn99f32omh1m2paqyyzc"
-    },
-    {
-      "id": "f6adbc14-2de4-43bd-abe9-490c88630f42",
-      "ts": "2026-11-27T23:00:44Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-egress-increment-2026-11-27",
-      "action": "blocked on the AGENTS.nix blob ceiling: note detailed (IN FLIGHT, 29 lines) and schema gate PASS, commit refused — 526443 bytes vs ceiling 522370, so 4073 bytes of note bodies must be trimmed or the ceiling raised deliberately; HEAD was already 953 over | not committed, not pushed",
-      "outcome": "blocked: AGENTS.nix is 4073 bytes over its shrink-only ceiling, needs an operator trim decision",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "5aa01e488d1ae8c91e1e0fa0194c9d0e82299e06",
-      "branch": "main",
-      "frame": "03hbdx2tgi45iibyaux9ecjx1"
-    },
-    {
-      "id": "dec4e395-a9d8-47d5-ac43-650dce2798b6",
-      "ts": "2026-11-27T22:58:45Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-egress-increment-2026-11-27",
-      "action": "note-change 0.99: detail top egress increment + commit note, push",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdwovbgruss1yttruq0iur"
-    },
-    {
-      "id": "6c9372b0-3ffe-4213-b349-ff40a883a70d",
-      "ts": "2026-11-27T22:57:18Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-cv-verify-2026-11-27",
-      "action": "verified 0.51: lib/matt/ is origin/main blob-for-blob — restored the 4 stale provider lines (profile{,.de}.json target+hire) that reverted b85ba978; no commit made (content already upstream, shared worktree) and nothing to push (main 3 ahead/126 behind, push rejected non-fast-forward). resume fetch pin is stale upstream too | gate: matt:cv:evidence PASS, agents:cv:publish-check PASS, matt:gist:drift PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/matt/"
-      ],
-      "files": [
-        "lib/matt/profile.json",
-        "lib/matt/profile.de.json"
-      ],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdweopvypaoo8ctmpbaia8"
-    },
-    {
-      "id": "2015c3f8-29d3-4885-b5ba-61cb008391e6",
-      "ts": "2026-11-27T22:55:27Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-egress-research-2026-11-27",
-      "action": "research landed: egress-lanes-research note in AGENTS.nix (8 increments, Jev ranking 57/30/7, cache-then-broker order) | gate: agents-notes-schema PASS | docs/ untouched on purpose: the decision record belongs in AGENTS.nix, a docs page would be a second truth | uncommitted",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "5aa01e488d1ae8c91e1e0fa0194c9d0e82299e06",
-      "branch": "main",
-      "frame": "03hbdw1p39hbgmq3vihl3vlam"
     }
   ]
 }

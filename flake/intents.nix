@@ -202,6 +202,14 @@
       via = "freebuff-headless dispatch";
       place = ["eval" "local-gate"];
     };
+    freebuff-next = {
+      what = "the steward-driven freebuff-next pane: reviews a staged module edit before commit";
+      provides = ["chain-change"];
+      claims = ["modules/secrets"];
+      floor = "resolved";
+      via = "the freebuff-next pane driven by tmux-pane-steward";
+      place = ["eval" "local-gate"];
+    };
     freebuff-pane-2 = {
       what = "the steward-driven freebuff pane: republishes /cv/ and gates the live links";
       provides = ["publish"];

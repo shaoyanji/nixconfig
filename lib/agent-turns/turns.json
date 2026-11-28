@@ -1,8 +1,52 @@
 {
-  "generated": "2026-11-27T23:57:56Z",
+  "generated": "2026-11-28T00:11:39Z",
   "count": 200,
-  "pin": "1bed742a3a8bc30143b5e1c70028171847024b7cd83cb0d686decda50f9c4f3e",
+  "pin": "6b38b0bf9cdfd13309d6c2084deb5c0dae496802841ca296ea4e67664433cafe",
   "turns": [
+    {
+      "id": "7f1fafb1-4218-4faa-ab16-a15f0798e049",
+      "ts": "2026-11-28T00:10:17Z",
+      "source": "image-daily",
+      "subject": "nixconfig:wall-plates",
+      "action": "2026-11-28: 0 plate(s) kept of 0 spent, 0 roster row(s) waiting, 876 asset(s) published",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": null,
+      "branch": null,
+      "frame": "03hbeanxi3i7q4zoqk33ggma4"
+    },
+    {
+      "id": "9e157823-9926-4e49-9d07-79d382aa91cd",
+      "ts": "2026-11-28T00:06:46Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-egress-lane-verify-2026-11-28",
+      "action": "note-change 0.86/0.77: verify 2 egress lanes, record in note, push",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbe9z5qg62f38cahhzzltr2"
+    },
+    {
+      "id": "db0f0372-0e8d-4840-a4a9-e9afc343fef0",
+      "ts": "2026-11-27T23:58:15Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-census-gate-2026-11-28",
+      "action": "landed: checks:nix:comments now compares the ceilings it printed, so 2ca9a316's 6513/6495 drift exits 1 at that tree (proved: 'trim 18'); hook runs the same script; fixture replays the drift, 3/3. gate: checks:nix:comments PASS, census 6495/6495, 133/140 dated; no AGENTS.nix edit was needed",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/nix-comments.sh",
+        "tests/nix-comments/run.sh"
+      ],
+      "files": [],
+      "base_commit": "01e1e79fa0f058ff5d62f0810c8969070d5e2e09",
+      "branch": "main",
+      "frame": "03hbe8bbgvdw5zemzcwjvlico"
+    },
     {
       "id": "9b19f101-b4dc-4bc4-aab2-dba3d669b305",
       "ts": "2026-11-27T23:54:41Z",
@@ -2918,60 +2962,6 @@
       "base_commit": "89f19a89b2dd0f6e491ce49a70692e5f92eecb5a",
       "branch": "HEAD",
       "frame": "03hbanfw4r3jdty1ajzucnpkw"
-    },
-    {
-      "id": "a8991830-72b0-4f0e-a7ae-fae28c326872",
-      "ts": "2026-11-27T12:54:57Z",
-      "source": "devin",
-      "subject": "nixconfig:lumi-lightweight-agent-harness",
-      "action": "claim: research and set up a memory-safe 24/7 messageable agent on lumi, preserving existing fallback sourcing and finishing the tmux launcher fix",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/lumi.nix",
-        "modules/user/ai",
-        "modules/services"
-      ],
-      "files": [
-        "hosts/lumi.nix"
-      ],
-      "base_commit": "bf137beb80a0f202e042a91a7519715f4fe17958",
-      "branch": "zeno-stage1",
-      "frame": "03hbamqp3bv75gziqcwjz0qc0"
-    },
-    {
-      "id": "d3e1a383-067a-4431-9f85-56ec137789f5",
-      "ts": "2026-11-27T12:44:32Z",
-      "source": "devin",
-      "subject": "nixconfig:lumi-hardening-agent-workflow",
-      "action": "landed: Traefik edge active, cloudflared sandboxed with clean argv, sshd hardened, unattended upgrades enabled, keys declarative, devin/tmux wrapper and 1GB RAM prompt alert deployed",
-      "outcome": "done",
-      "claims": [
-        "hosts/lumi.nix",
-        "modules/config/authorized-keys.nix"
-      ],
-      "files": [
-        "flake/host-inventory.nix",
-        "hosts/lumi.nix",
-        "inventory.toml",
-        "lib/home-agents.nix",
-        "lib/agent-turns/turns.json"
-      ],
-      "base_commit": "bf137beb80a0f202e042a91a7519715f4fe17958",
-      "branch": "zeno-stage1",
-      "frame": "03hbakpegd9ohq2mnmztyfq2w"
-    },
-    {
-      "id": "a4ba589a-6fa3-43da-beb3-ae75522501f9",
-      "ts": "2026-11-27T12:21:27Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-2-freebuff-cv-scout-2026-11-27",
-      "action": "landed: blog 4d05b35 publishes the five CVs rebuilt from lib/matt (PSI not memory pressure, SOPS, German sentence periods, 'CI aus der Inventardatei'); all six PDFs are byte-identical to the live site. | gate: agents:cv:publish-check PASS 6/6",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
-      "branch": "main",
-      "frame": "03hbag7359mj85zk4y508cih9"
     }
   ]
 }

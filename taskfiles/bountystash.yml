@@ -255,6 +255,9 @@ tasks:
       an unrelated ATS site. Exit 0 = every file matches, 1 = drift, 2 = no
       artifact or no host recorded.
     cmds:
+      # A copy of another build would make this gate prove the wrong thing, so
+      # the reference is checked as this tree's before any byte is compared.
+      - COPIES="/tmp/cv-ats=.#sites.cv-ats-site" bash scripts/task/site-copies-check.sh
       - bash scripts/task/cv-ats-check.sh --deployed
 
   matt:gist:pull:

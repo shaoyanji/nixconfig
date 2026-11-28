@@ -83,6 +83,7 @@ tasks:
       - task: checks:ports:test
       - task: checks:images
       - task: checks:images:test
+      - task: checks:site:copies
       - task: checks:wrangler
       - task: checks:agents:xs-post
       - task: checks:counts
@@ -132,6 +133,20 @@ tasks:
       carries `link-ok: <reason>` on its line. ~0.1 s, no network, no eval.
     cmds:
       - bash scripts/task/docs-links.sh
+
+  checks:site:copies:
+    desc: "[gate] A local copy of the CV site or the ATS audit is this tree's build"
+    summary: >
+      The CV gates read copies, not the tree: `/tmp/matt-site` (the six PDFs and
+      the pages that link them) and `/tmp/cv-ats` (the published audit). Both
+      out-links outlive a checkout, so a stale one turns a green drift gate into
+      proof of yesterday's build. Compares each present copy's store path with
+      `.#sites.matt-site.outPath` / `.#sites.cv-ats-site.outPath`; absent is fine
+      (CI has no out-links), and a plain directory fails as a hand copy. One eval
+      per present copy (~1 s warm), no build. Exit 0 current, 1 stale, 2 cannot
+      tell. `matt:cv:ats:drift` runs it before reading `/tmp/cv-ats`.
+    cmds:
+      - bash scripts/task/site-copies-check.sh
 
   checks:site:links:
     desc: "[gate] Build the Nix sites, resolve every internal href/src, prove every shipped CV PDF is linked"

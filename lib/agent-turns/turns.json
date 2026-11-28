@@ -1,8 +1,81 @@
 {
-  "generated": "2026-11-28T05:06:53Z",
+  "generated": "2026-11-28T05:23:24Z",
   "count": 200,
-  "pin": "733f1f4bc2cafd44034974e7ed4488f2bda857d433bb10fcdf028fb31169af4f",
+  "pin": "bb2f360b8e45a6962f65cd8380b4c2de0d773f4244eb3724dec1cad15fa0585a",
   "turns": [
+    {
+      "id": "d4ede283-0ffe-484b-a128-0d62111f6727",
+      "ts": "2026-11-28T05:23:16Z",
+      "source": "buffy",
+      "subject": "nixconfig:site-deploy-gate-methods-20261128",
+      "action": "claim: gate every publish method (docs symlink, manifest rsync, neocities) through one funnel — detail on the ledger",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/site-deploy-check.sh",
+        "scripts/task/site-target.sh",
+        "taskfiles/checks.yml"
+      ],
+      "files": [],
+      "base_commit": "5c72a84c01df9aa6a652ef8683180546ae8ec4f3",
+      "branch": "HEAD",
+      "frame": "03hbfzsyixumpx9ylkc5bpi8w"
+    },
+    {
+      "id": "330ba9d3-d4b2-4756-807f-85bfdaceb3b9",
+      "ts": "2026-11-28T05:15:00Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:wallpaper-agy-model-switch-20261128",
+      "action": "blocked: agy Hydrogen quota 125h; switched account route to Gemini 3.8 Flash; wallpaper task jev needs_review (0.76/0.64) left for clearer route",
+      "outcome": "blocked: model quota",
+      "claims": [],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfy6vrznv99skfiy0d2mry"
+    },
+    {
+      "id": "62178841-cdf9-4732-864a-f7df7e869c42",
+      "ts": "2026-11-28T05:13:38Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:site-deploy-gate-methods-20261128",
+      "action": "gate-change: extend checks:site:deploy to other publish paths",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/site-deploy-check.sh",
+        "scripts/task/pages-deploy.sh",
+        "taskfiles/checks.yml"
+      ],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfxx5d9npjpubyrlxv4muw"
+    },
+    {
+      "id": "dc317f54-b152-4a98-ba93-76969536c453",
+      "ts": "2026-11-28T05:07:12Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-deploy-gate-20261128",
+      "action": "landed: checks:site:deploy for /tmp/{matt-site,cv-ats,bountystash-mockup}, wired into pages-deploy.sh | gate: checks:site:deploy PASS 3/3, fires on removed link, foreign cv-ats build, stale hand copy, and pages-deploy refuses before wrangler; checks:tasks+yaml+nix PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfwnzrgneus3r874x6kp5i"
+    },
+    {
+      "id": "d84ebd03-3ca1-4d09-9745-ca73dc701efd",
+      "ts": "2026-11-28T05:07:12Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-deploy-gate-20261128",
+      "action": "gate-change: add checks:site:deploy — refuse to publish an unbuilt or foreign surface; prove, pass, push",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfwnxoq6p1bm19j4p80ttu"
+    },
     {
       "id": "de826112-12cd-4c60-9d9e-39d331285177",
       "ts": "2026-11-28T05:02:27Z",
@@ -2923,73 +2996,6 @@
       "base_commit": "239844cc96f7bb7593306d5f41d94b41e81dbae7",
       "branch": "HEAD",
       "frame": "03hbcjp9xxsqopos7wrntk701"
-    },
-    {
-      "id": "ad5ae95a-ffaa-4abe-a9a3-79d236ae0d61",
-      "ts": "2026-11-27T18:40:11Z",
-      "source": "pane-2-freebuff-cv-sync",
-      "subject": "nixconfig:wallpaper-set-anime-100",
-      "action": "wall 2026-11-27 live 61/100 (56 numbered + 5 legacy). cpg cap 100/day images: 69 used, 31 left -> paced run tops out ~92. Fixed silent publish gap (wrangler off PATH) with nix shell; manifest 837->845 deployed. Patched run.py WALL_DAY/MAX, tail.sh pinned to 2026-11-27, timer armed 00:05Z to render the exact shortfall and publish.",
-      "outcome": "in_progress",
-      "claims": [
-        "Pictures/cpg/wallpapers"
-      ],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbci6hngi4bfyjx6c5tx3fj"
-    },
-    {
-      "id": "d485c4ee-0d36-44ec-9271-f27d88ee85c2",
-      "ts": "2026-11-27T18:39:04Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin-rung3-gate-brief",
-      "action": "note-change 0.98|0.97; draft rung-3 gate brief, no gate change",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hbchymjymdw8dlk2ry48t5g"
-    },
-    {
-      "id": "735b7570-c9e9-4ee7-afcd-4bb60611557f",
-      "ts": "2026-11-27T18:37:25Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-freebuff-cv-publish",
-      "action": "done: cv-publish clean; 4 GETs + 6 HEADs ok; gate hashes unchanged",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hbchmz7hxo9ktg52iyisnhx"
-    },
-    {
-      "id": "07fac7ca-270d-407b-91cd-c49ed64c0895",
-      "ts": "2026-11-27T18:37:25Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin-feature-chain-refactor",
-      "action": "done: no-change closure @63a4f191 (5th consecutive); 32/32 eval PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hbchmyw3sxi1o3h5ip1dymc"
-    },
-    {
-      "id": "28bb30ef-38e5-42bc-92bf-e562c5a186fc",
-      "ts": "2026-11-27T18:28:46Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:probe2",
-      "action": "shape probe complete; no repo change",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hbcfy735y4bs5lphrryuby9"
     }
   ]
 }

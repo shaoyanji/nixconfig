@@ -150,19 +150,19 @@ tasks:
   checks:site:deploy:
     desc: "[gate] Every surface a deploy would publish is built here and is this tree's build"
     summary: >
-      `checks:site:copies` lets an absent out-link pass because nothing reads it in
-      CI; a deploy is the other case — a yesterday's tree answers 200 everywhere.
-      This fails when the artifact is missing, resolves to a store path this tree
-      does not build, or is a hand copy that differs. A store path is a string
-      compare; a plain directory is a walk. No build: an unbuilt surface fails, it
-      is not built here. `pages-deploy.sh` runs it on the directory it was handed,
-      so no deploy skips it.
+      A deploy publishes the directory it is handed, and a yesterday's tree
+      publishes as successfully as today's. This fails when the artifact is missing,
+      resolves to a store path this tree does not build, or is a hand copy that
+      differs. Every publish path runs it: `site-target.sh` for the four manifest
+      methods (pages, symlink, rsync, neocities), `pages-deploy.sh` for its direct
+      callers. A flake surface is compared with the ref its build command names,
+      query and all; an in-tree render needs a root index.html.
 
-      Vars: SURFACES=, DIR= (the path alone, attr from the manifest), EVAL_TIMEOUT=.
-      Exit 0 current, 1 unbuilt, 2 cannot tell.
+      Vars: SURFACES=, DIR=, TARGET=. Exit 0 current, 1 unbuilt, 2 cannot tell.
     env:
       SURFACES: '{{.SURFACES | default ""}}'
       DIR: '{{.DIR | default ""}}'
+      TARGET: '{{.TARGET | default ""}}'
       EVAL_TIMEOUT: '{{.EVAL_TIMEOUT | default ""}}'
     cmds:
       - bash scripts/task/site-deploy-check.sh

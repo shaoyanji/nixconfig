@@ -12,7 +12,8 @@ Commands:
   show [target]        Show target metadata (default target when omitted)
   build [target]       Run build command for target (default target when omitted)
   preview [target]     Build then serve output path locally (default target when omitted)
-  deploy [target]      Build then deploy output path (default target when omitted)
+  deploy [target]      Build then deploy output path (default target when omitted),
+                       after site-deploy-check.sh proves the build is this tree's
 USAGE
 }
 
@@ -125,6 +126,18 @@ run_deploy() {
   if [ -z "$deploy_target" ]; then
     error "Target '$target' is missing deployTarget"
     exit 1
+  fi
+
+  # Every method below hands a directory to a remote, and the failure is the same
+  # in all four: a build that is not this tree's leaves the machine looking current
+  # forever. `pages-deploy.sh` runs this check too, for its direct callers; the exit
+  # code is kept (1 unbuilt, 2 cannot tell) so a script reading it can tell the two
+  # apart.
+  local gate=0
+  TARGET="$target" bash "$SCRIPT_DIR/site-deploy-check.sh" || gate=$?
+  if [ "$gate" -ne 0 ]; then
+    error "refusing to deploy '$target' — the surface is not this tree's build"
+    exit "$gate"
   fi
 
   case "$deploy_method" in

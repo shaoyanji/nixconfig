@@ -1,8 +1,8 @@
 {
   "_comment": "Der auf Software und Infrastruktur zugeschnittene Lebenslauf. Er spiegelt lib/matt/cv-software.json: dieselben drei Rollen in derselben Reihenfolge, dieselben zwei Projekte und dieselbe Zahl an Bullets je Rolle. Jeder Bullet ist wörtlich aus lib/matt/lebenslauf.json übernommen; lib/matt-site.nix bricht den Build ab, sobald ein Satz dort nicht steht. Diese Datei wählt aus und ordnet, sie erfindet nichts.",
   "lang": "de",
-  "title": "Systemingenieur und Softwareentwickler",
-  "bio": "Ich baue die Systeme, die die Modelle ausführen: eine NixOS-Flotte aus einem Flake, ein E-Mail-Archiv, das seine Post selbst klassifiziert, und Chat-, Sprach- und Bildmodelle hinter einem einzigen OpenAI-kompatiblen Endpunkt. Davor vier Jahre Asset Management eines Solarportfolios über 100 Mio. USD und Forschung zu Heliostat-Messtechnik am Fraunhofer ISE.",
+  "title": "Systemingenieur, Infrastruktur und DevOps",
+  "bio": "Ich baue die Systeme, die die Modelle ausführen und im Betrieb halten: eine NixOS-Flotte aus einem Flake, ein E-Mail-Archiv, das seine Post selbst klassifiziert, und Chat-, Sprach- und Bildmodelle hinter einem einzigen OpenAI-kompatiblen Endpunkt. Davor vier Jahre Asset Management eines Solarportfolios über 100 Mio. USD und Forschung zu Heliostat-Messtechnik am Fraunhofer ISE.",
   "labels": {
     "projects": "Projekte"
   },
@@ -60,7 +60,10 @@
         "GitHub Actions",
         "CI aus der Inventardatei",
         "Binary-Cache",
-        "Remote-Builder"
+        "Remote-Builder",
+        "gatus-Health-Checks",
+        "Sentinel-Ledger und Alert-Bridge",
+        "Rollback je Generation"
       ]
     },
     {

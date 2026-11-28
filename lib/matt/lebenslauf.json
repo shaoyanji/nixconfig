@@ -184,7 +184,7 @@
     {
       "name": "nixconfig",
       "resumeName": "nixconfig",
-      "description": "Ein Flake deklariert 25 NixOS-Hosts, eine SSH-Zertifizierungsstelle, SOPS-verschlüsselte Secrets und ein Taskfile als Bedienoberfläche. Die CI führt dasselbe Modul-Gate aus wie die Maschinen.",
+      "description": "Ein Flake deklariert über zwanzig NixOS-Hosts, eine SSH-Zertifizierungsstelle, SOPS-verschlüsselte Secrets und ein Taskfile als Bedienoberfläche. Die CI führt dasselbe Modul-Gate aus wie die Maschinen.",
       "url": "https://github.com/shaoyanji/nixconfig",
       "startDate": "2023-01-01",
       "endDate": "",
@@ -368,16 +368,26 @@
       ]
     },
     {
+      "name": "Infrastruktur & Betrieb",
+      "keywords": [
+        "NixOS",
+        "Nix Flakes",
+        "Linux / systemd",
+        "SOPS und age",
+        "SSH-Zertifizierungsstelle",
+        "Binary-Cache",
+        "gatus-Health-Checks",
+        "Sentinel-Ledger"
+      ]
+    },
+    {
       "name": "DevOps",
       "level": "Grundkenntnisse",
       "keywords": [
-        "NixOS",
-        "Kubernetes",
+        "Kubernetes (Grundlagen)",
         "GitHub Actions",
-        "Linux / systemd",
-        "Container",
-        "Monitoring & Alerting",
-        "AWS Lambda (kleines Agenten-Projekt)"
+        "CI-Gates",
+        "Monitoring & Alerting"
       ]
     },
     {

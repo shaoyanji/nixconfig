@@ -8,7 +8,7 @@
     "location": "Gutach im Breisgau, Germany · remote (CET, US-East overlap)",
     "status": "Open to senior and lead roles",
     "target": "Target: DevOps, SRE, platform and infrastructure engineering — Kubernetes and containers on Linux and systemd, CI gates in GitHub Actions, and a Nix flake as the source of truth for the fleet; remote from a CET base or on site in Freiburg.",
-    "bio": "Most of my working life has gone into making operational data usable: four years of asset management for a commercial solar portfolio, with yield models that passed bank audits, mobile field capture and telemetry reconciliation when sensors went missing. Between roles I completed a three-month PPA engagement for EWE Trading and built a twenty-five-host NixOS fleet from one flake — SSH certificate authority, per-host encrypted secrets, a sentinel watching disk, memory and generation age — alongside local language, speech and image models behind one OpenAI-compatible endpoint. I am looking for systems work where operational data has to be trusted.",
+    "bio": "Most of my working life has gone into making operational data usable: four years of asset management for a commercial solar portfolio, with yield models that passed bank audits, mobile field capture and telemetry reconciliation when sensors went missing. Between roles I completed a three-month PPA engagement for EWE Trading and built a twenty-plus-host NixOS fleet from one flake — SSH certificate authority, per-host encrypted secrets, a sentinel watching disk, memory and generation age — alongside local language, speech and image models behind one OpenAI-compatible endpoint. I am looking for systems work where operational data has to be trusted.",
     "contacts": [
       {
         "label": "email",
@@ -98,7 +98,7 @@
     {
       "title": "Multi-host NixOS fleet",
       "role": "Author and operator",
-      "description": "I moved twenty-five machines off per-host install notes and onto one repository. Rebuilding, auditing or handing over a host is now the commit plus one command; secrets are encrypted per host and certificates rotate on a schedule. The same fleet runs self-hosted services and scheduled sync agents for job search and data sync.",
+      "description": "I moved more than twenty machines off per-host install notes and onto one repository. Rebuilding, auditing or handing over a host is now the commit plus one command; secrets are encrypted per host and certificates rotate on a schedule. The same fleet runs self-hosted services and scheduled sync agents for job search and data sync.",
       "link": "https://github.com/shaoyanji/nixconfig",
       "caseStudy": "nixos-fleet",
       "keywords": [

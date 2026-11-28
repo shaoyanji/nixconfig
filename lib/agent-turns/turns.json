@@ -1,8 +1,52 @@
 {
-  "generated": "2026-11-28T06:33:39Z",
+  "generated": "2026-11-28T06:53:16Z",
   "count": 200,
-  "pin": "834c30f0cf63caca878a941c2fc44be0beb248f44e354bc2b3df1b6cb0074bc9",
+  "pin": "8ecb3f785a8ebb8ae2dc4994244309f88f6e5e53474945d945ef7f0f5541e064",
   "turns": [
+    {
+      "id": "34bbb88c-8d89-4df4-8838-e675bbd98b73",
+      "ts": "2026-11-28T06:50:15Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-cv-packet-publish-20261128",
+      "action": "claim: refine Hisolutions packet (label/summary/DevOps groups, host count 13 vs measured, drop unbacked Lambda), letter pipeline+consulting, rebuild packet, publish matt-site, gate",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/lebenslauf.json",
+        "lib/matt/cv-software.de.json",
+        "lib/matt/cv-software.json",
+        "lib/matt/resume.cv.json"
+      ],
+      "files": [],
+      "base_commit": "8f2ccbf4e825f966ae59c25ed5e14b01cadef3a2",
+      "branch": "main",
+      "frame": "03hbggsp4nx591gkyvqkzog9f"
+    },
+    {
+      "id": "c54c12fb-fe41-41de-8480-b880289fc4c1",
+      "ts": "2026-11-28T06:48:27Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-packet-publish-20261128",
+      "action": "freebuff: refine Hisolutions AG CV packet, publish site, gate+push",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "8f2ccbf4e825f966ae59c25ed5e14b01cadef3a2",
+      "branch": "main",
+      "frame": "03hbggg2b2iq3v7xf8we80lkw"
+    },
+    {
+      "id": "f636edb4-1317-472c-98e4-5d36a77dee81",
+      "ts": "2026-11-28T06:34:20Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-site-gate-reprove-20261128",
+      "action": "re-proved after the drift-hint fix, pushed: checks:site:path PASS exit 0 4/4 delphi surfaces (public :80, portal :8446, tailnet :80, public HTTPS) all serving 3ammk88... == build; checks:site:published PASS 28/28 matt + 15/15 cv-ats vs origin/main 8f2ccbf4, no drift so nothing to republish; push 2d991e7f..8f2ccbf4 after trimming a 647-char summary the task gate refused",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "8f2ccbf4e825f966ae59c25ed5e14b01cadef3a2",
+      "branch": "main",
+      "frame": "03hbgdoqt3l3ypr2vzcq70rwd"
+    },
     {
       "id": "466deb08-6e59-4829-9e29-db0abe90b99c",
       "ts": "2026-11-28T06:32:00Z",
@@ -2959,51 +3003,6 @@
       "base_commit": "b80c2817788098164e914c8f4304534c151992bf",
       "branch": "HEAD",
       "frame": "03hbcz1nzvgmfoaru7bn3ofmt"
-    },
-    {
-      "id": "b2ff3a53-d1a2-406b-b9a3-901fe1d3ab5b",
-      "ts": "2026-11-27T20:05:26Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:cv-republish-links-2026-11-27",
-      "action": "publish 0.95: republish CV site, verify live links 200, gate",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/matt/cv.typ",
-        "lib/matt/cv-software.json",
-        "lib/matt/cv-energy.json"
-      ],
-      "files": [],
-      "base_commit": "74a215b9760999ef3fe88600d0c1707ce4f056a6",
-      "branch": "main",
-      "frame": "03hbcytydh1mw7ti0nryd8sgk"
-    },
-    {
-      "id": "87755a1d-b394-44e9-8974-1417831a8c53",
-      "ts": "2026-11-27T20:01:48Z",
-      "source": "freebuff",
-      "subject": "nixconfig:hisolutions-cv-packet",
-      "action": "landed: HiSolutions packet refined (gatus/alert-bridge replaces unsupported Prometheus-Grafana claim; Terraform stated as not in production; DevOps skills name CI, Linux, containers) and republished redacted to /cv/ — live 200 + sha256 match | gate: check-cv-links PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "74a215b9760999ef3fe88600d0c1707ce4f056a6",
-      "branch": "main",
-      "frame": "03hbcy4g4kse6168tnb4ebave"
-    },
-    {
-      "id": "92f717df-95bb-4952-a649-1b5a0363b993",
-      "ts": "2026-11-27T20:00:09Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:xs-turn-post-commits-guard-2026-11-27",
-      "action": "gate-change 0.98/0.96: restore COMMITS comma-sep guard + fail-on-space gate; drive agents:1",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/xs-turn-post.sh"
-      ],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbcxsvqw28buxrcc7skkj70"
     }
   ]
 }

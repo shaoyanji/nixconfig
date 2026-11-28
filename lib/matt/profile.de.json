@@ -8,7 +8,7 @@
     "location": "Gutach im Breisgau, Deutschland · remote (MEZ, Überlappung mit der US-Ostküste)",
     "status": "Offen für Senior- und Lead-Rollen",
     "target": "Ziel: DevOps-, SRE-, Plattform- und Infrastruktur-Engineering — Kubernetes und Container auf Linux und systemd, CI-Prüfungen in GitHub Actions und ein Nix-Flake als einzige Quelle der Flotte; remote mit Zeitzone MEZ oder vor Ort in Freiburg.",
-    "bio": "Der größte Teil meiner Arbeit dreht sich darum, Betriebsdaten brauchbar zu machen: vier Jahre Asset Management für ein kommerzielles Solarportfolio, mit Ertragsmodellen, die Bankprüfungen bestanden, mobiler Felderfassung und Telemetrie-Abgleich, wenn Sensoren fehlten. Zwischen Anstellungen habe ich ein dreimonatiges PPA-Mandat für die EWE Trading abgeschlossen und eine NixOS-Flotte mit fünfundzwanzig Hosts aus einem Flake gebaut — eigene SSH-Zertifizierungsstelle, verschlüsselte Secrets pro Host, ein Sentinel für Disk, Speicher und Generation-Alter — dazu lokale Sprach-, Sprech- und Bildmodelle hinter einem OpenAI-kompatiblen Endpunkt. Ich suche Systemarbeit, in der Betriebsdaten vertrauenswürdig sein müssen.",
+    "bio": "Der größte Teil meiner Arbeit dreht sich darum, Betriebsdaten brauchbar zu machen: vier Jahre Asset Management für ein kommerzielles Solarportfolio, mit Ertragsmodellen, die Bankprüfungen bestanden, mobiler Felderfassung und Telemetrie-Abgleich, wenn Sensoren fehlten. Zwischen Anstellungen habe ich ein dreimonatiges PPA-Mandat für die EWE Trading abgeschlossen und eine NixOS-Flotte mit über zwanzig Hosts aus einem Flake gebaut — eigene SSH-Zertifizierungsstelle, verschlüsselte Secrets pro Host, ein Sentinel für Disk, Speicher und Generation-Alter — dazu lokale Sprach-, Sprech- und Bildmodelle hinter einem OpenAI-kompatiblen Endpunkt. Ich suche Systemarbeit, in der Betriebsdaten vertrauenswürdig sein müssen.",
     "contacts": [
       {
         "label": "email",
@@ -96,9 +96,9 @@
   ],
   "work": [
     {
-      "title": "NixOS-Flotte über fünfundzwanzig Maschinen",
+      "title": "NixOS-Flotte über mehr als zwanzig Maschinen",
       "role": "Autor und Betreiber",
-      "description": "Ich habe fünfundzwanzig Maschinen von Installationsnotizen pro Host auf ein Repository umgestellt. Eine Maschine neu bauen, prüfen oder übergeben heißt jetzt: Commit plus ein Befehl. Secrets sind pro Host verschlüsselt, die Zertifikate rotieren nach Zeitplan. Dieselbe Flotte betreibt selbst gehostete Dienste und geplante Sync-Agenten für Jobsuche und Datenabgleich.",
+      "description": "Ich habe über zwanzig Maschinen von Installationsnotizen pro Host auf ein Repository umgestellt. Eine Maschine neu bauen, prüfen oder übergeben heißt jetzt: Commit plus ein Befehl. Secrets sind pro Host verschlüsselt, die Zertifikate rotieren nach Zeitplan. Dieselbe Flotte betreibt selbst gehostete Dienste und geplante Sync-Agenten für Jobsuche und Datenabgleich.",
       "link": "https://github.com/shaoyanji/nixconfig",
       "caseStudy": "nixos-fleet",
       "keywords": [

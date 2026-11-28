@@ -1,8 +1,8 @@
 {
   "_comment": "The software-first CV. Every work highlight is copied verbatim from resume.cv.json and every project names a corpus entry, so lib/matt-site.nix fails the build on anything this file cannot find. The bio states only what the repository proves: the CI cache path, the pinned LTS kernel on legacy NVIDIA hosts, the mail archive and media relay.",
   "lang": "en",
-  "title": "Systems and software engineer",
-  "bio": "I run a single-operator twenty-five-host NixOS fleet from one flake: an SSH certificate authority, per-host SOPS secrets, and the same checks in CI and before a deploy. CI builds only the affected hosts and pushes cache substitutes, and legacy NVIDIA hosts pin the 6.12 LTS kernel. The fleet self-hosts a PostgreSQL mail archive with full-text search, SQL endpoints and a web reader, and a media relay. Before software, four years of solar asset management.",
+  "title": "Systems engineer, infrastructure and DevOps",
+  "bio": "I run a single-operator twenty-five-host NixOS fleet from one flake: an SSH certificate authority, per-host SOPS secrets, and the same checks in CI and before a deploy, with gatus health checks and a rollback per generation. CI builds only the affected hosts and pushes cache substitutes, and legacy NVIDIA hosts pin the 6.12 LTS kernel. The fleet self-hosts a PostgreSQL mail archive with full-text search, SQL endpoints and a web reader, and a media relay. Before software, four years of solar asset management.",
   "labels": {
     "projects": "Projects"
   },
@@ -11,7 +11,7 @@
     {
       "name": "Bountystash",
       "highlights": [
-        "Built and runs a twenty-five-host NixOS fleet as one flake: a feature list per host, a module per service, secrets encrypted with SOPS behind the fleet's own SSH certificate authority",
+        "Built and runs a twenty-plus-host NixOS fleet as one flake: a feature list per host, a module per service, secrets encrypted with SOPS behind the fleet's own SSH certificate authority",
         "Gated infrastructure changes with inventory-driven CI and a per-host module check, so a broken host definition fails before a deploy",
         "Wrote a sentinel that logs job status, generation age, disk and PSI pressure every 15 minutes and pages when a service fails",
         "Built a Go service, still in development; no external users yet: Postgres work_versions, exact hashes over canonical JSON, a quotient hash over the fields a reviewer sees, append-only events, and Go tests (github.com/shaoyanji/bountystash)"
@@ -60,7 +60,10 @@
         "GitHub Actions",
         "inventory-driven CI",
         "binary cache",
-        "remote builder"
+        "remote builder",
+        "gatus health checks",
+        "sentinel ledger and alert bridge",
+        "per-generation rollback"
       ]
     },
     {

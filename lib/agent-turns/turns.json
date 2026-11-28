@@ -1,8 +1,98 @@
 {
-  "generated": "2026-11-28T00:21:14Z",
+  "generated": "2026-11-28T00:45:58Z",
   "count": 200,
-  "pin": "1a7c27c40e539d31ffc4582b105c0144f9106390de1bfb9ba9e947d0928bf8dd",
+  "pin": "57c046d35fa5934c967d61b5f411fcc82bbcd21d4616cfaa165e06a33f481b04",
   "turns": [
+    {
+      "id": "1652b6e9-0cb1-45c4-861d-3c7485b6f5bd",
+      "ts": "2026-11-28T00:36:47Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-cv-site-publish-2026-11-28",
+      "action": "publish: no drift — rebuilt .#sites.cv-ats-site locally (--builders \"\") from origin/main 62c78bfb, which is the re-synced corpus; all 9 published files at cv-ats-8lh.pages.dev byte-match that build (index f5ada59c, report.json 01030eb2 ok=true 6/6, robots 16ceb5ee, six cv-ats-check logs), so no deploy, no commit, no push was needed. | gate: nix build .#sites.cv-ats-site PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbefu8nl9bx9j8e4rcejwss"
+    },
+    {
+      "id": "59a21d30-06cb-49d4-b559-909587e85fcd",
+      "ts": "2026-11-28T00:36:32Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-egress-lane-deploy",
+      "action": "claim: enabling frieren:8471 + lumi:8470 lanes, delphi broker points at lane IPs; verify by IP",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi/configuration.nix AGENTS.nix hosts/lumi.nix"
+      ],
+      "files": [],
+      "base_commit": "62c78bfbbe32bae082c5573b57d86ff489f63739",
+      "branch": "main",
+      "frame": "03hbefsksl287kauw4jdn8rfg"
+    },
+    {
+      "id": "c672bc1a-a75f-4cbe-a602-aaf4b236217e",
+      "ts": "2026-11-28T00:35:45Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-egress-deploy-2026-11-28",
+      "action": "deploy 0.93/0.90: enable refusing egress proxy lanes, verify by IP, push",
+      "outcome": "in_progress",
+      "claims": [
+        "hosts/delphi/configuration.nix"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbefmyeo2d3o7sssq2e19v0"
+    },
+    {
+      "id": "9a96e796-12b2-4c44-b27a-cd3dd5e3263f",
+      "ts": "2026-11-28T00:35:45Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-publish-2026-11-28",
+      "action": "publish 0.94/0.90: verify cv-ats vs re-synced corpus, gate cv-ats-check, push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/cv-software.json",
+        "lib/matt/cv-software.de.json",
+        "lib/matt/lebenslauf.json"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbefmxum8eyes2v98plfqos"
+    },
+    {
+      "id": "eb92bcc9-e464-48c4-b8b8-10060f755812",
+      "ts": "2026-11-28T00:35:12Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-cv-site-publish-2026-11-28",
+      "action": "claim: rebuild .#sites.cv-ats-site at origin/main 62c78bfb, diff live cv-ats pages + report.json, redeploy only if drift",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/cv-ats-site.nix",
+        "lib/cv-ats-report.py",
+        "taskfiles/site-manifest.json"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbefj6xxzcfse1gb2zvb9wd"
+    },
+    {
+      "id": "0c390489-9b0b-4b3f-ad65-084315674921",
+      "ts": "2026-11-28T00:22:30Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-cv-land-2026-11-28",
+      "action": "landed: lib/matt/resume.json re-synced from the canonical resume — it was the only corpus still claiming AWS/Azure/Google Cloud at Master, which is the six unbacked claims matt:cv:evidence read at the tip; the same push carries the pending frieren-host intents declaration that kept checks:intents red | gate: matt:cv:evidence PASS (132 items, 6 CVs, 18 keywords, 7 providers, 1 packet) + cv-blog-check 6/6 + checks:intents PASS at 62c78bfb",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbed1unesg04c82o3b6e2tl"
+    },
     {
       "id": "e9e58353-5ca8-4842-8192-1cd713d5421e",
       "ts": "2026-11-28T00:18:18Z",
@@ -2885,84 +2975,6 @@
       "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
       "branch": "main",
       "frame": "03hbato9ne8lkcz9zvej28wlm"
-    },
-    {
-      "id": "075d0083-ee71-426f-a192-7fb3ab40ec55",
-      "ts": "2026-11-27T13:25:09Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-1-freebuff-cv-jobscout",
-      "action": "landed: 3 infra leads filed + packets (anschreiben+lebenslauf) built from DB text via apps:gate:packet; site deploy confirmed GitHub Pages (no Vercel), all routes 200 | gate: apps:gate:packet PASS x3",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbasn358zrcf6bj8x9o5yz4"
-    },
-    {
-      "id": "80796ea2-99e5-48d0-a25d-c7e2da10a20b",
-      "ts": "2026-11-27T13:21:37Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-1-freebuff-cv-jobscout",
-      "action": "scout: sweep 2026-11-27s filed 3 new infra leads (Loewenstein Medical cloud infra, H. Gautzsch senior Linux, SSI Solutions cloud architect) with JD imported and packets built; site deploy verified 200 on all routes",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
-      "branch": "main",
-      "frame": "03hbary8okwijjv1xr43dx1hr"
-    },
-    {
-      "id": "7b15a7cb-441f-4f73-9404-f3fbb938a337",
-      "ts": "2026-11-27T13:21:15Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:image-daily-wallpaper",
-      "action": "agents:3.1 wallpaper round blocked: free Gemini quota exhausted (resets ~140h); survey prompt showing",
-      "outcome": "blocked: free Gemini tier quota exhausted (~140h reset)",
-      "claims": [],
-      "files": [],
-      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
-      "branch": "main",
-      "frame": "03hbarvmwo6gu8xqbavs71800"
-    },
-    {
-      "id": "98173343-9c2b-4a41-b58b-1b4113c3501e",
-      "ts": "2026-11-27T13:20:42Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:image-daily-wallpaper",
-      "action": "drove agents:3.1 wallpaper-worker (publish); Running command started",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "6f95f2072e50760e6c820ead9a619e3d1be34d01",
-      "branch": "main",
-      "frame": "03hbarrqimgbic6xd6b345uc2"
-    },
-    {
-      "id": "b4fe220d-facb-4ac2-93ea-2249e74cd9db",
-      "ts": "2026-11-27T13:17:35Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-rebase-origin",
-      "action": "landed: rebased delphi main onto origin/main (76 commits; origin lumi/zeno/kali kept, delphi delphi ports 8464-8468 kept). Also fixed lumi port prose and aligned modules/secrets worktree to pinned f47b0a6 | gate: checks:quick PASS, checks:policies PASS, checks:host delphi PASS 2197 assertions",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "257e96b649d2ec2632a6624b109cd644f75fd336",
-      "branch": "main",
-      "frame": "03hbar5vtxodelcagz1a7lwsl"
-    },
-    {
-      "id": "389beaff-c628-41fe-a401-de0f7c12e30c",
-      "ts": "2026-11-27T13:08:07Z",
-      "source": "devin",
-      "subject": "nixconfig:netbook-dwl-ci",
-      "action": "landed: confirmed the existing dwl 0.9 graft fixes netbook CI; no new source edit required | gate: nix build -L --rebuild --no-link .#nixosConfigurations.netbook.config.programs.dwl.package PASS; CI netbook job 140513461028 in run 46001318317 success",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "89f19a89b2dd0f6e491ce49a70692e5f92eecb5a",
-      "branch": "HEAD",
-      "frame": "03hbapb9vn8p364hqgkm7cg96"
     }
   ]
 }

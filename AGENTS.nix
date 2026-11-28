@@ -2850,11 +2850,12 @@
         p95 823 then 726, 1.40 MB upstream; warm p50 46 then 41 ms, 0.085 MB — 94%
         fewer bytes, 3.3-3.7x faster; direct p50 165 then 256 ms.
 
-        **Lanes probed (2026-11-28, by IP).** Zero of two serve — :443/:53 (frieren)
-        and :22 (lumi) answer, `frieren:8471` and `lumi:8470` refuse in 13 and 518 ms,
-        so both proxies are declared and neither runs, and their names resolve nowhere
-        (`--accept-dns=false`). `bulk` holds: gnu.org 200 in 0.48 s. Done when both
-        lanes answer a CONNECT by name and by IP.
+        **Lanes live (2026-11-28, by IP).** Both run: `local` (frieren:8471)
+        answers 200 in 0.24 s as 79.215.107.59, `us` (lumi:8470) 200 in 1.13 s as
+        93.127.139.146, `bulk` holds at 0.48 s. The names resolve nowhere here
+        (`--accept-dns=false`), so the broker addresses them by inventory IP; that
+        pointer waits on delphi's switch (dirty tree). Open: per-lane throughput
+        on 20 URLs.
       '';
     };
     exp-120 = {

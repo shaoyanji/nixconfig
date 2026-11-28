@@ -387,8 +387,8 @@ in {
   };
   services.fetchBroker = {
     enable = true;
-    usProxy = "http://lumi.${hostMeta.network.tailnet_domain}:8470";
-    localProxy = "http://frieren.${hostMeta.network.tailnet_domain}:8471";
+    usProxy = "http://${config.fleet.inventory.hosts.lumi.network.tailscale_ip}:8470";
+    localProxy = "http://${config.fleet.inventory.hosts.frieren.network.tailscale_ip}:8471";
   };
 
   # --- the free-model relay, durable ---

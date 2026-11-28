@@ -34,6 +34,7 @@
       "outputPath": "/tmp/cv-ats",
       "deployMethod": "pages",
       "deployTarget": "cv-ats",
+      "deployHostname": "cv-ats-8lh.pages.dev",
       "previewBind": "127.0.0.1",
       "previewPort": 3003
     },

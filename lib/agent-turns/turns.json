@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-28T02:14:25Z",
+  "generated": "2026-11-28T02:15:23Z",
   "count": 200,
-  "pin": "fd0005f2b2e4db3c131abc7e5ebb7479ce79e438878b3c27dba7ab04b00ca6a5",
+  "pin": "3fbde8614005eceaa30239f56178c0333739da976babe6f92fdfe313317b8a1e",
   "turns": [
+    {
+      "id": "7aa74264-1a41-4560-9771-cf8e9ea842cd",
+      "ts": "2026-11-28T02:14:48Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-egress-throughput-2026-11-28",
+      "action": "landed: per-lane throughput p50 bulk 52/51, us 34/38, local 18.3/18.6 Mbps, 4-stream 51/41/18, and delphi's NIC itself caps at 43-52 so bulk is a ~50 Mbps line | gate: checks:quick PASS + agents-notes-schema PASS + census PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "0ee7706375bd4656b912973e066313ca1f245e83",
+      "branch": "main",
+      "frame": "03hbeyzll7t7s4hwstrnak4qu"
+    },
     {
       "id": "85f1bdcf-fcc0-41b4-a545-ec0a2e49306e",
       "ts": "2026-11-28T02:11:18Z",
@@ -2973,29 +2986,6 @@
       "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
       "branch": "main",
       "frame": "03hbbd67kaieeylhu27cn7l8s"
-    },
-    {
-      "id": "de638d29-6766-4758-a8ff-544441fd5167",
-      "ts": "2026-11-27T15:10:03Z",
-      "source": "devin",
-      "subject": "nixconfig:pane-3-lumi-harness-steer",
-      "action": "landed: zeno-stage1 merged/pushed, lumi ZeroClaw accepts both Telegram ids, sqlite memory schema deployed; round-trip still needs operator probe | gate: checks:quick+checks:host HOST=lumi+checks:policies PASS, nixcachix 46021338928 PASS",
-      "outcome": "blocked: operator Telegram probe required",
-      "claims": [
-        "hosts/lumi.nix",
-        "modules/user/ai/zeroclaw.nix"
-      ],
-      "files": [
-        "hosts/lumi.nix",
-        "modules/user/ai/zeroclaw.nix",
-        "flake/host-inventory.nix",
-        "inventory.toml",
-        "flake/policies.nix",
-        "lib/home-agents.nix"
-      ],
-      "base_commit": "a9d43dc2b4c982721dcce676578daf6a7c60a3d3",
-      "branch": "main",
-      "frame": "03hbbd4p4f1kj7zustcrz6z48"
     }
   ]
 }

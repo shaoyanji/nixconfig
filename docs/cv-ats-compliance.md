@@ -287,6 +287,22 @@ flake output, not an edit on a host: `task dev:site:build:cv-ats` builds it and
 `task dev:site:deploy:cv-ats` publishes it to the `cv-ats` Pages project. A
 defect fails that derivation, so the page only ever lists CVs that passed.
 
+### The published audit can be an older build
+
+Publishing is a hand step, so a green tree can sit beside a stale deployment.
+`task matt:cv:ats:drift` runs `cv-ats-check.sh --deployed`: it fetches every file
+the artifact carries from the published host and compares the bytes with
+`ARTIFACT` (default `/tmp/cv-ats`, the output of `task dev:site:build:cv-ats`),
+reading `index.html` as `/` because Pages redirects that path. Exit 0 means the
+page a reader opens is this build; 1 means a file differs or is not served; 2
+means there is no artifact or no host recorded.
+
+The host is `deployHostname` in `taskfiles/site-manifest.json`, not a name
+derived from the project. Pages assigns the `pages.dev` suffix, and
+`cv-ats.pages.dev` is an unrelated French ATS site: a gate that derived the host
+would compare this build with a stranger's files, which is exactly what the
+first run of this one did against that host.
+
 ## Downstream: `task apps:build` compiles another template
 
 `task apps:build` drives the workflow checkout, and that checkout keeps its own

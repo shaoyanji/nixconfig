@@ -239,6 +239,24 @@ tasks:
     cmds:
       - bash scripts/task/cv-evidence-check.sh
 
+  # Publishing is a hand step, so the audit a reader opens can be an older build
+  # than the tree. This fetches what the project serves and compares it, file for
+  # file, with the artifact built at the commit under test.
+  matt:cv:ats:drift:
+    desc: "[gate] the published CV ATS audit is this build, file for file"
+    summary: >
+      `cv-ats-check.sh --deployed` against the host named by `deployHostname` in
+      taskfiles/site-manifest.json: every file the artifact carries is fetched
+      and compared byte for byte (`/` for index.html, which Pages redirects).
+      Build the reference at the commit under test first —
+      `task dev:site:build:cv-ats` leaves it at `/tmp/cv-ats`, and ARTIFACT=
+      points elsewhere. The host is recorded, not derived, because Pages
+      suffixed the project `cv-ats` to `cv-ats-8lh`, while the bare name serves
+      an unrelated ATS site. Exit 0 = every file matches, 1 = drift, 2 = no
+      artifact or no host recorded.
+    cmds:
+      - bash scripts/task/cv-ats-check.sh --deployed
+
   matt:gist:pull:
     desc: Fetch resume.json and lebenslauf.json from the gists into the local cache
     cmds:

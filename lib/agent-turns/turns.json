@@ -1,8 +1,54 @@
 {
-  "generated": "2026-11-28T00:45:58Z",
+  "generated": "2026-11-28T00:55:31Z",
   "count": 200,
-  "pin": "57c046d35fa5934c967d61b5f411fcc82bbcd21d4616cfaa165e06a33f481b04",
+  "pin": "aef79187a89574a9e534528031f26b9c094a74b3c1342ccfb5ca679140c3cc1d",
   "turns": [
+    {
+      "id": "b004b422-7083-43cc-b2ae-b2b5fc165b3a",
+      "ts": "2026-11-28T00:53:49Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-tailnet-policy-land-2026-11-28",
+      "action": "chain-change: land tailnet-policy, check importing hosts, push",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/config/tailnet-policy.hujson"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbej60w1qyox9ypkopuhxk3"
+    },
+    {
+      "id": "9f4e90bd-6fa6-4ccb-9342-84188fba8105",
+      "ts": "2026-11-28T00:53:49Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-ats-republish-2026-11-28",
+      "action": "publish: rebuild cv-ats at origin/main, verify live + gate, push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt",
+        "scripts/task/cv-evidence-check.sh"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbej5zk771h9oa0fr7qvzlv"
+    },
+    {
+      "id": "8bcfcfa9-c2a3-463b-84dd-b81a48efe460",
+      "ts": "2026-11-28T00:46:24Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-egress-lane-deploy",
+      "action": "landed: both lanes serve from delphi by IP - local(frieren:8471) 200 0.22s as 79.215.107.59, us(lumi:8470) 200 1.14s as 93.127.139.146; frieren switched to main (139 behind), lumi HM switch + unit enabled; delphi broker -> inventory tailscale_ip, its activation waits on a dirty tree | gate: checks:host HOST=delphi PASS, services:validate:host:frieren PASS",
+      "outcome": "done",
+      "claims": [
+        "hosts/delphi/configuration.nix AGENTS.nix hosts/lumi.nix modules/services/tailnet-forward-proxy.nix"
+      ],
+      "files": [],
+      "base_commit": "0ba5f9763d88f2edf10f429cd01addda8e336c77",
+      "branch": "main",
+      "frame": "03hbehpxjgtsiulooiqor0gp2"
+    },
     {
       "id": "1652b6e9-0cb1-45c4-861d-3c7485b6f5bd",
       "ts": "2026-11-28T00:36:47Z",
@@ -2936,45 +2982,6 @@
       "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
       "branch": "main",
       "frame": "03hbav8ej3381xw2mt15g4imi"
-    },
-    {
-      "id": "ee9932a2-e9a9-465a-8cbc-d77adcc10430",
-      "ts": "2026-11-27T13:33:44Z",
-      "source": "buffy",
-      "subject": "nixconfig:pane-3-lumi-harness-steer",
-      "action": "steered pane 3 (devin, lumi-lightweight-agent-harness): verified pkgs.llm-agents.zeroclaw exists at locked rev a8e2ca87, morrow-telegram key + lumi recipient still present, sops template placeholders render values (mirrors profiles/hermes.nix), linger already on; flagged rebase merge trap on lumi-http naming and missing config.authorized-keys in main | gate: none (no tree change)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "257e96b649d2ec2632a6624b109cd644f75fd336",
-      "branch": "main",
-      "frame": "03hbaubetmp6shtsv1tchnn0g"
-    },
-    {
-      "id": "44d4625d-26ea-44aa-9cf0-439628dd3c78",
-      "ts": "2026-11-27T13:32:18Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-1-freebuff-cv-jobscout",
-      "action": "publish: CV site republished to GitHub Pages run 46007781128 success; 6 PDFs byte-identical to .#sites.matt-site; 8 routes + 8 pdfs return 200 | gate: live route sweep",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbau1cts81r5tc21d8rlib4"
-    },
-    {
-      "id": "5b9e5580-4bbb-4d79-87c7-6239e4f41ee8",
-      "ts": "2026-11-27T13:30:26Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-freebuff-cv-publish",
-      "action": "drove pane-2 freebuff: publish CV site to GitHub Pages and confirm routes 200; classify publish 0.95|0.91 exit 0; fresh working line confirmed",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbato9ne8lkcz9zvej28wlm"
     }
   ]
 }

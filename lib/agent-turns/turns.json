@@ -1,8 +1,39 @@
 {
-  "generated": "2026-11-28T00:11:39Z",
+  "generated": "2026-11-28T00:21:14Z",
   "count": 200,
-  "pin": "6b38b0bf9cdfd13309d6c2084deb5c0dae496802841ca296ea4e67664433cafe",
+  "pin": "1a7c27c40e539d31ffc4582b105c0144f9106390de1bfb9ba9e947d0928bf8dd",
   "turns": [
+    {
+      "id": "e9e58353-5ca8-4842-8192-1cd713d5421e",
+      "ts": "2026-11-28T00:18:18Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-land-2026-11-28",
+      "action": "novel 0.95/0.92: land CV edits + cv-evidence-check, rebase, push, 6/6",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/",
+        "scripts/task/cv-evidence-check.sh"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbec8bpoc6dzornbuqz6ugc"
+    },
+    {
+      "id": "d8bd444a-31e3-4467-8404-ab75c8551c71",
+      "ts": "2026-11-28T00:12:00Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-egress-lane-verify-2026-11-28",
+      "action": "landed: probed both lanes from delphi by IP — frieren :443/:53 and lumi :22 answer, frieren:8471 and lumi:8470 refuse in 13/518 ms: both proxies declared, neither runs; MagicDNS off by policy (--accept-dns=false) so the broker's names never resolve; bulk holds (92.5.115.103, gnu.org 200 in 0.48 s). In the egress-lanes-research body. | gate: checks:nix:comments PASS 6495/6495; checks:quick red on pre-existing checks:intents (frieren-host undeclared here, declared in unpushed e01eb48f)",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "f18b19fe5e89ecfae786ec9023f4a0645606011b",
+      "branch": "main",
+      "frame": "03hbeazywl77y6cyrpoxzyp46"
+    },
     {
       "id": "7f1fafb1-4218-4faa-ab16-a15f0798e049",
       "ts": "2026-11-28T00:10:17Z",
@@ -2932,36 +2963,6 @@
       "base_commit": "89f19a89b2dd0f6e491ce49a70692e5f92eecb5a",
       "branch": "HEAD",
       "frame": "03hbapb9vn8p364hqgkm7cg96"
-    },
-    {
-      "id": "57d8d5c8-7b4b-43d2-9364-3cd986167c41",
-      "ts": "2026-11-27T13:05:30Z",
-      "source": "devin",
-      "subject": "nixconfig:netbook-dwl-ci",
-      "action": "start: investigate netbook dwl CI build path and reproduce the failing derivation before editing",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/netbook",
-        "flake",
-        "modules"
-      ],
-      "files": [],
-      "base_commit": "89f19a89b2dd0f6e491ce49a70692e5f92eecb5a",
-      "branch": "HEAD",
-      "frame": "03hbaosuflwlchcrh0sb6uupq"
-    },
-    {
-      "id": "7682e3b6-4fba-4b96-8b59-2b5a592665ce",
-      "ts": "2026-11-27T12:58:32Z",
-      "source": "devin",
-      "subject": "nixconfig:feature-chain-module-refactor",
-      "action": "landed: shared linux/disko support chains, Linux-only tailscale leaf gate, and kali checksec dedupe | gate: checks:host eval sweep PASS for every module-system host; drv-equality ares/delphi/demo/lumi 4/4 identical",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "89f19a89b2dd0f6e491ce49a70692e5f92eecb5a",
-      "branch": "HEAD",
-      "frame": "03hbanfw4r3jdty1ajzucnpkw"
     }
   ]
 }

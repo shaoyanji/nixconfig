@@ -1,8 +1,122 @@
 {
-  "generated": "2026-11-28T03:46:52Z",
+  "generated": "2026-11-28T04:12:27Z",
   "count": 200,
-  "pin": "1bea85556759001dd5d0b65043a63b46b3e8ae9113232d50bfbaecda36d59766",
+  "pin": "e8bba78412c810c93f9b45cc6fee0c9bbc405c883972cfa685b744bd01462c69",
   "turns": [
+    {
+      "id": "3d9ebdbe-ed13-4240-8f8b-81267556ebd0",
+      "ts": "2026-11-28T04:07:02Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-scout-cycle-close-20261128",
+      "action": "blocked: agy quota exhausted both routes (resets ~125h); pane left idle, clean composer",
+      "outcome": "blocked: agy quota exhausted on free Hydrogen and Pro-account 3.8 Flash routes; relaunched on account route, still 429; left idle per back-off doctrine",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfkwusyean5adf8lx2kq9x"
+    },
+    {
+      "id": "23af6c1e-e03d-4c60-8f58-b4736d51799c",
+      "ts": "2026-11-28T04:06:37Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-scout-cycle-close-20261128",
+      "action": "note-change: write 2026-11-25j scout-close AGENTS.nix note, gate, push",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfktxihde5djvct2jqqrb5"
+    },
+    {
+      "id": "cad60756-ea51-4151-afdc-f3801a3042f9",
+      "ts": "2026-11-28T04:03:33Z",
+      "source": "frieren-host",
+      "subject": "nixconfig:system-audit-2026-11-28",
+      "action": "audit complete: SYSTEM.md refined in place (gen 313, 2026-11-28 05:05 CET). gate: ops:health PASS (sentinel ok) + prose/infron/ports/closure PASS. Regressions: fleet.frieren.lan 404 = dangling fleet-docs-site/current -> GC'd store (#13); sops:drift FAIL recipient drift from rewound modules/secrets (#14); downloads-sort README unknown (#11); delphi degraded queue-action:53, nixos-upgrade success (#12); FIREWALL-ONLY 8471 tinyproxy egress (#15). No commit (read-only).",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfk8cbe3v7nbwobmnn6yye"
+    },
+    {
+      "id": "e64fa7a4-a111-4f6a-b42b-b1e235223a2c",
+      "ts": "2026-11-28T04:01:40Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:site-live-drift-gate",
+      "action": "drove freebuff agents:2.1 with gate-live-drift task (jev gate-change p=1.0); pane working",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfjv5y5j7oeop15jk1iehu"
+    },
+    {
+      "id": "f3ab06f1-ee70-4c77-8eca-851ff100b955",
+      "ts": "2026-11-28T03:58:25Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-cv-republish-20261128",
+      "action": "landed: no republish needed — origin/main 14125f2a (fetched, tip) builds both sites byte-identical to live: 22/22 non-PDF files of matt.bountystash.com cmp-clean, 15/15 at cv-ats-8lh.pages.dev (report ok=true 6/6). Gates: matt:cv:check 14 ok/0 failed (8 clicked PDFs hash-equal), site-check 35/35, stale-copy guard passed. No commit, no deploy, no push; shared checkout untouched | gate: matt:cv:ats:drift PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/cv-ats-site.nix",
+        "lib/cv-ats-report.py"
+      ],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfj8b1y1b8gw0c47vgvjae"
+    },
+    {
+      "id": "34b97ed6-49a3-4194-a271-734eba1352c2",
+      "ts": "2026-11-28T03:55:23Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-republish-20261128",
+      "action": "publish: republish CV site + ATS surface, verify live pages, push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/cv-ats-site.nix",
+        "lib/cv-ats-report.py"
+      ],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfimxh5avnc4ean3qmhm9d"
+    },
+    {
+      "id": "ceb1825d-42b3-49d0-b4fb-1e970233447a",
+      "ts": "2026-11-28T03:51:07Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-steward-2026-11-28",
+      "action": "delphi: jev note-change .98 -> agy quota-blocked both routes; left idle",
+      "outcome": "blocked: agy quota exhausted on both routes",
+      "claims": [],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfhsupi1pb2i7uu0299u84"
+    },
+    {
+      "id": "0984d6e9-52b2-4b51-aae6-3c98eb5fc197",
+      "ts": "2026-11-28T03:47:13Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-cv-gate-20261128",
+      "action": "landed: tip 14125f2a stages the checks.yml row 0504a0c7 described but left unstaged — the copies gate is a task, not a checks:quick dep, since the guards now run inside the four readers. | gate: check:verify + checks:tasks PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "14125f2ae4d36cd35435e7a059471466d4da2ae7",
+      "branch": "freebuff-cv-copies-2026-11-28",
+      "frame": "03hbfh1i7pay2o1efrlnrva0n"
+    },
     {
       "id": "88ad0d9c-48de-4423-872a-62f1dc87a520",
       "ts": "2026-11-28T03:46:35Z",
@@ -2861,119 +2975,6 @@
       "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
       "branch": "main",
       "frame": "03hbc218vv8w05fgxu7i0qkba"
-    },
-    {
-      "id": "86cfd17a-79b4-49a9-a100-56e9f0fd6ae7",
-      "ts": "2026-11-27T16:57:39Z",
-      "source": "devin",
-      "subject": "nixconfig:pane-1-devin-flake-transitive",
-      "action": "landed: 31e0911d — transitive-sweep advanced 23 drifted lock pins (home-manager, nix-darwin, llm-agents, iets, zen-browser, niri-unstable, garnix-lib/nixpkgs et al); deliberate rev-pins netbook/nginx/nvidia relocked byte-identical as designed | gate: checks:hosts poseidon+mtfuji+cassini+penguin+minyx+frieren MODE=eval PASS 6/6, one host per affected chain",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "31e0911dc7a6f898a7ce03f34a32a9601924ebfe",
-      "branch": "HEAD",
-      "frame": "03hbby5eul1vhzfi2ttgcqc1z"
-    },
-    {
-      "id": "03d1b1b0-25ea-4abf-af0c-a487085a50f7",
-      "ts": "2026-11-27T16:39:40Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin-flake-transitive",
-      "action": "flake-change 0.97|0.96 · transitive-sweep; gate reserve-eval",
-      "outcome": "in_progress",
-      "claims": [
-        "flake.lock"
-      ],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbbun0a3llrzmcct0xlluv7"
-    },
-    {
-      "id": "50998296-3e73-41bf-b714-197327312d75",
-      "ts": "2026-11-27T16:34:34Z",
-      "source": "buffy",
-      "subject": "nixconfig:wallpaper-set-anime-100",
-      "action": "publish: 23/100 anime-scene plates generated (cpg 1024x1024) and published — bountystash-assets manifest 789 -> 812, live 200; paced runner agent-walls-run continues at 24/h, midnight timer finishes the last 13",
-      "outcome": "in_progress",
-      "claims": [
-        "~/Pictures/cpg/wallpapers",
-        "/Volumes/data/pics/generated/src/wall/2026-11-27"
-      ],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbbtn38slhl40ya7hh06xty"
-    },
-    {
-      "id": "b88810a0-633c-43f1-82df-89de714141a6",
-      "ts": "2026-11-27T16:29:54Z",
-      "source": "devin",
-      "subject": "nixconfig:egress-lanes-research",
-      "action": "landed: conditional cache adopted in job-db-scraper, link-vault and private-deals; fetch broker serves POST /v1/fetch on delphi tailnet :8469 with bulk/us/local lanes, us-to-bulk transport fallback only and no local fallback; lumi proxy :8470, frieren proxy/render lane :8471 | gates: checks:quick PASS; checks:host delphi/frieren/lumi PASS; go test fetch-broker PASS; broker package build PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "5aa01e488d1ae8c91e1e0fa0194c9d0e82299e06",
-      "branch": "main",
-      "frame": "03hbbsq9ad9odg7ht97j4zidg"
-    },
-    {
-      "id": "912698ef-2169-4987-a575-7fcd604c0435",
-      "ts": "2026-11-27T16:29:35Z",
-      "source": "devin",
-      "subject": "nixconfig:activate-host-stale-prose",
-      "action": "landed: b6da4652 — activate-host.sh preserved-host prose no longer names cassini as known-broken (it evals clean since the home-role fixes); rationale now stands on the general reason: no gate keeps a preserved host green, bit-rot reads as regression. Comment-only diff, bash -n PASS | gate: checks:nix:shell PASS 80 scripts 0 findings",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b6da46528ad5aaa1e8d403c57f43f2fde68cb155",
-      "branch": "HEAD",
-      "frame": "03hbbso4687a2c8cv9s776tec"
-    },
-    {
-      "id": "fa0bfd29-75e0-451a-a482-78a69460b7ca",
-      "ts": "2026-11-27T16:28:30Z",
-      "source": "devin",
-      "subject": "nixconfig:activate-host-stale-prose",
-      "action": "claim: fix stale cassini known-broken prose in activate-host.sh — cassini evals clean since the home-role fixes; rewrite the gate rationale without the dead example",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/activate-host.sh"
-      ],
-      "files": [],
-      "base_commit": "41e2c30dc51bf5790485f93e5eba5b3ffdf2577f",
-      "branch": "HEAD",
-      "frame": "03hbbsgf37bwa61vdvnzus8z4"
-    },
-    {
-      "id": "3c49e02d-e699-4853-8b53-28aefdee93b5",
-      "ts": "2026-11-27T16:27:45Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:activate-host-stale-prose",
-      "action": "fix stale cassini 'known-broken' prose in activate-host.sh (prose-change 0.86)",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/activate-host.sh"
-      ],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbbsb601egtg27cx3e2wttx"
-    },
-    {
-      "id": "4c597773-05fb-4ebf-ba39-856943795e5b",
-      "ts": "2026-11-27T16:24:06Z",
-      "source": "devin",
-      "subject": "nixconfig:cassini-dormant-gates",
-      "action": "landed: no-change closure at 41e2c30d — the home-role recursion is already fixed in tree. Bisect verdict: 3 landed fixes cover it (hmUserFeatures/dankShell as module args not config reads; homeDirectory mkDefault; niri feature-gated off darwin). Proven by deep force: cassini darwin system drvPath + HM activationPackage drvPath both resolve, minyx toplevel resolves | gate: checks:hosts cassini+minyx MODE=eval PASS in 32/32 sweep + drvPath deep evals PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "41e2c30dc51bf5790485f93e5eba5b3ffdf2577f",
-      "branch": "HEAD",
-      "frame": "03hbbrlopdu1q5oa6vahaw3p0"
     }
   ]
 }

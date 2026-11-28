@@ -73,6 +73,17 @@ lib.genAttrs systems.work (
         |> builtins.attrNames
         |> builtins.filter (name: !(hasInjection (moduleSets.hostModules hostInventory.${name})));
 
+      chainFeatureDrift =
+        hostInventory
+        |> builtins.attrNames
+        |> builtins.filter (
+          name: let
+            chain = self.inventory.hosts.${name}.software.module_chain or "";
+          in
+            builtins.hasAttr chain moduleSets.chainFeatures
+            && (hostInventory.${name}.features or []) != builtins.getAttr chain moduleSets.chainFeatures
+        );
+
       hostCount = hostInventory |> builtins.attrNames |> builtins.length;
 
       # pkgs.txt is a file a human edits: a trailing reason, a pasted markdown
@@ -668,6 +679,20 @@ lib.genAttrs systems.work (
           echo "inventory/flake host sets agree across nixos, darwin and home"
           touch $out
         '';
+
+      inventory-chain-features =
+        if chainFeatureDrift == []
+        then
+          pkgs.runCommand "inventory-chain-features" {} ''
+            echo "inventory module chains agree with host feature lists where a canonical chain is named"
+            touch $out
+          ''
+        else
+          builtins.throw ''
+            these hosts name a canonical module chain but their features differ
+            (update inventory.toml module_chain, or the host feature list if the
+            inventory is what is correct): ${builtins.toString chainFeatureDrift}
+          '';
 
       # --- every host COMPILES inventory.toml, proven without evaluating one -
       # This replaces the old per-host `inventory-host-<host>` evaluations, which

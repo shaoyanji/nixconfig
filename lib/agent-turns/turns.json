@@ -1,8 +1,51 @@
 {
-  "generated": "2026-11-28T11:48:10Z",
+  "generated": "2026-11-28T12:02:14Z",
   "count": 200,
-  "pin": "b7708ee141715db378ea0f63eaf2c9c5510acc8a4b0765ec58f35be97dfc2557",
+  "pin": "334ec5d0481fb914aa263fd1b4f118a8e6b1ae90b3aab965b880cddd4650be1e",
   "turns": [
+    {
+      "id": "fb60d19d-8e53-4670-be2b-8c1d83c8c517",
+      "ts": "2026-11-28T11:59:45Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-chain-feature-inventory-2026-11-28",
+      "action": "claim: close the chain-feature inventory drift gate gap",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/checks.nix",
+        "inventory.toml",
+        "taskfiles/checks.yml"
+      ],
+      "files": [],
+      "base_commit": "20bce34178489adb328ea2cf88318b858d12abbc",
+      "branch": "main",
+      "frame": "03hbi598kjdd9imvh87dznovq"
+    },
+    {
+      "id": "6e3d13dc-0444-4b96-b894-1c65261984ab",
+      "ts": "2026-11-28T11:55:44Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:steward-devin-drive",
+      "action": "drove agents:1 devin chain-change refactor; typing",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "20bce34178489adb328ea2cf88318b858d12abbc",
+      "branch": "main",
+      "frame": "03hbi4gx88qleco2zfnqyosvl"
+    },
+    {
+      "id": "f03d490d-4c2e-4aa7-b557-6ab006f685bf",
+      "ts": "2026-11-28T11:48:17Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-repo-improvements-20261128",
+      "action": "landed: checks:suites runs the ten tests/ suites nothing executed (357 cases); fixed the env leak in job-page-scrape's key fixture and the subprocess.run default that made portfolio-smoke launch a real browser | gate: checks:quick PASS (183/183 rows, 11 suites)",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "20bce34178489adb328ea2cf88318b858d12abbc",
+      "branch": "main",
+      "frame": "03hbi30i5gz9f9kj92l6vc1g3"
+    },
     {
       "id": "4131de24-2f23-4d1a-a8a4-9af65e0eab9d",
       "ts": "2026-11-28T11:43:59Z",
@@ -2956,53 +2999,6 @@
       "base_commit": "01e1e79fa0f058ff5d62f0810c8969070d5e2e09",
       "branch": "main",
       "frame": "03hbe8bbgvdw5zemzcwjvlico"
-    },
-    {
-      "id": "9b19f101-b4dc-4bc4-aab2-dba3d669b305",
-      "ts": "2026-11-27T23:54:41Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-egress-note",
-      "action": "note-change: egress-lanes-research note landed; census repaired",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbe7m7eybvvirc4abdixjeu"
-    },
-    {
-      "id": "b33c8582-1cf3-4350-ba4f-5f0ac4385afb",
-      "ts": "2026-11-27T23:54:17Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-census-gate-2026-11-28",
-      "action": "gate-change 1.0: add census gate, prove fires on past drift, push",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbe7jfqm3vx5isg3ma7hu7c"
-    },
-    {
-      "id": "d9e5c95c-4b0c-4bdf-beb2-159b4602d2bf",
-      "ts": "2026-11-27T23:45:51Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-intents-gate-2026-11-28",
-      "action": "flake-change: declared frieren-host in flake/intents.nix (provides gate-change+publish, claims lib/image-daily/, floor asserted, place local-gate+delphi — mirrors wallpaper-worker); checks:intents and checks:intents:test PASS; commit e01eb48f on local main, not pushed (main 5 ahead/133 behind). | gate: checks:intents PASS",
-      "outcome": "done",
-      "claims": [
-        "flake/intents.nix"
-      ],
-      "files": [
-        "flake/intents.nix"
-      ],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbe5w35yy6h0d74zho91bgl"
     }
   ]
 }

@@ -311,7 +311,7 @@ scheme = "http"
 note = "Gatus, watching frieren from outside its LAN"
 
 [hosts.delphi.software]
-module_chain = "globalModulesContainers"
+module_chain = "globalModulesContainers + disko"
 impermanence = false
 key_services = ["nginx :443 — Let's Encrypt TLS for the public dossier, /healthz, :80 redirect", "crab-hole tailnet resolver on 10.99.0.53 (ads/telemetry NXDOMAIN, failover pair with frieren)", "Tailscale exit node, advertising the shared 10.99.0.53/32 route", "Hermes agent + gateway (own Telegram bot, delphi-telegram)", "DeepSeek Harness, tailnet-only (:8443, dsh-web on loopback :3080)", "System One decision engine, tailnet-only (:8444, loopback :8091)", "Stirling PDF, tailnet-only (:8445, loopback :7351)", "Service console, tailnet-only (:8446, loopback :8082)", "Gemini capsule on :1965 (portfolio as gemtext, resume.json/lebenslauf.json) and :1966 on the tailnet", "Gatus fleet monitors — an out-of-LAN vantage", "Paperless-ngx, tailnet-only (:28981), served as docs.frieren.lan through frieren's vhost (moved off frieren 2026-11-02)", "Vaultwarden, tailnet-only (:8222, notifications websocket on the same port since 1.30), served as vault.frieren.lan (moved 2026-11-02)", "Anki sync server, tailnet-only (:27701), served as anki.frieren.lan (moved 2026-11-02)", "Shelter bridge: paperless, vaultwarden and anki state mirrored nightly to frieren:/srv/backup/offload", "Radicale CalDAV/CardDAV (:8457), ntfy push (:8458), Vikunja tasks with CalDAV (:8459), agent-turn dashboard with per-turn Hermes prompts (:8460), media relay for range-served video with YouTube search and fetch (:8461) — tailnet-only, added 2026-11-06", "OCI serial console logging", "Zettel graph, tailnet-only (:8453) — the private vault as a reader", "Mataroa console, tailnet-only (:8454) — the blog as markdown files", "Job database, tailnet-only (:8464) — scraped postings deduplicated into SQLite FTS5 with a search UI and JSON API", "Private deals, tailnet-only (:8465) — products, watchlists, price history and deal search in SQLite FTS5", "Inventory site, tailnet-only (:8466) — fleet hardware and personal assets with serials, warranties, value and SQLite FTS5 search", "Clanker runner, tailnet-only (:8467) — InstaBox VM state, wake/exec triggers, Nix and agent-browser job control with SQLite FTS5 history", "Link vault, tailnet-only (:8468) — bookmark and research archive with extracted page text, collections, read states and SQLite FTS5 search", "Fetch broker, tailnet-only (:8469) — lane-aware POST /v1/fetch with conditional validation, bulk on delphi, US through lumi and residential through frieren"]
 services = [{ name = "nginx", port = 443 }, { name = "crab-hole" }, { name = "tailscale-exit" }, { name = "hermes" }, { name = "deepseek-harness", port = 8443 }, { name = "system-one", port = 8444 }, { name = "stirling-pdf", port = 8445 }, { name = "service-console", port = 8446 }, { name = "gemini", port = 1965 }, { name = "gatus" }, { name = "paperless", port = 28981 }, { name = "vaultwarden", port = 8222 }, { name = "anki-sync", port = 27701 }, { name = "radicale", port = 8457 }, { name = "ntfy", port = 8458 }, { name = "vikunja", port = 8459 }, { name = "agent-turns", port = 8460 }, { name = "media-relay", port = 8461 }, { name = "zettel-graph", port = 8453 }, { name = "mataroa-console", port = 8454 }, { name = "job-db-scraper", port = 8464 }, { name = "private-deals", port = 8465 }, { name = "inventory-site", port = 8466 }, { name = "clanker-runner", port = 8467 }, { name = "link-vault", port = 8468 }, { name = "fetch-broker", port = 8469 }]
@@ -357,7 +357,7 @@ tailscale_ip = ""
 ssh_alias = "zeno"
 
 [hosts.zeno.software]
-module_chain = "globalModulesContainers"
+module_chain = "globalModulesContainers + disko"
 impermanence = false
 key_services = ["openssh (NAT 10033 -> 22)", "tailscaled"]
 services = [{ name = "openssh", port = 22 }, { name = "tailscale" }]
@@ -695,7 +695,7 @@ tailscale = true
 ssh_alias = "stark"
 
 [hosts.stark.software]
-module_chain = "globalModulesNixos"
+module_chain = "globalModulesNixos + disko"
 impermanence = false
 key_services = ["Gamescope Session (steam -gamepadui autologin)", "DMS Greeter (fallback Niri session)", "NVIDIA PRIME render offload (nvidia-offload)", "Steam library on /mnt/steam"]
 services = [{ name = "gamescope-session" }, { name = "dms-greeter" }, { name = "prime-offload" }, { name = "steam-library" }]
@@ -859,7 +859,7 @@ tailscale_hostname = "fern"
 ssh_alias = "fern"
 
 [hosts.fern.software]
-module_chain = "globalModulesNixos"
+module_chain = "globalModulesNixos + disko"
 impermanence = false
 key_services = ["dwl session (profiles.dwlDesktop: fleet keybinds, foot, fnott, wmenu, waylock, swayidle)", "KDE Connect phone integration", "Dell D6000 Dock (DisplayLink / EVDI)", "auto-cpufreq (powersave on battery, performance on AC)", "libinput touchpad tuning", "NAS client automount (/Volumes/data from frieren)", "NO Steam (deliberately omitted)"]
 services = [{ name = "dwl" }, { name = "kdeconnect" }, { name = "dell-dock" }, { name = "auto-cpufreq" }, { name = "libinput" }, { name = "nfs-automount" }]
@@ -1522,7 +1522,7 @@ storage_layout = "GRUB removable media bootloader"
 ssh_alias = "sledgehammer"
 
 [hosts.sledgehammer.software]
-module_chain = "globalModulesContainers"
+module_chain = "globalModulesContainers + disko"
 impermanence = false
 key_services = ["Disko automated disk partitioning", "SOPS, Age, and SSH-to-age secret tooling", "nixos-install toolchain"]
 services = [{ name = "disko" }, { name = "secret-tooling" }, { name = "nixos-install" }]

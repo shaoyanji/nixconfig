@@ -1,8 +1,124 @@
 {
-  "generated": "2026-11-28T04:31:12Z",
+  "generated": "2026-11-28T05:00:29Z",
   "count": 200,
-  "pin": "3b3f7ca0946fbec373ffb095ce5fcd6828050fdbb452db8ed2c2e9ede83ee7b8",
+  "pin": "a1e40346c9679c68915be9d56382fcd5753a8db572eb0b52469f06e798d780d4",
   "turns": [
+    {
+      "id": "9948ba5d-12f8-45c3-b96d-ff9239951088",
+      "ts": "2026-11-28T04:55:33Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-orphaned-live-gate-20261128",
+      "action": "gate-change 1.0/1.0: orphaned-live-files gate on published CV/site; prove+pass, push",
+      "outcome": "in_progress",
+      "claims": [
+        "checks:site"
+      ],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfudzxhvw4d0au8doe112i"
+    },
+    {
+      "id": "fcd87570-68f2-48ce-aa4f-5b00f3a23a26",
+      "ts": "2026-11-28T04:50:48Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-published-gates-20261128",
+      "action": "verify: both published surfaces are build f6f7c5d3, no drift | gate: checks:site:published PASS matt 28/28, checks:site:published:ats PASS ats 15/15, site-links 91 links/6 PDFs + 6 record links, report.json ok:true 6/6, nothing to republish",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbftgl8gnwmfujo1hdmyh0x"
+    },
+    {
+      "id": "bc80abe3-2379-4049-8106-9e004d5144ba",
+      "ts": "2026-11-28T04:50:47Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-published-gates-20261128",
+      "action": "verify: checks:site:published on matt.bountystash.com and cv-ats-8lh.pages.dev at origin/main f6f7c5d3, byte-compare live, sweep record links",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbftgj0pqp9nr64p6pl6urs"
+    },
+    {
+      "id": "a979ee31-bf20-470d-9212-4fd5a821f5a8",
+      "ts": "2026-11-28T04:49:31Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-site-publish-20261128-0546",
+      "action": "publish (jev needs_review 0.77/0.6, decisive margin>0.3): verify checks:site:published both surfaces at origin/main tip; fix drift, republish",
+      "outcome": "in_progress",
+      "claims": [
+        "checks:site:published",
+        "modules/sites"
+      ],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbft7kx4bpu3s8wjme85pi1"
+    },
+    {
+      "id": "a13e7e5f-21f6-4d77-be46-5a3a09cec55b",
+      "ts": "2026-11-28T04:44:38Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-publish-gate-20261128",
+      "action": "verified: cv-blog-check 6/6 hash-equal + all anchors download-resolve in _site; no drift, no files changed (gate cv-blog-check.sh)",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/cv-blog-check.sh"
+      ],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfs99if39f85tkahkgezr1"
+    },
+    {
+      "id": "82916afd-a125-48c2-a6c0-9fa324019be2",
+      "ts": "2026-11-28T04:44:19Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-publish-gate-20261128",
+      "action": "drove freebuff agents:2.1 cv publish gate (jev duel publish 0.69/0.38); pane working on cv-blog-check.sh",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/cv-blog-check.sh"
+      ],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfs6ywvo92x2ngm8bo1dd9"
+    },
+    {
+      "id": "ce5102bc-ab4c-4ca8-ae05-24d6f3957de2",
+      "ts": "2026-11-28T04:38:11Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-scout-cycle-close-20261128",
+      "action": "note-change: scout-close note + gate + push",
+      "outcome": "blocked: agy quota exhausted on all routes (free Hydrogen, Pro 3.8 Flash, Pro Gemini 4 Hydrogen); left idle per back-off doctrine",
+      "claims": [],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfqzwbzwoky8dbp3953cl8"
+    },
+    {
+      "id": "befb2003-e40a-4f0c-a4e5-b5eb6f7ed52b",
+      "ts": "2026-11-28T04:31:57Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-cv-ats-gate-20261128",
+      "action": "landed: checks:site:published:ats gates cv-ats-8lh.pages.dev (15/15 at tip) and the HOST/ATTR vars now reach the script task ignored before; fired on real past main 2ca9a316 (live / 4474B vs build 3802B, exit 1) | gate: checks:site:published:ats PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "taskfiles/checks.yml",
+        "flake/check-inventory.nix"
+      ],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfps1fuvbhj7obeikkusu9"
+    },
     {
       "id": "1558de11-2cf7-4015-9463-c1a714c3e656",
       "ts": "2026-11-28T04:28:17Z",
@@ -2872,118 +2988,6 @@
       "base_commit": "63a4f19105211c06e94a8b066407afa873aa5298",
       "branch": "HEAD",
       "frame": "03hbcflytz7mz2id4bxzrguhg"
-    },
-    {
-      "id": "397e50b7-7c2b-4e6f-be46-fa3c30d9ea66",
-      "ts": "2026-11-27T18:26:56Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:probe2",
-      "action": "events POST shape probe with uuid",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hbcfla1zw6pgxmersyy06k8"
-    },
-    {
-      "id": "9bca9b7f-8d5a-48d8-a30d-fd09cf227ca6",
-      "ts": "2026-11-27T18:01:12Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-freebuff-cv-publish",
-      "action": "done: ryoku-cv redeployed @4357b43; GH run 46041030539 ok; tree clean",
-      "outcome": "done",
-      "claims": [
-        "ryoku-cv"
-      ],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbcaker1hjpya0d7i13d3yt"
-    },
-    {
-      "id": "5b5b9711-ec87-4f5e-be6e-0e822e5a41ff",
-      "ts": "2026-11-27T18:01:12Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin-feature-chain-refactor",
-      "action": "done: devin no-change closure @63a4f191; 32/32 host eval PASS",
-      "outcome": "done",
-      "claims": [
-        "modules"
-      ],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbcakd560nfn4d258pok51h"
-    },
-    {
-      "id": "efa6c31e-e0ec-44d5-ae51-0cd4c0675cc3",
-      "ts": "2026-11-27T17:49:02Z",
-      "source": "devin",
-      "subject": "nixconfig:feature-chain-refactor-audit",
-      "action": "landed: no-change closure at 63a4f191. Zero chain-structure delta since the last full audit (diff empty across flake/ modules/ hosts/ — only lock/prose/script/budget commits since). Duplication verdict carries: 3 documented single-host exceptions only. New value this pass: closed the transitive-sweep coverage gap — its 6-host gate extended to the full fleet | gate: checks:hosts all-32 MODE=eval PASS 32/32 at 63a4f191 incl post-sweep inputs",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "63a4f19105211c06e94a8b066407afa873aa5298",
-      "branch": "HEAD",
-      "frame": "03hbc86sluja1px1cqb82zv9l"
-    },
-    {
-      "id": "8df4ce45-8fdd-49af-9109-4d4468881b8c",
-      "ts": "2026-11-27T17:48:05Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-freebuff-cv-publish",
-      "action": "publish: CV site to Pages, verify all routes 200",
-      "outcome": "in_progress",
-      "claims": [
-        "ryoku-cv"
-      ],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbc803ii3ojg2s3l6z9769z"
-    },
-    {
-      "id": "24bbf34a-49ee-454d-b2e9-19ee0a61c370",
-      "ts": "2026-11-27T17:48:04Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin-feature-chain-refactor",
-      "action": "chain-change: audit feature-chain, isolate in worktree",
-      "outcome": "in_progress",
-      "claims": [
-        "modules"
-      ],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbc801xzujy1ot0nbii0n4c"
-    },
-    {
-      "id": "45f23f04-93f5-41d3-a601-227a42974a49",
-      "ts": "2026-11-27T17:47:50Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-2-freebuff-cv-sync",
-      "action": "landed: GitHub Pages redeployed for ryoku-cv 4357b43 (no unpublished changes; tree clean, origin equal). Run 46041030539 re-run: check + deploy success, deployment 8116127382 at 17:46:55Z. Four routes 200 and byte-identical to the repo: / 11042B, ryoku.css 8596B, cv.pdf 43350B 91a2900, cv-de.pdf 43440B c5e610d | gate: routes all 200 sha-equal",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbc7ybbrr8uq60aq3uz7b1q"
-    },
-    {
-      "id": "18fb14a7-1100-4bcd-91df-5da125c95445",
-      "ts": "2026-11-27T17:37:00Z",
-      "source": "devin",
-      "subject": "nixconfig:pane-1-devin-closure-budgets",
-      "action": "landed: 63a4f191 — gate-change: budget_line now exits 1 for NOT BUDGETED (file header always said never-a-pass; code disagreed). Verified: stripped-budget probe rc=1, budgeted frieren rc=0. frieren ratchet re-adopted 29.7→21.6 GiB. Remote adoption swept 12 active hosts: all skipped w/ notice (tailscale offline; delphi Tailscale-SSH check-mode needs browser auth) | gate: checks:closure:budget ALL=1 PASS + checks:nix:shell PASS + checks:tasks clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "63a4f19105211c06e94a8b066407afa873aa5298",
-      "branch": "HEAD",
-      "frame": "03hbc5u7p51obua5r3181s909"
     }
   ]
 }

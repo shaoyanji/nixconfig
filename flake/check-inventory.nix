@@ -147,6 +147,8 @@
     "checks:site:copies" = "leaf";
     "checks:site:links" = "leaf";
     "checks:site:links:test" = "leaf";
+    "checks:site:orphans" = "leaf";
+    "checks:site:orphans:ats" = "leaf";
     "checks:site:path" = "leaf";
     "checks:site:published" = "leaf";
     "checks:site:published:ats" = "leaf";

@@ -1153,6 +1153,46 @@ tasks:
     cmds:
       - bash scripts/task/site-published-check.sh
 
+  checks:site:orphans:
+    desc: "[gate] Nothing the live Pages site serves is a file the build origin/main does not make"
+    summary: >
+      The other inclusion from `checks:site:published`: that proves every file the
+      build carries is served, this proves nothing else is. Pages 404s a path it
+      does not carry, so a 200 is a file — and a page still linking a CV renamed
+      out of the tree keeps answering long after the build forgot it. The walk
+      starts at `/` and the sitemap and follows every internal href/src; an orphan
+      fails naming its size.
+
+      Live, so absent from `checks:quick`. Vars: HOST=, ATTR=, BASE=, TIMEOUT=,
+      MAX_PAGES=, URL= (a local surface, to prove the gate fires), DEPLOY=.
+      Exit 0 clean, 1 orphan, 2 cannot tell.
+    env:
+      HOST: '{{.HOST | default ""}}'
+      ATTR: '{{.ATTR | default ""}}'
+      BASE: '{{.BASE | default ""}}'
+      TIMEOUT: '{{.TIMEOUT | default ""}}'
+      MAX_PAGES: '{{.MAX_PAGES | default ""}}'
+      URL: '{{.URL | default ""}}'
+      DEPLOY: '{{.DEPLOY | default ""}}'
+    cmds:
+      - bash scripts/task/site-orphans-check.sh
+
+  checks:site:orphans:ats:
+    desc: "[gate] The live cv-ats audit serves no file the build origin/main does not make"
+    summary: >
+      `checks:site:orphans` pointed at the audit surface. Its six `records/*.json`
+      are published byte for byte but never named twice: a record dropped from a
+      build while its page still links it is exactly the orphan this fails on.
+      Exit 0 clean, 1 orphan, 2 cannot tell.
+    env:
+      HOST: cv-ats-8lh.pages.dev
+      ATTR: sites.cv-ats-site
+      MAX_PAGES: '{{.MAX_PAGES | default ""}}'
+      URL: '{{.URL | default ""}}'
+      DEPLOY: task dev:site:deploy:cv-ats
+    cmds:
+      - bash scripts/task/site-orphans-check.sh
+
   checks:flake:transitive:
     desc: Sweep flake.lock transitive inputs against upstream heads (read-only; fails on drift)
     cmds:

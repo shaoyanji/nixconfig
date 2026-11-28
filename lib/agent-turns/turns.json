@@ -1,8 +1,51 @@
 {
-  "generated": "2026-11-28T01:57:22Z",
+  "generated": "2026-11-28T02:14:25Z",
   "count": 200,
-  "pin": "14c44f662f1d24bc390178771e7c2546cdeaed6ed34f0e6ca01c060c4b4028bd",
+  "pin": "fd0005f2b2e4db3c131abc7e5ebb7479ce79e438878b3c27dba7ab04b00ca6a5",
   "turns": [
+    {
+      "id": "85f1bdcf-fcc0-41b4-a545-ec0a2e49306e",
+      "ts": "2026-11-28T02:11:18Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-egress-throughput-2026-11-28",
+      "action": "claim: steward row is dispatch-only (0 commits ever); measuring per-lane throughput on delphi:8469",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "c239a5ef2739444a039e1cfc1f17f0cd8aff0511",
+      "branch": "main",
+      "frame": "03hbeyayw6wfpt9kidpifvaxk"
+    },
+    {
+      "id": "58cb9c86-64ef-43fe-a67c-bdeffdc9d87e",
+      "ts": "2026-11-28T02:05:30Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-egress-throughput-2026-11-28",
+      "action": "note-change 0.89: per-lane egress throughput, land note, push",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbex66170l8q9wcnh9v7w0v"
+    },
+    {
+      "id": "36667a76-bbe0-4ce0-ba21-6820d718fc1c",
+      "ts": "2026-11-28T02:00:10Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-egress-lane-latency-2026-11-28",
+      "action": "landed: three lanes measured through delphi:8469 (5 probes each, cache off) — warm median bulk 138 ms as 92.5.115.103, us 194 ms as 93.127.139.146 via lumi:8470, local 159 ms as 79.215.107.59 via frieren:8471; numbers in egress-architecture, AGENTS.nix 521746 B, body 30 lines | gate: checks:quick PASS + agents-notes-schema PASS + census PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "c239a5ef2739444a039e1cfc1f17f0cd8aff0511",
+      "branch": "main",
+      "frame": "03hbew4mhbp5dfka8akk5shma"
+    },
     {
       "id": "e45cfb72-903e-4615-8089-d914442b4517",
       "ts": "2026-11-28T01:57:15Z",
@@ -2953,51 +2996,6 @@
       "base_commit": "a9d43dc2b4c982721dcce676578daf6a7c60a3d3",
       "branch": "main",
       "frame": "03hbbd4p4f1kj7zustcrz6z48"
-    },
-    {
-      "id": "8dd2d108-55c5-4cde-80d8-54b1bdf162b6",
-      "ts": "2026-11-27T14:46:53Z",
-      "source": "buffy",
-      "subject": "nixconfig:job-scout",
-      "action": "Sweep 2026-11-27x: five boards parsed 1382 / fresh 115 / new 0; arbeitnow 2914 postings, 156 in-lane, 14 employers new to the record, 2 filed (VOLENTUM, DOMUS Consult), table at 150 rows | gate: Pages run 46018841892 success, 8 routes + 10 PDFs 200",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbb8lund0kka7z301ow8yvv"
-    },
-    {
-      "id": "63f5b3b8-5c04-449e-ad50-2a711d5b30de",
-      "ts": "2026-11-27T14:40:20Z",
-      "source": "devin",
-      "subject": "nixconfig:pane-3-lumi-harness-steer",
-      "action": "claim: taking git ops for zeno-stage1 merge, lumi Telegram peer update, deployment, gates, and push",
-      "outcome": "in_progress",
-      "claims": [
-        "hosts/lumi.nix",
-        "modules/user/ai/zeroclaw.nix",
-        "flake/host-inventory.nix",
-        "inventory.toml",
-        "lib/agent-turns/turns.json"
-      ],
-      "files": [],
-      "base_commit": "257e96b6",
-      "branch": "main",
-      "frame": "03hbb7bsb99gkqcwm35skgyt0"
-    },
-    {
-      "id": "6b66ee29-4d92-46e6-815e-2c672cba5b1f",
-      "ts": "2026-11-27T14:39:53Z",
-      "source": "buffy",
-      "subject": "nixconfig:pane-3-lumi-harness-steer",
-      "action": "handoff: pane 3 owns nixconfig git ops now (merge zeno-stage1->main, rebase onto origin/main ee2c4637, conflict rules, push, worktree hygiene); delivered the verified state into its box, incl. the new upstream host-inventory refactor and both merge-tree probes | gate: none (read-only fetch + merge-tree, no commit landed by me)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "257e96b649d2ec2632a6624b109cd644f75fd336",
-      "branch": "main",
-      "frame": "03hbb78nnigrm6snyfbta879b"
     }
   ]
 }

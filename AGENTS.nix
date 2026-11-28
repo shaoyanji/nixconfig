@@ -2808,7 +2808,7 @@
       kind = "proposal";
       status = "IN FLIGHT";
       date = "2026-11-27";
-      summary = "Route each research fetch by what its link is good at — delphi's gigabit for bulk, frieren's residential IP for hostile sources, lumi's US address for geography — through one fetch broker, so a crawl is charged to the tailnet once and the home line spends trust rather than bytes.";
+      summary = "Route each research fetch by what its link is good at — delphi's own line for bulk, frieren's residential IP for hostile sources, lumi's US address for geography — through one fetch broker, so a crawl is charged to the tailnet once and the home line spends trust rather than bytes.";
       from = ["gigabit-seams"];
       refs = {
         hosts = ["delphi" "frieren" "lumi"];
@@ -2838,8 +2838,10 @@
         p95 823 then 726, 1.40 MB upstream; warm p50 46 then 41 ms, 0.085 MB — 94%
         fewer bytes, 3.3-3.7x faster; direct p50 165 then 256 ms.
 
-        **Open.** Per-lane throughput on the same 20 URLs; the shape it measures is
-        `egress-architecture`.
+        **Throughput (2026-11-28, 4-6 MiB, cache off, p50).** Mbps: bulk 52 then
+        51, `us` 34 then 38, `local` 18.3 then 18.6; four streams give 51, 41, 18,
+        so the lane is the ceiling. Two mirrors from delphi's own NIC hold 43-52
+        at one and at four streams: bulk is a ~50 Mbps line, not gigabit.
       '';
     };
     egress-architecture = {

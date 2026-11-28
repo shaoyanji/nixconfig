@@ -1,8 +1,154 @@
 {
-  "generated": "2026-11-28T10:37:13Z",
+  "generated": "2026-11-28T11:10:37Z",
   "count": 200,
-  "pin": "8d725192cd4c88a158e71b1f10f0a39255e586804f71b29796e38f0fbe2367af",
+  "pin": "20b7ba9cc6e0c83f25ff0849b45e950125cdd1d5e45687158c7916f6fa760c9c",
   "turns": [
+    {
+      "id": "a8544e7b-5231-4142-b988-0df90e14b750",
+      "ts": "2026-11-28T11:08:56Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-2-freebuff-publish-20261128",
+      "action": "landed: checks:site:published:blog — rejects a dirty or non-main blog checkout, rebuilds blog main in production mode, compares 117/117 served files (build clock, sitemap lastmod, sourcemap ruby path are placeholders only); cv-blog-check builds instead of reading _site; failure modes proven | gate: checks:site:published:blog PASS, agents:cv:publish-check PASS, nixcachix success",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a52d4e5e83e1c623f554858e087360432e24affd",
+      "branch": "main",
+      "frame": "03hbhvbzj9etqzsw91ydjd2iy"
+    },
+    {
+      "id": "8365278b-a407-4aac-a47e-ff78d61b3bfc",
+      "ts": "2026-11-28T11:01:37Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-3-delphi-idle-20261128",
+      "action": "jev classify gate-change p=0.9/m=0.82; delphi left idle, back off",
+      "outcome": "blocked: agy quota exhausted ~120h; delphi left idle, back off",
+      "claims": [],
+      "files": [],
+      "base_commit": "a52d4e5e83e1c623f554858e087360432e24affd",
+      "branch": "main",
+      "frame": "03hbhtwb4ulb4u9im7jvn80eb"
+    },
+    {
+      "id": "cb6da8a7-d7ff-4568-ac4e-bf0b9897569b",
+      "ts": "2026-11-28T10:49:19Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-flake-projection-gate-2026-11-28",
+      "action": "claim: add and prove the missing bounded projection-eval gate for every flake-projected host",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/checks.yml",
+        "scripts/task",
+        "flake/check-inventory.nix",
+        "tests/"
+      ],
+      "files": [],
+      "base_commit": "d2cf5a3ab991c67cf01db7d91f3541fe2e8d7865",
+      "branch": "main",
+      "frame": "03hbhrhxg63mgoxl59f219l0g"
+    },
+    {
+      "id": "741e422a-519b-4e77-afe2-3ac28d4e4143",
+      "ts": "2026-11-28T10:48:45Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff-gate-20261128",
+      "action": "gate-change: gate the blog build verify blog main tracks origin/main",
+      "outcome": "in_progress",
+      "claims": [
+        "blog",
+        "/cv/"
+      ],
+      "files": [],
+      "base_commit": "d2cf5a3ab991c67cf01db7d91f3541fe2e8d7865",
+      "branch": "main",
+      "frame": "03hbhrdwrpfsozs1dkdju6lbx"
+    },
+    {
+      "id": "674d58c2-5c3d-4106-80ac-885c1c6027a9",
+      "ts": "2026-11-28T10:48:45Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-1-devin-gate-20261128",
+      "action": "gate-change: add and verify next missing check on flake-projected hosts",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/hosts",
+        "flake/outputs.nix"
+      ],
+      "files": [],
+      "base_commit": "d2cf5a3ab991c67cf01db7d91f3541fe2e8d7865",
+      "branch": "main",
+      "frame": "03hbhrdv2c71n1s4fh6x35euu"
+    },
+    {
+      "id": "0dd161a0-8171-4e44-81ec-3a42bd1f4ee7",
+      "ts": "2026-11-28T10:44:19Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-2-freebuff-publish-20261128",
+      "action": "landed: /cv/ surface already current — .#sites.matt-site built from HEAD d2cf5a3a matches the blog checkout and live byte-for-byte (6 CV PDFs), 8 download anchors 200 on /cv/ and 3 on /cv/ryoku/; blog main == origin/main at c629d10 (Build and Deploy 46119108172 success); no tree change, nothing pushed | gate: agents:cv:publish-check PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/matt/cv-*.json",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "d2cf5a3ab991c67cf01db7d91f3541fe2e8d7865",
+      "branch": "main",
+      "frame": "03hbhqiq7cv9wcvh3iss00ssv"
+    },
+    {
+      "id": "a3f7ccfc-75b9-4019-96ba-888f53451213",
+      "ts": "2026-11-28T10:43:01Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-2-freebuff-publish-20261128",
+      "action": "claim: publish /cv/ static surface from this tree — build .#sites.matt-site, copy PDFs to the blog checkout, prove agents:cv:publish-check, push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/cv-*.json",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "d2cf5a3ab991c67cf01db7d91f3541fe2e8d7865",
+      "branch": "main",
+      "frame": "03hbhq9l0qacjmawy08kiypce"
+    },
+    {
+      "id": "02a987ba-9b13-4470-96ef-1712bbb8fda1",
+      "ts": "2026-11-28T10:42:10Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff-publish-20261128",
+      "action": "publish /cv/ static surface, prove site gate, push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/cv-*.json",
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "d2cf5a3ab991c67cf01db7d91f3541fe2e8d7865",
+      "branch": "main",
+      "frame": "03hbhq3l5e3fvd35jea7z4sa8"
+    },
+    {
+      "id": "4c5712e8-7ac0-4881-a88a-f79546faa3cc",
+      "ts": "2026-11-28T10:40:27Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-flake-projection-audit-2026-11-28",
+      "action": "landed: projection audit note closed — 32/32 hosts eval clean, no failing host; freebuff-next lane declared and note-ledger ceiling ratcheted | gate: checks:hosts 32/32 eval PASS + checks:quick PASS + agents-notes-schema PASS + checks:intents PASS",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix",
+        "scripts/task/repo-blobs.sh",
+        "flake/intents.nix"
+      ],
+      "files": [
+        "AGENTS.nix",
+        "scripts/task/repo-blobs.sh",
+        "flake/intents.nix",
+        "lib/agent-turns/turns.json"
+      ],
+      "base_commit": "10a2712f87f536ab3930fb318e9e7764772db7af",
+      "branch": "main",
+      "frame": "03hbhprixgx5yp8sc5hl09h09"
+    },
     {
       "id": "1e5f0bd6-0cbf-4bf1-846c-5eace64efb08",
       "ts": "2026-11-28T10:36:45Z",
@@ -2853,146 +2999,6 @@
       "base_commit": "734a4f4364ef482cb45829594fce7dfda73d384a",
       "branch": "main",
       "frame": "03hbe1z0ekdlrzzuf3s06u8xh"
-    },
-    {
-      "id": "3fc2c72f-5844-4c40-ab7c-9878a7d4f1e4",
-      "ts": "2026-11-27T23:25:28Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-egress-perf-2026-11-28",
-      "action": "record egress lane timings in note, verify vs live endpoints, push",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbe1wp6d932umm1bm7xojbr"
-    },
-    {
-      "id": "04888a31-3ad1-4bf1-8972-1b5cc81b6750",
-      "ts": "2026-11-27T23:22:46Z",
-      "source": "buffy",
-      "subject": "nixconfig:egress-bench-2026-11-28",
-      "action": "landed: 20-URL broker bench on delphi — cold p50 154 ms / 1.40 MB, warm p50 46 ms / 0.085 MB (94% fewer bytes, 3.3x), direct p50 165 ms; us fell back 4/4 (+150 ms at a 112 ms hop), local 502 at CONNECT in 13 ms, gnu.org datacenter-blocked. Recorded in the egress note | gate: agents-notes-schema PASS + repo-blobs --index clean (510 KiB/522082)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "734a4f4364ef482cb45829594fce7dfda73d384a",
-      "branch": "main",
-      "frame": "03hbe1drmytizwcjbruu90a6x"
-    },
-    {
-      "id": "5eb90822-6bd0-44ff-85a7-82ffb88e6622",
-      "ts": "2026-11-27T23:21:26Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-ats-publish",
-      "action": "publish 1.0: expose CV ATS audit as static surface",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/matt",
-        "scripts/task/cv-ats-check.sh"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbe14bs1ep5xvwnlk0lmv4n"
-    },
-    {
-      "id": "9ac28f82-fc35-4fb4-a31a-14f5d4579de7",
-      "ts": "2026-11-27T23:21:21Z",
-      "source": "buffy",
-      "subject": "nixconfig:egress-bench-2026-11-28",
-      "action": "claim: benchmark the cache-then-broker lanes and record the numbers in the egress note",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "1e649efd0792dc9dac6b8b2ec4e2d99fc6bf2b9a",
-      "branch": "main",
-      "frame": "03hbe13sytghy7slka221v46h"
-    },
-    {
-      "id": "336b45ed-3788-43e7-8952-efd43ac7353d",
-      "ts": "2026-11-27T23:17:17Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-egress-perf-2026-11-28",
-      "action": "perf 0.88: measure egress lanes, record timings, push",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbe0b4mhrmbpttvukjny1dh"
-    },
-    {
-      "id": "1d712c92-2b6b-430a-ad93-1a8928510b70",
-      "ts": "2026-11-27T23:16:12Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-cv-ats-republish-2026-11-28",
-      "action": "ATS audit 6/6 PASS (headings order, entries, name/contact/URLs, no hyphenated ends) by re-running cv-ats-check on each recorded PDF; site build == origin/main 19a19fd6 byte-for-byte (29 files) so zero drift; republished matt pages a2677235 (0 files uploaded, 28 already live); live proof 14 ok / 0 failed, all 6 PDFs sha == artifact. | gate: matt:cv:check PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/matt",
-        "scripts/task/cv-ats-check.sh"
-      ],
-      "files": [
-        "lib/matt",
-        "scripts/task/cv-ats-check.sh"
-      ],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbe03izuty2q9njr05mfoz9"
-    },
-    {
-      "id": "629ca144-9230-4839-94a5-1d7df857d2e6",
-      "ts": "2026-11-27T23:12:31Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-ats-republish-2026-11-28",
-      "action": "publish 0.7: CV ATS audit, fix drift, republish, verify live pages",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/matt",
-        "scripts/task/cv-ats-check.sh"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdzdnux1oubuwh2pj133g9"
-    },
-    {
-      "id": "bfd488b7-c7ba-4047-a572-994942790512",
-      "ts": "2026-11-27T23:11:23Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-egress-increment-2026-11-27",
-      "action": "block resolved: the ceiling trim paid for the note and 1e649efd is pushed; schema PASS, repo-blobs 0 over",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "1e649efd0792dc9dac6b8b2ec4e2d99fc6bf2b9a",
-      "branch": "main",
-      "frame": "03hbdz5ni7z3gegh0w2e21dhu"
-    },
-    {
-      "id": "7a01da96-b115-4962-8373-8c3741636f77",
-      "ts": "2026-11-27T23:11:22Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-egress-note-2026-11-28",
-      "action": "landed: egress-lanes-research note IN FLIGHT with cache/broker detail; trimmed exp-018/049/064/076/090 to pay the ceiling and lowered AGENTS_CEILING 522370 to 522082 | gate: agents-notes-schema PASS, repo-blobs 0 over | commit 1e649efd pushed to origin/main",
-      "outcome": "done",
-      "claims": [
-        "AGENTS.nix",
-        "scripts/task/repo-blobs.sh"
-      ],
-      "files": [],
-      "base_commit": "1e649efd0792dc9dac6b8b2ec4e2d99fc6bf2b9a",
-      "branch": "main",
-      "frame": "03hbdz5lzdvgpg05l2bs1qijo"
     }
   ]
 }

@@ -894,21 +894,32 @@ tasks:
       - bash scripts/task/sentinel-ledger-check.sh
 
   checks:drv-equality:
-    desc: "[gate] Every configuration's derivation is unchanged against a baseline (MODE=snapshot|compare)"
+    desc: "[gate] Every configuration: derivation equality, or projection eval with MODE=projection"
     summary: >
       The refactor gate: a rename or moved module may not change behaviour, so it
       may not change a host's `hostChecks` derivation or config fingerprint.
-      MODE=snapshot writes the baseline (~/.cache/nixconfig/drv-baseline.json);
-      MODE=compare re-evaluates every configuration, ONE PROCESS EACH under
-      oom-guard.sh, exiting 1 on any drift. A host already failing compares by its
-      error text. DEEP=1 uses each toplevel derivation instead (narrow with
-      HOSTS=); a config embedding the flake source changes it on any tree edit.
-      Refuses the 03:00-05:30 window unless FORCE=1.
+      MODE=snapshot writes the baseline; MODE=compare re-evaluates every config,
+      ONE PROCESS EACH under oom-guard.sh, exiting 1 on drift and comparing a
+      pre-existing failure by error text. MODE=projection is the bounded
+      every-projected-host eval gate: no baseline, exit 1 if any config fails its
+      module system, assertions or compiled inventory. DEEP=1 is compare/snapshot
+      only (narrow with HOSTS=). Refuses 03:00-05:30 unless FORCE=1.
     env:
       HOSTS: '{{.HOSTS}}'
       DEEP: '{{.DEEP}}'
     cmds:
       - python3 scripts/task/drv-equality.py {{.MODE | default "compare"}}
+
+  checks:drv-equality:test:
+    desc: "Fixture for checks:drv-equality (projection refusal, live pass, unchanged compare)"
+    summary: >
+      Proves MODE=projection is a current-state gate, not only a baseline diff:
+      a HOSTS typo is refused, a seeded false assertion in alarm exits 1 and
+      names the host, the live alarm projection passes, and snapshot/compare on
+      the same clean host stays identical. Worktree-seeded, one small host per
+      eval, no fleet sweep. Exit 0 = every case behaves.
+    cmds:
+      - bash tests/drv-equality/run.sh
 
   checks:units:
     desc: "[gate] systemd understands every unit ONE host's config installs, and can exec each ExecStart (HOST=name)"

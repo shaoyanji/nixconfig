@@ -7,6 +7,7 @@ Review cannot prove that; a hash can, for a few minutes of evaluation.
 
     drv-equality.py snapshot [--out FILE]     write the baseline
     drv-equality.py compare  [--out FILE]     re-evaluate, diff, exit 1 on drift
+    drv-equality.py projection                evaluate every projected config, exit 1 on any failure
 
 One host per nix process, each under `oom-guard.sh`, because the rule that makes
 `checks:host` safe applies here too. A host that already fails to evaluate is
@@ -111,6 +112,23 @@ in {{
 """
 
 
+EXPR_PROJECTION = """
+let
+  f = builtins.getFlake "{flake}";
+  cfg = f.{attr}.{host}.config;
+  assertions = cfg.assertions or [];
+  bad = builtins.filter (a: !a.assertion) assertions;
+in
+  if bad != [] then
+    throw ("assertion(s) failed: " + builtins.concatStringsSep " | " (map (a: a.message) bad))
+  else {{
+    hostname = (builtins.getAttr "{host}" cfg.fleet.inventory.hosts).hostname;
+    registry = builtins.length (builtins.attrNames cfg.fleet.inventory.hosts);
+    assertions = builtins.length assertions;
+  }}
+"""
+
+
 # A standalone home-manager config has no system build; its activation package
 # is `home.path`. Both are the complete instrument for their kind.
 DEEP_ATTR = {
@@ -120,16 +138,23 @@ DEEP_ATTR = {
 }
 
 
-def probe(name, kind, system):
+def probe(name, kind, system, projection=False):
     deep = "true" if os.environ.get("DEEP") == "1" else "false"
-    expr = EXPR.format(
-        flake=FLAKE,
-        attr=KIND_ATTR[kind],
-        host=name,
-        system=system,
-        deep=deep,
-        deep_attr=DEEP_ATTR[kind],
-    )
+    if projection:
+        expr = EXPR_PROJECTION.format(
+            flake=FLAKE,
+            attr=KIND_ATTR[kind],
+            host=name,
+        )
+    else:
+        expr = EXPR.format(
+            flake=FLAKE,
+            attr=KIND_ATTR[kind],
+            host=name,
+            system=system,
+            deep=deep,
+            deep_attr=DEEP_ATTR[kind],
+        )
     cmd = [
         "bash",
         "scripts/task/oom-guard.sh",
@@ -168,20 +193,26 @@ def probe(name, kind, system):
     elif lines[idx] == "error:" and idx + 1 < len(lines):
         # nix prints the banner alone when the message is a multi-line trace.
         err = "error: " + lines[idx + 1]
+        if lines[idx + 1].endswith(":") and idx + 2 < len(lines):
+            err += " " + lines[idx + 2].lstrip("- ")
+    elif lines[idx].endswith(":") and idx + 1 < len(lines):
+        err = lines[idx] + " " + lines[idx + 1].lstrip("- ")
     else:
         err = lines[idx]
     return {"error": STORE.sub("<store>", err)[:300], "seconds": elapsed}
 
 
-def collect():
+def collect(projection=False):
     state = {}
     hosts = registry()
     print(f"drv-equality: {len(hosts)} configuration(s)", file=sys.stderr)
     for i, (name, kind, system, status) in enumerate(hosts, 1):
-        rec = probe(name, kind, system)
+        rec = probe(name, kind, system, projection=projection)
         state[name] = {"kind": kind, "system": system, "status": status, **rec}
         if "error" in rec:
             mark = "ERROR"
+        elif projection:
+            mark = "eval"
         else:
             mark = (rec.get("drv") or "no-drv")[-12:]
         print(
@@ -204,7 +235,7 @@ def load(path):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["snapshot", "compare", "show"], nargs="?", default="compare")
+    ap.add_argument("mode", choices=["snapshot", "compare", "show", "projection"], nargs="?", default="compare")
     ap.add_argument("--out", default=os.environ.get("OUT") or DEFAULT_OUT)
     args = ap.parse_args()
 
@@ -226,6 +257,21 @@ def main():
 
     if args.mode == "show":
         print(json.dumps(collect(), indent=1, sort_keys=True))
+        return 0
+
+    if args.mode == "projection":
+        state = collect(projection=True)
+        if not state:
+            print("drv-equality projection: no configuration matches HOSTS")
+            return 2
+        bad = [(n, v["error"]) for n, v in state.items() if "error" in v]
+        for name, err in bad:
+            print(f"BROKEN {name}: {err}")
+        if bad:
+            print(f"drv-equality projection: {len(bad)}/{len(state)} configuration(s) do not evaluate")
+            return 1
+        assertions = sum(v.get("assertions", 0) for v in state.values())
+        print(f"drv-equality projection: {len(state)} configuration(s) evaluate cleanly ({assertions} assertions)")
         return 0
 
     base = load(args.out)

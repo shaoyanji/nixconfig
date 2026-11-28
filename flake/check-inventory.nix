@@ -50,6 +50,7 @@
     "checks:docs:links" = "leaf";
     "checks:docs:links:test" = "leaf";
     "checks:drv-equality" = "host";
+    "checks:drv-equality:test" = "leaf";
     "checks:edge" = "leaf";
     "checks:edge:resident" = "leaf";
     "checks:email:bodies" = "leaf";

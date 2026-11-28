@@ -167,6 +167,10 @@ fallback_providers:
     base_url: https://api.runcrate.ai/v1
     key_env: RUNCRATE_API_KEY
   - provider: custom
+    model: deepseek/deepseek-v4.1-flash
+    base_url: https://api.cantrustai.xyz/v1
+    key_env: CANTRUSTAI_API_KEY
+  - provider: custom
     model: lebrel/deepseek-v4.1-flash-uncensored
     base_url: https://attested.lebrel.ai/v1
     key_env: LEBREL_API_KEY

@@ -64,6 +64,7 @@ tasks:
       - task: checks:pane-nudge:test
       - task: checks:yaml:lint
       - task: checks:yaml:lint:test
+      - task: checks:toml:lint:test
       - task: checks:toon
       - task: checks:toon:surfaces
       - task: checks:toon:surfaces:test
@@ -2001,6 +2002,15 @@ tasks:
       clean.
     cmds:
       - bash tests/yaml-lint/run.sh
+
+  checks:toml:lint:test:
+    desc: "Regression fixture for checks:toml:lint (seeded malformed inventory.toml)"
+    summary: >
+      A scratch worktree appends an unclosed array to inventory.toml — the
+      parse failure a TOML edit leaves before inventory consumers read it.
+      The ls-files + yq loop must exit 1 and name the file; HEAD stays clean.
+    cmds:
+      - bash tests/toml-lint/run.sh
 
   checks:toml:lint:
     desc: Validate that every tracked TOML file parses — the guard for tool-written TOML edits

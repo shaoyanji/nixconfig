@@ -171,6 +171,7 @@
     "checks:tasks" = "leaf";
     "checks:tls:watchdog" = "leaf";
     "checks:toml:lint" = "leaf";
+    "checks:toml:lint:test" = "leaf";
     "checks:toolcall" = "leaf";
     "checks:toon" = "leaf";
     "checks:toon:surfaces" = "leaf";

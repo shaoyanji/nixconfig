@@ -1,8 +1,86 @@
 {
-  "generated": "2026-11-28T11:35:22Z",
+  "generated": "2026-11-28T11:42:45Z",
   "count": 200,
-  "pin": "6c259188879a4a0ca004e62d6dbff684a6c1652bfdcd3c262ed48138d305608e",
+  "pin": "adf5c60677358db095bf264b23aaa123ca7317fa52e649c5d8c9b31ceb275fd3",
   "turns": [
+    {
+      "id": "7e97bc43-cdb3-460a-9ddd-b38fe69e38ac",
+      "ts": "2026-11-28T11:41:14Z",
+      "source": "devin",
+      "subject": "nixconfig:lumi-clanker-agent-browser",
+      "action": "claim: document and prove clanker-hosted agent-browser browser automation without consuming lumi browser resources",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/clanker.sh",
+        "scripts/task/clanker-container.sh",
+        "taskfiles/instabox.yml",
+        ".agents/skills/instabox/SKILL.md",
+        ".agents/skills/agent-browser/SKILL.md"
+      ],
+      "files": [],
+      "base_commit": "f877e13acd860343f1f8d32de3a7fd24a9a3f642",
+      "branch": "devin/lumi-clanker-codespaces",
+      "frame": "03hbi1n04ooslozxfgggep6mj"
+    },
+    {
+      "id": "e35e6672-3c1e-48fa-81e3-de03cbe03998",
+      "ts": "2026-11-28T11:39:38Z",
+      "source": "devin",
+      "subject": "nixconfig:lumi-clanker-codespaces",
+      "action": "activated: hm generation 12 live; agent-tmux and zeroclaw active; taskrc concurrency=1; capped worker probe PASS; closure imported through clanker",
+      "outcome": "done",
+      "claims": [],
+      "files": [
+        "modules/user/ai/zeroclaw.nix",
+        "hosts/lumi.nix",
+        "scripts/task/clanker.sh",
+        "scripts/task/clanker-container.sh",
+        "taskfiles/instabox.yml"
+      ],
+      "base_commit": "f877e13acd860343f1f8d32de3a7fd24a9a3f642",
+      "branch": "devin/lumi-clanker-codespaces",
+      "frame": "03hbi1bt4eigfjv9a801r65x2"
+    },
+    {
+      "id": "043e19f9-95fb-4b2f-94e0-0de24f083e84",
+      "ts": "2026-11-28T11:38:28Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-toml-lint-fixture-2026-11-28",
+      "action": "claim: add the missing toml lint regression fixture",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/checks.yml",
+        "flake/check-inventory.nix",
+        "tests/"
+      ],
+      "files": [],
+      "base_commit": "11b66a0766ceb38960e50ed7a9268b8088e466c2",
+      "branch": "main",
+      "frame": "03hbi13kvpfex4p0try47ntu5"
+    },
+    {
+      "id": "626c9628-a425-4d25-8f68-4dd275599385",
+      "ts": "2026-11-28T11:35:44Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-nix-format-gate-2026-11-28",
+      "action": "landed: checks:quick now gates alejandra formatting, with a fixture proving NixOS/darwin/home host files are covered | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [
+        "taskfiles/checks.yml",
+        "scripts/task",
+        "flake/check-inventory.nix",
+        "tests/"
+      ],
+      "files": [
+        "taskfiles/checks.yml",
+        "flake/check-inventory.nix",
+        "tests/nix-format/run.sh",
+        "lib/agent-turns/turns.json"
+      ],
+      "base_commit": "11b66a0766ceb38960e50ed7a9268b8088e466c2",
+      "branch": "main",
+      "frame": "03hbi0k9vpkzurrbdyggfh381"
+    },
     {
       "id": "5c8773b8-cc47-40fc-bae2-b72c1054f185",
       "ts": "2026-11-28T11:35:07Z",
@@ -2913,74 +2991,6 @@
       "base_commit": "3c2d9f55910f7a2226b93f4855517dcb8268642d",
       "branch": "main",
       "frame": "03hbe5l4gl0qx0ljiu93jfapo"
-    },
-    {
-      "id": "3aefb5f4-a133-4c04-b1d1-2bb27c2d847d",
-      "ts": "2026-11-27T23:40:38Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-cv-ats-publish-1-0-2026-11-28",
-      "action": "publish 1.0: no drift — origin/main 494c8a17 builds .#sites.cv-ats-site 6/6 (index sha f5ada59c, report ok), and all 9 live files at cv-ats-8lh.pages.dev byte-match that build; surface already landed as 2ca9a316, still in history, so no new commit or push was needed. | gate: nix build .#sites.cv-ats-site PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/matt",
-        ".#sites.cv-ats-site"
-      ],
-      "files": [
-        "lib/cv-ats-site.nix",
-        "lib/cv-ats-report.py",
-        "lib/matt-site.nix",
-        "flake/packages.nix",
-        "taskfiles/site-manifest.json"
-      ],
-      "base_commit": "db40d4fa3519d1e1ca48af45b302d9fa0f62f85f",
-      "branch": "main",
-      "frame": "03hbe4vfowqr1v5ufyvi8vv02"
-    },
-    {
-      "id": "32998e61-afe5-473e-95be-db27d0087644",
-      "ts": "2026-11-27T23:40:37Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-egress-note",
-      "action": "note-change: finish egress-lanes-research note, pay AGENTS.nix ceiling, schema gate, push",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "db40d4fa3519d1e1ca48af45b302d9fa0f62f85f",
-      "branch": "main",
-      "frame": "03hbe4v89uduntax7984y3xf3"
-    },
-    {
-      "id": "c5f6dec1-1157-45d3-bdac-88c07120a6d1",
-      "ts": "2026-11-27T23:40:36Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-ats-publish",
-      "action": "publish 1.0: expose CV ATS audit as static surface (.#sites.cv-ats-site), verify live pages, push",
-      "outcome": "in_progress",
-      "claims": [
-        "modules/sites",
-        "lib/matt"
-      ],
-      "files": [],
-      "base_commit": "db40d4fa3519d1e1ca48af45b302d9fa0f62f85f",
-      "branch": "main",
-      "frame": "03hbe4v73b854zved8b4vyckw"
-    },
-    {
-      "id": "0cbe9ad6-2bc1-4377-a7c8-f88879447eba",
-      "ts": "2026-11-27T23:40:21Z",
-      "source": "buffy",
-      "subject": "nixconfig:egress-note-final-2026-11-28",
-      "action": "claim: finish the egress note (order, cold/warm/direct numbers, lane identity), pay the shrink-only ceiling, gate, push",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "494c8a1798a8bfff303412f5f431978c60f118f6",
-      "branch": "main",
-      "frame": "03hbe4tg04jfgoffs1zuigo26"
     }
   ]
 }

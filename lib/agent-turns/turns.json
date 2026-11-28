@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-28T03:21:59Z",
+  "generated": "2026-11-28T03:24:00Z",
   "count": 200,
-  "pin": "c93d14558c3860bad853e70d257d2c64a76be506fbd6c1aac7a294abf83801e5",
+  "pin": "7ae87441df6b880dd4e8591aff8fd304e66e588fe106cbec0f61fb85cd241455",
   "turns": [
+    {
+      "id": "009c082b-24be-4fe2-8039-765bdaa318bb",
+      "ts": "2026-11-28T03:22:32Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-wrangler-lookup-2026-11-28",
+      "action": "landed: wrangler.sh tries WRANGLER, PATH, then the newest realised store copy before evaluating nixpkgs, surfaces nix's error when all fail, and answers --which without the token. checks:wrangler (scripts/task/wrangler-lookup-check.sh, wired into checks:quick + check-inventory) demands a realised copy resolve with nix stubbed to refuse, PATH to win, a bogus WRANGLER to be refused; 2 legs fail on the pre-fix script. whoami proves the sops token | gate: checks:wrangler PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbfc7xv66oixtayym2his9d"
+    },
     {
       "id": "17ead676-0412-4371-a7a2-b779efa6dbd8",
       "ts": "2026-11-28T03:16:50Z",
@@ -2966,19 +2979,6 @@
       "base_commit": "41e2c30dc51bf5790485f93e5eba5b3ffdf2577f",
       "branch": "devin/zeroclaw-worker-plane",
       "frame": "03hbbma9ac99wt7dp3fr2h9mo"
-    },
-    {
-      "id": "b4f4362d-2e4f-43d7-9ff1-3aaa46a0596d",
-      "ts": "2026-11-27T15:54:06Z",
-      "source": "devin",
-      "subject": "nixconfig:netbook-dwl-ci",
-      "action": "landed: no-change closure. Root cause was netbook pinned nixpkgs shipping dwl 0.8 vs shared config.h written for 0.9. Fix already in tree: profiles/dwl-desktop grafts v0.9 src + wlroots_0_20 when pkgs.dwl older than 0.9. Measured pin 0.8, package 0.9, forced rebuild rc=0. CI red is site-cv-links not dwl | gate: rebuild netbook dwl PASS; netbook eval PASS in 32/32 sweep",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "41e2c30dc51bf5790485f93e5eba5b3ffdf2577f",
-      "branch": "HEAD",
-      "frame": "03hbblqmkrb2jemtc1lkh7dla"
     }
   ]
 }

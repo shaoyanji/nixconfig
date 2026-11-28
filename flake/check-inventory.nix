@@ -5,6 +5,7 @@
 {
   # name -> kind
   byName = {
+    "checks:agents:xs-post" = "leaf";
     "checks:appflow" = "leaf";
     "checks:appflow:gate" = "leaf";
     "checks:appflow:resolve" = "leaf";
@@ -18,6 +19,9 @@
     "checks:caldav" = "leaf";
     "checks:career" = "leaf";
     "checks:closure:budget" = "cache";
+    "checks:sentinel:ledger" = "leaf";
+    "checks:resolver:health" = "leaf";
+    "checks:resolver:loopback" = "leaf";
     "checks:codespace" = "leaf";
     "checks:codespace:sync" = "leaf";
     "checks:counts" = "leaf";
@@ -39,6 +43,7 @@
     "checks:decision:thermal" = "leaf";
     "checks:decision:triage" = "leaf";
     "checks:decision:vuln" = "leaf";
+    "checks:delphi:endpoints" = "host";
     "checks:dns:failover" = "leaf";
     "checks:dns:pool" = "leaf";
     "checks:dns:resolver-health" = "leaf";
@@ -70,6 +75,7 @@
     "checks:intents" = "leaf";
     "checks:intents:test" = "leaf";
     "checks:invalidation" = "cache";
+    "checks:inventory:sync" = "leaf";
     "checks:inventory:compiled" = "leaf";
     "checks:inventory:compiled:test" = "leaf";
     "checks:kg" = "leaf";
@@ -80,6 +86,8 @@
     "checks:kernel:collision" = "leaf";
     "checks:kernel:collision:test" = "leaf";
     "checks:kiwix:watchdog" = "leaf";
+    "checks:mail-atlas" = "leaf";
+    "checks:mail-atlas:site" = "leaf";
     "checks:media-relay" = "leaf";
     "checks:modules:edges" = "leaf";
     "checks:modules:edges:test" = "leaf";
@@ -101,9 +109,11 @@
     "checks:nixcache:probe" = "cache";
     "checks:ntfy" = "leaf";
     "checks:ontology" = "leaf";
+    "checks:ops:health" = "leaf";
     "checks:pane-nudge:test" = "leaf";
     "checks:paperless:watchdog" = "leaf";
     "checks:portfolio" = "leaf";
+    "checks:portfolio-ui" = "leaf";
     "checks:ports" = "leaf";
     "checks:ports:test" = "leaf";
     "checks:policies" = "leaf";

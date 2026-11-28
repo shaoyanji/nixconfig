@@ -96,6 +96,7 @@ in {
           # the value is injected there too (the file says why).
           hmShared.hmUser
           hmShared.sops
+          hmShared.sopsKeyCoverage
           hmShared.nixvim
           hmShared.nixIndex
           # Per-host ~/AGENTS.md from `.#homeAgents.<host>` (lib/home-agents.nix).

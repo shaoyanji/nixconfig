@@ -157,6 +157,7 @@
     "checks:skills:mirror:test" = "leaf";
     "checks:sops:drift" = "leaf";
     "checks:sops:drift:test" = "leaf";
+    "checks:sops:key-coverage:test" = "leaf";
     "checks:sqlite:maintenance" = "leaf";
     "checks:ssh:bitwarden" = "leaf";
     "checks:ssh:modes" = "leaf";

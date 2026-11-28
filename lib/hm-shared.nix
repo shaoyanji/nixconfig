@@ -8,6 +8,7 @@
 }: {
   hmUser = self.modules."global.hm-user";
   sops = inputs.sops-nix.homeManagerModules.sops;
+  sopsKeyCoverage = self.modules."global.sops-key-coverage";
   nixvim = inputs.kickstart-nixvim.homeManagerModules.default;
   nixIndex = inputs.nix-index-database.homeModules.nix-index;
   homeAgents = self.modules."user.ai.home-agents";

@@ -69,6 +69,7 @@
       };
       config.fleet.inventory = inventory;
     }
+    moduleFiles."global.sops-key-coverage"
   ];
 
   globalModules =

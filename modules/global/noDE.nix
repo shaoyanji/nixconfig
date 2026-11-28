@@ -34,6 +34,7 @@ in {
       sharedModules = [
         hmShared.hmUser
         hmShared.sops
+        hmShared.sopsKeyCoverage
         hmShared.nixvim
         hmShared.nixIndex
         # Per-host ~/AGENTS.md from `.#homeAgents.<host>`.

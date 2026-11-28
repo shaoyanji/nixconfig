@@ -1728,6 +1728,16 @@ tasks:
     cmds:
       - bash tests/sops-drift/run.sh
 
+  checks:sops:key-coverage:test:
+    desc: "Regression fixture for the sops key-coverage host assertion (seeded deleted declared key)"
+    summary: >
+      A worktree replays lumi's deleted-key near-miss: modules/secrets.yaml
+      loses morrow-telegram while hosts/lumi.nix still declares it. The host
+      eval must fail inside the assertion layer and name the key; HEAD lumi
+      stays green. Key names only — nothing is decrypted.
+    cmds:
+      - bash tests/sops-key-coverage/run.sh
+
   checks:nix:lint:
     desc: Run deadnix (hard gate) and statix (advisory) on all Nix files
     summary: >

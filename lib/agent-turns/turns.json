@@ -1,8 +1,272 @@
 {
-  "generated": "2026-11-28T08:23:56Z",
+  "generated": "2026-11-28T09:47:53Z",
   "count": 200,
-  "pin": "52b3579e44a8c4d1cc9ef98a55ba39a0e3160e09f7f4012939669fbcf23ab7af",
+  "pin": "7fe5dad26349488f629c0efbc236dcd8b4f93d36a0309ae10e22c59abefe956c",
   "turns": [
+    {
+      "id": "4572b9b7-535f-44bc-bbbf-ee666a481285",
+      "ts": "2026-11-28T09:44:03Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-3-delphi-idle-20261128",
+      "action": "drove delphi site-gate via load-buffer+paste-buffer+Enter; agy quota exhausted ~120h, task not accepted, pane back to idle",
+      "outcome": "blocked: agy quota exhausted ~120h",
+      "claims": [],
+      "files": [],
+      "base_commit": "eb1a24d3d953277272f41587487444a8be2ae531",
+      "branch": "main",
+      "frame": "03hbheqwc6pw68yrdxeaqk649"
+    },
+    {
+      "id": "f794a938-5ac9-4c38-bc95-3054ea5a9feb",
+      "ts": "2026-11-28T09:37:13Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-cv-publish",
+      "action": "claim: visual check done on both sites (docs, matt EN/DE, DE PDF); closing the lebrel item as a rejected note in AGENTS.nix and publishing the note as the site change",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix",
+        "scripts/task/repo-blobs.sh"
+      ],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbhdev5zb7m3mpt16p2zpd5"
+    },
+    {
+      "id": "bdc15c63-b81b-422f-a9a5-526eaf0c2729",
+      "ts": "2026-11-28T09:32:08Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-publish",
+      "action": "Publish CV/site: run visual check, close lebrel, land site changes",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbhcf4d4fwd1kg1zg98y19j"
+    },
+    {
+      "id": "64de422a-966b-4268-96a0-b58b4d3ab209",
+      "ts": "2026-11-28T09:28:05Z",
+      "source": "devin",
+      "subject": "nixconfig:lumi-clanker-codespaces",
+      "action": "claim: inspect origin/main for the worker-plane caveats and build a clanker codespaces-style offload path for lumi",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/instabox.yml",
+        "scripts/task/clanker.sh",
+        "scripts/task/instabox.sh",
+        "modules/user/ai/zeroclaw.nix",
+        "hosts/lumi.nix"
+      ],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbhbmo7varn5hjxceo25pbw"
+    },
+    {
+      "id": "2be102fd-15bc-44a3-982c-b6cb6555cca2",
+      "ts": "2026-11-28T09:27:11Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-next-gate-2026-11-27",
+      "action": "claim: taking the steward assignment over as devin; selecting the current missing gate from the ledger, proving it fires, then pushing",
+      "outcome": "in_progress",
+      "claims": [
+        "checks/"
+      ],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbhbgbtn1hfticeit8bfhxd"
+    },
+    {
+      "id": "62109373-37db-4789-bb6b-107f6e06c2b0",
+      "ts": "2026-11-28T09:23:48Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-2-freebuff-main-push-20261128",
+      "action": "landed: pushed main c992e792..a3657451 (2 commits: cv SOPS spelling, AGENTS.nix note distil). Fast-forward, no force, tree clean, both submodule pointers unchanged and reachable upstream. gate: nixcachix PASS (hygiene, site-cv-links, build-machines frieren) + pages PASS (build+deploy; docs site 200) on a3657451.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbhash0hrygg217i9mjjyfy"
+    },
+    {
+      "id": "e99936e4-8579-4367-9b9c-2f8738ecce27",
+      "ts": "2026-11-28T09:20:40Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-3-delphi-idle-20261128",
+      "action": "jev classify gate-change p=0.58 below 0.8 — delphi left idle, agy quota ~122h; panes 1-2 BUSY",
+      "outcome": "done",
+      "claims": [
+        "agents:3.1"
+      ],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbha6egmatieietjygp7oyb"
+    },
+    {
+      "id": "a705a1e9-ffb1-4fb3-9dad-79485ab2424d",
+      "ts": "2026-11-28T09:14:55Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-3-delphi-idle-20261128",
+      "action": "delphi idle: jev needs_review 0.51/0.18, agy quota ~122h",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbh920cyrdbnkdrtnzf41ks"
+    },
+    {
+      "id": "d9394435-786c-44ca-8cd6-f330a0857357",
+      "ts": "2026-11-28T09:06:06Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-2-freebuff-main-push-20261128",
+      "action": "claim: push main -> origin/main and verify. HEAD is 2 ahead of origin/main (a3657451, 4d174228); tree clean; submodule modules/secrets at f47b0a6 = origin/master so no pointer bump needed.",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbh7c19d9oitlwecb3mf22t"
+    },
+    {
+      "id": "058c0e34-8702-48ae-a6ae-90e285a8b831",
+      "ts": "2026-11-28T09:05:51Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff-main-push-20261128",
+      "action": "push main to origin/main and verify (publish)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbh7aa4h2n2vqsxvdsjq5k3"
+    },
+    {
+      "id": "a6775554-2f37-4920-8865-25054dfb92e6",
+      "ts": "2026-11-28T08:48:42Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-2-freebuff-hisolutions-publish-20261128",
+      "action": "verified publish: HEAD a3657451 builds the identical matt-site store path as origin/main (bhaxz3qpa), live site 28/28 files byte-identical, orphans 24/24, CV evidence+ATS+blog-copy green — nothing to upload",
+      "outcome": "done",
+      "claims": [
+        "lib/matt/cv-*.json",
+        "lib/matt-site.nix"
+      ],
+      "files": [
+        "lib/matt/lebenslauf.json"
+      ],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbh3xoz7d46dadkptoos9wg"
+    },
+    {
+      "id": "712f1979-3fbf-4cf1-8e29-8e45859cf326",
+      "ts": "2026-11-28T08:47:42Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-2-freebuff-hisolutions-publish-20261128",
+      "action": "claim: publish the HiSolutions CV fix — HEAD a3657451 renders a different matt site than origin/main, so build, deploy, and prove the gates",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/cv-*.json",
+        "lib/matt-site.nix"
+      ],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbh3qmvcw0lwtiltljw93lt"
+    },
+    {
+      "id": "b169fbe2-cf3a-47fd-bec2-f6e24cc80fa0",
+      "ts": "2026-11-28T08:46:45Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff-hisolutions-publish-20261128",
+      "action": "publish: Hisolutions CV packet + static site",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/cv-*.json",
+        "lib/matt-site.nix"
+      ],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbh3jwhu3s9zhlcm0k2zl48"
+    },
+    {
+      "id": "c47cfcb1-80a6-453f-bc19-44d9d64f714b",
+      "ts": "2026-11-28T08:38:31Z",
+      "source": "freebuff-next",
+      "subject": "nixconfig:pane-2-freebuff-next-20261128",
+      "action": "reviewed the modules/secrets change: it deletes morrow-telegram that hosts/lumi.nix binds, adds an unreferenced lebrel, and was written at the pre-rekey base (40 recipients, no lumi). Rejected, not committed. Ciphertext kept at ~/.local/state/nixconfig/secrets-lebrel-uncommitted-20261128.yaml; submodule restored to the recorded f47b0a6, mirror byte-identical, tree clean.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbh1y0rwiev9nliqvu0uurv"
+    },
+    {
+      "id": "64b64d69-4c81-4371-9c70-98c170075e6d",
+      "ts": "2026-11-28T08:35:16Z",
+      "source": "freebuff-next",
+      "subject": "nixconfig:pane-2-freebuff-next-20261128",
+      "action": "claim: review staged modules/secrets edit, run sops gate, commit to main",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/secrets"
+      ],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbh1b8bq2qpwowmne95kgxa"
+    },
+    {
+      "id": "49630e54-4485-45f4-b0dc-b101894abd26",
+      "ts": "2026-11-28T08:34:58Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff-next-20261128",
+      "action": "review staged modules edit, sops gate, commit to main",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/secrets"
+      ],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbh194j5yup7krw112us5qy"
+    },
+    {
+      "id": "925cbda8-e535-462f-99fb-0e1c56486b72",
+      "ts": "2026-11-28T08:26:48Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-3-delphi-backoff-20261128",
+      "action": "steward: delphi left idle — agy quota resets ~122h; classify gate-change p=0.75 below 0.8; panes 1-2 BUSY",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbgznl22546mokf3vonin3h"
+    },
+    {
+      "id": "8d30e70c-d6b1-4e30-8c87-999e3e1b2d50",
+      "ts": "2026-11-28T08:26:01Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-hisolutions-packet-20261128",
+      "action": "landed: reviewed the HiSolutions packet and rebuilt it from a tailored corpus (label/bio/projects from cv-software.de.json, bullets from lebenslauf.json) so dreizehn hosts and inventargetriebener CI are gone; fixed sops->SOPS in the corpus (a3657451); fixed the config letter's 25-host source of truth; site redeployed, live == build on 20 assets + 6 PDFs, cv-ats 15/15 | gate: matt:cv:evidence PASS, agents:cv:publish-check PASS, site:check PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/matt/lebenslauf.json"
+      ],
+      "files": [],
+      "base_commit": "a3657451ec2a6d8ce22532da3b389a5abe12da68",
+      "branch": "main",
+      "frame": "03hbgzi351zue0ygk0leile9c"
+    },
     {
       "id": "296278e3-f4f3-47c1-a7e9-070f248a765a",
       "ts": "2026-11-28T08:23:51Z",
@@ -2722,268 +2986,6 @@
       "base_commit": "5aa01e488d1ae8c91e1e0fa0194c9d0e82299e06",
       "branch": "main",
       "frame": "03hbdw1p39hbgmq3vihl3vlam"
-    },
-    {
-      "id": "ec0794f7-5342-421e-b9ca-e80aa751e6a8",
-      "ts": "2026-11-27T22:54:29Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-egress-research-2026-11-27",
-      "action": "research 0.97: tailnet egress architecture — rank the increments with Jev, document findings",
-      "outcome": "in_progress",
-      "claims": [
-        "docs/"
-      ],
-      "files": [],
-      "base_commit": "5aa01e488d1ae8c91e1e0fa0194c9d0e82299e06",
-      "branch": "main",
-      "frame": "03hbdvuvr3ktshkov5947usi4"
-    },
-    {
-      "id": "38799d2f-0c4d-4a7b-9e5a-55afafc68795",
-      "ts": "2026-11-27T22:53:48Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-egress-research-2026-11-27",
-      "action": "research 0.97: tailnet egress architecture, document findings",
-      "outcome": "in_progress",
-      "claims": [
-        "docs/"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdvq3zulcue6qxhqc0pqna"
-    },
-    {
-      "id": "694960ad-ca94-40d2-bd70-1988508d923a",
-      "ts": "2026-11-27T22:53:48Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-verify-2026-11-27",
-      "action": "publish 0.51: verify CVs match origin/main, fix drift, push",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/matt/"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdvq1lr6pqyd8xct6ii6u5"
-    },
-    {
-      "id": "26ee9f7e-1b98-44b8-9fc7-af5a092ef522",
-      "ts": "2026-11-27T22:53:47Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-next-gate-2026-11-27",
-      "action": "gate-change 1.0: add next missing check gate, prove fires, push",
-      "outcome": "in_progress",
-      "claims": [
-        "checks/"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdvpyyihgjxm80ooaodks5"
-    },
-    {
-      "id": "125c5ddd-257a-44da-8805-747c68a746d6",
-      "ts": "2026-11-27T22:28:30Z",
-      "source": "freebuff",
-      "subject": "nixconfig:matt-cv-publish-2026-11-27",
-      "action": "published matt.bountystash.com: 28/28 served files byte-identical to the origin/main build, six CV PDFs verified live; blog copies already match, nothing to push",
-      "outcome": "done",
-      "claims": [
-        "lib/matt/"
-      ],
-      "files": [],
-      "base_commit": "ba21634e",
-      "branch": "main",
-      "frame": "03hbdqs54ywvj8jjpq93der1y"
-    },
-    {
-      "id": "8421d4e1-1f2e-4afd-8654-b3d0de6fb667",
-      "ts": "2026-11-27T22:26:15Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-republish-verify-2026-11-27",
-      "action": "publish 0.98: republish matt CV site, verify 6 live pages, push",
-      "outcome": "in_progress",
-      "claims": [
-        "sites/matt-site",
-        "flake.nix"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdqc9wf4alvnoi1xqhmnsz"
-    },
-    {
-      "id": "6fd208a0-91f2-4f7f-85e2-53f9285de3fb",
-      "ts": "2026-11-27T22:25:41Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-anycast-gate-2026-11-27",
-      "action": "gate-change 1.0: add checks:resolver loopback gate, prove fires, push",
-      "outcome": "in_progress",
-      "claims": [
-        "checks:resolver",
-        "flake/check-inventory.nix"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdq8e6hoposj2y0t996f1y"
-    },
-    {
-      "id": "880cd730-8c52-4808-bff6-9697cf1b15ae",
-      "ts": "2026-11-27T22:24:55Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-hisolutions-packet-2026-11-27",
-      "action": "published: build at ba21634e matches the live row and the public copy byte-for-byte; agents:cv:publish-check PASS; no drift, nothing to commit or push",
-      "outcome": "done",
-      "claims": [
-        "lib/matt/"
-      ],
-      "files": [],
-      "base_commit": "ba21634e",
-      "branch": "main",
-      "frame": "03hbdq2z94ywwtiijjg7mh5z8"
-    },
-    {
-      "id": "8d93beb5-eae9-4c3e-ab6b-a93eb18c3fb6",
-      "ts": "2026-11-27T22:21:06Z",
-      "source": "devin",
-      "subject": "nixconfig:devin-gate-sweep-2026-11-27",
-      "action": "landed: resolver-health-check.sh — probes the two failover endpoints clients use (LAN VIP VRRP frieren/minyx + tailnet anycast frieren/delphi). Note resolver-independence's health probe, blind to failover doing its job exactly as clients are. Proofs: real endpoints pass rc 0; dead fixture fires rc 1 naming it; mixed set fails on dead member only | gate: checks:resolver:health PASS rc 0 live; check:verify 168 rows no drift; shellcheck clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "ba21634eec422ae061ce8f77bb6abc1e344f26d7",
-      "branch": "HEAD",
-      "frame": "03hbdpc33z7u5zio9225mn9ab"
-    },
-    {
-      "id": "4d0bef7a-afdb-4189-a3fd-b7f0eb39910c",
-      "ts": "2026-11-27T22:17:58Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-hisolutions-packet-2026-11-27",
-      "action": "publish 0.91/0.85: build Hisolutions packet, cv gates, deploy, push",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/matt/"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdoq38qyvljlys5i1myyr6"
-    },
-    {
-      "id": "795d637f-a2ee-4e85-afb3-b13e0c671b29",
-      "ts": "2026-11-27T22:17:57Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-gate-sweep-2026-11-27",
-      "action": "gate-change 0.9/0.84: add next check gate, prove it fires, push",
-      "outcome": "in_progress",
-      "claims": [
-        "checks/"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdopzbbv71addaia8ux486"
-    },
-    {
-      "id": "bd3f5e35-b185-4be6-8dfc-bfd80af2801b",
-      "ts": "2026-11-27T22:11:10Z",
-      "source": "freebuff",
-      "subject": "nixconfig:appflow-packet-gate-2026-11-27",
-      "action": "landed: appflow packet gate proves the real packet — pii.json staged so the build carries the phone/address, --out into scratch so the live row is never overwritten, and a link whose artifact is gone now fails (123 of 314 rows in the live store are dead links). HiSolutions accepted exit 0 with the row byte-identical; advantest-ai-platform-engineer rejected exit 1 | gate: apps:gate:packet ACCEPT/REJECT PASS, tests/appflow-packet 8/8 PASS, shellcheck PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "fdd59b7448a01036249640bf5953dbf32c9410e8",
-      "branch": "HEAD",
-      "frame": "03hbdne8mqqaergeqb3nc3cc6"
-    },
-    {
-      "id": "ea290402-bc83-4a34-b384-20a7265bab85",
-      "ts": "2026-11-27T22:06:27Z",
-      "source": "devin",
-      "subject": "nixconfig:sentinel-ledger-coverage-gate",
-      "action": "landed: sentinel-ledger-check.sh — active nixos host absent from ledger.jsonl+incoming/ fails, named. Wired into checks:host scoped to frieren + leaf checks:sentinel:ledger. Proofs: fixture complete passes; fixture minus poseidon fires naming poseidon; real ledger fires naming the 12 genuinely missing hosts. Red until rollout; green only by first contact | gate: check:verify 167 rows, checks:tasks clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "e4bf9b8bd55c2c17abf7bfaa67781a831ad0875a",
-      "branch": "HEAD",
-      "frame": "03hbdmh3hhlk3b4s88fyas359"
-    },
-    {
-      "id": "f0b61b13-bcc2-4274-ad51-c03f657ff327",
-      "ts": "2026-11-27T22:06:23Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-gate",
-      "action": "Widen packet gate for Hisolutions AG CV packet; verify + push",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/appflow-gate.sh",
-        "scripts/task/appflow-packet.sh"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdmgm9l5egxgpfehm7o6ea"
-    },
-    {
-      "id": "4f2f6f7c-e09a-4953-ade7-e6ab6c5cc568",
-      "ts": "2026-11-27T22:01:20Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:devin-sentinel-ledger-gate-2026-11-27",
-      "action": "gate-change 1.0/1.0: add checks:host gate, active host missing from sentinel ledger fails; prove it fires",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdlh504p33eswp0hf8j8y2"
-    },
-    {
-      "id": "55b3f3e3-233c-45d9-856b-0d7796ce25f1",
-      "ts": "2026-11-27T22:00:19Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-cv-packet-gate-2026-11-27",
-      "action": "landed: evidence gate gains a packet leg (DevOps skills line of each public packet CV must name only rendered stack items); Flink + Pentland copies withdrawn (builds gone from store, skills line still claimed AWS/Azure/GCP); blog page keeps HiSolutions | gate: matt:cv:evidence PASS (1 packet), cv-blog-check PASS, negative test FAIL 6 claims before withdrawal, checks:tasks clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdl9xg0s90c5s71wcxvl22"
-    },
-    {
-      "id": "dceadc4c-dcd5-4de5-bcb2-2acfcd93a39b",
-      "ts": "2026-11-27T21:54:52Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-stale-packets-2026-11-27",
-      "action": "gate-change .96/.93: harden CV gate; fix stale Flink+Pentland; push",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/matt/",
-        "scripts/task/"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdk7klr8dtb55zngjy9pnb"
-    },
-    {
-      "id": "ca6e7cba-3920-48fc-b84f-dcac92228499",
-      "ts": "2026-11-27T21:41:24Z",
-      "source": "devin",
-      "subject": "nixconfig:nixcachix-ci-fix-2026-11-27",
-      "action": "landed 1880862e: two independent reds fixed. hygiene — cv-evidence-check probe resolves via paths.sh secrets-dir instead of spelling the plane path. delphi build — inventory-site compile broken since 9915102b's half-finished rewrite: api.go+import.go were dead leftovers redeclaring server/writeJSON; deleted, nothing references them. CI run 46071401269: hygiene SUCCESS, plan+site-cv-links green | gate: policies build rc=0, go build+test pass locally, CI hygiene green",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "1880862ebf0b07f544e6da0d2ad4b781fcf2389d",
-      "branch": "HEAD",
-      "frame": "03hbdhkvkvofkxcqm6gwokz2q"
     }
   ]
 }

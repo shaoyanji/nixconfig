@@ -1,8 +1,145 @@
 {
-  "generated": "2026-11-28T13:08:22Z",
+  "generated": "2026-11-28T13:35:18Z",
   "count": 200,
-  "pin": "49e8776fd94d2cab22513fd565fd14ea3f6a3ac688dad61651bab36bb494f077",
+  "pin": "c8b4a49f2a1f258eeac28cd68b334b5f23e128655515aa7ddbeddbeea8c8b464",
   "turns": [
+    {
+      "id": "d5a99025-f0b5-488a-8162-955936ddfa8a",
+      "ts": "2026-11-28T13:29:40Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-1-devin-20261128-1426",
+      "action": "No route: deploy needs_review p=0.42/m=0.23; left idle.",
+      "outcome": "blocked: Jev needs_review",
+      "claims": [],
+      "files": [],
+      "base_commit": "fda5a48a7b0b2a880b946031539abf892098df43",
+      "branch": "main",
+      "frame": "03hbimtisq3omnsb9v5le8sfb"
+    },
+    {
+      "id": "146371d9-be18-4d96-9666-9b641b2dc712",
+      "ts": "2026-11-28T13:29:15Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-watch-regression-20261128",
+      "action": "gate-change: regress pane-watch states incl ssh TUI vs shell",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "fda5a48a7b0b2a880b946031539abf892098df43",
+      "branch": "main",
+      "frame": "03hbimqmedlwzkb9n5m22eu41"
+    },
+    {
+      "id": "fb7ab3c8-e597-4e3d-8688-7f111bf2cc1c",
+      "ts": "2026-11-28T13:23:33Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-publish-gate",
+      "action": "drive complete: freebuff four gates PASS, no drift, nothing published; ff-pulled fda5a48a",
+      "outcome": "done",
+      "claims": [
+        "scripts/task/cv-ats-check.sh",
+        "scripts/task/cv-links-check.sh",
+        "scripts/task/cv-evidence-check.sh",
+        "scripts/task/site-published-check.sh",
+        "scripts/task/pages-deploy.sh"
+      ],
+      "files": [],
+      "base_commit": "fda5a48a7b0b2a880b946031539abf892098df43",
+      "branch": "main",
+      "frame": "03hbilmhz798mb50yetfvdbg5"
+    },
+    {
+      "id": "a118e38f-f76a-43e8-a696-6d0fa85dc93b",
+      "ts": "2026-11-28T13:18:14Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-publish-gate",
+      "action": "landed: no drift — nothing published, nothing to push. matt:build bhaxz3qp; site-published 28/28 at origin/main fda5a48a; cv-ats --deployed 15/15 at cv-ats-8lh.pages.dev; cv-links 14 ok 0 failed (6 PDFs application/pdf, sha-equal to artifact); cv-evidence 138 stack items / 16 DevOps / 7 providers / 1 packet. Tree clean, 0 local commits, 1 behind origin/main | gate: all four PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "64470fddb4987e8e5b2d5d8d33ac50ec8f94f4c0",
+      "branch": "main",
+      "frame": "03hbikl4787ga5sugqws659co"
+    },
+    {
+      "id": "522629ef-f65a-45e8-92a9-93b902b2c0b2",
+      "ts": "2026-11-28T13:18:01Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-publish-gate",
+      "action": "drove agents:2 freebuff publish lane: CV gate + site byte-compare, deploy on drift (jev publish 0.92)",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/cv-ats-check.sh",
+        "scripts/task/cv-links-check.sh",
+        "scripts/task/cv-evidence-check.sh",
+        "scripts/task/site-published-check.sh",
+        "scripts/task/pages-deploy.sh"
+      ],
+      "files": [],
+      "base_commit": "64470fddb4987e8e5b2d5d8d33ac50ec8f94f4c0",
+      "branch": "main",
+      "frame": "03hbikjjud46vh4qh6tif5tqt"
+    },
+    {
+      "id": "bd69b946-45e2-449f-ae87-cf11030afb67",
+      "ts": "2026-11-28T13:17:02Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-publish-gate",
+      "action": "claim: publish lane — matt:build, then cv-ats-check (--deployed), cv-links-check, cv-evidence-check, site-published-check at origin/main; publish only on drift",
+      "outcome": "in_progress",
+      "claims": [
+        "sites/matt-site",
+        "taskfiles/checks.yml"
+      ],
+      "files": [],
+      "base_commit": "64470fddb4987e8e5b2d5d8d33ac50ec8f94f4c0",
+      "branch": "main",
+      "frame": "03hbikcog5ldzh8f6qm12tu0a"
+    },
+    {
+      "id": "3eaaf421-21d2-4a3d-b710-ce5bacc04856",
+      "ts": "2026-11-28T13:16:19Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-gate-blog-20261128-1402",
+      "action": "landed: the blog gate was a false positive — the sourcemap names the gem path as well as the ruby; norm now collapses both, 117/117 on blog main c629d10, and real byte edits still fail | gate: checks:quick PASS + checks:site:published:blog PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "fda5a48a7b0b2a880b946031539abf892098df43",
+      "branch": "main",
+      "frame": "03hbik7mvt6f9tn1230zanion"
+    },
+    {
+      "id": "36ebc13f-82a0-40d6-9c63-dac23e251367",
+      "ts": "2026-11-28T13:09:00Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-gate-blog-20261128-1402",
+      "action": "claim: checks:site:published:blog is a false positive — live is c629d10's build, only the sourcemap sources prefix differs; widen norm, prove strict, push",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task"
+      ],
+      "files": [],
+      "base_commit": "abc9c394d0c88f8caa3f9cffa2e63f46c89056a8",
+      "branch": "main",
+      "frame": "03hbiis51uyeiinqzz730g7es"
+    },
+    {
+      "id": "73bb3454-0d34-42cc-9f90-a752eeb9bc0f",
+      "ts": "2026-11-28T13:08:58Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-next-gate-20261128-1402",
+      "action": "landed: inventory-chain-features now accepts canonical chains or a feature name as the base, composes the expected feature list, and still validates + feature suffixes; pre-fix proof failed on frieren-canary naming microvm as an incomplete chain, then testvm and frieren-canary were canonicalized to inventory + microvm; both preserved microvms pass ALLOW_PRESERVED eval (1528 and 1539 assertions); pre-commit refreshed the agent-turns pin | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [
+        "flake/checks.nix",
+        "taskfiles/check.yml"
+      ],
+      "files": [],
+      "base_commit": "64470fddb4987e8e5b2d5d8d33ac50ec8f94f4c0",
+      "branch": "main",
+      "frame": "03hbiirxmwfelnbkc6vbn1ya0"
+    },
     {
       "id": "6b089fef-b7ed-4caf-9053-e2418d45ad96",
       "ts": "2026-11-28T13:07:40Z",
@@ -2881,141 +3018,6 @@
       "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
       "branch": "main",
       "frame": "03hbf0cixcr4luc2z6m5f823d"
-    },
-    {
-      "id": "f01e2f75-2dfd-4343-8aa5-e42e586f85f9",
-      "ts": "2026-11-28T02:15:53Z",
-      "source": "buffy",
-      "subject": "nixconfig:freebuff-cv-drift-gate-2026-11-28",
-      "action": "landed: cv-ats --deployed drift gate; 9/9 divergent at cv-ats.pages.dev (exit 1), 9/9 match at cv-ats-8lh (exit 0), exit 2 no artifact; host recorded in site-manifest; task matt:cv:ats:drift; gate: checks:quick+prose+budget PASS",
-      "outcome": "done",
-      "claims": [
-        "scripts/task/cv-ats-check.sh",
-        "taskfiles/site-manifest.json",
-        "taskfiles/bountystash.yml",
-        "docs/cv-ats-compliance.md"
-      ],
-      "files": [],
-      "base_commit": "0ee77063",
-      "branch": "HEAD",
-      "frame": "03hbez78lo06gc8tdkg90n4gd"
-    },
-    {
-      "id": "7aa74264-1a41-4560-9771-cf8e9ea842cd",
-      "ts": "2026-11-28T02:14:48Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-egress-throughput-2026-11-28",
-      "action": "landed: per-lane throughput p50 bulk 52/51, us 34/38, local 18.3/18.6 Mbps, 4-stream 51/41/18, and delphi's NIC itself caps at 43-52 so bulk is a ~50 Mbps line | gate: checks:quick PASS + agents-notes-schema PASS + census PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "0ee7706375bd4656b912973e066313ca1f245e83",
-      "branch": "main",
-      "frame": "03hbeyzll7t7s4hwstrnak4qu"
-    },
-    {
-      "id": "85f1bdcf-fcc0-41b4-a545-ec0a2e49306e",
-      "ts": "2026-11-28T02:11:18Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-egress-throughput-2026-11-28",
-      "action": "claim: steward row is dispatch-only (0 commits ever); measuring per-lane throughput on delphi:8469",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "c239a5ef2739444a039e1cfc1f17f0cd8aff0511",
-      "branch": "main",
-      "frame": "03hbeyayw6wfpt9kidpifvaxk"
-    },
-    {
-      "id": "58cb9c86-64ef-43fe-a67c-bdeffdc9d87e",
-      "ts": "2026-11-28T02:05:30Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-egress-throughput-2026-11-28",
-      "action": "note-change 0.89: per-lane egress throughput, land note, push",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbex66170l8q9wcnh9v7w0v"
-    },
-    {
-      "id": "36667a76-bbe0-4ce0-ba21-6820d718fc1c",
-      "ts": "2026-11-28T02:00:10Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-egress-lane-latency-2026-11-28",
-      "action": "landed: three lanes measured through delphi:8469 (5 probes each, cache off) — warm median bulk 138 ms as 92.5.115.103, us 194 ms as 93.127.139.146 via lumi:8470, local 159 ms as 79.215.107.59 via frieren:8471; numbers in egress-architecture, AGENTS.nix 521746 B, body 30 lines | gate: checks:quick PASS + agents-notes-schema PASS + census PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "c239a5ef2739444a039e1cfc1f17f0cd8aff0511",
-      "branch": "main",
-      "frame": "03hbew4mhbp5dfka8akk5shma"
-    },
-    {
-      "id": "e45cfb72-903e-4615-8089-d914442b4517",
-      "ts": "2026-11-28T01:57:15Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-drift-gate-2026-11-28",
-      "action": "gate-change 1.0: add cv-ats drift gate, prove fires, push",
-      "outcome": "in_progress",
-      "claims": [
-        "scripts/task/cv-ats-check.sh"
-      ],
-      "files": [],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbevk66ghydhd9g5ox75y0s"
-    },
-    {
-      "id": "7ac4b649-034a-448a-91a3-131130158e5d",
-      "ts": "2026-11-28T01:56:05Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-egress-lane-latency-2026-11-28",
-      "action": "claim: taking the 01:54 dispatched row (steward has 0 commits in 86 turns); measuring lanes through delphi:8469, writing numbers into egress-architecture, paying the byte ceiling",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "9263460a89267e7a3d6985502ecd1006be6be933",
-      "branch": "main",
-      "frame": "03hbevbwtjnu7u35j1kai4kiy"
-    },
-    {
-      "id": "ccb3e16a-0748-49b1-b431-f31987479a7c",
-      "ts": "2026-11-28T01:54:47Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-egress-lane-latency-2026-11-28",
-      "action": "note-change 0.84: measure egress lanes, update note, push",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbev2txpvz7q501iwtl26oh"
-    },
-    {
-      "id": "80511d32-5204-4ac4-8ee4-4873770bce0a",
-      "ts": "2026-11-28T01:48:46Z",
-      "source": "buffy",
-      "subject": "nixconfig:freebuff-cv-gate-battery-2026-11-28",
-      "action": "landed: resume projection restored at the tip (e3da97f5->27b33207): thirteen->25 hosts, DevOps AWS/Azure/Google Cloud at Master -> Linux/systemd, Container, GitHub Actions, Monitoring & Alerting at Advanced. Duel: origin/main@9263460a red (6 unbacked claims + drift), patched tree green. | gate: matt:cv:evidence PASS, matt:gist:drift PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/matt/resume.json",
-        "lib/matt/lebenslauf.json"
-      ],
-      "files": [],
-      "base_commit": "9263460a",
-      "branch": "main",
-      "frame": "03hbetwh0zzj5uzaviutpn2li"
     }
   ]
 }

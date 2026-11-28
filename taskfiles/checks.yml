@@ -62,6 +62,7 @@ tasks:
       - task: checks:infron
       - task: checks:infron:test
       - task: checks:pane-nudge:test
+      - task: checks:pane-watch:test
       - task: checks:yaml:lint
       - task: checks:yaml:lint:test
       - task: checks:toml:lint:test
@@ -1109,6 +1110,20 @@ tasks:
       an unknown window exits 1.
     cmds:
       - bash tests/pane-nudge/run.sh
+
+  checks:pane-watch:test:
+    desc: "Regression fixture for pane-watch (idle/busy/unknown, ssh TUI versus raw shell, TMUX_TMPDIR)"
+    summary: >
+      Pins the pane state report the pane-idle-watch cron reads: a state comes
+      from the capture's working/thinking line or composer, never from a timer's
+      magnitude and never from the persistent footer chrome or Devin's Braille
+      header. An ssh pane showing an agent TUI is IDLE/BUSY — the tunnel is
+      driveable — while a raw remote shell is SKIP, and SKIP is ssh-only (a
+      local shell pane with no marker is UNKNOWN). The script exports
+      TMUX_TMPDIR itself (an inherited one is preserved), and a missing server
+      is one UNKNOWN line at exit 0. Stubbed tmux, so no live session is touched.
+    cmds:
+      - bash tests/pane-watch/run.sh
 
   checks:kg:test:
     desc: "Regression fixture for checks:kg (mutated graph via KG_GRAPH)"

@@ -113,6 +113,7 @@
     "checks:ontology" = "leaf";
     "checks:ops:health" = "leaf";
     "checks:pane-nudge:test" = "leaf";
+    "checks:pane-watch:test" = "leaf";
     "checks:paperless:watchdog" = "leaf";
     "checks:portfolio" = "leaf";
     "checks:portfolio-ui" = "leaf";

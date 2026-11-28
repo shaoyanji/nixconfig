@@ -16,6 +16,7 @@ import tempfile
 import unittest
 import urllib.error
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -286,8 +287,12 @@ class KeyLoadingTest(unittest.TestCase):
         with tempfile.NamedTemporaryFile("w", suffix=".env", delete=False) as handle:
             handle.write("FIRECRAWL_API_KEY=fc-abc\nOTHER_TOKEN=seq-xyz\n# note\n")
             path = handle.name
+        # `load_keys` lets the environment win over the file, so a key exported
+        # on the host running the fixture replaced the seeded value.
+        env = {k: v for k, v in os.environ.items() if k != "FIRECRAWL_API_KEY"}
         try:
-            keys = scrape.load_keys(path, ("FIRECRAWL_API_KEY",))
+            with mock.patch.dict(os.environ, env, clear=True):
+                keys = scrape.load_keys(path, ("FIRECRAWL_API_KEY",))
         finally:
             os.unlink(path)
         self.assertEqual(keys, {"FIRECRAWL_API_KEY": "fc-abc"})

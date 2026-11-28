@@ -356,7 +356,7 @@ def check_search(base, path, query, expect_hit=False, timeout=10.0, fetch=fetch)
 
 def check_dom(
     base, marker, browser="agent-browser", timeout=45.0, attempts=4, pause=0.5,
-    run=subprocess.run, sleep=time.sleep,
+    run=None, sleep=time.sleep,
 ):
     """The rendered page, not the HTML string: the element the JS fills exists.
 
@@ -364,6 +364,10 @@ def check_dom(
     that fills it, so an empty answer is re-read a few times before it counts as
     a failure — otherwise a working page reads as broken on a slow first paint.
     """
+    # Resolved here, not at definition: a default bound to `subprocess.run` keeps
+    # the original function, so a caller patching `subprocess.run` was ignored and
+    # the real browser ran (test_a_hung_browser_is_a_failure_not_a_traceback).
+    run = run or subprocess.run
     if not shutil.which(browser):
         return None, f"{browser} is not installed; DOM check skipped"
     script = (

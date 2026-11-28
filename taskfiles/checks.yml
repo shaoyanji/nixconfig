@@ -103,6 +103,8 @@ tasks:
       - task: checks:modules:edges:test
       - task: checks:intents
       - task: checks:intents:test
+      - task: checks:suites
+      - task: checks:suites:test
       # The check inventory (flake/check-inventory.nix): every checks:* task has
       # a key and every key names a task, so the three verbs cannot drift.
       - task: check:verify
@@ -1739,6 +1741,30 @@ tasks:
       TOML as exit 2, and an audit that never runs without `--toml`.
     cmds:
       - python3 -m unittest discover -s tests/inventory-sync -p 'test_*.py'
+
+  checks:suites:
+    desc: "[gate] Every tests/ Python suite runs and passes — discovery, not a name list"
+    summary: >
+      Ten unittest suites under tests/ carried 322 cases that no task, gate or
+      runner executed: deals-ingest, deals-page-scrape, email-archive-import,
+      endpoints-smoke, job-page-scrape, jobs-ingest, mail-atlas-reconcile,
+      portfolio-seed, portfolio-smoke, web-research. Two had broken. Discovers
+      `tests/*/test_*.py` and runs each directory in its own process, offline;
+      `SUITES_ROOT=` judges another tree. Exit 0 = all pass, 1 = a failed suite
+      is named with its tail, 2 = no suite found, which is not a pass. ~11 s.
+    cmds:
+      - bash scripts/task/python-suites.sh
+
+  checks:suites:test:
+    desc: "Regression fixture for checks:suites (a failing suite is refused and named)"
+    summary: >
+      A temp `SUITES_ROOT` holds one passing suite and one whose case asserts a
+      false fact: the runner must refuse at exit 1 and name the failing suite,
+      a clean root must report its count at exit 0, and an empty root must
+      refuse at exit 2 instead of reporting a clean run. Seeded, so the gate
+      cannot become a loop that only ever prints ok. ~0.4 s, no eval.
+    cmds:
+      - bash tests/python-suites/run.sh
 
   checks:mail-atlas:site:
     desc: "Drawer smoke assertions without a browser (BROWSER_STUB payloads), plus the clanker lane's contract"

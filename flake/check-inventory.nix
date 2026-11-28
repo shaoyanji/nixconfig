@@ -166,6 +166,8 @@
     "checks:ssh:modes" = "leaf";
     "checks:status" = "leaf";
     "checks:submodules" = "leaf";
+    "checks:suites" = "leaf";
+    "checks:suites:test" = "leaf";
     "checks:task-descs" = "leaf";
     "checks:task-shim:test" = "leaf";
     "checks:tasks" = "leaf";

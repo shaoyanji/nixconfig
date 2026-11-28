@@ -1,8 +1,48 @@
 {
-  "generated": "2026-11-28T11:42:45Z",
+  "generated": "2026-11-28T11:48:10Z",
   "count": 200,
-  "pin": "adf5c60677358db095bf264b23aaa123ca7317fa52e649c5d8c9b31ceb275fd3",
+  "pin": "b7708ee141715db378ea0f63eaf2c9c5510acc8a4b0765ec58f35be97dfc2557",
   "turns": [
+    {
+      "id": "4131de24-2f23-4d1a-a8a4-9af65e0eab9d",
+      "ts": "2026-11-28T11:43:59Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-repo-improvements-20261128",
+      "action": "claim: run the ten tests/ Python suites nothing executes, fix the two failures they expose, and add checks:suites so they cannot rot silently",
+      "outcome": "in_progress",
+      "claims": [
+        "tests/",
+        "scripts/task/portfolio-smoke.py",
+        "flake/check-inventory.nix",
+        "taskfiles/checks.yml"
+      ],
+      "files": [],
+      "base_commit": "f3088c8c600500b69cde625d753acfd1059e35d0",
+      "branch": "main",
+      "frame": "03hbi26azkvn2nuyv36iw0v1r"
+    },
+    {
+      "id": "a1fc9ef9-4fbc-4ae4-b846-c0a4378626b5",
+      "ts": "2026-11-28T11:43:03Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-toml-lint-fixture-2026-11-28",
+      "action": "landed: checks:toml:lint:test proves malformed inventory.toml is refused; fixture wired into checks:quick | gate: checks:quick PASS",
+      "outcome": "done",
+      "claims": [
+        "taskfiles/checks.yml",
+        "flake/check-inventory.nix",
+        "tests/"
+      ],
+      "files": [
+        "taskfiles/checks.yml",
+        "flake/check-inventory.nix",
+        "tests/toml-lint/run.sh",
+        "lib/agent-turns/turns.json"
+      ],
+      "base_commit": "f3088c8c600500b69cde625d753acfd1059e35d0",
+      "branch": "main",
+      "frame": "03hbi1zspockhkjhitrcvksxt"
+    },
     {
       "id": "7e97bc43-cdb3-460a-9ddd-b38fe69e38ac",
       "ts": "2026-11-28T11:41:14Z",
@@ -2963,34 +3003,6 @@
       "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
       "branch": "main",
       "frame": "03hbe5w35yy6h0d74zho91bgl"
-    },
-    {
-      "id": "6edffb00-2b55-4464-b27f-fc2ca3b6b6f0",
-      "ts": "2026-11-27T23:44:21Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-intents-gate-2026-11-28",
-      "action": "flake-change: declare frieren-host xs capability; checks:intents green",
-      "outcome": "in_progress",
-      "claims": [
-        "flake/intents.nix"
-      ],
-      "files": [],
-      "base_commit": "db40d4fa3519d1e1ca48af45b302d9fa0f62f85f",
-      "branch": "main",
-      "frame": "03hbe5lhshn1mnz938wf0t2nu"
-    },
-    {
-      "id": "1715a490-ed0f-4232-ab95-9790069c2a9c",
-      "ts": "2026-11-27T23:44:18Z",
-      "source": "buffy",
-      "subject": "nixconfig:egress-note-final-2026-11-28",
-      "action": "landed: note finished — order stated (cache then broker), cold p50 154->152 ms at 1.40 MB, warm 46->41 ms at 0.085 MB, direct 165->256 ms, bulk identity 92.5.115.103 AS31898 Frankfurt; paid the blob ceiling inside the note (522073/522082) and repaired a pre-existing census regression (6513/6495 from 2ca9a316) so .nix commits work again | gate: agents-notes-schema PASS + census 6495/6495",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "3c2d9f55910f7a2226b93f4855517dcb8268642d",
-      "branch": "main",
-      "frame": "03hbe5l4gl0qx0ljiu93jfapo"
     }
   ]
 }

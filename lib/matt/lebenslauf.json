@@ -191,7 +191,7 @@
       "type": "open source",
       "highlights": [
         "Deklarierte die gesamte Flotte in einem Flake: jeder Host eine Feature-Liste, jeder Dienst ein Modul, sodass die Optionsfläche ein Gate bleibt statt Copy-and-paste",
-        "Verschlüsselte jedes Secret mit sops und stellte Host-Schlüssel über die eigene SSH-Zertifizierungsstelle der Flotte aus",
+        "Verschlüsselte jedes Secret mit SOPS und stellte Host-Schlüssel über die eigene SSH-Zertifizierungsstelle der Flotte aus",
         "Bediente Rebuilds aus einem gemeinsamen Binary-Cache; jede Server-Generation lässt sich mit einem Befehl zurückrollen",
         "Ließ in CI dasselbe Modul-Gate je Host laufen wie auf den Maschinen, dazu ein Sentinel-Ledger aus Job-Status, Generation-Alter, Disk- und PSI-Druck"
       ],

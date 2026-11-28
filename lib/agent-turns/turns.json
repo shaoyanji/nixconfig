@@ -1,8 +1,67 @@
 {
-  "generated": "2026-11-28T08:06:10Z",
+  "generated": "2026-11-28T08:23:56Z",
   "count": 200,
-  "pin": "2d222a31d2f4e51ea0cbf33ef4346da2c5380e721bcad6085e12e2a441aeea7b",
+  "pin": "52b3579e44a8c4d1cc9ef98a55ba39a0e3160e09f7f4012939669fbcf23ab7af",
   "turns": [
+    {
+      "id": "296278e3-f4f3-47c1-a7e9-070f248a765a",
+      "ts": "2026-11-28T08:23:51Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-hisolutions-packet-20261128",
+      "action": "claim: HiSolutions packet — fix the corpus prose (sops->SOPS), rebuild the fair packet from a tailored corpus, republish the CV site",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/lebenslauf.json"
+      ],
+      "files": [],
+      "base_commit": "4d17422819f2fc9d153f0016b95576337bc6c06c",
+      "branch": "main",
+      "frame": "03hbgz2uixnhzert9fs9dw74m"
+    },
+    {
+      "id": "fc464cde-c8f6-4c2c-85c7-ead34a061756",
+      "ts": "2026-11-28T08:19:57Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff-hisolutions-publish-20261128",
+      "action": "freebuff: publish Hisolutions CV packet + static site (publish)",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "4d17422819f2fc9d153f0016b95576337bc6c06c",
+      "branch": "main",
+      "frame": "03hbgybg13dr3h8b1ygbeu1a2"
+    },
+    {
+      "id": "1ef974ff-7a94-4648-973e-448d1964cf1b",
+      "ts": "2026-11-28T08:06:25Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-hisolutions-note-20261128",
+      "action": "note landed: hisolutions-packet-polish-2026-11-28 is committed in 4d174228, unblocked by the AGENTS.nix trim; prose items 1-3 and the one-source rebuild stay open | gate: checks:prose PASS, .#agentsNotes.issues []",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "4d17422819f2fc9d153f0016b95576337bc6c06c",
+      "branch": "main",
+      "frame": "03hbgvocecs0u9aokkvjjbyhu"
+    },
+    {
+      "id": "d9860b28-21c4-4eb6-a21c-e8992967a7bb",
+      "ts": "2026-11-28T08:06:25Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-2-freebuff-agents-nix-trim-20261128",
+      "action": "landed: four delivered notes distilled (microvm-guests, tpm-sops-planes, open-parakeet-hardening, netbook-desktop-phase-2); AGENTS.nix 520,660 B and AGENTS_CEILING lowered to match | gate: repo-blobs --index PASS, checks:prose PASS, .#agentsNotes.issues []",
+      "outcome": "done",
+      "claims": [
+        "AGENTS.nix",
+        "scripts/task/repo-blobs.sh"
+      ],
+      "files": [],
+      "base_commit": "4d17422819f2fc9d153f0016b95576337bc6c06c",
+      "branch": "main",
+      "frame": "03hbgvoab5wpshxpohsaaplds"
+    },
     {
       "id": "9e7b817b-9513-4ce8-90ba-62c0acee04ab",
       "ts": "2026-11-28T08:05:03Z",
@@ -2925,64 +2984,6 @@
       "base_commit": "1880862ebf0b07f544e6da0d2ad4b781fcf2389d",
       "branch": "HEAD",
       "frame": "03hbdhkvkvofkxcqm6gwokz2q"
-    },
-    {
-      "id": "15a03421-c2a0-4e6b-9ad1-9f383d44b17a",
-      "ts": "2026-11-27T21:39:04Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-cv-publish-verify-2026-11-27",
-      "action": "landed: clean build of origin/main 1880862e reproduces all 6 live CVs byte-for-byte; Pages deploy uploaded 0 files (already current), blog 6/6 match | gate: matt:build + matt:cv:evidence PASS (132 stack items, 7 provider classes backed), dev:blog:cv:check PASS, 0 provider words",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdh4h7rrqqs7or622mdyqd"
-    },
-    {
-      "id": "56055070-4892-4013-ace0-df75b1d7ea18",
-      "ts": "2026-11-27T21:37:51Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-publish-verify-2026-11-27",
-      "action": "publish 0.96/0.95: verify CV packet vs origin/main, republish, gate",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/matt/resume.cv.json",
-        "lib/matt/cv-software.json"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdgvzwl9k54pd5y796xmiw"
-    },
-    {
-      "id": "0e75996e-d4d3-4659-8841-bc6cc37ba4ab",
-      "ts": "2026-11-27T21:34:54Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-cv-drift-audit-2026-11-27",
-      "action": "landed: target prose in both languages named 'Terraform and GitOps on GCP or Azure' — the last provider words in any shipped CV; rewritten to the fleet stack, rebuilt, deployed | gate: matt:build + matt:cv:evidence PASS, 6/6 live PDFs sha-match build with 0 provider words | blog: dev:blog:cv:check PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdgb8qb8dkhliv4njq5xyc"
-    },
-    {
-      "id": "ecb402ff-ed03-46ba-b53e-9f54e252c4c4",
-      "ts": "2026-11-27T21:30:01Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-drift-audit-2026-11-27",
-      "action": "deploy 0.71/0.42: CV drift audit stale PDFs/provider words; fix, deploy, verify",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/matt/resume.cv.json",
-        "lib/matt/cv-software.json"
-      ],
-      "files": [],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdfcwetu6evha81a35o9qk"
     }
   ]
 }

@@ -733,7 +733,7 @@ tailscale = true
 ssh_alias = "ares"
 
 [hosts.ares.software]
-module_chain = "containers + impermanence"
+module_chain = "globalModulesContainers + impermanence"
 impermanence = true
 key_services = ["greetd autologin to gamescope-session (steam -gamepadui)", "Impermanence (/persist subvolume)", "NVIDIA legacy_580 driver with DRM KMS"]
 services = [{ name = "greetd-gamescope" }, { name = "impermanence" }, { name = "nvidia-legacy" }]
@@ -1559,7 +1559,7 @@ tailscale = false
 ssh_alias = "guckloch"
 
 [hosts.guckloch.software]
-module_chain = "globalModulesContainers + nixos-wsl"
+module_chain = "globalModulesContainers"
 impermanence = false
 key_services = ["Docker Desktop WSL2 integration", "SSHFS NAS client mount", "Nix-LD dynamic library loader for unpatched binaries"]
 services = [{ name = "docker-desktop" }, { name = "sshfs" }, { name = "nix-ld" }]

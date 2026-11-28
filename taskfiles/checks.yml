@@ -1127,12 +1127,13 @@ tasks:
       A deploy can finish and leave the previous generation's tree serving — a
       boot-only activation, a rollback, a flake ref that never moved — and from
       outside that looks like success. Each site vhost emits `X-Site-Path`; this
-      asks the live server which store path it serves and compares it with
-      `.#sites.delphi-site`, the host's `system.build.delphiSite`.
+      compares that answer with `.#sites.delphi-site`.
 
-      One request with a timeout plus one eval, under the OOM watchdog, no ssh.
-      Vars: ATTR=, URL= (default http://127.0.0.1/), HOST_HEADER=, TIMEOUT=,
-      EVAL_TIMEOUT=. Exit 0 = in sync, 1 = stale, 2 = cannot tell.
+      Vantage is the check: 127.0.0.1 is the local host and 10.99.0.53 answers
+      from frieren, so either reads as a missing header; delphi is
+      URL=http://100.123.145.53/. One request plus one eval, no ssh. Vars: ATTR=,
+      URL=, HOST_HEADER=, TIMEOUT=, EVAL_TIMEOUT=. Exit 0 = in sync, 1 = stale,
+      2 = cannot tell.
     cmds:
       - bash scripts/task/site-drift.sh
 

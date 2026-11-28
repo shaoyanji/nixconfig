@@ -29,6 +29,13 @@ URL=${URL:-http://127.0.0.1/}
 TIMEOUT=${TIMEOUT:-5}
 EVAL_TIMEOUT=${EVAL_TIMEOUT:-180}
 
+# Running here is not running there. Off delphi, 127.0.0.1 is whatever host this
+# shell is on (the builder, typically), and 10.99.0.53 is the DNS failover VIP
+# whose :80 answers from frieren — both return a healthy page with no
+# X-Site-Path, which this script used to report as a broken header. The vantage
+# that actually serves delphi-site is delphi's own tailnet address.
+DELPHI_URL=${DELPHI_URL:-http://100.123.145.53/}
+
 headers="$(mktemp)"
 pathfile="$(mktemp)"
 trap 'rm -f "$headers" "$pathfile"' EXIT
@@ -36,14 +43,15 @@ trap 'rm -f "$headers" "$pathfile"' EXIT
 if ! curl -fsS --max-time "$TIMEOUT" -o /dev/null -D "$headers" \
   -H "Host: ${HOST_HEADER}" "$URL"; then
   echo "site-drift: ${URL} (Host: ${HOST_HEADER}) gave no usable answer within ${TIMEOUT}s" >&2
-  echo "site-drift: run this where the page is served, or point URL= at it (URL=http://10.99.0.53/)" >&2
+  echo "site-drift: wrong vantage unless this shell is on delphi — point URL= at the host that serves it (URL=${DELPHI_URL})" >&2
   exit 2
 fi
 
 served="$(awk -F': *' 'tolower($1)=="x-site-path" {gsub(/\r$/,"",$2); print $2; exit}' "$headers")"
 if [ -z "$served" ]; then
   echo "site-drift: the response carried no X-Site-Path header" >&2
-  echo "site-drift: the serving generation predates the header (rebuild it), or HOST_HEADER=${HOST_HEADER} names the wrong vhost" >&2
+  echo "site-drift: either the serving generation predates the header (rebuild delphi), or this is the wrong vantage: 127.0.0.1 is this shell's host and 10.99.0.53 answers from frieren, so a headerless page is another host's" >&2
+  echo "site-drift: name delphi directly — URL=${DELPHI_URL} HOST_HEADER=${HOST_HEADER} — and a headerless answer there means the generation, not the URL" >&2
   exit 2
 fi
 

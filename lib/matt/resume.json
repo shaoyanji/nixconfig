@@ -22,7 +22,7 @@
         "username": "Shaoyan_Ji"
       }
     ],
-    "summary": "Engineer and risk analyst, ten years across renewable energy and software. Builds the models and the systems that run them: options and hedging models for energy portfolios, Go services, a NixOS fleet, an email archive that classifies its own mail. Headed asset management for a USD 100M+ solar portfolio and researched heliostat metrology at Fraunhofer ISE. US citizen with German permanent residence; no sponsorship required.",
+    "summary": "Engineer and risk analyst, ten years across renewable energy and software. Builds the models and the systems that run them: options and hedging models for energy portfolios, Go services, a NixOS fleet, an email archive that classifies its own mail. Headed asset management for a USD 100M+ solar portfolio and researched heliostat metrology at Fraunhofer ISE.",
     "url": "https://www.bountystash.com"
   },
   "education": [
@@ -114,7 +114,7 @@
       "url": "https://unu.edu"
     },
     {
-      "description": "One flake declares thirteen NixOS hosts, an SSH certificate authority, SOPS-encrypted secrets and a taskfile as the operator interface. CI runs the same module gate the machines run.",
+      "description": "One flake declares 25 NixOS hosts, an SSH certificate authority, SOPS-encrypted secrets and a taskfile as the operator interface. CI runs the same module gate the machines run.",
       "endDate": "",
       "entity": "Personal",
       "highlights": [
@@ -297,11 +297,12 @@
       "keywords": [
         "Kubernetes",
         "NixOS",
-        "AWS",
-        "Azure",
-        "Google Cloud"
+        "Linux / systemd",
+        "Container",
+        "GitHub Actions",
+        "Monitoring & Alerting"
       ],
-      "level": "Master",
+      "level": "Advanced",
       "name": "DevOps"
     },
     {

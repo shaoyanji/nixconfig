@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-28T13:35:18Z",
+  "generated": "2026-11-28T13:37:48Z",
   "count": 200,
-  "pin": "c8b4a49f2a1f258eeac28cd68b334b5f23e128655515aa7ddbeddbeea8c8b464",
+  "pin": "a2c2f750d5a6ebf5d5e0cbd3e33ce10bbb3f34bbcb375123bf8add330c9eb1ff",
   "turns": [
+    {
+      "id": "30774148-b19f-4983-b38e-4881e34952d5",
+      "ts": "2026-11-28T13:35:36Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-watch-regression-20261128",
+      "action": "landed: pane-watch ported to scripts/task + tests/pane-watch fixture (17 cases: idle/busy/unknown, ssh TUI vs raw shell, TMUX_TMPDIR) | gate: checks:pane-watch:test PASS, checks:quick PASS, check:verify 184/184",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "f117c6fd5cee4f46653df85cdc58617a28634822",
+      "branch": "main",
+      "frame": "03hbinzdsx9tne6fwgpuugvxk"
+    },
     {
       "id": "d5a99025-f0b5-488a-8162-955936ddfa8a",
       "ts": "2026-11-28T13:29:40Z",
@@ -3001,23 +3014,6 @@
       "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
       "branch": "main",
       "frame": "03hbf6a109lv4gc9h7srg05mn"
-    },
-    {
-      "id": "8bdfd594-c3ad-415f-a35e-a8b5fd848e49",
-      "ts": "2026-11-28T02:21:46Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-gigabit-claims-2026-11-28",
-      "action": "prose-change 0.86/0.78: clear stale gigabit claims, ceiling gate, push",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix",
-        "docs/media-relay.md",
-        "docs/deepseek-v4-flash.md"
-      ],
-      "files": [],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbf0cixcr4luc2z6m5f823d"
     }
   ]
 }

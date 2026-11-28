@@ -162,6 +162,18 @@ fallback_providers:
   # only three surviving :free models: the 550b nemotron, crow-roleplay, and
   # laguna-xs-2.1-uncensored. deepseek-v4-flash / minimax-m3.1-flash were
   # decommissioned; qwen3-8-omni-flash no longer answers — all dropped.
+  - provider: custom
+    model: lebrel/deepseek-v4.1-flash-uncensored
+    base_url: https://attested.lebrel.ai/v1
+    key_env: LEBREL_API_KEY
+  - provider: custom
+    model: gpt-6-luna
+    base_url: https://api.experientiallabs.ai/v1
+    key_env: EXPLABS_API_KEY
+  - provider: custom
+    model: deepseek/deepseek-v4.1-flash-1017-free
+    base_url: https://api.tokenrouter.com/v1
+    key_env: TOKENROUTER_API_KEY
   - provider: nvidia
     model: nvidia/nemotron-3.5-super-vl-120b-a12b
   - provider: openrouter
@@ -179,6 +191,10 @@ fallback_providers:
     base_url: https://crowllm.com/v1
     key_env: CROWLLM_API_KEY
   - provider: custom
+    model: deepseek-ai/DeepSeek-V4.1-Flash-1017
+    base_url: https://api.sailresearch.com/v1
+    key_env: SAIL_API_KEY
+  - provider: custom
     model: qwen/qwen3.8-27b:free
     base_url: https://llm.onerouter.pro/v1
     key_env: INFRON_API_KEY
@@ -186,12 +202,6 @@ fallback_providers:
     model: free-ai
     base_url: https://api.apisfreellm.com/v1
     api_key: free
-  # Sail Research — last resort fallback. SAIL_API_KEY lives in sops
-  # ai-services-shared-env. Probed separately before trusting.
-  - provider: custom
-    model: deepseek-ai/DeepSeek-V4.1-Flash-1017
-    base_url: https://api.sailresearch.com/v1
-    key_env: SAIL_API_KEY
 tts:
   primary: speechify
   speechify:

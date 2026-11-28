@@ -147,6 +147,26 @@ tasks:
     cmds:
       - bash scripts/task/site-copies-check.sh
 
+  checks:site:deploy:
+    desc: "[gate] Every surface a deploy would publish is built here and is this tree's build"
+    summary: >
+      `checks:site:copies` lets an absent out-link pass because nothing reads it in
+      CI; a deploy is the other case — a yesterday's tree answers 200 everywhere.
+      This fails when the artifact is missing, resolves to a store path this tree
+      does not build, or is a hand copy that differs. A store path is a string
+      compare; a plain directory is a walk. No build: an unbuilt surface fails, it
+      is not built here. `pages-deploy.sh` runs it on the directory it was handed,
+      so no deploy skips it.
+
+      Vars: SURFACES=, DIR= (the path alone, attr from the manifest), EVAL_TIMEOUT=.
+      Exit 0 current, 1 unbuilt, 2 cannot tell.
+    env:
+      SURFACES: '{{.SURFACES | default ""}}'
+      DIR: '{{.DIR | default ""}}'
+      EVAL_TIMEOUT: '{{.EVAL_TIMEOUT | default ""}}'
+    cmds:
+      - bash scripts/task/site-deploy-check.sh
+
   checks:site:links:
     desc: "[gate] Build the Nix sites, resolve every internal href/src, prove every shipped CV PDF is linked"
     summary: >

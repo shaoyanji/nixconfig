@@ -28,6 +28,14 @@ repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 log=$(mktemp "${TMPDIR:-/tmp}/pages-deploy.XXXXXX")
 trap 'rm -f "$log"' EXIT
 
+# The artifact, not the upload, is what a deploy gets wrong: a directory left from
+# yesterday's tree answers 200 on every path and sleeps through the readiness wait
+# at the bottom of this script. Refuse it before anything is published.
+if ! DIR="$dir" bash "$repo/scripts/task/site-deploy-check.sh"; then
+  echo "pages-deploy: refusing to upload $dir — build the surface first" >&2
+  exit 1
+fi
+
 bash "$repo/scripts/task/wrangler.sh" pages deploy "$dir" "$@" 2>&1 | tee "$log"
 
 # The hostname is `<hash>.<project><suffix>.pages.dev` — the suffix is assigned by

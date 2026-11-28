@@ -145,6 +145,7 @@
     "checks:sessions:reaper" = "leaf";
     "checks:shell-inputs:test" = "leaf";
     "checks:site:copies" = "leaf";
+    "checks:site:deploy" = "leaf";
     "checks:site:links" = "leaf";
     "checks:site:links:test" = "leaf";
     "checks:site:orphans" = "leaf";

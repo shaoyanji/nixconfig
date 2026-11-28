@@ -1,8 +1,49 @@
 {
-  "generated": "2026-11-28T05:00:29Z",
+  "generated": "2026-11-28T05:06:53Z",
   "count": 200,
-  "pin": "a1e40346c9679c68915be9d56382fcd5753a8db572eb0b52469f06e798d780d4",
+  "pin": "733f1f4bc2cafd44034974e7ed4488f2bda857d433bb10fcdf028fb31169af4f",
   "turns": [
+    {
+      "id": "de826112-12cd-4c60-9d9e-39d331285177",
+      "ts": "2026-11-28T05:02:27Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-deploy-gate-20261128",
+      "action": "gate-change: add deploy gate, fail on unbuilt surface, prove+pass",
+      "outcome": "in_progress",
+      "claims": [
+        "flake/check-inventory.nix"
+      ],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfvqjyq7se22vyaz7o7bdm"
+    },
+    {
+      "id": "7da51a67-893f-4f12-a4c2-cc107054ff48",
+      "ts": "2026-11-28T05:01:21Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-site-orphans-gate-20261128",
+      "action": "landed: checks:site:orphans + :ats (crawl both surfaces, 200 with no build source fails) | gate: checks:tasks PASS, checks:site:orphans PASS matt 24 paths, :ats PASS ats 7 paths, site:published 28/28 + 15/15, fires exit 1 on a planted old CV",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfvivbrioq1l1ada16v453"
+    },
+    {
+      "id": "b0a118d1-a2af-42e6-a69e-877e6036d9a2",
+      "ts": "2026-11-28T05:01:21Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-site-orphans-gate-20261128",
+      "action": "gate-change: add checks:site:orphans — fail when a Pages surface serves a file the tree build does not make; prove on a real orphan, push",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "a7d4bc99ad49e317cd53ec832726f58d48fef90f",
+      "branch": "main",
+      "frame": "03hbfvit58cdzefk3c0cqncn7"
+    },
     {
       "id": "9948ba5d-12f8-45c3-b96d-ff9239951088",
       "ts": "2026-11-28T04:55:33Z",
@@ -2949,45 +2990,6 @@
       "base_commit": null,
       "branch": null,
       "frame": "03hbcfy735y4bs5lphrryuby9"
-    },
-    {
-      "id": "2068c3fe-2238-496b-96a7-74354a621366",
-      "ts": "2026-11-27T18:28:46Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-freebuff-cv-publish",
-      "action": "publish 0.95|0.91; verify ryoku-cv Pages deploy, routes 200",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hbcfy6hlfjeu7jgxdqd8ynp"
-    },
-    {
-      "id": "e284e520-ca83-4e12-82fc-9eb8b5db2028",
-      "ts": "2026-11-27T18:28:46Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin-feature-chain-refactor",
-      "action": "chain-change 0.93|0.88; re-audit chain drift + 32-host eval",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": null,
-      "branch": null,
-      "frame": "03hbcfy64zjw15xq0tvzv1x3b"
-    },
-    {
-      "id": "e991bfff-702e-45a3-87d4-742fb0bbc6ce",
-      "ts": "2026-11-27T18:27:01Z",
-      "source": "devin",
-      "subject": "nixconfig:feature-chain-refactor-audit",
-      "action": "landed: no-change closure, 5th consecutive. origin/main byte-identical to 63a4f191 — the commit the full 32/32 eval sweep passed against minutes ago; zero new input since, so no re-run spent. Lane verdict stands: chain extraction complete, 3 documented single-host exceptions only. Recommend operator retires this recurring lane — structural diff vs last audit is now mechanically empty each time | gate: checks:hosts all-32 MODE=eval PASS 32/32 at 63a4f191 (same commit, same day)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "63a4f19105211c06e94a8b066407afa873aa5298",
-      "branch": "HEAD",
-      "frame": "03hbcflytz7mz2id4bxzrguhg"
     }
   ]
 }

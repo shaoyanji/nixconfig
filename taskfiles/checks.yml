@@ -148,17 +148,17 @@ tasks:
       - bash scripts/task/site-copies-check.sh
 
   checks:site:deploy:
-    desc: "[gate] Every surface a deploy would publish is built here and is this tree's build"
+    desc: "[gate] A surface a deploy would publish is this tree's build, or the console's current bundle"
     summary: >
-      A deploy publishes the directory it is handed, and a yesterday's tree
-      publishes as successfully as today's. This fails when the artifact is missing,
-      resolves to a store path this tree does not build, or is a hand copy that
-      differs. Every publish path runs it: `site-target.sh` for the four manifest
-      methods (pages, symlink, rsync, neocities), `pages-deploy.sh` for its direct
-      callers. A flake surface is compared with the ref its build command names,
-      query and all; an in-tree render needs a root index.html.
+      A deploy publishes the directory it is handed; yesterday's tree publishes just
+      as cleanly. Fails on a missing artifact, a store path this tree lacks, a hand
+      copy that differs, or the console's dist/ from older sources. Every publish
+      path runs it: site-target.sh per method, pages-deploy.sh for callers (matt,
+      mockup, console). A flake surface is compared with the ref its build
+      command names; the console bundle with its checkout (data is the corpus,
+      rebuilt after its sources); an in-tree render needs a root index.html.
 
-      Vars: SURFACES=, DIR=, TARGET=. Exit 0 current, 1 unbuilt, 2 cannot tell.
+      Vars: SURFACES=, DIR=, TARGET=. Exit 0 current, 1 stale, 2 cannot tell.
     env:
       SURFACES: '{{.SURFACES | default ""}}'
       DIR: '{{.DIR | default ""}}'

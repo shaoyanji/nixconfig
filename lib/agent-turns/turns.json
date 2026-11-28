@@ -1,8 +1,99 @@
 {
-  "generated": "2026-11-28T01:24:20Z",
+  "generated": "2026-11-28T01:47:53Z",
   "count": 200,
-  "pin": "4173e022974879d825271b48b29367aa1431ecc55ed40298d0401c278dd3c164",
+  "pin": "5ce6b50c38adff1fb95ee8d39bee340f7894a848daacb68340f5abc452a50037",
   "turns": [
+    {
+      "id": "5fd11299-5444-4849-8160-1643a5813ce3",
+      "ts": "2026-11-28T01:44:47Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-bulk-egress-lane-2026-11-28",
+      "action": "host-change 0.55/0.10: bulk lane, verify exit IP, push",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/config/tailnet-policy.hujson",
+        "hosts/delphi/configuration.nix"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbet4ibq297ck66weyh8k1q"
+    },
+    {
+      "id": "78479db9-4191-46e0-a70e-897f31328f2e",
+      "ts": "2026-11-28T01:44:47Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-gate-battery-2026-11-28",
+      "action": "novel 0.93/0.86 duel: CV gate battery vs origin/main, push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/resume.json",
+        "lib/matt/lebenslauf.json"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbet4h8u59iyllfv5wxopv7"
+    },
+    {
+      "id": "68ce1721-3508-4bfd-ad6e-3ce6e33b56bd",
+      "ts": "2026-11-28T01:36:25Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-cv-de-gist-2026-11-28",
+      "action": "landed: published German CV gist 541b117a from lib/matt/lebenslauf.json (was stale 2026-11-09: 13->25 fleet hosts, B2->C1, missing fleet/CI bullets, wrong project order); live raw sha a69f6d47 17128B, email+location+profiles intact, no phone; en gist unchanged (8248a6cb); corpus already upstream 937306b7 so no commit owed. gate: matt:gist:drift PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/matt/resume.json"
+      ],
+      "files": [],
+      "base_commit": "3da73b6c",
+      "branch": "main",
+      "frame": "03hberhod4i5e5xjd4nerises"
+    },
+    {
+      "id": "3ffe33b7-0d61-4ec4-acba-ab0b46516fe5",
+      "ts": "2026-11-28T01:32:08Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-de-gist-2026-11-28",
+      "action": "publish 0.95/0.93: publish German CV gist, verify live, push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/resume.json"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbeqng1qckv92gmd5pt2jad"
+    },
+    {
+      "id": "37f5018a-ed30-429d-9625-5ce2b357bd5d",
+      "ts": "2026-11-28T01:25:31Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-cv-verify-2026-11-28",
+      "action": "verified: origin/main 3da73b6c builds .#sites.cv-ats-site 9/9 byte-identical to cv-ats-8lh.pages.dev (index f5ada59c, report 6/6 ok) and all 6 live PDFs hash-match the build; zero drift, so no redeploy and no commit to push | gate: checks:site:links PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/matt",
+        "sites/cv-ats"
+      ],
+      "files": [],
+      "base_commit": "3da73b6c",
+      "branch": "main",
+      "frame": "03hbepd1vx55q0v2rifv4oju4"
+    },
+    {
+      "id": "785ca826-422b-4280-ba36-3cc76c8fb95c",
+      "ts": "2026-11-28T01:24:36Z",
+      "source": "buffy",
+      "subject": "nixconfig:egress-architecture-note-2026-11-28",
+      "action": "landed: egress-architecture reference note (broker on delphi:8469, lanes bulk/us/local, validator before lane) + AGENTS_CEILING 522082->522000 | gate: checks:aarch64-linux.agents-notes-schema PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "9263460a89267e7a3d6985502ecd1006be6be933",
+      "branch": "main",
+      "frame": "03hbep6kzzao33av2r95bauho"
+    },
     {
       "id": "58b92d1a-f8a8-436a-b552-a7009000dbbf",
       "ts": "2026-11-28T01:23:52Z",
@@ -2901,101 +2992,6 @@
       "base_commit": "ee2c4637f309a68ad9ec742050a8050c8454e4ed",
       "branch": "main",
       "frame": "03hbb6w89daqnpujzzn0rggp8"
-    },
-    {
-      "id": "f78d3aff-464d-4591-ac6c-e72cb56e3e10",
-      "ts": "2026-11-27T14:33:03Z",
-      "source": "buffy",
-      "subject": "nixconfig:cv-packet-downloads",
-      "action": "landed: every CV site PDF anchor now carries download (6 variants + 4 packet links) | gate: Pages run 46016755930 success, 8 routes + 10 PDFs 200",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbb5wmh8n88gsc33ph24q8i"
-    },
-    {
-      "id": "baca8b44-828c-468b-b845-b92f8fa9bb2b",
-      "ts": "2026-11-27T14:31:36Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-freebuff-cv-download",
-      "action": "drove agents:2.1 freebuff (publish)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbb5mb6w167ems6hv3d1mft"
-    },
-    {
-      "id": "800a619d-8213-4f03-80cb-5514b552d28d",
-      "ts": "2026-11-27T14:28:49Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-freebuff-cv-publish",
-      "action": "drove agents:2.1 freebuff (publish)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbb52px40tqjd91oj8bfmpd"
-    },
-    {
-      "id": "96b4c597-8e8f-45a1-a366-8d4fb1e9b248",
-      "ts": "2026-11-27T14:26:50Z",
-      "source": "devin",
-      "subject": "nixconfig:feature-chain-closure",
-      "action": "landed: canonical desktop HM base/suite now feed inventory and user defaults; mtfuji drops its duplicate sops input; delphi/frieren accept-policy flags move into fleet.tailscale with resolver/ssh flags preserved | gate: drv-equality 6/6 identical + host eval 6/6 PASS + lint/docs PASS",
-      "outcome": "done",
-      "claims": [
-        "flake/module-sets.nix",
-        "flake/host-inventory.nix",
-        "modules",
-        "hosts"
-      ],
-      "files": [
-        "flake/host-inventory.nix",
-        "modules/global/user.nix",
-        "modules/global/tailscale-policy.nix",
-        "hosts/mtfuji/configuration.nix",
-        "hosts/delphi/configuration.nix",
-        "hosts/frieren/dns.nix"
-      ],
-      "base_commit": "4422d5e9f94cce3c9a33df1a2ce1a709dbe2e7af",
-      "branch": "main",
-      "frame": "03hbb4ot6x4mtui5vnqphguag"
-    },
-    {
-      "id": "d2c11ee4-9046-4b68-81ea-f4c3f3ffe53e",
-      "ts": "2026-11-27T14:13:40Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-1-freebuff-cv-jobscout",
-      "action": "sweep: 2026-11-27w five boards 1381 parsed/59 fresh/0 new, arbeitnow 12 pages 78 in-lane/0 new (record 1747); sweep note published from 2abff58, Pages run 46013828265 success; 8 routes + 6 CV pdfs + 4 packet pdfs 200 | gate: live route sweep",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbb24b3eqf02prf3gz1fid8"
-    },
-    {
-      "id": "7e6ea05e-9bcc-43dd-9a79-d8e866364b4d",
-      "ts": "2026-11-27T14:11:11Z",
-      "source": "devin",
-      "subject": "nixconfig:feature-chain-closure",
-      "action": "start: audit all hosts for chain leaves still duplicated after the desktop-HM, microvm, linux/disko, and tailscale folds",
-      "outcome": "in_progress",
-      "claims": [
-        "flake/module-sets.nix",
-        "flake/host-inventory.nix",
-        "modules",
-        "hosts"
-      ],
-      "files": [],
-      "base_commit": "4422d5e9f94cce3c9a33df1a2ce1a709dbe2e7af",
-      "branch": "HEAD",
-      "frame": "03hbb1msjkde989x64ptxsxwk"
     }
   ]
 }

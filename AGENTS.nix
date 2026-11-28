@@ -558,34 +558,14 @@
         docs = ["hosts/microvms/README.md"];
       };
       body = ''
-        The shape is Stapelberg's ("Coding Agent VMs on NixOS with microvm.nix", 2026-02-01):
-        a shared read-only store, explicit shares, ephemeral by default. Nothing is copied at boot.
-
-        Two tiers, and the tier is a declaration. frieren's guests are ephemeral tooling
-        (`autostart = false`, /var is tmpfs, a restart is a factory reset). delphi's sandbox is a
-        service tier — `autostart = true`, 4096 MiB, two stub httpd units, Stirling PDF — because a
-        reboot should bring back what the vhost serves.
-
-        State is a named volume, never a bind mount: `persist = { stirling = { size = 4096; }; }`
-        mkfs's one ext4 image per name under `<stateRoot>/sandbox/volumes/` and finds it by **label**
-        (enumeration order is not identity), so the guest owns the filesystem and its own uids.
-
-        TCG is why the guest needed a wider device timeout: systemd's 90 s expired before udev
-        published the virtio-blk labels. `DefaultDeviceTimeoutSec = 600` there; KVM untouched.
-
-        How to get in — the guest is a service tier, not a shell you visit: `ssh sandbox` on delphi,
-        or `task microvm:ssh NAME=sandbox`. Plain `ssh delphi.bountystash.com` is the HOST shell as
-        `devji`; `sandbox` resolves only on delphi because the bridge subnet is host-local.
-
-        The deck is OFF, and it is a development facility rather than a service: `slidesUser =
-        "slides"` plus `exposeSsh = 2222` brings back a forced command into a terminal markdown deck.
-        It was turned off because it leaked — every login is a TUI that no one closes, and under TCG
-        each one cost real host CPU (three abandoned sessions were 0.65 of the box's two cores). The
-        forced-command traps, kept for whoever turns it back on: `AuthorizedKeysFile` REPLACES the
-        default, so the keys NixOS writes to `/etc/ssh/authorized_keys.d/%u` must be named back;
-        StrictModes refuses a keys file whose path is not root-owned, so the hop's public half lives
-        in `/srv/microvm/hop-auth`; and a fleet cert's principal is the user name, so the account
-        needs `AuthorizedPrincipalsFile` listing `devji`.
+        Shape is Stapelberg's ("Coding Agent VMs on NixOS with microvm.nix", 2026-02-01): a shared
+        read-only store over virtiofs, explicit shares, ephemeral by default. Two tiers, declared:
+        frieren's guests are ephemeral tooling, delphi's sandbox is a service tier (`autostart = true`,
+        4096 MiB, Stirling PDF), and its state is a named volume found by filesystem **label**.
+        `DefaultDeviceTimeoutSec = 600` only under TCG, where udev met the 90 s timeout. In: `ssh
+        sandbox` on delphi (the bridge subnet is host-local), or `task microvm:ssh NAME=sandbox`.
+        The markdown deck is off: abandoned TUIs cost the box's CPU under TCG, and turning it back on
+        needs the three forced-command traps in `hosts/microvms/README.md`.
       '';
     };
     arch-shape = {
@@ -1580,30 +1560,16 @@
         docs = [".agents/deploy/hosts/eisen.md"];
       };
       body = ''
-        Found while reviewing the 2026-10-17 parakeet module (not yet in a switched generation):
-        - ~1 GB stays resident while idle. The warm-up is one HTTP POST, so socket activation or an idle stop is the cheap fix.
-        - The unit runs as root with no `ProtectSystem`/`PrivateTmp`/`MemoryMax`, yet hands untrusted audio to ffmpeg.
-        - `Restart=always` with no `StartLimit*`: missing weights crash-loop instead of failing visibly.
-        - The HTTP handler has no read timeout, so a stalled upload holds a thread.
-        - `--threads 8` is deliberate for this CPU budget; do not "fix" it without a benchmark.
+        Found on the 2026-10-17 module: ~1 GB resident while idle, a root unit with no
+        `ProtectSystem`/`PrivateTmp`/`MemoryMax` decoding untrusted audio with ffmpeg, `Restart=always`
+        without `StartLimit*` crash-looping on missing weights, no read timeout on the HTTP handler, and
+        `--threads 8` deliberate for this CPU budget.
 
-        Exit: a bounded unit (user, sandbox, memory cap, start limit) that still answers `POST /transcribe`
-        with 200 and returns 413 above the 25 MB cap. The keep-alive body-drain fix already landed in
-        `parakeet-server.py`.
-
-        Delivered 2026-11-20 (commits 6cb73ec9 + 422ad47d; eisen woken by `infra:wol:eisen`):
-        - DynamicUser + ProtectSystem=strict/PrivateTmp/MemoryMax=2G had already landed (28fe7729);
-          the unit is unchanged there except `Restart=always` → `on-failure` (a clean idle exit must
-          not resurrect the service) and `wantedBy` dropped — the service is socket-activated now.
-        - `parakeet-stt.socket` holds 127.0.0.1:8091 (Accept=no); the server takes the inherited fd
-          via LISTEN_FDS/LISTEN_PID, so a connection cold-starts the service (~50 s first hit).
-        - `--idle-timeout 900` exits the service cleanly; watchdog measured by hand at 20 s.
-        - Upload reads are bounded by a total 120 s deadline (a per-recv timeout alone does not
-          stop a drip). `--threads 8` untouched.
-        Verified live: socket-listener + dead service = 0 B resident vs 1.05 GiB before; POST
-        /transcribe → 200 through the cold start; 26 MB body → 413; 200 B/s drip → 400 "timed out"
-        at 120 s. Gate: `checks:host HOST=eisen` 2067 assertions; switch landed on eisen and is the
-        boot default (/run/current-system = b8mn7c9…-eisen-26.11.20261116.e21fec3).
+        Delivered 2026-11-20 (6cb73ec9 + 422ad47d, eisen woken by `infra:wol:eisen`): socket activation
+        on 127.0.0.1:8091 (`Accept=no`, inherited fd), `--idle-timeout 900`, a 120 s total upload
+        deadline, `Restart=on-failure`, and no `wantedBy`. Verified live: 0 B resident while idle (was
+        1.05 GiB), 200 through a cold start, 413 at 26 MB, 400 on a 200 B/s drip; `checks:host
+        HOST=eisen` 2067 assertions, and the switch is the boot default.
       '';
     };
     open-eisen-gpu-off-bus = {
@@ -3453,33 +3419,18 @@
         docs = ["docs/sops-rekey.md" ".agents/deploy/hosts/scratch.md"];
       };
       body = ''
-        Procedure is `docs/sops-rekey.md` § *TPM-sealed identity* (the skill that
-        duplicated it was deleted: `agent-prose-budget`). Three facts a reconstruction
-        gets wrong:
-
-        1. **Two rebuilds.** Rebuild A installs `security.tpm2`, `tss` and `age-plugin-tpm` and must not
-           reference the identity; rebuild B points `sops.age.keyFile` at it. Referencing a file that
-           does not exist yet fails activation and reads as a config bug.
-        2. **`sops.age.plugins` on both planes.** sops-nix sets the user unit's `Environment=PATH=` to
-           exactly that list, so a TPM host without it runs `sops-nix.service` with an empty PATH and
-           dies on `0 successful groups required, got 0`. `home.packages` does not reach the unit.
-        3. **`tss` is per session.** The deploy that adds the user to the group does not change the
-           running `systemd --user` manager, so the first user-plane start still fails until a reboot.
-        4. **Verify the store copy, not a checkout.** The unit executes
-           `sops-install-secrets … <manifest>.json`, which names `/nix/store/<hash>-secrets.yaml`; that
-           path is what activation reads. Decrypting a working-tree copy proves the wrong thing on a host
-           where `~/Documents/nixconfig` is a home-manager store symlink (`git rev-parse` there answers
-           about the active generation, and it cannot be pulled — scratch's real clone was `~/nixconfig`,
-           2768 commits behind). Pair the decrypt with a `SOPS_AGE_KEY_FILE=/nonexistent` control that
-           must fail, or a stale `keys.txt` passes the test the chip was supposed to pass.
-
-        Verified on scratch 2026-10-22: `hashedPassword` installed, user unit `Result=success` with
-        `Environment=PATH=<age-plugin-tpm>`, CA key present, `switch-to-configuration` exit 0. After a
-        genuine pull (`a1b56c8d`, submodule `7a35ad4` matching frieren byte-for-byte) the store file
-        decrypts on both planes to the same digest as the checkout and the mirror (sha256 `5042298e…`
-        encrypted, `436f477d…` plaintext), with the no-identity control at exit 128. Upstream's `p256tag
-        unsupported` report is stale for sops 3.13.3 / age 1.3.2: encrypt, `updatekeys` and decrypt all
-        accept `age1tag1…`.
+        Procedure is `docs/sops-rekey.md` § *TPM-sealed identity* (the skill that duplicated it was
+        deleted: `agent-prose-budget`). Three facts a reconstruction gets wrong: (1) two rebuilds,
+        because rebuild A installs `security.tpm2`, `tss` and `age-plugin-tpm` and must not reference
+        the identity that rebuild B points `sops.age.keyFile` at; (2) `sops.age.plugins` on both
+        planes, since sops-nix sets the user unit's `Environment=PATH=` to exactly that list and
+        `home.packages` does not reach it, so an empty PATH dies on `0 successful groups required,
+        got 0`; (3) `tss` is per session, so the first user-plane start after the group change still
+        fails until a reboot. Verify the store copy, not a checkout: the unit decrypts
+        `/nix/store/<hash>-secrets.yaml`, and on scratch `~/Documents/nixconfig` is a home-manager
+        store symlink that cannot be pulled. Pair the decrypt with a `SOPS_AGE_KEY_FILE=/nonexistent`
+        control that must fail. Scratch passed both planes 2026-10-22 (`5042298e…` encrypted,
+        `436f477d…` plaintext, control exit 128), and `p256tag` works on sops 3.13.3 / age 1.3.2.
       '';
     };
 
@@ -3630,33 +3581,17 @@
       };
       from = ["rice-fork-not-patch"];
       body = ''
-        **Delivered 2026-10-27: the session is the fleet's.** tty1 autologins and the login
-        shell execs `/etc/xdg/dwl-session` — NixOS's `programs.dwl`, driven by this
-        profile's `package` (spliced keymap) and `extraSessionCommands`, so the compositor
-        is `lib.getExe cfg.package` and no PATH shadows it. niri, waybar, greetd and
-        gnome-keyring left the closure; her layer is `hosts/netbook/dwl-keybinds.h`,
-        spliced *first* because dwl takes the first match. Two defects came from that
-        deploy: it ran stock dwl for one deploy — a wrapper listed `pkgs.dwl`
-        beside the keymap build, and a wrapper's PATH wins inside the session — then its
-        clients raced a socket FILE a killed session left behind.
-
-        **Delivered 2026-10-27: her userland runs the session it is in.** The six cards and
-        every `~/.dotfiles` helper were ported in place and committed in her two repos;
-        `mako`, `fuzzel`, `alacritty` and `swaylock` left the bridge block, so the closure
-        carries fnott (112 MiB, was mako 326) and the profile ships
-        `/etc/xdg/fnott/fnott.ini`. Three rules carry it: a card identifies itself by a
-        unique *summary* (`fnottctl list` → `id: <summary>`; makofetch gained one), bodies
-        pass through `strip_span` because fnott draws `<span>` literally, and menus/lock
-        are `wmenu -p/-l/-P` and `waylock -fork-on-lock`. Losses and mapping:
-        `docs/netbook-rice-port.md`.
-
-        **Proven.** fnott owns the bus name, a synthetic Notify reads back through
-        `fnottctl list`, `📊 makotop` toggles on the same chord, and a grim capture of the
-        Mod+Alt+Backspace card shows its table and italic footer with no literal markup.
-        That capture caught what the first pass missed — makokill sends `body` and `footer`
-        as one argument, so neither was filtered; every Notify body now filters at its own
-        call site. Exit met: bridge block gone, bind targets resolve on the session PATH,
-        `checks:host HOST=netbook` green, deploy 3m24s / 0 failed units. Firefox stays.
+        Delivered 2026-10-27: the session is the fleet's. tty1 autologins and execs
+        `/etc/xdg/dwl-session` (NixOS's `programs.dwl`), driven by this profile's spliced-keymap
+        `package` and `extraSessionCommands`, so no PATH shadows the compositor; her layer is
+        `hosts/netbook/dwl-keybinds.h`, spliced *first* because dwl takes the first match. niri, waybar,
+        greetd and gnome-keyring left the closure; mako, fuzzel, alacritty and swaylock left the bridge
+        block, so the closure carries fnott at 112 MiB (was mako 326) and the profile ships
+        `/etc/xdg/fnott/fnott.ini`. A card identifies itself by a unique *summary* (`fnottctl list` →
+        `id: <summary>`), bodies pass through `strip_span` because fnott draws `<span>` literally, and
+        menus/lock are `wmenu -p/-l/-P` and `waylock -fork-on-lock`. Proven: fnott owns the bus name, a
+        synthetic Notify reads back through `fnottctl list`, and `checks:host HOST=netbook` is green.
+        Losses and mapping: `docs/netbook-rice-port.md`.
       '';
     };
 
@@ -8668,6 +8603,58 @@
       '';
     };
 
+    hisolutions-packet-polish-2026-11-28 = {
+      title = "HiSolutions AG packet: the letter is send-ready, the CV came from a stale working copy";
+      kind = "open";
+      status = "OPEN";
+      priority = "P2";
+      date = "2026-11-28";
+      summary = "HiSolutions AG packet: the letter is corpus-backed and can ship, but its CV still declares thirteen NixOS hosts and carries the pre-review Bountystash wording, and the 07:51 build read a state working copy the task path never reads. Three prose fixes and one source-of-truth fix, then gate and hand-submit after 2026-12-07.";
+      from = ["hisolutions-cv-prose-review-2026-11-27"];
+      refs = {
+        modules = [
+          "lib/matt/lebenslauf.json"
+          "lib/matt/cv-software.de.json"
+          "scripts/task/appflow-packet.sh"
+          "modules/plugins/appflow/packet.nix"
+          "scripts/task/letter-pdf-check.sh"
+        ];
+        tasks = ["apps:gate:packet" "checks:appflow" "matt:cv:check"];
+        docs = [".agents/skills/apps/SKILL.md"];
+      };
+      body = ''
+        Reviewed the 07:52 packet against both corpora and the letter record: anschreiben.pdf 1 p
+        25,738 B `b146f361`, lebenslauf.pdf 2 p 42,381 B `dd038a58`, selection.json JD mode (12
+        terms, kubernetes 15.4 / cloud 12.5) keeping 2/4 projects and 2/4 Bountystash highlights.
+        Decided: the letter ships as written, the CV does not — it was projected from a working copy
+        that predates the 2026-11-27 prose fixes. Nothing sends before 2026-12-07.
+
+        Checked rather than assumed: every letter claim is corpus-backed (EWE Trading as the
+        risk-manager mandate, 2020-2025 as five founder years, 2023-today as three nixconfig years,
+        72,000 EUR, availability 07.12.2026 = the row's hold); the honesty lines survive (no CKA, no
+        enterprise Helm/GitOps cluster, Terraform unused, Kubernetes as a foundation); both document
+        gates passed on the shipped bytes.
+
+        Prose still to polish, in order:
+        1. The CV says "dreizehn NixOS-Hosts" in the nixconfig blurb while the letter beside it says
+           "über zwanzig" and both corpora already do: the row's status corrects the letter only.
+        2. Its two Bountystash bullets are the pre-review dialect ("inventargetriebener CI", "Secrets
+           mit sops ... hinter der eigenen CA") against the corpora's "CI aus der Inventardatei".
+        3. `sops` in the bullets against `SOPS` in the skills line: pick one, and a corpus change moves
+           lib/matt/cv-software.de.json in lockstep or the build fails on the variant.
+        4. No container/Kubernetes bullet survives the projection while the letter leans on the layer
+           below as its substitute — state that limit harder, or accept the fit as it stands.
+
+        Remaining: rebuild from one current source. The 07:51 build read
+        ~/.local/state/appflow/letters/<id>/{letter,resume}.json, but appflow-packet.sh defaults to
+        $CONFIG/lebenslauf.json and $CONFIG/letters/<id>.json — and that letter (27 Nov 20:58) still
+        says "25 NixOS-Hosts" in five paragraphs, so a task-path rebuild silently restores it. Then
+        letter-pdf-check, cv-ats-check and checks:appflow on the new bytes (1 p / 2 p, dir 700, files
+        600); if the corpus moves, matt:build, matt:cv:check and agents:cv:publish-check too.
+        Next for this lane: fix 1-3, rebuild, gate, leave the PDFs ready; the operator hand-submits on
+        2026-12-07 at karriere.hisolutions.com/jobs/68820855 and records apps:update --status applied.
+      '';
+    };
     classification-gate-placement = {
       title = "Move the systemd classification gate out of host eval, or keep paying 314 MiB for its guarantee";
       kind = "proposal";

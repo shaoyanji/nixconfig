@@ -352,13 +352,10 @@ systemctl list-timers email-archive-import     # next elapse
 curl -s 'http://127.0.0.1:8080/api/list-emails?lim=5' | jq
 ```
 
-## Google drive mirror (skipped until a remote exists)
+## Attachments off-site: the bridge, not Drive
 
-The sync is one-way — Drive holds a mirror, never the source of truth. The timer
-runs from first boot and the unit carries `ConditionPathExists` on
-`/var/lib/npgsqlrest/rclone.conf`: **skipped, not failed**, until that file
-exists. That is the calendar's rule — the OAuth client is declared, the **token is
-state** — and the same `googleDrive/clientId` + `clientSecret` pair drives both.
+A Drive token only a browser consent mints; sops holds the client pair, never the
+token — so delphi's mirror ran hourly, condition unmet, reporting success 55×.
 
 ```bash
 rclone authorize drive                  # 1. on a browser machine: prints a token blob
@@ -367,8 +364,10 @@ sudo -u npgsqlrest rclone --config /var/lib/npgsqlrest/rclone.conf \
   client_id="$(sops -d modules/secrets.yaml | yq -r '.["googleDrive"]["clientId"]')" \
   client_secret="$(sops -d modules/secrets.yaml | yq -r '.["googleDrive"]["clientSecret"]')" \
   token="$(cat token.json)"             # 2. the blob from step 1
-sudo systemctl start email-archive-gdrive-sync   # 3. no rebuild; the next tick keeps it
 ```
+
+`gdrive.enable = true` plus a rebuild turns it back on; meanwhile the 25 MB tree
+rides the offload bridge (`hosts/delphi/backups.nix`) into frieren's restic.
 
 ## Where a guest lives
 
@@ -384,10 +383,12 @@ upstream project: the JSON is a data source, and documents are a Nix build —
 The token is state, not sops: rotating it is `rclone config reconnect` with no
 rebuild, and `rm` of the conf plus a remote stop returns the unit to *skipped*.
 
+## Backup
+
+`hosts/delphi/backups.nix` dumps at 02:50 into `/var/backup/postgresql`, pushed to frieren at 03:10 and carried off the fleet by its 03:30 restic snapshot; Sunday's drill restores each dump and fails below 14 tables.
+
 ## Not done here
 
-- **No backup of `email_archive` yet.** `services.postgresBackupDrill` and
-  `services.postgresqlBackup` are opt-in; a database that matters needs one.
 - **No auth on the API.** Tailnet membership is the only gate; the generated
   endpoints are open to any tailnet peer.
 - **Only the inbox is imported.** `importer.mailbox` is one folder; sent mail and

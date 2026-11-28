@@ -52,7 +52,7 @@
       "items": [
         "NixOS",
         "Linux",
-        "Kubernetes",
+        "Kubernetes (Grundlagen)",
         "systemd",
         "Nix Flakes",
         "SSH-Zertifizierungsstelle",

@@ -28,7 +28,7 @@
     pkgs.runCommand "mail-atlas-han.woff" {
       nativeBuildInputs = [pkgs.python3Packages.fonttools];
     } ''
-      printf '%s' '信海圖郵門網卷尋業商財器守文人行公錄總氣觀緣數時經讀靜' > glyphs.txt
+      printf '%s' '信海圖郵門網卷尋業商財器守文人行公錄總氣觀緣數時經讀靜源' > glyphs.txt
       pyftsubset \
         ${pkgs.noto-fonts-cjk-sans}/share/fonts/opentype/noto-cjk/NotoSansCJK-VF.otf.ttc \
         --font-number=3 \

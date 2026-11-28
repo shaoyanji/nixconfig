@@ -22,6 +22,8 @@ in {
     # The fleet desktop baseline: Dux shell on niri, greetd. The Ryoku tier that
     # replaced it from 2026-11-02 to 2026-11-11 is retired.
     self.modules."profiles.base-desktop-environment"
+    self.modules."services.fleet-sentinel"
+    self.modules."profiles.sentinel-push"
     self.modules."profiles.laptop"
     # Dock + battery ceiling — host-hardware leaves that used to ride
     # base-node for every host (chain-split).
@@ -133,6 +135,14 @@ in {
     #   { from = 47998; to = 48000; }
     #   { from = 8000; to = 8010; }
     # ];
+  };
+
+  services.fleetSentinel = {
+    enable = true;
+    watchUnits = [
+      {unit = "nixos-upgrade.service";}
+      {unit = "tailscaled.service";}
+    ];
   };
 
   system.stateVersion = "25.11";

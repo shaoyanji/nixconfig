@@ -59,27 +59,58 @@ tasks:
     cmds:
       - FORMAT="{{.FORMAT | default "toon"}}" bash scripts/task/apps-scout.sh {{.CLI_ARGS}}
 
+  apps:page:
+    desc: Postings on a JS-rendered career page (task apps:page -- <url>… [--backend browser|firecrawl|tavily|http])
+    summary: >
+      `job-page-scrape.py` reads the page a person would open, through the
+      widest layer that can answer and falling back by cost: `browser` is
+      agent-browser on headless Chrome (install it where it runs — clanker takes
+      `nix profile install github:numtide/llm-agents.nix#agent-browser`),
+      `firecrawl` is a hosted browser, `http` is a plain GET plus JSON-LD. Keys
+      come from `~/.hermes/.env` by name only, never printed. One JSON object
+      per URL: the backend that answered, the postings, and every layer that
+      refused with its reason. Exit 1 when no page yielded a posting.
+    cmds:
+      - python3 scripts/task/job-page-scrape.py {{.CLI_ARGS}}
+
+  apps:ingest:
+    desc: Feed job-page-scrape JSON into job-db-scraper (task apps:ingest -- --api http://127.0.0.1:8101 --in pages.json [--dry-run])
+    summary: >
+      `jobs-ingest.py` is the pipe between reading a board and indexing it:
+      stdin or `--in` takes the JSON `apps:page` prints, and each posting goes
+      to `POST /api/postings`, which owns the SQLite FTS5 index. The company is
+      read from the ATS URL (`jobs.lever.co/<co>/…`), the URL stays the identity
+      the server dedupes on, and a page whose employer cannot be read is skipped
+      and named rather than filed under a guess. `--source` and `--company`
+      override, `--tag` adds tags, `--dry-run` prints the payloads and posts
+      nothing. Exit 1 when the server refused a posting; one refusal never stops
+      the rest.
+    cmds:
+      - python3 scripts/task/jobs-ingest.py {{.CLI_ARGS}}
+
   # A sweep is a cycle, not a scan: the lane's durable state is the record, and
   # the boards move independently — a flat german feed says nothing about
   # Stepstone. This carries the next cycle's id and read order so a pass starts
   # where the last one ended instead of re-deriving it.
   apps:scout:sweep:
-    desc: The next scout sweep — id, the boards in read order and the write rules (SWEEP, FAMILY)
+    desc: The next scout sweep — id (today UTC by default), the boards in read order and the write rules (SWEEP, FAMILY)
     summary: >
-      Sweep id `2026-11-25s`, the pass after 25p. Prints the boards in read
-      order with the trap each one hides, then the lane's write rules. The 25s
-      read took Stepstone's six lane queries to two pages each: 256 unique
-      cards, 85 of them at employers the ledger already holds, six rows filed
-      and three parked on an expiry inside the hold. Read-only and network-free:
-      a sweep still dedupes through `apps:scout`/`apps:search` and files with
-      `apps:scout`, never a second writer. The 2026-12-07 send hold stands over
-      every row found, and no row is filed from a listing alone.
+      Sweep id defaults to today in UTC (`2026-11-26`); a second pass the same
+      day takes the next free letter, `SWEEP=2026-11-26j`. Prints the boards in
+      read order with the trap each one hides, then the lane's write rules. The
+      25s read took Stepstone's six queries two pages each: 256 cards, 85 at
+      employers the ledger holds, six filed and three parked on an expiry inside
+      the hold. Read-only and network-free: it dedupes through
+      `apps:scout`/`apps:search` and files with `apps:scout`, never a second
+      writer. The 2026-12-07 send hold stands over every row found, and no row is
+      filed from a listing alone.
     vars:
-      SWEEP: '{{.SWEEP | default "2026-11-25s"}}'
+      SWEEP: '{{.SWEEP | default (now | date "2006-01-02")}}'
       FAMILY: '{{.FAMILY | default "devops|sre|platform|infrastructure"}}'
     cmds:
       - |
         printf 'sweep %s\n' '{{.SWEEP}}'
+        printf 'cycle: %s — today UTC unless named; a second pass today takes the next free letter (SWEEP=<date><letter>)\n' '{{.SWEEP}}'
         printf 'families: %s\n\n' '{{.FAMILY}}'
         printf '%s\t%s\n' 'board' 'trap that makes it read wrong'
         printf '%s\t%s\n' \
@@ -91,7 +122,7 @@ tasks:
           'arbeitnow /api/job-board-api?page=1' '300 per page; page one is not the board' \
           'ashby camunda/kubermatic, personio 1KOMMA5GRAD, smartrecruiters DeliveryHero' 'employer feeds, not the market'
         printf '\nrules: dedupe by exact name and by house token before filing; read the detail page before a verdict;\n'
-        printf 'band 1-5 from FIT_MAP, never 0 or 100; origin scout-{{.SWEEP}}, stage scouted; nothing sends before 2026-12-07.\n'
+        printf 'band 1-5 from FIT_MAP, never 0 or 100; origin scout-{{.SWEEP}}, stage lead (the family rides the status line); nothing sends before 2026-12-07.\n'
         printf 'exit: AGENTS.nix note job-scout-sweep-{{.SWEEP}} plus one xs turn naming the commit and the gate.\n'
 
   # The eleven Stepstone ads 25o read and parked on expiry are not rows: seven
@@ -596,16 +627,16 @@ tasks:
   # The automated half of the sweep lane: apps:scout:sweep prints the read order,
   # this runs it. The write stays apps:scout, so the lane keeps one writer.
   apps:sweep:pipeline:
-    desc: "Run the sweep-to-upsert chain: five boards, lane filter, dedupe, rank, file via apps:scout, read mail, post the turn (SWEEP, DAYS, LIMIT, APPLY, MAIL, XS, GH)"
+    desc: "Run the sweep-to-upsert chain: six boards, lane filter, dedupe, rank, file via apps:scout, read mail, post the turn (SWEEP, DAYS, LIMIT, APPLY, MAIL, XS, GH)"
     summary: >
-      `apps:scout:sweep` prints the read order; this runs it. germantechjobs, We
-      Work Remotely, RemoteOK, Stepstone and Berlin Startup Jobs are fetched,
-      kept to DevOps/SRE/Platform/Infrastructure postings younger than DAYS,
-      deduped against every employer the record holds, and validated — a
+      `apps:scout:sweep` prints the read order; this runs it: six boards
+      (germantechjobs, We Work Remotely, RemoteOK, Stepstone, Berlin Startup
+      Jobs, Arbeitnow) fetched and kept to DevOps/SRE/Platform postings younger
+      than DAYS, deduped against every employer on record, validated — a
       truncated name is reported under "not filed", never guessed. Survivors
-      are ranked by postings and GitHub recency; APPLY=1 files each through
-      `apps:scout` at SWEEP, the lane's own writer. MAIL=1 reads the reply
-      queue, XS=1 posts the turn. Exit 0 = ran, 1 = one step failed, 2 = bad
+      rank an application link first, then postings and GitHub recency; APPLY=1
+      files each linked lead through `apps:scout` at SWEEP, MAIL=1 reads
+      replies, XS=1 posts the turn. Exit 0 = ran, 1 = one step failed, 2 = bad
       usage. Next: `apps:lane`.
     cmds:
       - |

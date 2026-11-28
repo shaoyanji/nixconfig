@@ -401,9 +401,15 @@ in {
       };
 
       maxPages = lib.mkOption {
-        type = lib.types.ints.positive;
-        default = 20;
-        description = "Envelope pages a run may scan before giving up.";
+        type = lib.types.ints.unsigned;
+        default = 0;
+        description = ''
+          Envelope pages a run may scan. 0 derives the window from the archive
+          size, which is the only value that keeps reaching past the frontier as
+          the archive grows: a fixed window shorter than the archive makes every
+          run re-read known mail and stop short of the frontier, and the
+          importer therefore widens such a window back to the derived one.
+        '';
       };
 
       pageSize = lib.mkOption {
@@ -768,9 +774,9 @@ in {
       };
     };
 
-    # One-way by design: Drive holds a mirror, never the source of truth. The
-    # unit is skipped — not failed — on a host with no remote yet, so the timer
-    # ticks from the first boot and the mirror starts the moment a token exists.
+    # One-way by design: Drive holds a mirror, never the source of truth. A skip
+    # reports success, so never enable this without a token, and the offload bridge
+    # is the alternative when one cannot be minted (docs/email-archive.md).
     systemd.services.email-archive-gdrive-sync = lib.mkIf cfg.gdrive.enable archiveJobs.gdrive.service;
     systemd.timers.email-archive-gdrive-sync = lib.mkIf cfg.gdrive.enable archiveJobs.gdrive.timer;
 

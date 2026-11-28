@@ -20,4 +20,17 @@ select
   (select count(*) from mail_box where box = 'queued')::int as queued,
   (
     select count(*) from mail_command where status = 'pending'
-  )::int as commands;
+  )::int as commands,
+  -- A queue that stopped draining and an empty queue look identical in a
+  -- count. The age is what tells them apart, so the header can say "3h"
+  -- instead of a reassuring zero.
+  (
+    select coalesce(extract(epoch from now() - min(requested_at)) / 60, 0)::int
+    from mail_action
+    where status = 'pending'
+  ) as oldest_pending_min,
+  (
+    select coalesce(extract(epoch from now() - min(changed_at)) / 60, 0)::int
+    from mail_box
+    where box = 'queued'
+  ) as oldest_queued_min;

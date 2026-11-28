@@ -95,15 +95,26 @@
     ];
   # The Linux plumbing every NixOS-assembly feature shares: systemd policy,
   # Determinate Nix (one Nix binary for every NixOS host — see the module
-  # header for the priority and registry traps), HM integration, sops and
-  # nix-index. `nixos` and `containers` differ only in the kernel module that
-  # precedes it; `demo` opts out of sops/nix-index and spells its own.
-  nixosSupport = [
+  # header for the priority and registry traps), and HM integration. `nixos`
+  # and `containers` add sops/nix-index; `demo` opts out of those two but takes
+  # the same floor rather than restating it.
+  linuxSupport = [
     moduleFiles."global.linux-systemd"
     moduleFiles."global.determinate-nix"
     inputs.home-manager.nixosModules.default
-    inputs.sops-nix.nixosModules.sops
-    inputs.nix-index-database.nixosModules.nix-index
+  ];
+
+  nixosSupport =
+    linuxSupport
+    ++ [
+      inputs.sops-nix.nixosModules.sops
+      inputs.nix-index-database.nixosModules.nix-index
+    ];
+
+  # disko is a feature of its own and a component of impermanence. Keep the
+  # input edge in one list so both features cannot drift apart.
+  diskoSupport = [
+    inputs.disko.nixosModules.default
   ];
 
   # Minimal sharedModules for home-manager-only (standalone) configs.
@@ -135,13 +146,16 @@ in rec {
   # derivation of all 30 configurations did not move.
   featureModules = {
     # Only the inventory/user/systemdJobs injection — the floor every host
-    # stands on. Hosts that take no chain at all (garnixMachine, netbook, the
-    # microVM guests) name this one feature so `features` is never empty.
+    # stands on. Hosts that take no chain at all (garnixMachine and netbook)
+    # name this one feature so `features` is never empty.
     inventory = inventoryModules;
 
     # inventory injection + configurationRevision + modules/global/global.nix +
     # the nixpkgs overlays (simplex-chat, molly-brown, llm-agents).
     base = globalModules;
+
+    # The MicroVM guest input, shared by the canary and test guests.
+    microvm = [inputs.microvm.nixosModules.microvm];
 
     # The NixOS kernel of a desktop or VM host, over the shared support list.
     nixos = [moduleFiles."global.nixos"] ++ nixosSupport;
@@ -157,30 +171,22 @@ in rec {
       moduleFiles."global.dms"
     ];
 
-    impermanence = [
-      inputs.impermanence.nixosModules.impermanence
-      inputs.disko.nixosModules.default
-      moduleFiles."global.impermanence"
-    ];
+    impermanence =
+      [inputs.impermanence.nixosModules.impermanence]
+      ++ diskoSupport
+      ++ [moduleFiles."global.impermanence"];
 
     # disko without impermanence: stark/fern/delphi/sledgehammer partition the
     # disk but keep a persistent root. Used to be a hand-add on each of them —
     # four copies of the same input line, which is what a feature exists to
     # name. impermanence still bundles its own disko entry.
-    disko = [
-      inputs.disko.nixosModules.default
-    ];
+    disko = diskoSupport;
 
     # A container/WSL host: home-manager without a shell, and no
     # modules/global/nixos.nix.
     containers = [moduleFiles."global.noDE"] ++ nixosSupport;
 
-    demo = [
-      moduleFiles."global.demo"
-      moduleFiles."global.linux-systemd"
-      moduleFiles."global.determinate-nix"
-      inputs.home-manager.nixosModules.default
-    ];
+    demo = [moduleFiles."global.demo"] ++ linuxSupport;
 
     macos = [
       moduleFiles."global.macos"

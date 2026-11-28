@@ -26,6 +26,15 @@ for `nix copy`. Use the name, not the IP it resolves to: `inventory.toml` record
 the public IP as ephemeral, so an address that works today can move without a
 config change.
 
+The switch never reads a checkout on the host. `/root/Documents/nixconfig` is a
+leftover October clone — clean `main` at `e1216fa2` (2026-10-26), never fetched,
+`modules/secrets` uninitialised, and no unit, `/etc/nixos` file or keeper path
+naming it. Its history is *not* this tree's: the same commit subject exists here
+as `57679c54`, so it cannot fast-forward to what runs. Do not rebuild from it —
+a `nixos-rebuild --flake` there rebuilds October. The deployed commits live on
+local `main` with no remote containing them, so there is currently no published
+tree to reconcile the host against; that is the other half of the drift.
+
 delphi is `warmOn = "self"` (`inventory.cache.delphi`): it builds its own
 fleet-specific derivations and substitutes the rest from cachix, so no builder is
 involved and no push is needed:

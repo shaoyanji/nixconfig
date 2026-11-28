@@ -2,8 +2,11 @@
   <h2><span>01</span> Services</h2>
   <div class="filter">
     <input id="svc-filter" type="search" placeholder="filter services &mdash; press / to focus" autocomplete="off" spellcheck="false" aria-label="Filter services">
+    <button id="svc-attention" class="attention-button" type="button" aria-pressed="false">attention</button>
+    <span class="telemetry-exports">telemetry <a href="/api/telemetry/export?format=json">json</a> · <a href="/api/telemetry/export?format=csv">csv</a> · <a href="/api/telemetry/export?format=markdown">markdown</a></span>
     <output id="svc-count" for="svc-filter">{{mountCount}} {{mountWord}}</output>
   </div>
+  <div id="telemetry-attention" class="telemetry-banner" hidden></div>
   {{serviceList}}
 </section>
 
@@ -29,9 +32,10 @@
     that does not exist on this host.
   </p>
   <p>
-    It shows structure, not liveness. A card says where a service is, never that
-    it is up &mdash; those are different claims, and the monitors on the tailnet
-    are the ones allowed to make the second. Nothing here is sampled from a
-    running process, so nothing here can be stale in a way that looks live.
+    Structure and liveness are labelled separately. The card, address and unit
+    are compiled truth; the small status row on the portfolio services is
+    sampled by a loopback telemetry aggregate with a short bounded timeout. When a
+    service or the aggregate is offline, the row says so or disappears rather
+    than freezing into a false green badge.
   </p>
 </section>

@@ -9,27 +9,18 @@ version: "3"
 
 tasks:
   ops:health:
-    desc: Gate on the fleet sentinel verdict (exit 1 when degraded)
+    desc: Gate on the fleet sentinel verdict — ok AND written recently (exit 1 when degraded or stale)
     summary: >
-      Reads /var/lib/fleet-sentinel/www/health.txt and, on degradation, prints
-      every reason from status.json. Exit 0 = ok, 1 = degraded or no sentinel.
-      Cheap and local: no nix, no network. This is the closed-loop gate a
-      scheduler or an agent runs before doing work.
+      Reads /var/lib/fleet-sentinel/www/health.txt, prints the verdict with its
+      age, and on degradation prints every reason from status.json. Exit 0 = ok
+      and fresh, 1 = degraded, stale (older than 45 minutes: three missed
+      15-minute passes) or no sentinel. The age ceiling is the point — a `ok`
+      that stopped being rewritten reads green forever. Cheap and local: no nix,
+      no network. This is the closed-loop gate a scheduler or an agent runs
+      before doing work. OPS_HEALTH_MAX_AGE_MIN moves the ceiling,
+      OPS_HEALTH_FILE/OPS_HEALTH_STATUS point it at another host's verdict.
     cmds:
-      - |
-        f=/var/lib/fleet-sentinel/www/health.txt
-        if [ ! -r "$f" ]; then
-          echo "sentinel: no health file at $f (fleet-sentinel not enabled/running?)"
-          exit 1
-        fi
-        state="$(cat "$f")"
-        if [ "$state" = "ok" ]; then
-          echo "sentinel: ok"
-          exit 0
-        fi
-        echo "sentinel: $state"
-        jq -r '.reasons[]?' /var/lib/fleet-sentinel/www/status.json 2>/dev/null || true
-        exit 1
+      - bash scripts/task/ops-health.sh
 
   ops:categorize:
     desc: Categorize prose (jev, TypeSafe) behind calibration, rule and error gates

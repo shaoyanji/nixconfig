@@ -107,7 +107,7 @@ never `internal: true` [[flake/policies.nix#task-surface-visible]].
 ## Architecture
 
 `flake.nix` → flake-parts mkFlake → `flake/outputs.nix`, which projects each host by `kind` (machine configs,
-`packages`/`checks`/`devShells`, `nixFiles`/`modules`, `docs`/`sites`). A host registers once in
+`legacyPackages`/`checks`/`devShells`, `nixFiles`/`modules`, `docs`/`sites`). A host registers once in
 `flake/host-inventory.nix` as a **feature list** concatenated in order; `globalModules*` are derived aliases and
 the user role is a second list (`fleet.hmUserFeatures`), because option surface is what a gate pays for.
 `.#modules` is keyed `profiles.base-node` and `nix-registry` proves one name per file; directories are

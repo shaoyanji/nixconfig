@@ -7,9 +7,10 @@
 //   task ops:tailnet:policy          # semantic diff: repo file vs live tailnet
 //   task ops:tailnet:policy:apply    # [destructive] push this file (needs write scope)
 //
-// This file mirrors the live tailnet as of 2026-10-20, when the two fleet
-// prefixes below were added and the stale 192.168.178.0/24 rule (a FritzBox
-// default subnet nothing in inventory.toml advertises) was dropped.
+// This file mirrors the live tailnet as of 2026-11-28. 2026-10-20 added the two
+// fleet prefixes below and dropped the stale 192.168.178.0/24 rule (a FritzBox
+// default subnet nothing in inventory.toml advertises); 2026-11-28 mirrored the
+// external-agent tags and SSH rules that had only ever existed in the console.
 //
 // `apply` posts the WHOLE document, so everything below is authoritative —
 // a console edit that is not mirrored here is reverted by the next apply.
@@ -61,5 +62,33 @@
       "dst": ["autogroup:self"],
       "users": ["autogroup:nonroot", "root"],
     },
+    // The two accept rules below are the external agents: a node tagged
+    // `tag:extagent` (an agent running on someone else's machine) may SSH into
+    // `tag:Experimental` boxes, and the owning GitHub identity may do so as root.
+    // They are `accept`, not `check`, so no console prompt stands in the way; the
+    // tag boundary is what keeps the grant narrow. Mirrored here because a
+    // FORCE=1 apply would otherwise delete them, and plain `apply` refuses while
+    // the file lacks them — the gate could not tell drift from intent.
+    {
+      "action": "accept",
+      "src": ["tag:extagent"],
+      "dst": ["tag:Experimental"],
+      "users": ["autogroup:nonroot"],
+    },
+    {
+      "action": "accept",
+      "src": ["shaoyanji@github"],
+      "dst": ["tag:Experimental"],
+      "users": ["root", "autogroup:nonroot"],
+    },
   ],
+
+  // Who may tag a device. Deliberately the human GitHub identity and nothing
+  // else: a member who could tag `extagent` could mint the SSH grant above, and a
+  // tag is the only thing that rule trusts.
+  "tagOwners": {
+    "tag:ci": ["shaoyanji@github"],
+    "tag:extagent": ["shaoyanji@github"],
+    "tag:Experimental": ["shaoyanji@github"],
+  },
 }

@@ -1,4 +1,4 @@
-# `packages.<system>` as a tree, not a bag: one namespace per kind of artifact —
+# `legacyPackages.<system>` as a tree, not a bag: one namespace per kind of artifact —
 # sites, artifacts, servers, cli. The CLI tree is imported from flake/cli.nix, so
 # a tool cannot exist in one namespace and be missing from the other.
 {
@@ -55,8 +55,7 @@ in
   lib.genAttrs systems.work (system: let
     pkgs = pkgsFor system;
     cli = cliFor system;
-    # Imported once: `cv-ats-site` audits the CVs `matt-site` ships, so a second
-    # import would let the published audit and the published page disagree.
+    # Imported once: `lib/cv-ats-site.nix` audits the CVs this build ships.
     mattSite = import ../lib/matt-site.nix {inherit pkgs lib;};
     # The one serializer. `pkgs.formats.json` validates the value against the
     # JSON type at eval time, so an attribute that cannot be represented fails
@@ -80,9 +79,8 @@ in
         # one CSS file, no JavaScript.
         matt-site = mattSite;
 
-        # The CV ATS audit as a page: the six shipped PDFs read back against the
-        # records that built them. Its own surface, so publishing an audit cannot
-        # rewrite the page a cold-mail recipient opens.
+        # The audit as its own surface (`lib/cv-ats-site.nix`), so publishing it
+        # cannot rewrite the page a cold-mail recipient opens (`lib/cv-ats-site.nix`).
         cv-ats-site = import ../lib/cv-ats-site.nix {
           inherit pkgs lib;
           inherit mattSite;
@@ -155,7 +153,7 @@ in
       # is bash plus writeText, so it builds in well under a second on either
       # architecture. They were once gated to x86_64-linux, which made
       # `nix build .#artifacts.docs` on an aarch64 host resolve the foreign
-      # `packages.x86_64-linux` attribute and fail for want of an x86 builder:
+      # `legacyPackages.x86_64-linux` attribute and fail for want of an x86 builder:
       # the gate created the failure it was written to prevent.
       docs = docsGen.mkDocs pkgs;
 

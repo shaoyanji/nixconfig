@@ -25,13 +25,28 @@
 #   * the packet's JSON Resume (`basics`, `work[].position`) — packet.nix, whose
 #     language lives in `application.json`, hence `--application`.
 #
+# `--deployed` asks the other question: is what is published still this build?
+# `task dev:site:deploy:cv-ats` publishes by hand, so production can be a build
+# behind while every local gate is green. It fetches each file the artifact
+# carries and compares the bytes, `index.html` as `/` because Pages redirects
+# that path and `/` is the page a reader gets.
+#
+# The host comes from `taskfiles/site-manifest.json`, never from the project name.
+# Pages assigns the `pages.dev` suffix, and the bare `cv-ats.pages.dev` belongs to
+# an unrelated French ATS site: a gate that derived the host would compare this
+# build with a stranger's files and call the stranger drift.
+#
 # Usage: cv-ats-check.sh --record RECORD.json [--application APP.json] PDF
-# Exit: 0 parity holds, 1 a property is missing, 2 bad usage or no pdftotext.
+#        cv-ats-check.sh --deployed [URL]
+# Exit: 0 parity holds, 1 a property is missing, 2 bad usage, no pdftotext, no
+#       artifact, or no host recorded for the target.
 set -uo pipefail
 
 record=""
 application=""
 pdf=""
+deployed=0
+url=""
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --record)
@@ -41,6 +56,16 @@ while [ "$#" -gt 0 ]; do
     --application)
       application=${2:?--application needs a file}
       shift 2
+      ;;
+    --deployed)
+      deployed=1
+      shift
+      case "${1:-}" in
+        http://* | https://*)
+          url=$1
+          shift
+          ;;
+      esac
       ;;
     -?*)
       echo "cv-ats-check: unknown option $1" >&2
@@ -52,6 +77,72 @@ while [ "$#" -gt 0 ]; do
       ;;
   esac
 done
+
+if [ "$deployed" = 1 ]; then
+  artifact=${ARTIFACT:-/tmp/cv-ats}
+  host=$url
+  if [ -z "$host" ]; then
+    command -v jq >/dev/null 2>&1 || {
+      echo "cv-ats-check: jq missing (it reads the target's host from the manifest)" >&2
+      exit 2
+    }
+    manifest=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/taskfiles/site-manifest.json
+    host=$(jq -r '.targets["cv-ats"].deployHostname // empty' "$manifest" 2>/dev/null)
+    [ -n "$host" ] || {
+      echo "cv-ats-check: no deployHostname for the cv-ats target in $manifest" >&2
+      exit 2
+    }
+    host=https://$host
+  fi
+  host=${host%/}
+  command -v curl >/dev/null 2>&1 || {
+    echo "cv-ats-check: curl missing" >&2
+    exit 2
+  }
+  [ -d "$artifact" ] && [ -f "$artifact/index.html" ] || {
+    echo "cv-ats-check: no built audit at $artifact — build .#sites.cv-ats-site at the commit under test (task dev:site:build:cv-ats) first" >&2
+    exit 2
+  }
+
+  work=$(mktemp -d)
+  trap 'rm -rf "$work"' EXIT
+  same=0
+  drift=0
+  while IFS= read -r file; do
+    rel=${file#"$artifact"/}
+    path=/$rel
+    [ "$rel" = index.html ] && path=/
+    # Cache-busted: Pages fronts every deployment, and a stale edge copy of a
+    # matching file would otherwise read as drift in the other direction.
+    if ! curl -fsSL --max-time 30 -o "$work/live" "$host$path?cb=$(date +%s)" 2>/dev/null; then
+      printf 'FAIL %s is not served at %s%s\n' "$rel" "$host" "$path"
+      drift=$((drift + 1))
+      continue
+    fi
+    built=$(sha256sum "$file" | cut -d' ' -f1)
+    live=$(sha256sum "$work/live" | cut -d' ' -f1)
+    if [ "$built" = "$live" ]; then
+      printf 'ok   %s\n' "$path"
+      same=$((same + 1))
+      continue
+    fi
+    hint=""
+    if [ "$rel" = index.html ] && ! grep -q 'CV ATS audit' "$work/live" 2>/dev/null; then
+      hint=" — and it is not the audit page: the project is cv-ats, whose real host is the manifest's deployHostname, not its bare name"
+    fi
+    printf 'FAIL %s: live %s B %s, build %s B %s%s\n' \
+      "$rel" "$(wc -c <"$work/live")" "${live:0:12}" "$(wc -c <"$file")" "${built:0:12}" "$hint"
+    drift=$((drift + 1))
+  done < <(find -L "$artifact" -type f ! -name '.*' | sort)
+
+  echo
+  if [ "$drift" -ne 0 ]; then
+    printf 'cv-ats-check: %s of %s deployed file(s) diverge from %s\n' "$drift" "$((same + drift))" "$artifact"
+    exit 1
+  fi
+  printf 'cv-ats-check: %s file(s) at %s match %s\n' "$same" "$host" "$artifact"
+  exit 0
+fi
 
 [ -n "$record" ] && [ -f "$record" ] || {
   echo "cv-ats-check: no record (usage: cv-ats-check.sh --record RECORD.json [--application APP.json] PDF)" >&2

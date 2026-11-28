@@ -24,12 +24,28 @@ const state = {
   selected: new Set(),
   queued: new Map(),
   reader: { messageId: null, actions: [] },
+  views: [],
+  activeView: null,
+  // The page as the archive answered it, and the slice of it on screen: an
+  // untagged view filters what is loaded, it does not ask a second question.
+  rows: [],
+  untagged: false,
+  suggestions: [],
+  recent: [],
 };
 
 const el = {
   q: document.getElementById("q"),
   form: document.getElementById("search-form"),
   chips: document.getElementById("chips"),
+  savedViews: document.getElementById("saved-views"),
+  savedViewChips: document.getElementById("saved-view-chips"),
+  saveView: document.getElementById("save-view"),
+  analytics: document.getElementById("analytics"),
+  analyticsOpen: document.getElementById("analytics-open"),
+  analyticsClose: document.getElementById("analytics-close"),
+  analyticsBody: document.getElementById("analytics-body"),
+  threadTimeline: document.getElementById("thread-timeline"),
   hint: document.getElementById("hint"),
   categories: document.getElementById("categories"),
   results: document.getElementById("results"),
@@ -37,6 +53,7 @@ const el = {
   batchState: document.getElementById("batch-state"),
   meta: document.getElementById("result-meta"),
   letters: document.getElementById("stat-letters"),
+  tagged: document.getElementById("stat-tagged"),
   inbox: document.getElementById("stat-inbox"),
   queuedStat: document.getElementById("stat-queued"),
   boxTabs: document.getElementById("box-tabs"),
@@ -44,6 +61,13 @@ const el = {
   actionBar: document.getElementById("action-bar"),
   more: document.getElementById("more"),
   hermesOpen: document.getElementById("hermes-open"),
+  sources: document.getElementById("sources"),
+  sourcesOpen: document.getElementById("sources-open"),
+  sourcesClose: document.getElementById("sources-close"),
+  sourcesQ: document.getElementById("sources-q"),
+  sourcesSort: document.getElementById("sources-sort"),
+  sourcesList: document.getElementById("sources-list"),
+  sourcesFoot: document.getElementById("sources-foot"),
   command: document.getElementById("command"),
   commandForm: document.getElementById("command-form"),
   commandText: document.getElementById("command-text"),
@@ -101,6 +125,16 @@ async function getJSON(path) {
 async function postJSON(path, body) {
   const response = await fetch(path, {
     method: "POST",
+    headers: { accept: "application/json", "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status} on ${path}`);
+  return response.json();
+}
+
+async function deleteJSON(path, body = {}) {
+  const response = await fetch(path, {
+    method: "DELETE",
     headers: { accept: "application/json", "content-type": "application/json" },
     body: JSON.stringify(body),
   });
@@ -240,9 +274,12 @@ const field = (() => {
   let height = 0;
   let alpha = 0;
   let hovered = null;
+  // The node whose cluster is lit: a tag-hub and the letters and gate around it.
+  let focus = null;
   let openMail = null;
   let onTag = null;
   let onCategory = null;
+  let onClear = null;
   // One clock for the whole session. Resetting it on hover made the sweep and
   // every spark jump backwards under the pointer, which read as jitter.
   const start = performance.now();
@@ -294,6 +331,29 @@ const field = (() => {
         node.y = a.y;
       }
     }
+  }
+
+  // One link away from the focused node, plus itself. A tag-hub answers with its
+  // letters and the gate that owns it; a letter answers with the path it came
+  // by. Anything outside the set is drawn back rather than removed, so the shape
+  // of the whole field stays visible around the part being read.
+  function clusterIds() {
+    if (!focus) return null;
+    const ids = new Set([focus]);
+    for (const link of links) {
+      if (link.from === focus) ids.add(link.to);
+      else if (link.to === focus) ids.add(link.from);
+    }
+    return ids;
+  }
+
+  function setFocus(id) {
+    if (focus === id) return;
+    focus = id;
+    const ids = clusterIds();
+    canvas.dataset.focus = id || "";
+    canvas.dataset.cluster = ids ? String(ids.size) : "";
+    kick();
   }
 
   // Stable identity: a node keeps its position across keystrokes and only its
@@ -628,10 +688,12 @@ const field = (() => {
       }
     }
 
+    const cluster = clusterIds();
     // Links: bowed, and the hotter the link the brighter the current in it.
     for (const link of links) {
       const c = curve(link, byId);
       if (!c) continue;
+      ctx.globalAlpha = cluster && !(cluster.has(link.from) && cluster.has(link.to)) ? 0.16 : 1;
       const heat = link.heat;
       const strong = link.from === "query";
       ctx.strokeStyle = strong
@@ -654,9 +716,11 @@ const field = (() => {
         ctx.fill();
         ctx.shadowBlur = 0;
       }
+      ctx.globalAlpha = 1;
     }
 
     for (const node of nodes) {
+      ctx.globalAlpha = cluster && !cluster.has(node.id) ? 0.16 : 1;
       const heat = node.heat;
       const breathe = 0.5 + 0.5 * Math.sin(elapsed * 1.7 + hash(node.id) * 6.28);
       if (node.kind === "category") {
@@ -778,14 +842,17 @@ const field = (() => {
           ctx.shadowBlur = 0;
         }
       }
+      ctx.globalAlpha = 1;
     }
 
-    // A faint second ring around the hovered node, so the pointer has an anchor.
-    if (hovered) {
-      ctx.strokeStyle = "rgba(62, 240, 221, 0.5)";
+    // A second ring around the hovered or focused node: the pointer's anchor, and
+    // the thing the rail is talking about when the pointer is elsewhere.
+    const ringed = hovered || (focus ? byId.get(focus) : null);
+    if (ringed) {
+      ctx.strokeStyle = focus ? "rgba(240, 201, 135, 0.85)" : "rgba(62, 240, 221, 0.5)";
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.arc(hovered.x, hovered.y, 11, 0, 6.283185);
+      ctx.arc(ringed.x, ringed.y, focus ? 12.5 : 11, 0, 6.283185);
       ctx.stroke();
     }
   }
@@ -853,6 +920,7 @@ const field = (() => {
   canvas.addEventListener("mousemove", (event) => {
     const node = hit(event);
     hovered = node;
+    setFocus(node ? node.id : null);
     const rect = canvas.getBoundingClientRect();
     if (node) {
       el.graphTip.style.display = "block";
@@ -869,6 +937,7 @@ const field = (() => {
 
   canvas.addEventListener("mouseleave", () => {
     hovered = null;
+    setFocus(null);
     el.graphTip.style.display = "none";
   });
 
@@ -878,6 +947,7 @@ const field = (() => {
     if (node.kind === "mail" && openMail) openMail(node.mailId);
     else if (node.kind === "tag" && onTag) onTag(node.label);
     else if (node.kind === "category" && onCategory) onCategory(node.cat);
+    else if (node.kind === "query" && onClear) onClear();
   });
 
   const observer = new ResizeObserver(debounce(resize, 90));
@@ -895,6 +965,12 @@ const field = (() => {
     onCategory(fn) {
       onCategory = fn;
     },
+    onClear(fn) {
+      onClear = fn;
+    },
+    focusTag(tag) {
+      setFocus(tag ? `tag:${tag}` : null);
+    },
   };
 })();
 
@@ -907,6 +983,9 @@ function normalize(row) {
     id: row.id,
     messageId: row.messageId,
     sender: plain(row.sender) || "",
+    // `plain()` reduces `<addr>` as if it were markup, so the address survives
+    // only here — and the address is what a sender filter needs.
+    senderRaw: String(row.sender ?? ""),
     subject: plain(row.subject) || "(no subject)",
     sentAt: row.sentAt,
     snippet: row.snippet || "",
@@ -1105,7 +1184,11 @@ function renderResults() {
   if (!state.results.length) {
     const li = document.createElement("li");
     li.className = "empty";
-    li.textContent = state.q ? "nothing in the sea answers to that" : "the archive is quiet";
+    li.textContent = state.untagged
+      ? "every letter on this page carries a tag · page for more, or clear the chip"
+      : state.q
+        ? "nothing in the sea answers to that"
+        : "the archive is quiet";
     el.results.append(li);
     return;
   }
@@ -1369,66 +1452,293 @@ function renderViewTags() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "vt";
+    button.title = `letters tagged ${tag} · hover or focus to light the cluster`;
     button.innerHTML = `${esc(tag)} <span class="n">${count}</span>`;
     button.addEventListener("click", () => {
       el.q.value = tag;
       runSearch({ inhale: true });
     });
+    // The rail is the keyboard path into the graph: the same hub the pointer
+    // can hover is the one a tab stop can focus.
+    button.addEventListener("mouseenter", () => field.focusTag(tag));
+    button.addEventListener("focus", () => field.focusTag(tag));
+    button.addEventListener("mouseleave", () => field.focusTag(null));
+    button.addEventListener("blur", () => field.focusTag(null));
     el.viewTags.append(button);
   }
 }
 
-function renderChips(suggestions = []) {
-  el.chips.textContent = "";
-  const items = suggestions
-    .filter((s) => s.id !== state.q)
-    .slice(0, 7)
-    .map((s) => ({ id: s.id, count: s.mailCount, fuzzy: true }));
+const RECENT_KEY = "atlas.recent";
+const RECENT_MAX = 5;
 
-  const fallback = () => {
-    const seen = [];
-    for (const cat of state.taxonomy) {
-      for (const tag of cat.tags || []) {
-        if (tag.count > 0) seen.push({ id: tag.id, count: tag.count, fuzzy: false });
-      }
-    }
-    return seen.sort((a, b) => b.count - a.count).slice(0, 7);
+// The last few things asked, kept in the browser: the archive has no opinion
+// about what you were looking for an hour ago, and a shortcut that survives a
+// reload is worth more than one that only lives in the tab.
+function recentQueries() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(RECENT_KEY) || "[]");
+    return Array.isArray(raw) ? raw.filter((item) => typeof item === "string" && item) : [];
+  } catch {
+    return [];
+  }
+}
+
+function rememberQuery(q) {
+  const next = [q, ...recentQueries().filter((item) => item !== q)].slice(0, RECENT_MAX);
+  state.recent = next;
+  try {
+    localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+  } catch {
+    /* no storage: the chips still work for this tab */
+  }
+}
+
+function renderChips() {
+  el.chips.textContent = "";
+
+  const label = (text) => {
+    const span = document.createElement("span");
+    span.className = "label";
+    span.textContent = text;
+    el.chips.append(span);
   };
+
+  const chip = (text, count, onClick, { gold = false, on = false, title = "" } = {}) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `chip${gold ? " gold" : ""}${on ? " on" : ""}`;
+    if (title) button.title = title;
+    if (on) button.setAttribute("aria-pressed", "true");
+    button.innerHTML = `${esc(text)}${count == null ? "" : ` <span class="n">${count}</span>`}`;
+    button.addEventListener("click", onClick);
+    el.chips.append(button);
+  };
+
+  // Triage first: how much of this page the taxonomy never placed. It is a view
+  // over rows already fetched — the API pages, so "untagged" can only mean
+  // "untagged among these" — and the chip stays visible while it is on so the
+  // way back is never the thing that disappeared.
+  if (state.rows.length || state.untagged) {
+    const loose = state.rows.filter((mail) => !mail.tags.length).length;
+    chip(
+      state.untagged ? "× untagged" : "untagged",
+      state.rows.length && !state.untagged ? loose : null,
+      () => {
+        state.untagged = !state.untagged;
+        renderChips();
+        runSearch({ inhale: true });
+      },
+      {
+        on: state.untagged,
+        title: state.untagged
+          ? "showing only letters with no tag · click to show the whole page"
+          : "letters on this page the taxonomy never placed · page for more",
+      },
+    );
+  }
 
   // With no query there is no suggestion to make: the inbox is the inbox, and a
   // row of "most worn" tags above it is noise in the one view that is not about
-  // searching.
-  if (!state.q) return;
+  // searching. Recent queries are the exception, because they are yours.
+  const suggestions = state.suggestions.filter((s) => s.id !== state.q && s.mailCount > 0).slice(0, 5);
+  if (suggestions.length) {
+    label("did you mean");
+    for (const item of suggestions) {
+      chip(
+        item.id,
+        item.mailCount,
+        () => {
+          el.q.value = item.id;
+          runSearch();
+        },
+        { gold: true },
+      );
+    }
+  } else if (state.q) {
+    const seen = [];
+    for (const cat of state.taxonomy) {
+      for (const tag of cat.tags || []) if (tag.count > 0) seen.push({ id: tag.id, count: tag.count });
+    }
+    const list = seen
+      .sort((a, b) => b.count - a.count)
+      .filter((item) => item.id !== state.q)
+      .slice(0, 5);
+    if (list.length) {
+      label("also in the sea");
+      for (const item of list) {
+        chip(item.id, item.count, () => {
+          el.q.value = item.id;
+          runSearch();
+        });
+      }
+    }
+  }
 
-  const list = items.length ? items : fallback();
-  if (!list.length) return;
-
-  const label = document.createElement("span");
-  label.className = "label";
-  label.textContent = items.length ? "did you mean" : state.q ? "also in the sea" : "most worn";
-  el.chips.append(label);
-
-  for (const item of list) {
-    const chip = document.createElement("button");
-    chip.type = "button";
-    chip.className = `chip${item.fuzzy ? " gold" : ""}`;
-    chip.innerHTML = `${esc(item.id)} <span class="n">${item.count}</span>`;
-    chip.addEventListener("click", () => {
-      el.q.value = item.id;
-      runSearch();
-    });
-    el.chips.append(chip);
+  const recent = state.recent.filter((item) => item !== state.q).slice(0, state.q ? 3 : RECENT_MAX);
+  if (recent.length) {
+    label("recent");
+    for (const item of recent) {
+      chip(item, null, () => {
+        el.q.value = item;
+        runSearch({ inhale: true });
+      }, { title: `search again for ${item}` });
+    }
   }
 
   if (state.cat) {
-    const clear = document.createElement("button");
-    clear.type = "button";
-    clear.className = "chip";
-    clear.textContent = `× ${state.cat}`;
-    clear.addEventListener("click", () => setCategory(""));
-    el.chips.append(clear);
+    chip(`× ${state.cat}`, null, () => setCategory(""));
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* saved views + archive analytics                                     */
+/* ------------------------------------------------------------------ */
+
+function renderSavedViews() {
+  el.savedViewChips.textContent = "";
+  for (const view of state.views) {
+    const wrap = document.createElement("span");
+    wrap.className = `saved-view${state.activeView === view.id ? " on" : ""}`;
+
+    const apply = document.createElement("button");
+    apply.type = "button";
+    apply.className = "chip gold";
+    apply.title = [view.q && `query: ${view.q}`, view.cat && `gate: ${view.cat}`, view.box && `box: ${view.box}`, view.sender && `sender: ${view.sender}`, view.tier && `triage: ${view.tier}`]
+      .filter(Boolean)
+      .join(" · ");
+    apply.textContent = view.name;
+    apply.addEventListener("click", () => runSavedView(view));
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "saved-view-delete";
+    remove.textContent = "×";
+    remove.title = `delete saved view ${view.name}`;
+    remove.addEventListener("click", async (event) => {
+      event.stopPropagation();
+      try {
+        await deleteJSON(`${API}/atlas-view-delete`, { id: view.id });
+        state.views = state.views.filter((item) => item.id !== view.id);
+        if (state.activeView === view.id) state.activeView = null;
+        renderSavedViews();
+      } catch (error) {
+        console.error(error);
+      }
+    });
+
+    wrap.append(apply, remove);
+    el.savedViewChips.append(wrap);
+  }
+}
+
+async function loadSavedViews() {
+  try {
+    const rows = await getJSON(`${API}/atlas-views?lim=40`);
+    state.views = (Array.isArray(rows) ? rows : []).map((view) => ({
+      ...view,
+      id: Number(view.id),
+      q: view.q || "",
+      cat: view.cat || "",
+      box: view.box || "inbox",
+      sender: view.sender || "",
+      tier: view.tier || "",
+    }));
+    renderSavedViews();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function runSavedView(view) {
+  state.activeView = view.id;
+  state.untagged = false;
+  el.q.value = view.q || "";
+  state.cat = view.cat || "";
+  renderCategories();
+  state.box = view.box || "inbox";
+  renderBoxTabs();
+  runSearch({ inhale: true });
+}
+
+el.saveView.addEventListener("click", async () => {
+  const fallback = el.q.value.trim() || state.cat || `${state.box} mail`;
+  const name = window.prompt("name this view", fallback);
+  if (!name || !name.trim()) return;
+  try {
+    const rows = await postJSON(`${API}/atlas-view-save`, {
+      name: name.trim(),
+      q: el.q.value.trim(),
+      cat: state.cat,
+      box: state.box,
+      sender: "",
+      tier: "",
+      pinned: true,
+    });
+    const saved = Array.isArray(rows) ? rows[0] : rows;
+    if (saved) {
+      state.views = [...state.views.filter((view) => view.id !== Number(saved.id)), { ...saved, id: Number(saved.id) }];
+      state.views.sort((a, b) => String(a.name).localeCompare(String(b.name)));
+      renderSavedViews();
+    }
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+function metricList(title, rows, labelKey, countKey, emptyText) {
+  const items = (Array.isArray(rows) ? rows : []).slice(0, 8);
+  const max = Math.max(1, ...items.map((row) => Number(row[countKey] || 0)));
+  return `<section class="analytics-section"><h3>${esc(title)}</h3>${
+    items.length
+      ? items
+          .map((row) => {
+            const count = Number(row[countKey] || 0);
+            const width = Math.max(3, Math.round((count / max) * 100));
+            return `<div class="analytics-row"><span class="analytics-label">${esc(row[labelKey] ?? "unknown")}</span><span class="analytics-bar"><i style="width:${width}%"></i></span><b>${count}</b></div>`;
+          })
+          .join("")
+      : `<p class="dim">${esc(emptyText)}</p>`
+  }</section>`;
+}
+
+async function loadAnalytics() {
+  el.analyticsBody.innerHTML = '<p class="dim">listening…</p>';
+  try {
+    const rows = await getJSON(`${API}/atlas-analytics?days=90&lim=12`);
+    const data = Array.isArray(rows) ? rows[0] : rows;
+    const totals = typeof data.totals === "string" ? JSON.parse(data.totals) : data.totals || {};
+    const timeline = toArray(data.timeline);
+    const recent = timeline.slice(-14);
+    const maxDay = Math.max(1, ...recent.map((row) => Number(row.letters || 0)));
+    el.analyticsBody.innerHTML = `
+      <div class="analytics-total">
+        <span><b>${Number(totals.letters || 0)}</b> letters</span>
+        <span><b>${Number(totals.threads || 0)}</b> threads</span>
+        <span><b>${Number(totals.attachments || 0)}</b> attachments</span>
+        <span><b>${Number(totals.senders || 0)}</b> senders</span>
+      </div>
+      <section class="analytics-section"><h3>last fourteen days</h3><div class="analytics-days">${recent
+        .map((row) => `<span title="${esc(row.day)} · ${Number(row.letters || 0)} letters"><i style="height:${Math.max(4, Math.round((Number(row.letters || 0) / maxDay) * 44))}px"></i></span>`)
+        .join("")}</div></section>
+      <div class="analytics-grid">
+        ${metricList("domains", toArray(data.domains), "domain", "letters", "no domains in this window")}
+        ${metricList("tags", toArray(data.tags), "tag", "letters", "no tags in this window")}
+        ${metricList("triage", toArray(data.triage), "tier", "verdicts", "no verdicts in this window")}
+      </div>`;
+  } catch (error) {
+    console.error(error);
+    el.analyticsBody.innerHTML = '<p class="dim">the archive did not answer</p>';
+  }
+}
+
+el.analyticsOpen.addEventListener("click", () => {
+  el.analytics.showModal();
+  loadAnalytics();
+});
+el.analyticsClose.addEventListener("click", () => el.analytics.close());
+el.analytics.addEventListener("click", (event) => {
+  if (event.target === el.analytics) el.analytics.close();
+});
 
 /* ------------------------------------------------------------------ */
 /* search                                                              */
@@ -1471,9 +1781,11 @@ async function runSearch({ updateURL = true, inhale = false, append = false } = 
   el.readoutHits.textContent = "—";
   el.readoutMs.textContent = "…";
 
-  const url = `${API}/atlas-search?q=${encodeURIComponent(q)}&cat=${encodeURIComponent(
-    state.cat,
-  )}&box=${encodeURIComponent(state.box)}&off=${state.offset}&lim=${LIMIT}`;
+  const url = state.activeView
+    ? `${API}/atlas-view-run?id=${encodeURIComponent(state.activeView)}&off=${state.offset}&lim=${LIMIT}`
+    : `${API}/atlas-search?q=${encodeURIComponent(q)}&cat=${encodeURIComponent(
+        state.cat,
+      )}&box=${encodeURIComponent(state.box)}&off=${state.offset}&lim=${LIMIT}`;
 
   const mine = ++request;
   try {
@@ -1481,8 +1793,10 @@ async function runSearch({ updateURL = true, inhale = false, append = false } = 
     if (mine !== request) return;
     const elapsed = Math.round(performance.now() - started);
     const page = (Array.isArray(rows) ? rows : []).map(normalize);
-    state.results = append ? [...state.results, ...page] : page;
+    state.rows = append ? [...state.rows, ...page] : page;
+    state.results = state.untagged ? state.rows.filter((mail) => !mail.tags.length) : state.rows;
     state.offset += page.length;
+    if (q.length >= 2) rememberQuery(q);
     // A full page means the cap, not the end: the list says so instead of
     // pretending forty-eight is the whole inbox.
     el.more.hidden = page.length < LIMIT;
@@ -1531,16 +1845,19 @@ async function runSearch({ updateURL = true, inhale = false, append = false } = 
   if (q.length >= 2) {
     try {
       const suggestions = await getJSON(`${API}/atlas-tags?q=${encodeURIComponent(q)}&lim=7`);
-      renderChips(Array.isArray(suggestions) ? suggestions : []);
+      state.suggestions = Array.isArray(suggestions) ? suggestions : [];
     } catch {
-      renderChips([]);
+      state.suggestions = [];
     }
   } else {
-    renderChips([]);
+    state.suggestions = [];
   }
+  renderChips();
 }
 
 function setCategory(cat) {
+  state.activeView = null;
+  renderSavedViews();
   state.cat = state.cat === cat ? "" : cat;
   renderCategories();
   runSearch({ inhale: true });
@@ -1561,6 +1878,8 @@ function renderBoxTabs() {
 
 function setBox(box) {
   if (state.box === box) return;
+  state.activeView = null;
+  renderSavedViews();
   state.box = box;
   renderBoxTabs();
   runSearch({ inhale: true });
@@ -1569,6 +1888,23 @@ function setBox(box) {
 function renderCounts() {
   el.inbox.textContent = String(state.counts.inbox ?? 0);
   el.queuedStat.textContent = String(state.counts.queued ?? 0);
+  // Coverage is honest, not total: mail no rule claims is searchable but not
+  // placed, and the header should say so rather than imply a complete map.
+  if (el.tagged) {
+    const total = state.total || 0;
+    const tagged = Number(state.counts.tagged ?? 0);
+    el.tagged.textContent = total ? `${Math.round((tagged / total) * 100)}%` : "—";
+    el.tagged.title = total
+      ? `${tagged} of ${total} letters carry a tag; the rest are searchable by body only`
+      : "";
+  }
+  // A queue that stopped draining and an empty queue show the same count; the
+  // age is the honest signal, so it rides in the tooltip.
+  const mins = Number(state.counts.oldestQueuedMin ?? 0);
+  el.queuedStat.title =
+    state.counts.queued && mins
+      ? `oldest decision waiting ${mins >= 60 ? `${Math.round(mins / 60)}h` : `${mins}m`}`
+      : "";
 }
 
 // A decision takes the letter out of the working set the moment it is asked
@@ -1750,13 +2086,46 @@ function renderBody(text) {
   }
 }
 
+// A sender arrives as `Name <addr>` or as a bare address. The address is the
+// part that names one correspondent, and it is what the search matches.
+function senderNeedle(sender) {
+  const text = String(sender ?? "");
+  const angled = text.match(/<([^<>\s]+@[^<>\s]+)>/);
+  if (angled) return angled[1].toLowerCase();
+  const bare = text.match(/[^\s<>",;]+@[^\s<>",;]+\.[^\s<>",;]+/);
+  return (bare ? bare[0] : text).trim().toLowerCase();
+}
+
+// Two quick filters, both of which are a query: `from this sender` and `this
+// tag`. The taxonomy ranks tags against the typed string, so a tag is already a
+// search — the page does not need a second parameter to say so.
+function filterQuery(needle) {
+  const value = String(needle ?? "").trim();
+  if (!value) return;
+  el.q.value = value;
+  runSearch({ inhale: true });
+}
+
+function filterBySender(sender) {
+  filterQuery(senderNeedle(sender));
+}
+
+function filterByTag(tag) {
+  filterQuery(tag);
+}
+
 async function openReader(id) {
   try {
     const rows = await getJSON(`${API}/atlas-message?id=${encodeURIComponent(id)}`);
     const mail = Array.isArray(rows) ? rows[0] : rows;
     if (!mail) return;
     const tags = toArray(mail.tags);
-    state.reader = { messageId: mail.messageId, actions: toArray(mail.actions) };
+    state.reader = {
+      messageId: mail.messageId,
+      actions: toArray(mail.actions),
+      sender: mail.sender || "",
+      tags,
+    };
     armedUntil = 0;
     el.act.delete.dataset.armed = "";
     el.instruct.hidden = true;
@@ -1772,8 +2141,15 @@ async function openReader(id) {
     el.readerSubject.textContent = plain(mail.subject) || "(no subject)";
     const trail = toArray(mail.boxHistory);
     el.readerMeta.innerHTML = [
-      `<span>from <b>${esc(mail.sender || "unknown")}</b></span>`,
-      tags.length ? `<span class="rtag">${tags.map((t) => `#${esc(t)}`).join(" ")}</span>` : "",
+      `<button type="button" class="meta-filter" data-needle="${esc(senderNeedle(mail.sender))}" title="every letter from this sender (f)">from <b>${esc(mail.sender || "unknown")}</b></button>`,
+      tags.length
+        ? `<span class="rtag">${tags
+            .map(
+              (t) =>
+                `<button type="button" class="meta-filter tag-filter" data-needle="${esc(t)}" title="every letter carrying this tag">#${esc(t)}</button>`,
+            )
+            .join(" ")}</span>`
+        : "",
       mail.attachmentPath ? "<span>attachment</span>" : "",
       trail.length
         ? `<span class="rtrail">${trail
@@ -1785,6 +2161,7 @@ async function openReader(id) {
       .filter(Boolean)
       .join("");
     renderBody(plain(mail.bodyPlain ?? mail.body_plain ?? "", { lines: true }));
+    loadThreadTimeline(id, mail.messageId);
     el.reader.showModal();
   } catch (error) {
     console.error(error);
@@ -1792,8 +2169,52 @@ async function openReader(id) {
 }
 
 document.getElementById("reader-close").addEventListener("click", () => el.reader.close());
+async function loadThreadTimeline(id, currentMessageId) {
+  el.threadTimeline.hidden = true;
+  el.threadTimeline.textContent = "";
+  try {
+    const rows = await getJSON(`${API}/atlas-thread?id=${encodeURIComponent(id)}&lim=80`);
+    const letters = (Array.isArray(rows) ? rows : []).map(normalize);
+    if (!letters.length) return;
+    const first = rows[0];
+    const participants = toArray(first.participants).filter(Boolean);
+    el.threadTimeline.innerHTML = [
+      `<div class="thread-head"><b>${letters.length}</b> letter${letters.length === 1 ? "" : "s"} in thread · ${participants.length || 1} participant${participants.length === 1 ? "" : "s"}</div>`,
+      ...letters.map((mail) => {
+        const current = mail.messageId === currentMessageId;
+        return `<button type="button" class="thread-letter${current ? " current" : ""}" data-id="${esc(mail.id)}" ${current ? "disabled" : ""}>
+          <span class="thread-when">${esc(when(mail.sentAt) || "undated")}</span>
+          <span class="thread-sender">${esc(mail.sender || "unknown")}</span>
+          <span class="thread-subject">${esc(mail.subject)}</span>
+          ${mail.attachmentPath ? '<span class="thread-attachment">attachment</span>' : ""}
+        </button>`;
+      }),
+    ].join("");
+    el.threadTimeline.hidden = false;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+el.threadTimeline.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-id]");
+  if (!button || button.disabled) return;
+  openReader(button.dataset.id);
+});
+
+document.getElementById("reader-close").addEventListener("click", () => el.reader.close());
 el.reader.addEventListener("click", (event) => {
   if (event.target === el.reader) el.reader.close();
+});
+
+// The sender and the tags in the reader are filters: closing the letter is not a
+// loss, because the query that replaces it names the same correspondent.
+el.readerMeta.addEventListener("click", (event) => {
+  const target = event.target.closest("button[data-needle]");
+  if (!target) return;
+  event.preventDefault();
+  el.reader.close();
+  filterQuery(target.dataset.needle);
 });
 
 /* ------------------------------------------------------------------ */
@@ -1808,6 +2229,8 @@ el.form.addEventListener("submit", (event) => {
 el.q.addEventListener(
   "input",
   debounce(() => {
+    state.activeView = null;
+    renderSavedViews();
     const point = searchPoint();
     if (qi) qi.caret(point.x, point.y);
     runSearch();
@@ -1821,6 +2244,12 @@ document.addEventListener("keydown", (event) => {
   // dialog, which closes natively.
   if (el.reader.open) {
     if (document.activeElement === el.instruction) return;
+    if (event.key === "f") {
+      event.preventDefault();
+      el.reader.close();
+      filterBySender(state.reader.sender);
+      return;
+    }
     const kind = event.key === "a" ? "archive" : event.key === "x" ? "delete" : event.key === "h" ? "hermes" : null;
     if (kind) {
       event.preventDefault();
@@ -1843,6 +2272,13 @@ document.addEventListener("keydown", (event) => {
     openCommand();
     return;
   }
+  // `S` opens the sources drawer before any result exists: "who writes to me" is
+  // the question you have with an empty search box, not after one.
+  if (event.key === "S" && !typing) {
+    event.preventDefault();
+    openSources();
+    return;
+  }
   // Esc also disarms a half-pressed `x`, not just the marks: an armed bar that
   // survives the key that clears everything reads as a stuck state.
   if (event.key === "Escape" && (state.selected.size || Date.now() <= batchArmedUntil)) {
@@ -1857,6 +2293,26 @@ document.addEventListener("keydown", (event) => {
     return;
   }
   if (!state.results.length) return;
+
+  // Quick filters from the row you walked to: `f` asks who else wrote, `t` asks
+  // what else carries its first tag. Neither needs the reader.
+  const focusedMail = state.results[state.focus >= 0 ? state.focus : 0];
+  if (event.key === "f" && !typing && focusedMail) {
+    event.preventDefault();
+    filterBySender(focusedMail.senderRaw || focusedMail.sender);
+    return;
+  }
+  if (event.key === "t" && !typing && focusedMail?.tags?.length) {
+    event.preventDefault();
+    filterByTag(focusedMail.tags[0]);
+    return;
+  }
+  if ((event.key === "Home" || event.key === "End") && !typing) {
+    event.preventDefault();
+    state.focus = event.key === "Home" ? 0 : state.results.length - 1;
+    renderResults();
+    return;
+  }
 
   // The list is a workspace, not just an index: space marks, `a` archives,
   // `x` queues deletion (twice), and the marked set is what they apply to.
@@ -1939,6 +2395,112 @@ for (const button of el.actionBar.querySelectorAll(".ab-actions button")) {
   });
 }
 
+/* ------------------------------------------------------------------ */
+/* sources — who writes, by domain                                     */
+/* ------------------------------------------------------------------ */
+
+// The rail answers "what is in this answer"; this answers "who keeps sending
+// it". Volume alone would rank one noisy CI bot above a bank, so `untagged` sits
+// beside it and can become the sort: mail the taxonomy never placed is mail a
+// person still has to decide about.
+let sources = [];
+let sourcesSort = "volume";
+
+function renderSources() {
+  el.sourcesList.textContent = "";
+  const rows = [...sources].sort((a, b) =>
+    sourcesSort === "untagged"
+      ? b.untagged - a.untagged || b.letters - a.letters
+      : b.letters - a.letters
+  );
+  if (!rows.length) {
+    const none = document.createElement("li");
+    none.className = "src empty";
+    none.textContent = el.sourcesQ.value ? "no domain matches" : "no senders yet";
+    el.sourcesList.append(none);
+    return;
+  }
+  const top = rows[0].letters || 1;
+  for (const row of rows) {
+    const item = document.createElement("li");
+    item.className = "src";
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "src-row";
+    button.title = `${row.letters} letters from ${row.domain} — search them`;
+
+    const domain = document.createElement("span");
+    domain.className = "src-domain";
+    domain.textContent = row.domain;
+
+    // The bar is the share of the busiest shore, not of the whole archive: a
+    // mailbox's head is always one sender, and a bar scaled to 3500 letters
+    // would draw every other row as a hairline.
+    const bar = document.createElement("span");
+    bar.className = "src-bar";
+    bar.style.setProperty("--w", `${Math.max(2, Math.round((row.letters / top) * 100))}%`);
+
+    const counts = document.createElement("span");
+    counts.className = "src-counts";
+    counts.innerHTML = `<b>${row.letters}</b>${row.untagged ? `<i class="untagged" title="letters the taxonomy never placed">${row.untagged} untagged</i>` : ""}`;
+
+    const when = document.createElement("span");
+    when.className = "src-when mono-xs";
+    when.textContent = since(row.newest);
+
+    button.append(domain, bar, counts, when);
+    button.addEventListener("click", () => {
+      el.sources.close();
+      el.q.value = row.domain;
+      runSearch({ inhale: true });
+    });
+    item.append(button);
+    el.sourcesList.append(item);
+  }
+}
+
+async function loadSources() {
+  el.sourcesList.textContent = "";
+  const note = document.createElement("li");
+  note.className = "src loading";
+  note.textContent = "listening…";
+  el.sourcesList.append(note);
+  try {
+    const rows = await getJSON(
+      `${API}/atlas-senders?lim=40&q=${encodeURIComponent(el.sourcesQ.value.trim())}`
+    );
+    sources = toArray(rows);
+    const untagged = sources.reduce((sum, row) => sum + (row.untagged || 0), 0);
+    const letters = sources.reduce((sum, row) => sum + (row.letters || 0), 0);
+    el.sourcesFoot.textContent = `${sources.length} domains · ${letters} letters · ${untagged} untagged`;
+    renderSources();
+  } catch (error) {
+    console.error(error);
+    el.sourcesList.textContent = "";
+    const failed = document.createElement("li");
+    failed.className = "src empty";
+    failed.textContent = "the archive did not answer";
+    el.sourcesList.append(failed);
+    el.sourcesFoot.textContent = "";
+  }
+}
+
+function openSources() {
+  el.sources.showModal();
+  el.sourcesQ.focus();
+  loadSources();
+}
+
+el.sourcesOpen.addEventListener("click", openSources);
+el.sourcesClose.addEventListener("click", () => el.sources.close());
+el.sourcesSort.addEventListener("click", () => {
+  sourcesSort = sourcesSort === "volume" ? "untagged" : "volume";
+  el.sourcesSort.textContent = `sort: ${sourcesSort}`;
+  el.sourcesSort.setAttribute("aria-pressed", String(sourcesSort === "untagged"));
+  renderSources();
+});
+el.sourcesQ.addEventListener("input", debounce(loadSources, 220));
+
 function openCommand() {
   el.commandState.textContent = "";
   el.commandState.classList.remove("live");
@@ -1989,6 +2551,12 @@ field.onTag((tag) => {
   runSearch({ inhale: true });
 });
 field.onCategory((cat) => setCategory(cat));
+// Clicking the query node is the way back to the whole sea: the node that names
+// the search is the node that clears it.
+field.onClear(() => {
+  el.q.value = "";
+  runSearch({ inhale: true });
+});
 
 (async function boot() {
   qi = await startQiField(document.getElementById("qi-field"));
@@ -2026,16 +2594,20 @@ field.onCategory((cat) => setCategory(cat));
     state.counts.inbox = Number(headline?.inbox ?? 0);
     state.counts.queued = Number(headline?.queued ?? 0);
     state.counts.commands = Number(headline?.commands ?? 0);
+    state.counts.tagged = Number(headline?.tagged ?? 0);
+    state.counts.oldestQueuedMin = Number(headline?.oldest_queued_min ?? 0);
     renderCounts();
     renderBoxTabs();
     renderSelection();
     if (state.total) {
-      el.hint.textContent = `${state.counts.inbox} in · ${state.counts.queued} queued · ↑↓ walk · ↵ read`;
+      el.hint.textContent = `${state.counts.inbox} in · ${state.counts.queued} queued · ↑↓ walk · ↵ read · f sender · t tag`;
     }
     el.dot.className = "dot live";
     el.link.textContent = "linked";
     renderCategories();
-    renderChips([]);
+    state.recent = recentQueries();
+    renderChips();
+    loadSavedViews();
     try {
       if (localStorage.getItem("atlas.field") === "folded") setField(true);
     } catch {

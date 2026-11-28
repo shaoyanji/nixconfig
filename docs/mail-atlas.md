@@ -75,6 +75,7 @@ registers a defaulted one, and an unregistered parameter is a 404 rather than a
 | `/api/atlas-command-close` | POST | `id`, `status`, `result` | close a general command with one line of result |
 | `/api/atlas-boxes` | GET | — | every letter and its box, flat — the reconcile's index, not a ranked page |
 | `/api/atlas-box-set` | POST | `messageId`, `box` | set one letter's box from outside a decision |
+| `/api/atlas-senders` | GET | `q`, `lim` | the archive by sender domain: letters, distinct addresses, how many are untagged, oldest and newest — the sources drawer reads it |
 
 **A POST body is camelCase.** NpgsqlRest binds a JSON property to a SQL parameter
 by name, and the response aliases arrive camelCased too: `{"messageId": "<RFC
@@ -257,7 +258,10 @@ a sea, over the character for a chart.
   opens the reader — including with the caret still in the search box, as long as
   that box holds the query the list was built from, so `↵` after typing a new
   word searches instead of opening a stale result. Inside the reader `a` / `x` /
-  `h` are the decisions, `⌘↵` in the instruction box queues it, `Esc` closes.
+  `h` are the decisions, `f` filters to the sender, `⌘↵` in the instruction box
+  queues it, `Esc` closes. `Home`/`End` jump to the ends of the list, and with a
+  row focused `f` asks who else wrote and `t` what else carries its first tag —
+  the sender and the `#tags` in the reader are buttons that do the same.
   State lives in the URL (`?q=&cat=`), so a search is a link.
 - **The list is a workspace.** `space` (or a click on the row's box) marks a
   letter, `a` archives the marked set, `x` queues it for deletion — twice, the
@@ -266,6 +270,15 @@ a sea, over the character for a chart.
   so a single decision never needs a second gesture. The bar under the title
   carries the same three verbs as buttons, so the list does not require the
   keyboard it rewards.
+- **Sources, before there is a query.** `S`, or the `源 sources` button in the
+  header, opens a drawer of the domains that write: one bar per domain scaled to
+  the busiest, its letter count, the distinct addresses behind it, the number
+  with no tag in gold and how recently it wrote. Sorting toggles between volume
+  and untagged; the row click closes the drawer, puts the domain in the search
+  box and runs it, so "who is this" becomes "show me theirs" in one gesture.
+  The domain comes from the address, not the display name, and a sender with no
+  `@` keeps its whole string instead of vanishing from the sum. It is the
+  many-letter form of `f`: `f` narrows to the sender, this to its shore.
 - **One command for the whole mailbox.** `H`, or the `command Hermes` button in
   the header, opens a box for a sentence with no letter behind it — "every
   newsletter older than a month can go". It writes a `mail_command` row: nothing
@@ -298,9 +311,28 @@ curl -s http://127.0.0.1:8085/ | grep -c 信海圖          # the page
 curl -s -o /dev/null -w '%{content_type}\n' http://127.0.0.1:8085/particles.wasm  # application/wasm
 curl -s -o /dev/null -w '%{content_type} %{size_download}\n' http://127.0.0.1:8085/han.woff  # font/woff ~11.9 kB
 curl -s 'http://127.0.0.1:8085/api/atlas-stats' | jq
+curl -s 'http://127.0.0.1:8085/api/atlas-senders?q=&lim=5' | jq -r '.[] | "\(.domain) \(.letters) \(.untagged)"'
 curl -s 'http://127.0.0.1:8085/api/atlas-search?q=invoce&cat=&lim=3' | jq '.[].subject'
 sudo journalctl -u mail-atlas-tag -n 5 --no-pager
 ```
+
+The drawer has a browser smoke against the built page, not the source directory —
+the font subset and the wasm module only exist after the Nix build:
+
+```bash
+nix shell github:numtide/llm-agents.nix#agent-browser -c bash tests/mail-atlas-site/run.sh
+```
+
+It serves the site derivation with a canned `/api/atlas-senders`, opens the
+drawer, and asserts three rows in volume order, the untagged badge, the summary
+line and that a row click searches its domain. Absent `agent-browser` it exits 2
+rather than passing quietly.
+
+On a host without a browser, `CLANKER_BROWSER=1` runs the same probe through
+`scripts/task/clanker-browser.sh`: the site and the stub are copied to clanker
+and served on its loopback, and the run kills the stub and deletes the copy when
+it exits. `tests/mail-atlas-site/browser-stub/run.sh` checks the assertions with
+no browser at all.
 
 The last line should end in a number: rows added. `0` means the archive is fully
 tagged against the current rules.

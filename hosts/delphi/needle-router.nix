@@ -14,7 +14,7 @@
   # the shipped engine runs on. Without it, `task vox:*` rebuilds the binary from
   # the flake on every call; with it, the task finds `vox` on PATH and the turn
   # costs one engine pass. The weights were already in this host's closure.
-  vox = self.packages.${pkgs.stdenv.hostPlatform.system}.cli.ai.vox;
+  vox = self.legacyPackages.${pkgs.stdenv.hostPlatform.system}.cli.ai.vox;
 in {
   environment.systemPackages = [
     (pkgs.writeShellScriptBin "needle-route" ''

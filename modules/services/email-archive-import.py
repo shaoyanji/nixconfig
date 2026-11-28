@@ -293,8 +293,25 @@ class Importer:
     def run(self):
         self.load_known()
         pages = self.args.max_pages or self.pages_for(len(self.known))
+        if pages * self.args.page_size <= len(self.known):
+            # A window shorter than the archive stops before the frontier, so
+            # every run re-reads mail it already holds and reports success.
+            # Measured on delphi 2026-11-26: `--max-pages 20` over 3,516
+            # archived messages read the same 2,000 known envelopes hourly for
+            # days while the INBOX held 7,555, and the only signal was the
+            # warning at the end of the run. The derived window is the floor,
+            # not a suggestion: an archive that outgrows a fixed window is
+            # exactly the case `pages_for` exists for.
+            widened = self.pages_for(len(self.known))
+            log(
+                f"window {pages} x {self.args.page_size} cannot reach past "
+                f"{len(self.known)} archived messages; widening to {widened} pages"
+            )
+            pages = widened
+        start = max(1, self.args.start_page)
         scanned = 0
-        for page in range(1, pages + 1):
+        stopped_at = None
+        for page in range(start, start + pages):
             envelopes = self.envelopes(page)
             if not envelopes:
                 break
@@ -328,18 +345,21 @@ class Importer:
                 else:
                     self.imported += 1
             if self.imported >= self.args.limit:
+                stopped_at = page
                 break
         log(
             f"imported {self.imported}, refilled {self.refilled}, "
             f"html-converted {self.converted}, already archived {self.skipped}, "
-            f"failed {self.failed}, newly seen {scanned}, pages {pages}"
+            f"failed {self.failed}, newly seen {scanned}, pages {pages} "
+            f"from {start}"
         )
-        # A run that stops on the window instead of on the mailbox looks exactly
-        # like a caught-up archive. Say so rather than reporting success.
-        if self.imported == 0 and len(self.known) >= pages * self.args.page_size:
+        # A backfill deeper than one run's limit needs somewhere to resume, and
+        # a page number is cheaper to trust than a state file: the mailbox is
+        # ordered, and one page of overlap costs less than a hole.
+        if stopped_at is not None and self.imported >= self.args.limit:
             log(
-                f"warning: no new mail inside {pages} pages while {len(self.known)} are "
-                f"archived — the scan window, not the mailbox, is the limit"
+                f"stopped at page {stopped_at} on --limit {self.args.limit}; "
+                f"resume with --start-page {max(1, stopped_at - 1)}"
             )
         return 1 if self.failed else 0
 
@@ -365,6 +385,12 @@ def main():
         help="envelope pages to scan; 0 derives it from the archive size",
     )
     parser.add_argument("--page-size", type=int, default=100)
+    parser.add_argument(
+        "--start-page",
+        type=int,
+        default=1,
+        help="first envelope page to read; resume a long backfill with the logged page",
+    )
     parser.add_argument(
         "--known-limit",
         type=int,

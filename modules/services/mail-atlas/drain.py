@@ -18,14 +18,21 @@ a Message-ID, and a real inbox holds subjects that are not valid queries
 colons, parens). So the header always decides, and each query is only a way to
 narrow the page it is found on: the message's own sent date first (`date` is a
 plain date, no free text to parse), then one alphanumeric token of the subject.
-A message none of those find is closed as dismissed with "not in inbox": the
-archive stored the same `Date:` header the query reads, so three neighbouring
-days are the whole answer, and whatever already moved the message satisfied the
-person's decision. (`--deep-scan` adds a paged walk of the mailbox for a manual
-investigation; on a 6000-envelope inbox that walk is a minute per run, which is
-not what a five-minute timer should spend.) Any himalaya failure leaves its row
-pending and fails the unit, so the timer retries; one bad row never stops the
-others.
+A message none of those find is closed as dismissed with "not in inbox", but
+only after two more looks, because absence is the one verdict that discards a
+person's decision. First the target mailbox: if the Message-ID already sits in
+the archive (or the trash) then an earlier run moved it and died before closing
+the row, and the retry records that as done. Then the newest `--recent-pages`
+pages of the source: the `date` queries read IMAP `date`, which is the arrival
+date, while the archive stores the sender's `Date:` header, and newsletters,
+listservs and forwards land days after they were written. Only then is the
+message called absent. A subject token is skipped when it is a stopword — a
+common word matches thousands of envelopes, and `subject Update` therefore
+failed to narrow anything at all. (`--deep-scan` adds a paged walk of the whole
+mailbox for a manual investigation; on a 7000-envelope inbox that walk is a
+minute per run, which is not what a five-minute timer should spend.) Any
+himalaya failure leaves its row pending and fails the unit, so the timer
+retries; one bad row never stops the others.
 """
 
 import argparse
@@ -58,14 +65,42 @@ def call(argv, timeout=300):
     return proc.stdout
 
 
-def search_token(subject):
-    """One token a text query can carry: the longest alphanumeric run.
+# A token a text query can carry: himalaya matches it as a case-insensitive
+# substring and the Message-ID header still picks the row, so the token only has
+# to narrow the page. Words that appear in most subjects narrow nothing —
+# `subject Update` matched thousands of envelopes, the two-page scan never
+# reached the message, and the decision was closed as "not in inbox".
+STOPWORDS = frozenset(
+    """
+    about account alert alerts available best confirm confirmation contact daily
+    dear digest email follow from hello invite invitation issue issues march
+    meeting message more monthly newsletter notification notify only please
+    received regarding reminder report reports request required review security
+    service services subject thanks thank that their there this today update
+    updated updates weekly welcome will with your yours
+    """.split()
+)
 
-    himalaya matches a text clause as a case-insensitive substring, so the
-    token only has to narrow the page; the Message-ID header picks the row.
+
+def search_token(subject):
+    """The token a text query should carry, or None when nothing narrows it.
+
+    Preference, in order: a token with digits (message ids, ticket numbers), an
+    upper-case token, then the longest content word.
     """
     tokens = re.findall(r"[A-Za-z0-9]{4,}", subject or "")
-    return max(tokens, key=len)[:60] if tokens else None
+    strong = [t for t in tokens if t.lower() not in STOPWORDS]
+    if not strong:
+        return None
+
+    def rank(token):
+        return (
+            0 if any(c.isdigit() for c in token) else 1,
+            0 if token.isupper() else 1,
+            -len(token),
+        )
+
+    return sorted(strong, key=rank)[0][:60]
 
 
 def date_queries(sent_at):
@@ -89,13 +124,17 @@ def date_queries(sent_at):
 
 
 class Mailbox:
-    def __init__(self, config, account, source, page_size=100, index_pages=60):
+    def __init__(
+        self, config, account, source, page_size=100, index_pages=60, recent_pages=5
+    ):
         self.config = config
         self.account = account
         self.source = source
         self.page_size = page_size
         self.index_pages = index_pages
+        self.recent_pages = recent_pages
         self._by_id = None
+        self._pages = {}
         self.pages_read = 0
         self.searches = 0
 
@@ -109,27 +148,18 @@ class Mailbox:
         except json.JSONDecodeError as exc:
             raise RuntimeError(f"himalaya returned non-JSON: {exc}") from exc
 
-    def index(self):
-        """Every message in the source mailbox, keyed by Message-ID.
+    def _walk(self, pages, mailbox=None):
+        """Envelopes from the first `pages` pages of a mailbox, keyed by id.
 
-        Bounded by `index_pages`; the mailbox is read once per run and shared by
-        every row, so a run of fifteen decisions costs one scan, not fifteen.
+        The full index, the bounded recent window and the "did it already move"
+        check all page the same way, so the rule lives in one place.
         """
-        if self._by_id is not None:
-            return self._by_id
+        name = mailbox or self.source
         by_id = {}
-        for page in range(1, self.index_pages + 1):
+        complete = False
+        for page in range(1, pages + 1):
             doc = self.himalaya(
-                [
-                    "envelope",
-                    "list",
-                    "-m",
-                    self.source,
-                    "-s",
-                    str(self.page_size),
-                    "-p",
-                    str(page),
-                ]
+                ["envelope", "list", "-m", name, "-s", str(self.page_size), "-p", str(page)]
             )
             self.pages_read += 1
             envelopes = doc.get("envelopes") or []
@@ -138,9 +168,40 @@ class Mailbox:
                 if key:
                     by_id[key] = str(envelope.get("id"))
             if len(envelopes) < self.page_size:
+                complete = True
                 break
-        self._by_id = by_id
-        return by_id
+        return by_id, complete
+
+    def index(self):
+        """Every message in the source mailbox, keyed by Message-ID.
+
+        Bounded by `index_pages`; the mailbox is read once per run and shared by
+        every row, so a run of fifteen decisions costs one scan, not fifteen.
+        """
+        if self._by_id is None:
+            self._by_id, _ = self._walk(self.index_pages)
+        return self._by_id
+
+    def recent(self, pages=None):
+        """The newest `pages` pages of the source mailbox, keyed by Message-ID."""
+        width = pages or self.recent_pages
+        if (self.source, width) not in self._pages:
+            self._pages[(self.source, width)], _ = self._walk(width)
+        return self._pages[(self.source, width)]
+
+    def in_mailbox(self, mailbox, message_id, pages=None):
+        """Whether a Message-ID sits in the newest pages of `mailbox`.
+
+        This is the proof that a decision already happened: a run that moved the
+        message and died before closing its row leaves the row pending, and the
+        retry has to record "already moved" rather than "never here".
+        """
+        if not message_id:
+            return False
+        width = pages or self.recent_pages
+        if (mailbox, width) not in self._pages:
+            self._pages[(mailbox, width)], _ = self._walk(width, mailbox)
+        return message_id in self._pages[(mailbox, width)]
 
     def scan(self, query, message_id, max_pages=2):
         """Pages of one search query, matched by Message-ID. None on a miss.
@@ -148,8 +209,14 @@ class Mailbox:
         A himalaya failure is raised, not swallowed into a miss: "the mailbox
         did not answer" must leave the row pending, while "the mailbox answered
         and it is not here" is the only thing that closes one as dismissed.
+
+        A full final page means the query matched more than was read, so one
+        more page is read — stopping at the cap on a full page is how a match
+        three pages deep became a miss and then a dismissal.
         """
-        for page in range(1, max_pages + 1):
+        cap = max_pages
+        page = 1
+        while page <= cap:
             self.searches += 1
             doc = self.himalaya(
                 [
@@ -170,10 +237,20 @@ class Mailbox:
                     return str(envelope.get("id"))
             if len(envelopes) < self.page_size:
                 return None
+            if page == cap:
+                cap += 1
+            page += 1
         return None
 
     def find(self, message_id, subject, sent_at, deep=False):
-        """The mailbox uid for a Message-ID, or None when it is not here."""
+        """The mailbox uid for a Message-ID, or None when it is not here.
+
+        The `date` queries are IMAP `date`, which is the arrival date, not the
+        sender's `Date:` header — newsletters and list mail routinely land days
+        after they were written. A miss on every query is therefore followed by
+        a bounded read of the newest pages before absence is believed; the full
+        walk stays behind `--deep-scan`.
+        """
         if not message_id:
             return None
         queries = date_queries(sent_at)
@@ -184,6 +261,9 @@ class Mailbox:
             uid = self.scan(query, message_id)
             if uid is not None:
                 return uid
+        uid = self.recent().get(message_id)
+        if uid is not None:
+            return uid
         return self.index().get(message_id) if deep else None
 
     def move(self, uid, target):
@@ -248,9 +328,16 @@ def main():
     parser.add_argument("--account", default="")
     parser.add_argument("--mailbox", default="inbox")
     parser.add_argument("--archive-mailbox", default="[Gmail]/All Mail")
+    parser.add_argument("--trash-mailbox", default="[Gmail]/Trash")
     parser.add_argument("--limit", type=int, default=50)
     parser.add_argument("--page-size", type=int, default=100)
     parser.add_argument("--index-pages", type=int, default=60)
+    parser.add_argument(
+        "--recent-pages",
+        type=int,
+        default=5,
+        help="newest pages read before a missed decision is called absent",
+    )
     parser.add_argument(
         "--deep-scan",
         action="store_true",
@@ -266,6 +353,7 @@ def main():
         args.mailbox,
         page_size=args.page_size,
         index_pages=args.index_pages,
+        recent_pages=args.recent_pages,
     )
 
     done, dismissed, skipped, failed = [], [], [], []
@@ -284,6 +372,16 @@ def main():
                 deep=args.deep_scan,
             )
             if uid is None:
+                # Not in the source is not the same as never moved: a run that
+                # moved the message and died before its close leaves the row
+                # pending, and this retry must call that done, not dismissed.
+                target = args.trash_mailbox if kind == DELETE else args.archive_mailbox
+                if target and mailbox.in_mailbox(target, row.get("messageId") or ""):
+                    result = f"already in {target}"
+                    if not args.dry_run:
+                        close(args.api, row["id"], "done", result)
+                    done.append({"id": row["id"], "kind": kind, "result": result})
+                    continue
                 result = f"not in {args.mailbox}"
                 if not args.dry_run:
                     close(args.api, row["id"], "dismissed", result)

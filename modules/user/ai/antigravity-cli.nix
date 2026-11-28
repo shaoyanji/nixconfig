@@ -6,11 +6,11 @@
   self,
   ...
 }: let
-  # `self.packages` is emitted for the fleet's build systems only (linux), so
+  # `self.legacyPackages` is emitted for the fleet's build systems only (linux), so
   # the agy-gemini registry path does not exist on darwin. The wrapper is a
   # pure shell script — the null check is the darwin gate, not a downgrade:
   # `ai` on a mac gets agy itself and skips the gemini-route pair.
-  agyGemini = (self.packages.${pkgs.stdenv.hostPlatform.system} or {}).cli.ai.agy-gemini or null;
+  agyGemini = (self.legacyPackages.${pkgs.stdenv.hostPlatform.system} or {}).cli.ai.agy-gemini or null;
 in {
   # Unconditional: being imported is the enable decision (the leaf list), so
   # there is no profiles.ai.enable flag to read (see ./default.nix).

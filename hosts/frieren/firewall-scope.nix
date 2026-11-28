@@ -89,6 +89,11 @@ in {
         lan = false;
         tailnet = true;
       };
+      fetch-local-proxy = {
+        port = config.services.tailnetForwardProxy.port;
+        lan = false;
+        tailnet = true;
+      };
       harmonia = {
         port = config.services.harmonia-fleet.port;
         tailnet = true;

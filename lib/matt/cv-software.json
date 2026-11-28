@@ -52,10 +52,7 @@
       "items": [
         "NixOS",
         "Linux",
-        "Kubernetes",
-        "AWS",
-        "Azure",
-        "Google Cloud",
+        "Kubernetes (foundations)",
         "systemd",
         "Nix flakes",
         "SSH certificate authority",

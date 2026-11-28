@@ -9,11 +9,60 @@
 }: let
   cfg = config.services.servicePortal;
 
+  telemetryPackage = pkgs.buildGoModule {
+    pname = "service-portal-telemetry";
+    version = "0.2.0";
+    src = ./service-portal/telemetry;
+    vendorHash = null;
+    env.CGO_ENABLED = 0;
+    meta = {
+      description = "Loopback health and stats aggregator for service portal cards";
+      mainProgram = "service-portal-telemetry";
+    };
+  };
+
   esc = s:
     builtins.replaceStrings
     ["&" "<" ">" "\"" "'"]
     ["&amp;" "&lt;" "&gt;" "&quot;" "&#39;"]
     (toString s);
+
+  metricType = lib.types.submodule {
+    options = {
+      key = lib.mkOption {
+        type = lib.types.str;
+        description = "Stats JSON key copied onto the card.";
+      };
+      label = lib.mkOption {
+        type = lib.types.str;
+        description = "Short human-readable metric label.";
+      };
+    };
+  };
+
+  telemetryTargetType = lib.types.submodule {
+    options = {
+      baseUrl = lib.mkOption {
+        type = lib.types.str;
+        description = "Loopback base URL for the service being sampled.";
+      };
+      healthPath = lib.mkOption {
+        type = lib.types.str;
+        default = "/api/health";
+        description = "Health endpoint path below `baseUrl`.";
+      };
+      statsPath = lib.mkOption {
+        type = lib.types.str;
+        default = "/api/stats";
+        description = "Stats endpoint path below `baseUrl`.";
+      };
+      metrics = lib.mkOption {
+        type = lib.types.listOf metricType;
+        default = [];
+        description = "Stats keys surfaced on the card, in display order.";
+      };
+    };
+  };
 
   entryType = lib.types.submodule {
     options = {
@@ -100,6 +149,11 @@
         type = lib.types.nullOr lib.types.str;
         default = null;
       };
+      kind = lib.mkOption {
+        type = lib.types.str;
+        default = "link";
+        description = "Where the card comes from: `nginx`, `mount` or `external`.";
+      };
     };
   };
 
@@ -178,6 +232,7 @@
         then e.badge
         else "${s.proxy.name} :${toString s.port}";
       vhost = s.proxy.name;
+      kind = "nginx";
     })
     exposedKeys;
 
@@ -211,6 +266,7 @@
       else "${cfg.tailnetHost}:${toString m.port}";
     inherit (m) requires;
     vhost = null;
+    kind = "mount";
   }) (cfg.mounts |> lib.filterAttrs (_: m: !m.hideCard) |> builtins.attrNames);
 
   # 3. Standalone cards: renames (`entries.paste` → `frieren.lan`) and things a
@@ -243,11 +299,14 @@
         then e.vhost
         else "";
       inherit (e) vhost;
+      kind = "external";
     })
     standaloneKeys;
 
   allCards = exposureCards ++ mountCards ++ standaloneCards;
   visible = allCards;
+
+  cardSearch = c: lib.toLower "${c.title} ${c.description} ${c.badge} ${c.group} ${c.name}";
 
   cardsFor = audiences:
     lib.concatMapStrings (g: let
@@ -256,17 +315,25 @@
         (lib.filter (c: c.group == g && builtins.elem c.audience audiences) visible);
     in
       lib.optionalString (inGroup != []) ''
-        <h2>${esc g}</h2>
-        <div class="grid">
-        ${lib.concatMapStrings (c: ''
-            <a class="card" href="${esc c.href}">
+        <section class="group" data-group="${esc g}">
+          <h2>${esc g} <span class="gn">${toString (builtins.length inGroup)}</span></h2>
+          <div class="grid">
+          ${lib.concatMapStrings (c: ''
+            <a class="card" href="${esc c.href}" data-group="${esc c.group}"
+               data-audience="${esc c.audience}" data-kind="${esc (c.kind or "link")}"
+               data-service="${esc c.name}" data-search="${esc (cardSearch c)}">
               <div class="title">${esc c.title}</div>
               <div class="desc">${esc c.description}</div>
-              ${lib.optionalString (c.badge != "") ''<div class="badge">${esc c.badge}</div>''}
+              <div class="foot">
+                ${lib.optionalString (c.badge != "") ''<span class="badge">${esc c.badge}</span>''}
+                <span class="kind">${esc (c.kind or "link")}</span>
+              </div>
+              <span class="live" data-live-for="${esc c.name}" hidden></span>
             </a>
           '')
           inGroup}
-        </div>
+          </div>
+        </section>
       '')
     cfg.groups;
 
@@ -277,6 +344,7 @@
   cardsJson = audiences:
     builtins.toJSON (map (c: {
       inherit (c) name title description group audience href badge;
+      kind = c.kind or "link";
       requires = c.requires or [];
     }) (lib.filter (c: builtins.elem c.audience audiences) visible));
 
@@ -307,13 +375,231 @@
             .card:hover { border-color:var(--accent); }
             .title { color:var(--accent); font-weight:600; }
             .desc { color:#8b949e; font-size:.875rem; line-height:1.4; }
-            .badge { margin-top:auto; padding-top:.5rem; color:#58a6ff; font-size:.7rem; }
+            .card .foot { margin-top:auto; display:flex; gap:.5rem; align-items:baseline; padding-top:.5rem; }
+            .badge { color:#58a6ff; font-size:.7rem; }
+            .kind { margin-left:auto; font-size:.6rem; letter-spacing:.06em; text-transform:uppercase;
+                    color:#8b949e; border:1px solid var(--border); border-radius:4px; padding:.05rem .3rem; }
+            .live { display:flex; flex-wrap:wrap; gap:.3rem .45rem; align-items:center; margin-top:.45rem;
+                    padding-top:.45rem; border-top:1px solid var(--border); color:#8b949e;
+                    font-size:.68rem; letter-spacing:.04em; }
+            .live::before { content:""; width:.42rem; height:.42rem; border-radius:50%; background:#8b949e; }
+            .live[data-status="online"]::before { background:#3fb950; }
+            .live[data-status="online"] .live-status { color:#3fb950; }
+            .live[data-status="degraded"]::before { background:#d29922; }
+            .live[data-status="degraded"] .live-status { color:#d29922; }
+            .live[data-status="offline"]::before { background:#f85149; }
+            .live[data-status="offline"] .live-status { color:#f85149; }
+            .live-status { font-weight:600; text-transform:uppercase; letter-spacing:.08em; }
+            .live-metric { color:var(--text); }
+            .live-latency, .live-uptime { border:1px solid var(--border); border-radius:999px; padding:.04rem .34rem; }
+            .live-spark { color:var(--accent); font-size:.72rem; letter-spacing:.02em; }
+            .card[data-live-status="degraded"] { border-color:#d29922; }
+            .card[data-live-status="offline"] { border-color:#f85149; }
+            .attention-banner { width:100%; max-width:60rem; margin:0 0 1rem; padding:.65rem .8rem;
+                                border:1px solid #d29922; border-radius:6px; color:#d29922; background:rgba(210,153,34,.08); }
+            .gn { font-weight:400; color:#484f58; }
+            .toolbar { width:100%; max-width:60rem; display:flex; flex-wrap:wrap; gap:.5rem;
+                       align-items:center; margin:0 0 1rem; }
+            .toolbar input { flex:1 1 16rem; min-width:12rem; padding:.55rem .75rem; border-radius:6px;
+                             border:1px solid var(--border); background:var(--card); color:var(--text);
+                             font-size:.9rem; }
+            .toolbar input:focus { outline:none; border-color:var(--accent); }
+            .chips { display:flex; flex-wrap:wrap; gap:.35rem; }
+            .chip { font:inherit; font-size:.75rem; padding:.3rem .6rem; border-radius:999px;
+                    border:1px solid var(--border); background:transparent; color:#8b949e; cursor:pointer; }
+            .chip[aria-pressed="true"] { border-color:var(--accent); color:var(--accent); }
+            .meta { color:#8b949e; font-size:.75rem; margin-left:auto; }
+            #none { color:#8b949e; margin:1.5rem 0 0; }
+            footer { width:100%; max-width:60rem; color:#484f58; font-size:.7rem; margin-top:2rem; }
+            [hidden] { display:none !important; }
           </style>
         </head>
         <body>
           <h1>${esc cfg.title}</h1>
           <p class="sub">${esc cfg.subtitle}</p>
+          <div class="toolbar">
+            <input id="search" type="search" placeholder="filter services — name, group, address"
+                   autocomplete="off" spellcheck="false" aria-label="Filter services">
+            <div class="chips" id="chips">
+              <button class="chip" data-filter="all" aria-pressed="true">all</button>
+              ${lib.concatMapStrings (g: ''<button class="chip" data-filter="${esc g}" aria-pressed="false">${esc g}</button>'')
+        cfg.groups}
+            </div>
+            <button class="chip attention-chip" id="attention-chip" data-filter="attention" aria-pressed="false">attention</button>
+            <span class="meta" id="count"></span>
+          </div>
+          <div class="attention-banner" id="attention-banner" hidden></div>
           ${body}
+          <p id="none" hidden>nothing matches that filter</p>
+          <footer><a href="data/services.json">data/services.json</a> · telemetry <a href="/api/telemetry/export?format=json">json</a> · <a href="/api/telemetry/export?format=csv">csv</a> · <a href="/api/telemetry/export?format=markdown">markdown</a> · one registry, every renderer</footer>
+          <script>
+            (function () {
+              var search = document.getElementById("search");
+              var count = document.getElementById("count");
+              var none = document.getElementById("none");
+              var cards = Array.prototype.slice.call(document.querySelectorAll(".card"));
+              var groups = Array.prototype.slice.call(document.querySelectorAll("section.group"));
+              var chips = Array.prototype.slice.call(document.querySelectorAll(".chip"));
+              var active = "all";
+              var attentionOnly = false;
+              function apply() {
+                var words = search.value.toLowerCase().split(/\s+/).filter(Boolean);
+                var shown = 0;
+                cards.forEach(function (card) {
+                  var hay = card.getAttribute("data-search") || "";
+                  var okGroup = active === "all" || card.getAttribute("data-group") === active;
+                  var okWords = words.every(function (word) { return hay.indexOf(word) !== -1; });
+                  var liveStatus = card.getAttribute("data-live-status") || "";
+                  var okAttention = !attentionOnly || liveStatus === "degraded" || liveStatus === "offline";
+                  var ok = okGroup && okWords && okAttention;
+                  card.hidden = !ok;
+                  if (ok) shown += 1;
+                });
+                groups.forEach(function (group) {
+                  group.hidden = !group.querySelector(".card:not([hidden])");
+                });
+                count.textContent = shown === cards.length
+                  ? cards.length + " services"
+                  : shown + " of " + cards.length + " services";
+                none.hidden = shown > 0;
+              }
+              chips.forEach(function (chip) {
+                chip.addEventListener("click", function () {
+                  var next = chip.getAttribute("data-filter");
+                  if (next === "attention") {
+                    attentionOnly = !attentionOnly;
+                    chip.setAttribute("aria-pressed", String(attentionOnly));
+                  } else {
+                    active = next === active ? "all" : next;
+                    chips.forEach(function (other) {
+                      if (other.getAttribute("data-filter") === "attention") return;
+                      other.setAttribute(
+                        "aria-pressed",
+                        String(other.getAttribute("data-filter") === active)
+                      );
+                    });
+                  }
+                  apply();
+                });
+              });
+              search.addEventListener("input", apply);
+              document.addEventListener("keydown", function (event) {
+                if (event.key === "/" && document.activeElement !== search) {
+                  event.preventDefault();
+                  search.focus();
+                  search.select();
+                } else if (event.key === "Escape" && document.activeElement === search) {
+                  search.value = "";
+                  apply();
+                  search.blur();
+                }
+              });
+              apply();
+
+              var liveSlots = Array.prototype.slice.call(document.querySelectorAll("[data-live-for]"));
+              function metricText(value) {
+                if (typeof value === "number") return Number.isInteger(value) ? String(value) : value.toFixed(1);
+                if (typeof value === "boolean") return value ? "yes" : "no";
+                return String(value == null ? "—" : value);
+              }
+              function sparkline(samples) {
+                if (!samples || !samples.length) return "";
+                var blocks = "▁▂▃▄▅▆▇█";
+                var max = Math.max.apply(null, samples.concat([1]));
+                return samples.map(function (latency) {
+                  var index = Math.max(0, Math.min(blocks.length - 1, Math.round((latency / max) * (blocks.length - 1))));
+                  return blocks.charAt(index);
+                }).join("");
+              }
+              function renderLive(slot, state) {
+                slot.textContent = "";
+                slot.hidden = false;
+                slot.setAttribute("data-telemetry-active", "1");
+                slot.setAttribute("data-status", state.status || "unknown");
+                var card = slot.closest(".card");
+                if (card) card.setAttribute("data-live-status", state.status || "unknown");
+                var status = document.createElement("span");
+                status.className = "live-status";
+                status.textContent = state.status || "unknown";
+                slot.appendChild(status);
+                if (typeof state.latency_ms === "number") {
+                  var latency = document.createElement("span");
+                  latency.className = "live-latency";
+                  latency.textContent = state.latency_ms + " ms";
+                  slot.appendChild(latency);
+                }
+                if (typeof state.uptime_percent === "number") {
+                  var uptime = document.createElement("span");
+                  uptime.className = "live-uptime";
+                  uptime.textContent = state.uptime_percent.toFixed(1) + "% up";
+                  slot.appendChild(uptime);
+                }
+                var spark = sparkline(state.latency_samples || []);
+                if (spark) {
+                  var line = document.createElement("span");
+                  line.className = "live-spark";
+                  line.textContent = spark;
+                  slot.appendChild(line);
+                }
+                (state.metrics || []).slice(0, 3).forEach(function (metric) {
+                  var item = document.createElement("span");
+                  item.className = "live-metric";
+                  item.textContent = metricText(metric.value) + " " + (metric.label || metric.key || "metric");
+                  slot.appendChild(item);
+                });
+                slot.title = (state.error || "live service telemetry") +
+                  " · p50 " + (state.p50_latency_ms || 0) + " ms" +
+                  " · p95 " + (state.p95_latency_ms || 0) + " ms" +
+                  (state.last_transition_at ? " · last transition " + state.last_transition_at : "");
+              }
+              function updateAttention(services) {
+                var banner = document.getElementById("attention-banner");
+                if (!banner) return;
+                var names = Object.keys(services).filter(function (name) {
+                  return services[name].status === "degraded" || services[name].status === "offline";
+                });
+                banner.hidden = names.length === 0;
+                banner.textContent = names.length
+                  ? names.length + " service" + (names.length === 1 ? "" : "s") + " need attention: " + names.join(", ")
+                  : "";
+              }
+              function loadTelemetry() {
+                if (!liveSlots.length || !window.fetch) return;
+                fetch("/api/telemetry", {headers: {Accept: "application/json"}, cache: "no-store"})
+                  .then(function (response) {
+                    if (!response.ok) throw new Error("telemetry HTTP " + response.status);
+                    return response.json();
+                  })
+                  .then(function (payload) {
+                    var services = payload.services || {};
+                    liveSlots.forEach(function (slot) {
+                      var state = services[slot.getAttribute("data-live-for")];
+                      if (!state) {
+                        slot.hidden = true;
+                        return;
+                      }
+                      renderLive(slot, state);
+                    });
+                    updateAttention(services);
+                    apply();
+                  })
+                  .catch(function () {
+                    liveSlots.forEach(function (slot) {
+                      if (slot.getAttribute("data-telemetry-active") !== "1") return;
+                      slot.textContent = "";
+                      slot.hidden = false;
+                      slot.setAttribute("data-status", "unknown");
+                      var status = document.createElement("span");
+                      status.className = "live-status";
+                      status.textContent = "telemetry unavailable";
+                      slot.appendChild(status);
+                    });
+                  });
+              }
+              loadTelemetry();
+              setInterval(loadTelemetry, 15000);
+            })();
+          </script>
         </body>
       </html>
     '';
@@ -329,6 +615,23 @@
   serve = args: "${pkgs.util-linux}/bin/flock ${serveLock} ${config.services.tailscale.package}/bin/tailscale ${args}";
 
   mountPorts = map (m: m.port) (builtins.attrValues cfg.mounts);
+
+  telemetryConfigFile = pkgs.writeText "service-portal-telemetry.json" (builtins.toJSON {
+    targets = map (name: let
+      target = cfg.telemetry.targets.${name};
+    in {
+      inherit name;
+      base_url = target.baseUrl;
+      health_path = target.healthPath;
+      stats_path = target.statsPath;
+      metrics =
+        map (metric: {
+          inherit (metric) key label;
+        })
+        target.metrics;
+    }) (builtins.attrNames cfg.telemetry.targets);
+  });
+
   # Prefix test, not a regex: POSIX ERE rejected the bracket form of `[::1]`
   # at eval (measured on delphi, 2026-10-21), and a mount upstream is a literal
   # loopback URL in every case this registry will ever hold.
@@ -404,6 +707,70 @@ in {
       '';
     };
 
+    telemetry = {
+      enable = lib.mkEnableOption "loopback health and stats telemetry for portal cards";
+
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 8105;
+        description = "Loopback port for the telemetry aggregator. It is proxied by nginx; no tailnet mount or firewall port is opened.";
+      };
+
+      intervalSeconds = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 10;
+        description = "Seconds between target polls.";
+      };
+
+      timeoutMilliseconds = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 1500;
+        description = "Per-request timeout for a target health or stats read.";
+      };
+
+      historySamples = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 144;
+        description = "Per-target ring-buffer samples kept for latency and uptime calculations.";
+      };
+
+      alertWebhook = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Optional ntfy or generic webhook URL receiving debounced degradation and recovery alerts as JSON posts. Prefer SERVICE_PORTAL_ALERT_WEBHOOK in environmentFile when the URL contains a private topic or credential.";
+      };
+
+      environmentFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Optional systemd EnvironmentFile containing SERVICE_PORTAL_ALERT_WEBHOOK. Render it from sops; never put private topics or credentials in the Nix store.";
+      };
+
+      alertCooldownSeconds = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 900;
+        description = "Minimum seconds between alert episodes for one target, suppressing flap spam.";
+      };
+
+      alertFailureThreshold = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 2;
+        description = "Consecutive non-online samples required before a degradation alert is posted.";
+      };
+
+      alertRecovery = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Post a recovery alert when a target that raised an alert returns online.";
+      };
+
+      targets = lib.mkOption {
+        type = lib.types.attrsOf telemetryTargetType;
+        default = {};
+        description = "Telemetry targets keyed by the service card/mount name.";
+      };
+    };
+
     cards = lib.mkOption {
       type = lib.types.listOf cardType;
       readOnly = true;
@@ -435,6 +802,7 @@ in {
     services.servicePortal.cards =
       map (c: {
         inherit (c) name title description group audience href badge vhost;
+        kind = c.kind or "link";
         requires = c.requires or [];
       })
       visible;
@@ -446,45 +814,96 @@ in {
     };
     services.servicePortal.json = pkgs.writeText "service-portal.json" (cardsJson ["public" "lan" "tailnet"]);
 
-    systemd.services = lib.mapAttrs' (n: m:
-      lib.nameValuePair "tailscale-serve-${n}" {
-        description = "Tailnet-only HTTPS front for ${m.title}";
-        after = ["tailscaled.service"] ++ m.requires;
-        wants = ["tailscaled.service"] ++ m.requires;
-        # `After=` is ordering, not readiness: at boot tailscaled is still
-        # NoState, `tailscale serve` exits 1 exactly once, and the unit then
-        # stays failed with no retry — every mount on delphi was down until a
-        # manual restart (2026-10-26). Wait for BackendState=Running, and
-        # re-assert the mount when tailscaled restarts, because serve
-        # configuration is per-process state rather than a file.
-        partOf = ["tailscaled.service"];
-        wantedBy = ["multi-user.target"];
-        unitConfig.StartLimitIntervalSec = 0;
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-          TimeoutStartSec = 150;
-          Restart = "on-failure";
-          RestartSec = 5;
-          ExecStartPre = pkgs.writeShellScript "tailscale-serve-wait" ''
-            set -euo pipefail
-            state=NoState
-            for _ in $(seq 1 60); do
-              state=$(${config.services.tailscale.package}/bin/tailscale status --json 2>/dev/null |
-                ${pkgs.jq}/bin/jq -r '.BackendState // "NoState"' 2>/dev/null || echo NoState)
-              if [ "$state" = Running ]; then
-                exit 0
-              fi
-              sleep 2
-            done
-            echo "tailscale serve: tailscaled not Running after 120s (last: $state)" >&2
-            exit 1
-          '';
-          ExecStart = serve "serve --bg --https=${toString m.port} ${m.upstream}";
-          ExecStop = serve "serve --https=${toString m.port} off";
+    systemd.services =
+      lib.mapAttrs' (n: m:
+        lib.nameValuePair "tailscale-serve-${n}" {
+          description = "Tailnet-only HTTPS front for ${m.title}";
+          after = ["tailscaled.service"] ++ m.requires;
+          wants = ["tailscaled.service"] ++ m.requires;
+          # `After=` is ordering, not readiness: at boot tailscaled is still
+          # NoState, `tailscale serve` exits 1 exactly once, and the unit then
+          # stays failed with no retry — every mount on delphi was down until a
+          # manual restart (2026-10-26). Wait for BackendState=Running, and
+          # re-assert the mount when tailscaled restarts, because serve
+          # configuration is per-process state rather than a file.
+          partOf = ["tailscaled.service"];
+          wantedBy = ["multi-user.target"];
+          unitConfig.StartLimitIntervalSec = 0;
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            TimeoutStartSec = 150;
+            Restart = "on-failure";
+            RestartSec = 5;
+            ExecStartPre = pkgs.writeShellScript "tailscale-serve-wait" ''
+              set -euo pipefail
+              state=NoState
+              for _ in $(seq 1 60); do
+                state=$(${config.services.tailscale.package}/bin/tailscale status --json 2>/dev/null |
+                  ${pkgs.jq}/bin/jq -r '.BackendState // "NoState"' 2>/dev/null || echo NoState)
+                if [ "$state" = Running ]; then
+                  exit 0
+                fi
+                sleep 2
+              done
+              echo "tailscale serve: tailscaled not Running after 120s (last: $state)" >&2
+              exit 1
+            '';
+            ExecStart = serve "serve --bg --https=${toString m.port} ${m.upstream}";
+            ExecStop = serve "serve --https=${toString m.port} off";
+          };
+        })
+      cfg.mounts
+      // lib.optionalAttrs cfg.telemetry.enable {
+        service-portal-telemetry = {
+          description = "Loopback health and stats aggregator for service portal cards";
+          wantedBy = ["multi-user.target"];
+          unitConfig.X-Fleet-Role = "daemon";
+          serviceConfig = {
+            Type = "simple";
+            DynamicUser = true;
+            ExecStart = lib.escapeShellArgs [
+              (lib.getExe telemetryPackage)
+              "-addr"
+              "127.0.0.1:${toString cfg.telemetry.port}"
+              "-config"
+              telemetryConfigFile
+              "-interval"
+              "${toString cfg.telemetry.intervalSeconds}s"
+              "-timeout"
+              "${toString cfg.telemetry.timeoutMilliseconds}ms"
+              "-history"
+              (toString cfg.telemetry.historySamples)
+              "-alert-webhook"
+              (
+                if cfg.telemetry.alertWebhook == null
+                then ""
+                else cfg.telemetry.alertWebhook
+              )
+              "-alert-cooldown"
+              "${toString cfg.telemetry.alertCooldownSeconds}s"
+              "-alert-threshold"
+              (toString cfg.telemetry.alertFailureThreshold)
+              "-alert-recovery"
+              (
+                if cfg.telemetry.alertRecovery
+                then "true"
+                else "false"
+              )
+            ];
+            EnvironmentFile = lib.optional (cfg.telemetry.environmentFile != null) cfg.telemetry.environmentFile;
+            Restart = "always";
+            RestartSec = 3;
+            TimeoutStopSec = 10;
+            PrivateTmp = true;
+            ProtectSystem = "strict";
+            ProtectHome = true;
+            NoNewPrivileges = true;
+            RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
+            MemoryMax = "128M";
+          };
         };
-      })
-    cfg.mounts;
+      };
 
     assertions = [
       {
@@ -498,6 +917,14 @@ in {
       {
         assertion = builtins.all (m: isLoopback m.upstream) (builtins.attrValues cfg.mounts);
         message = "services.servicePortal.mounts: an upstream must be loopback — a mount to 0.0.0.0 or a LAN address proxies past the tailnet fence.";
+      }
+      {
+        assertion = !cfg.telemetry.enable || cfg.telemetry.targets != {};
+        message = "services.servicePortal.telemetry: enable it only with at least one target.";
+      }
+      {
+        assertion = builtins.all (target: isLoopback target.baseUrl) (builtins.attrValues cfg.telemetry.targets);
+        message = "services.servicePortal.telemetry.targets: baseUrl must be loopback; the aggregator is not a LAN probe.";
       }
       {
         assertion = builtins.all (m: builtins.all (u: builtins.hasAttr (lib.removeSuffix ".service" u) config.systemd.services) m.requires) (builtins.attrValues cfg.mounts);

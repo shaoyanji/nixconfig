@@ -28,7 +28,7 @@
   defaultSideBySide = !isLaptop;
   geminiApi =
     if pkgs.stdenv.hostPlatform.system == "x86_64-linux"
-    then (self.packages.${pkgs.stdenv.hostPlatform.system} or {}).cli.ai.gemini-api or null
+    then (self.legacyPackages.${pkgs.stdenv.hostPlatform.system} or {}).cli.ai.gemini-api or null
     else null;
 in {
   imports = [

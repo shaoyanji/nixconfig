@@ -150,25 +150,22 @@ if [ -n "$STAGED_NIX" ]; then
 fi
 
 # The comment census is a shrink-only ratchet: a `.nix` file may not carry one
-# more prose line than `flake/nix-comments.nix` records. It is one eval and no
-# build, so it runs on every commit that stages a `.nix` — the failure mode is a
-# ceiling raised by accident in a commit whose diff looked like a one-line edit
-# and whose author never ran `checks:policies`.
+# more prose line than `flake/nix-comments.nix` records. It runs the script
+# behind `task checks:nix:comments` rather than a second copy of the comparison,
+# for the reason the formatter above does: the gate judging your commit cannot
+# drift from the task you just ran locally. It costs ~2.7 s and no build.
+CENSUS="$REPO_ROOT/scripts/task/nix-comments.sh"
 if [ -n "$STAGED_NIX" ]; then
-  HEADER="$(nix eval .#nixComments.header 2>/dev/null || true)"
-  CEILING="$(nix eval .#nixComments.ceiling 2>/dev/null || true)"
-  if ! [[ "$HEADER" =~ ^[0-9]+$ && "$CEILING" =~ ^[0-9]+$ ]]; then
-    echo "pre-commit: the comment census could not be read; refusing to skip it." >&2
+  if [ ! -f "$CENSUS" ]; then
+    echo "pre-commit: $CENSUS is missing; refusing to skip the census gate." >&2
     exit 1
   fi
-  if [ "$HEADER" -gt "$CEILING" ]; then
-    echo "Commit refused: Nix comment lines ${HEADER} > ceiling ${CEILING}." >&2
-    echo "  A comment must be a pointer: a path, a task name, a policy id, an attr." >&2
-    echo "  Where the prose is: nix eval --json .#nixComments.headerPerFile | jq 'to_entries|sort_by(-.value)|.[:5]'" >&2
-    echo "  Rule: flake/policies.nix#nix-comments-are-pointers" >&2
+  if ! CENSUS_OUT="$(bash "$CENSUS" 2>&1)"; then
+    echo "Commit refused: the Nix comment census failed." >&2
+    printf '%s\n' "$CENSUS_OUT" | sed 's/^/  /' >&2
     exit 1
   fi
-  echo "Comment census ${HEADER}/${CEILING}."
+  printf '%s\n' "$CENSUS_OUT" | sed -n '1p'
 fi
 
 # A task that arrives without a desc and without a summary is invisible in both

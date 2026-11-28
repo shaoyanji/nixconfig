@@ -288,11 +288,13 @@ tasks:
       scripts/task/cv-blog-check.sh: the six published PDFs — cv, cv-de,
       cv-energy, cv-energy-de, cv-software, cv-software-de — must hash equal to
       `.#sites.matt-site` and, in `_site`, be the target of an anchor with
-      `download` that resolves. Measured 2026-11-25: exit 0, 6/6 hash-equal and
-      6/6 anchors resolving; the German CV's "dreizehn Hosts" still matches the
-      13 active NixOS hosts. Env: BLOG_REPO, ARTIFACT, SITE, REQUIRED. Exit 0
-      linked, 1 drift, 2 cannot tell. Deploys, sends and commits nothing.
+      `download` that resolves. `matt:cv:evidence` runs first, so the published
+      hash also carries claims a built PDF and an artifact back, and it fails a
+      public packet copy whose DevOps skills line names a stack item the CVs no
+      longer render. Exit 0 linked, 1 drift, 2 cannot tell. Deploys, sends and
+      commits nothing.
     cmds:
+      - bash scripts/task/cv-evidence-check.sh
       - bash scripts/task/cv-blog-check.sh
 
   agents:agy:
@@ -366,6 +368,34 @@ tasks:
       vars: [CMD]
     cmds:
       - 'bash scripts/task/edge-sidecar.sh "{{.CMD | default "status"}}"'
+
+  agents:portfolio:smoke:
+    desc: "Smoke the portfolio services end to end: health, stats, analytics, page, search"
+    summary: >
+      scripts/task/portfolio-smoke.py — one run over job-db-scraper,
+      private-deals, inventory-site, clanker-runner and link-vault: health answers
+      `ok` naming itself, stats a non-empty object, `/api/analytics` a report, `/`
+      the element its JS fills, search `q=` rows, a QR label (skipped when empty),
+      clanker's machines/presets/schedules, link-vault's `/api/tags`. Empty answers
+      pass; `--expect-hit` fails them. `--format toon`, `--browser` (DOM half;
+      `--clanker-browser` runs it on clanker, no local binary),
+      `--jobs/--deals/--inventory/--clanker/--link-vault` for the mounts. Exit 1
+      names the failure.
+    cmds:
+      - python3 scripts/task/portfolio-smoke.py {{.CLI_ARGS}}
+
+  agents:portfolio:seed:
+    desc: "Seed the portfolio indexes in one pass: scrape, batch-ingest, inventory sync"
+    summary: >
+      scripts/task/portfolio-seed.py — the three lanes in one run: a page through
+      job-page-scrape into `POST /api/postings/batch`, one through
+      deals-page-scrape into `POST /api/deals/batch`, and inventory-sync by
+      `--eval`. `--jobs` and `--deals` take URLs, `--jobs-from` and `--deals-from`
+      reuse a saved scrape, `--only jobs,deals,inventory` picks lanes, `--dry-run`
+      shapes without posting, `--format toon` renders it. A page with no hits is
+      a zero, not a failure; a refusal exits 1 with the first error named.
+    cmds:
+      - python3 scripts/task/portfolio-seed.py {{.CLI_ARGS}}
 
   agents:ledger:record:
     desc: "Record one classified issue in the running ledger (CLASS, EVIDENCE, FIX)"
@@ -663,6 +693,20 @@ tasks:
         [ "$n" -gt 0 ] || { echo "agents:mail:resolve: nothing open for {{.ID}}" >&2; exit 1; }
         echo "resolved {{.ID}} ($n verdict(s))"
 
+  agents:web:
+    desc: Search, extract or health-check the web (task agents:web -- search "query" [--max N] [--link-vault URL] | extract <url> | health <url> [--via clanker] [--format toon])
+    summary: >
+      `web-research.py`: search, extract and health-check the web. `search` asks
+      Tavily, Context and Firecrawl together and merges by canonical URL, so one
+      page is one source (`s1`, `s2`). `--link-vault BASE` files the hits into
+      link-vault and reports pushed, skipped and failed; `--extract-on-push`
+      also fetches the page text there and counts extracted and extract-failed
+      apart; `--collection`, `--tags`, `LINK_VAULT_TOKEN`. `extract` walks
+      firecrawl → context → tavily → browser → http. `health` judges what
+      agent-browser rendered, here or on clanker.
+    cmds:
+      - python3 scripts/task/web-research.py {{.CLI_ARGS}}
+
   agents:mail:sweep:
     desc: "Resolve a block of the open queue by selector (SENDER= DOMAIN= SUBJECT= TIER= OWNER= OLDER= NEWER=; dry run unless DRY=0)"
     summary: >
@@ -818,6 +862,19 @@ tasks:
         else
           mail-atlas-reconcile --dry-run
         fi
+
+  agents:mail:atlas:probe:
+    desc: "Is the mailbox still moving? probe|stats|recent|search|routes over the archive API (CLI_ARGS; EMAIL_ARCHIVE_API overrides the mount)"
+    summary: >
+      `bash scripts/task/mail-atlas.sh probe` fails when the newest letter is
+      older than 48h, when a queued letter waited past 30m, or when the archive
+      holds nothing — the three ways the reader looks fine while the loop is
+      dead. `stats` is the counters, `recent N` the newest letters, `search Q`
+      full-text (`--fuzzy` for typos), `routes` the deployed contract. Read-only.
+      It never appends `lim` to search: an undeclared parameter is a 404 on this
+      API, which reads as a route that is not deployed.
+    cmds:
+      - bash scripts/task/mail-atlas.sh {{.CLI_ARGS}}
 
   agents:ci:queue:
     desc: "Unresolved CI and robot mail an agent owns — the loop's own inbox (TOON; FORMAT=text for a table, LIM=50)"

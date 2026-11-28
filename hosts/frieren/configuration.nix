@@ -170,6 +170,7 @@ in {
     self.modules."services.aria2-daemon"
     self.modules."services.harmonia"
     self.modules."services.fleet-sentinel"
+    self.modules."profiles.sentinel-push"
     self.modules."services.fleet-classification-gate"
     self.modules."services.home-assistant"
     self.modules."services.kiwix"
@@ -178,6 +179,7 @@ in {
     self.modules."services.iventoy"
     self.modules."services.simplex-smp-server"
     self.modules."services.task-web"
+    self.modules."services.tailnet-forward-proxy"
     self.modules."profiles.nixbuild-client"
   ];
 
@@ -193,6 +195,12 @@ in {
 
   # Serve the fleet's LAN binary cache (see modules/services/harmonia.nix).
   services.harmonia-fleet.enable = true;
+
+  services.tailnetForwardProxy = {
+    enable = true;
+    port = 8471;
+    memoryMax = "64M";
+  };
 
   # Closed loop: 15-minute observation ledger + health endpoint. gatus watches
   # /sentinel/status.json; `task ops:health` is the operator gate; the ledger is

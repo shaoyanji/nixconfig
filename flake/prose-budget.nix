@@ -44,7 +44,7 @@
     ".agents/skills/job-scout-lane/SKILL.md" = 84;
     ".agents/skills/jobsearch-pipeline/SKILL.md" = 81;
     ".agents/skills/jev-email-cleansing/SKILL.md" = 12;
-    ".agents/skills/jevdecide/SKILL.md" = 156;
+    ".agents/skills/jevdecide/SKILL.md" = 170;
     ".agents/skills/knowledge-base/SKILL.md" = 197;
     ".agents/skills/mail-alias/SKILL.md" = 83;
     ".agents/skills/mail-archive/SKILL.md" = 169;

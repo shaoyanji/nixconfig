@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clanker Runner · VM job control</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="hero">
+      <nav class="topline">
+        <div class="brand"><span class="mark">CR</span><span>clanker-runner</span></div>
+        <div class="status-pill" id="health"><span class="pulse"></span>connecting</div>
+      </nav>
+      <section class="hero-grid">
+        <div>
+          <p class="eyebrow">tailnet offload control plane</p>
+          <h1>Wake the box. Run the build. Keep the log.</h1>
+          <p class="lede">A persistent control surface for InstaBox VMs: machine state, wake and exec triggers, Nix and agent-browser jobs, and SQLite FTS5 history that survives the run.</p>
+        </div>
+        <form class="job-card" id="job-form">
+          <div class="card-label">new remote job</div>
+          <div class="form-grid">
+            <label>Machine<input id="machine" value="clanker" autocomplete="off"></label>
+            <label>Kind
+              <select id="kind">
+                <option value="shell">shell</option>
+                <option value="nix">nix build</option>
+                <option value="agent-browser">agent-browser</option>
+              </select>
+            </label>
+          </div>
+          <label id="command-label">Command<textarea id="command" rows="4" placeholder="nix flake show&#10;or a shell command for the VM"></textarea></label>
+          <label id="attr-label" class="hidden">Flake attribute<input id="attr" placeholder=".#packages.x86_64-linux.demo"></label>
+          <label id="args-label" class="hidden">Extra args<input id="args" placeholder="--print-out-paths or agent-browser arguments"></label>
+          <button type="submit">Queue job</button>
+        </form>
+      </section>
+    </header>
+
+    <main>
+      <section class="metrics">
+        <article><span id="metric-total">—</span><small>recorded jobs</small></article>
+        <article><span id="metric-running">—</span><small>queued or running</small></article>
+        <article><span id="metric-success">—</span><small>successful</small></article>
+        <article><span id="metric-failed">—</span><small>failed</small></article>
+      </section>
+
+      <section class="workspace">
+        <aside class="side">
+          <div class="panel-heading">Validated presets</div>
+          <div class="preset-params">
+            <input id="preset-url" placeholder="https://page for DOM check">
+            <input id="preset-selector" placeholder="CSS selector (default body)">
+            <input id="preset-package" placeholder="nixpkgs package">
+            <input id="preset-args" placeholder="plain tool args">
+            <input id="preset-flake" placeholder="flake ref (default /data/nixconfig)">
+            <input id="preset-dir" placeholder="/data/project checkout">
+            <input id="preset-target" placeholder="build target / package path">
+          </div>
+          <div id="presets" class="presets"></div>
+          <div class="panel-heading filter-heading">Recurring schedules</div>
+          <form id="schedule-form" class="schedule-form">
+            <select id="schedule-preset"></select>
+            <input id="schedule-machine" value="clanker" aria-label="machine">
+            <input id="schedule-interval" type="number" min="15" max="604800" value="3600" aria-label="interval seconds">
+            <label class="checkline"><input id="schedule-start" type="checkbox"> start now</label>
+            <button type="submit">Add schedule</button>
+          </form>
+          <div id="schedules" class="schedules"></div>
+          <div class="panel-heading filter-heading">Machines</div>
+          <div id="machines" class="machines"></div>
+          <div class="panel-heading filter-heading">Filter jobs</div>
+          <label>Search<input id="q" placeholder="command, output, machine…"></label>
+          <label>Status
+            <select id="status"><option value="">any</option><option>queued</option><option>running</option><option>finished</option><option>failed</option></select>
+          </label>
+          <label>Kind
+            <select id="kind-filter"><option value="">any</option><option>shell</option><option>nix</option><option>agent-browser</option></select>
+          </label>
+          <button id="reset" class="ghost">Reset</button>
+        </aside>
+
+        <section class="jobs-panel">
+          <div class="jobs-header"><strong id="job-count">0</strong> jobs<span class="muted" id="query-echo">latest first</span></div>
+          <div id="jobs" class="jobs"></div>
+          <div class="pager"><button id="prev" class="ghost">← Previous</button><span id="page-label">page 1</span><button id="next" class="ghost">Next →</button></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="detail">
+    <button class="close" id="close-detail" aria-label="Close">×</button>
+    <div id="detail-body"></div>
+  </dialog>
+  <script src="/app.js" defer></script>
+</body>
+</html>

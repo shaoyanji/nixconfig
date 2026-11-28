@@ -7,7 +7,7 @@
     "subtitle": "Go · NixOS fleets · operational data · energy infrastructure",
     "location": "Gutach im Breisgau, Germany · remote (CET, US-East overlap)",
     "status": "Open to senior and lead roles",
-    "target": "Target: DevOps, SRE, platform and infrastructure engineering — Kubernetes or OpenShift, Terraform and GitOps on GCP or Azure, Linux estates on-prem or in the cloud; remote from a CET base or on site in Freiburg.",
+    "target": "Target: DevOps, SRE, platform and infrastructure engineering — Kubernetes and containers on Linux and systemd, CI gates in GitHub Actions, and a Nix flake as the source of truth for the fleet; remote from a CET base or on site in Freiburg.",
     "bio": "Most of my working life has gone into making operational data usable: four years of asset management for a commercial solar portfolio, with yield models that passed bank audits, mobile field capture and telemetry reconciliation when sensors went missing. Between roles I completed a three-month PPA engagement for EWE Trading and built a twenty-five-host NixOS fleet from one flake — SSH certificate authority, per-host encrypted secrets, a sentinel watching disk, memory and generation age — alongside local language, speech and image models behind one OpenAI-compatible endpoint. I am looking for systems work where operational data has to be trusted.",
     "contacts": [
       {
@@ -228,19 +228,21 @@
       "items": [
         "NixOS",
         "Nix flakes",
-        "AWS Lambda (small agent project)",
+        "Linux and systemd",
+        "containers",
+        "Kubernetes (foundations)",
+        "GitHub Actions",
+        "CI gates",
         "SSH certificate authority",
         "SOPS and age",
         "Tailscale",
-        "systemd",
-        "CI gates",
-        "Salesforce",
-        "Microsoft 365",
-        "networking and Wi-Fi",
+        "gatus health checks",
+        "alert bridge and sentinel ledger",
         "MCP servers",
         "local model endpoints",
-        "Prometheus-series metrics",
-        "alerting"
+        "Salesforce",
+        "Microsoft 365",
+        "networking and Wi-Fi"
       ]
     },
     {
@@ -264,7 +266,7 @@
   ],
   "hire": {
     "title": "What I am looking for",
-    "body": "A senior or lead systems role across DevOps, SRE, platform and infrastructure: Kubernetes with GitOps and infrastructure as code, cloud platform work on GCP or Azure, or the Linux, datacenter and AI estates underneath. Remote from a CET base, or on site in Freiburg and the Upper Rhine.",
+    "body": "A senior or lead systems role across DevOps, SRE, platform and infrastructure: Kubernetes and containers on Linux and systemd, CI gates in GitHub Actions, and the declarative Nix fleet that replaces hand-built hosts, with the datacenter and AI estates underneath. Remote from a CET base, or on site in Freiburg and the Upper Rhine.",
     "briefsNote": "Notes on what I would do in the first ninety days:",
     "wants": [
       "Go, Python, PostgreSQL, NixOS; comfortable owning a service end to end",

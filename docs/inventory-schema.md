@@ -98,8 +98,8 @@ module list.
 | :--- | :--- | :--- |
 | Fast per-host read | `nix eval .#inventory.hosts.<host> --json` | The validated record. **No host configuration is evaluated** — the registry is parsed once at flake level. |
 | Derived facts | `nix eval .#inventory.derived --json` | `total`, `nix`, `external`, `active`, `activeNix`, `activeExternal`, `wip`, `preserved` |
-| Pretty JSON | `task dev:inventory:json` | `packages.<system>.inventory-json` — the registry for scripts, instead of re-parsing TOML with `yq` |
-| Agent feed | `task dev:inventory:feed` | `packages.<system>.fleet-feed` — role, status, persona hint, compute tier, hardware, traits, services and notes per Nix host |
+| Pretty JSON | `task dev:inventory:json` | `legacyPackages.<system>.artifacts.inventory-json` — the registry for scripts, instead of re-parsing TOML with `yq` |
+| Agent feed | `task dev:inventory:feed` | `legacyPackages.<system>.artifacts.fleet-feed` — role, status, persona hint, compute tier, hardware, traits, services and notes per Nix host |
 | Per-host convenience | `task dev:inventory:host HOST=<name>` | One compiled record, no host eval |
 
 Use `task dev:inventory:json` in scripts rather than `yq` on

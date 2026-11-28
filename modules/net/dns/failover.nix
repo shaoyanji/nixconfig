@@ -229,6 +229,11 @@ in {
           };
         };
         database.maxDBdays = 31;
+        # checks:resolver:loopback — un-pinned, the lo-bound anycast answer is 127.0.0.1
+        reply.host = {
+          force4 = true;
+          IPv4 = cfg.zoneAddress;
+        };
         # FTL 6 is an NTP client and server, and 6.7.1 has no single switch: the
         # keys are `ntp.ipv4.active`, `ntp.ipv6.active`, `ntp.sync.active` (a bare
         # `ntp.active` is silently ignored). Nothing in the fleet opens 123, so

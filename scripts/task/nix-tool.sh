@@ -27,7 +27,7 @@ LLM="github:numtide/llm-agents.nix"     # fresh upstream — cache-served by des
 registry() {
   cat <<EOF
 agy|${LLM}#antigravity-cli|agy
-agy-gemini|git+file://{REPO}?submodules=1#packages.{SYSTEM}.cli.ai.agy-gemini|agy-gemini
+agy-gemini|git+file://{REPO}?submodules=1#cli.ai.agy-gemini|agy-gemini
 qmd|${LLM}#qmd|qmd
 toon|${LLM}#toon|toon
 ai-memory|${LLM}#ai-memory|ai-memory

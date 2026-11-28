@@ -437,6 +437,27 @@ tasks:
       - task dev:inventory:home-agents
       - task docs:build
 
+  dev:inventory:site:
+    desc: Push compiled fleet hosts into inventory-site (DRY=1 prints, DRY=0 writes; ONLY=, TOON=1, IN=)
+    summary: >
+      One row per host from `nix eval .#inventory.hosts` into inventory-site's
+      `/api/items`, written under the service's own identity — `source=inventory.toml`,
+      `source_key=host/<name>` — so a sync and its TOML import update the same row
+      instead of filing each host twice. Hardware lands in the notes, traits in tags.
+      DRY=1 (the default) prints what would post; DRY=0 writes to API=. ONLY=
+      narrows by host key, TOON=1 reads as TOON, IN=hosts.json skips the eval.
+      CLI_ARGS=--toml inventory.toml adds each host's declared services and
+      audits its tailnet mounts for two things on one port.
+    cmds:
+      - >-
+        python3 scripts/task/inventory-sync.py
+        --api {{.API | default "https://delphi.cloudforest-kardashev.ts.net:8466"}}
+        {{if eq (.DRY | default "1") "1"}}--dry-run{{end}}
+        {{if .ONLY}}--only {{.ONLY}}{{end}}
+        {{if eq (.TOON | default "0") "1"}}--format toon{{end}}
+        {{if .IN}}--in {{.IN}}{{else}}--eval{{end}}
+        {{.CLI_ARGS}}
+
   dev:inventory:counts:
     desc: Recompute inventory.toml's derived [metadata] counts from .hosts
     summary: >
@@ -492,22 +513,22 @@ tasks:
   dev:inventory:json:
     desc: Print the compiled inventory as pretty JSON (schema-checked, derived counts)
     summary: >
-      Builds packages.<system>.inventory-json from the single parse in lib/inventory.nix.
+      Builds legacyPackages.<system>.artifacts.inventory-json from the single parse in lib/inventory.nix.
       Consume THIS rather than re-parsing inventory.toml with yq: it is already validated,
       defaults-normalised, and carries the derived counts, so no consumer can disagree
       with another. Store-cached — repeat calls cost nothing.
     cmds:
-      - nix build --no-link --print-out-paths .?submodules=1#packages.x86_64-linux.inventory-json | xargs cat
+      - nix build --no-link --print-out-paths .?submodules=1#artifacts.inventory-json | xargs cat
 
   dev:inventory:feed:
     desc: Print the compiled agent feed for every Nix host
     summary: >
-      Builds packages.<system>.fleet-feed: role, status, persona hint, compute tier,
+      Builds legacyPackages.<system>.artifacts.fleet-feed: role, status, persona hint, compute tier,
       hardware, traits, key services and notes for every Nix host, generated from the
       compiled registry. This is where host commentary is meant to live (inventory.toml
       `notes`) instead of as comments in Nix.
     cmds:
-      - nix build --no-link --print-out-paths .?submodules=1#packages.x86_64-linux.fleet-feed | xargs cat
+      - nix build --no-link --print-out-paths .?submodules=1#artifacts.fleet-feed | xargs cat
 
   dev:inventory:host:
     desc: Print one host's compiled inventory record (HOST=name)

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Sweep five boards for in-lane leads, dedupe against the record, rank, emit JSON.
+"""Sweep six boards for in-lane leads, dedupe against the record, rank, emit JSON.
 
 Reads nothing from the repo and writes nothing to the archive: it is the fetch,
 filter and rank half of `apps:sweep:pipeline`, and the only network it touches is
-the five boards plus `gh api` when --gh is passed. The held list is an argument
+the boards plus `gh api` when --gh is passed. The held list is an argument
 because the record lives in Postgres on delphi, not here.
 
 Two rules are why this exists rather than an ad-hoc script per sweep:
@@ -25,11 +25,13 @@ import re
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 from collections import Counter
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
+from urllib.parse import quote
 
 UA = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
@@ -47,7 +49,11 @@ OUT = re.compile(
     r"(duales studium|studium|hochschule|embedded|softwareentwickler|software developer"
     r"|backend|frontend|fullstack|support|kundensupport|sales|vertrieb|\berp\b|\bsap\b"
     r"|datev|windows|m365|sharepoint|citrix|helpdesk|first[ -]level|werkstudent"
-    r"|praktik|ausbildung|trainee|elektro|maschinenbau|mechanical|bauwesen|junior)",
+    r"|praktik|ausbildung|trainee|elektro|maschinenbau|mechanical|bauwesen|junior"
+    # `Intern` and `Internship` reached the record on sweep 2026-11-26d, and a
+    # cloud product-manager ad and a freelance mandate came with them: the board
+    # matched on `Platform` and `DevOps`, the lane is engineering employment.
+    r"|\bintern\b|\binternship\b|working student|product manager|freelance)",
     re.I,
 )
 AGENCY = re.compile(
@@ -214,13 +220,21 @@ def recency(value: str) -> int | None:
     if not value:
         return None
     if re.match(r"^\d{4}-\d\d-\d\d", value):
-        try:
-            stamp = datetime.strptime(value[:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc)
-            return (datetime.now(timezone.utc) - stamp).days
-        except ValueError:
-            return None
+        # LinkedIn's `<time datetime>` is date-only: without this branch the age
+        # is unknown and a two-month-old ad passes every `--max-age` window.
+        for fmt, width in (("%Y-%m-%dT%H:%M:%S", 19), ("%Y-%m-%d", 10)):
+            try:
+                stamp = datetime.strptime(value[:width], fmt).replace(tzinfo=timezone.utc)
+                return (datetime.now(timezone.utc) - stamp).days
+            except ValueError:
+                continue
+        return None
     if re.match(r"^(today|heute)\b", value, re.I):
         return 0
+    if re.match(r"^(last|this)\s+week", value, re.I):
+        return 7
+    if re.match(r"^(last|this)\s+month", value, re.I):
+        return 30
     if re.match(r"^(gestern|yesterday)\b", value, re.I):
         return 1
     match = re.match(
@@ -243,7 +257,12 @@ def recency(value: str) -> int | None:
 
 
 def parse_boards(
-    boards: set[str], stepstone_pages: list[tuple[str, str]]
+    boards: set[str],
+    stepstone_searches: list[tuple[str, str]],
+    stepstone_depth: int = 1,
+    jobsch_depth: int = 2,
+    linkedin_searches: list[tuple[str, str]] | None = None,
+    linkedin_depth: int = 1,
 ) -> tuple[list[dict], list[dict]]:
     rows: list[dict] = []
     unnameable: list[dict] = []
@@ -291,50 +310,184 @@ def parse_boards(
                         item.findtext("link"), item.findtext("pubDate"))
         except Exception as exc:  # a board that refuses is unfetched, not empty
             print(f"jobsearch-sweep: bsj unavailable: {exc}", file=sys.stderr)
+    if "arbeitnow" in boards:
+        # 300 postings a page and the board is ordered by created_at, so page one
+        # is not the board: the loop walks pages until one is older than the
+        # window it is looking for, and a refusal is named rather than counted.
+        for page_number in range(1, 9):
+            try:
+                payload = json.loads(
+                    fetch(f"https://www.arbeitnow.com/api/job-board-api?page={page_number}", timeout=120)
+                )
+            except Exception as exc:
+                print(f"jobsearch-sweep: arbeitnow page {page_number}: {exc}", file=sys.stderr)
+                break
+            entries = payload.get("data") or []
+            if not entries:
+                break
+            oldest = None
+            for entry in entries:
+                created = entry.get("created_at")
+                stamp = ""
+                if isinstance(created, (int, float)):
+                    stamp = datetime.fromtimestamp(created, timezone.utc).isoformat()
+                    oldest = created if oldest is None else min(oldest, created)
+                add("arbeitnow", entry.get("company_name", ""), entry.get("title", ""),
+                    entry.get("location", ""), entry.get("url", ""), stamp)
+            if oldest and (time.time() - oldest) > 10 * 86400:
+                break
+            time.sleep(0.4)
+    if "linkedin" in boards:
+        # The guest search is the one surface the original 25 November rows came
+        # from, and it refuses in bursts (429) rather than per query: a refusal
+        # is printed and ends that query, never counted as an empty market.
+        for query, location in linkedin_searches or []:
+            for start in range(0, 25 * linkedin_depth, 25):
+                listing = None
+                for attempt in range(3):
+                    try:
+                        listing = fetch(
+                            "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search"
+                            f"?keywords={quote(query)}&location={quote(location)}&start={start}"
+                        ).decode("utf-8", "replace")
+                        break
+                    except Exception as exc:
+                        print(
+                            f"jobsearch-sweep: linkedin {query}/{location} start {start}"
+                            f" attempt {attempt + 1}: {exc}",
+                            file=sys.stderr,
+                        )
+                        # A 429 is a burst limit, not a verdict on the query: the
+                        # pause grows until the third try, and only then does the
+                        # gap get reported.
+                        time.sleep(15 * (attempt + 1))
+                if listing is None:
+                    break
+                cards = listing.split("<li>")[1:]
+                if not cards:
+                    break
+                for chunk in cards:
+                    chunk = chunk[:12000]
+                    href = re.search(r'base-card__full-link[^"]*"[^>]*href="([^"]+)"', chunk)
+                    title = re.search(r'base-search-card__title[^>]*>(.*?)</h3>', chunk, re.S)
+                    company = re.search(
+                        r'base-search-card__subtitle[^>]*>(.*?)</h4>', chunk, re.S
+                    )
+                    if not (href and title and company):
+                        continue
+                    loc = re.search(r'job-search-card__location[^>]*>(.*?)</span>', chunk, re.S)
+                    when = re.search(r'<time[^>]*datetime="([^"]+)"', chunk)
+                    add("linkedin", company.group(1), title.group(1),
+                        loc.group(1) if loc else "", href.group(1).split("?")[0],
+                        when.group(1) if when else "")
+                # The guest API throttles at a couple of requests a second and
+                # answers 429 for the rest of that query; a pause between pages
+                # is cheaper than losing the market for the pass.
+                time.sleep(4)
+    if "jobsch" in boards:
+        # jobs.ch is the Swiss market, which no German board carries: the card is
+        # server-rendered, with the age first, the advertised title on the link,
+        # the city under "Place of work" and the employer after the contract
+        # type. 22 cards a page, so depth matters here too.
+        for query in ("devops", "sre", "platform", "infrastructure", "kubernetes", "cloud"):
+            for depth in range(1, jobsch_depth + 1):
+                try:
+                    listing = fetch(
+                        f"https://www.jobs.ch/en/vacancies/?term={quote(query)}&page={depth}"
+                    ).decode("utf-8", "replace")
+                except Exception as exc:
+                    print(f"jobsearch-sweep: jobs.ch {query} p{depth}: {exc}", file=sys.stderr)
+                    break
+                cards = listing.split('data-cy="vacancy-serp-item"')[1:]
+                if not cards:
+                    break
+                for chunk in cards:
+                    chunk = chunk[:20000]
+                    title = re.search(r'data-cy="job-link"[^>]*title="([^"]*)"', chunk)
+                    href = re.search(r'data-cy="job-link"[^>]*href="([^"]*)"', chunk)
+                    if not title or not href:
+                        continue
+                    plain = re.sub(r"<[^>]+>", "\n", chunk)
+                    lines = [html.unescape(x).strip() for x in plain.split("\n") if x.strip()]
+                    city = ""
+                    if "Place of work" in lines:
+                        at = lines.index("Place of work")
+                        city = next((x for x in lines[at + 1: at + 3] if x != ":"), "")
+                    company = ""
+                    if "Contract type" in lines:
+                        at = lines.index("Contract type")
+                        after = [x for x in lines[at + 1: at + 4] if x != ":"]
+                        if len(after) >= 2:
+                            company = after[1]
+                    if company in ("Promoted", "Is this job relevant to you?"):
+                        company = ""
+                    # The chunk starts mid-tag, so its first "line" is attribute
+                    # soup; the age is the first head line that parses as a date.
+                    stamps = [x for x in lines[:6] if recency(x) is not None]
+                    age = stamps[0] if stamps else ""
+                    add("jobsch", company, title.group(1), city,
+                        "https://www.jobs.ch" + href.group(1), age)
+                time.sleep(0.5)
     if "stepstone" in boards:
         seen: set[str] = set()
-        for query, city in stepstone_pages:
-            try:
-                page = fetch(
-                    f"https://www.stepstone.de/jobs/{query}?radius=30&where={city}",
-                    referer="https://www.stepstone.de/",
-                ).decode("utf-8", "replace")
-            except Exception as exc:
-                print(f"jobsearch-sweep: stepstone {query}/{city}: {exc}", file=sys.stderr)
-                continue
-            for block in page.split('data-at="job-item"')[1:]:
-                block = block[:24000]
-                link = re.search(
-                    r'data-at="job-item-title"[^>]*href="([^"]+)"[^>]*>(.*?)</a>', block, re.S
-                )
-                if not link or link.group(1) in seen:
-                    continue
-                seen.add(link.group(1))
-                loc = re.search(r'data-at="job-item-location"[^>]*>(.*?)</', block, re.S)
-                when = re.search(r'data-at="job-item-timeago"[^>]*>(.*?)</', block, re.S)
-                company = ""
-                for pattern in (
-                    r'data-at="company-logo"[^>]*alt="([^"]+)"',
-                    r'data-at="company-logo"[^>]*title="([^"]+)"',
-                ):
-                    found = re.search(pattern, block)
-                    if found:
-                        company = clean(found.group(1))
-                        break
-                if not company:
-                    found = re.search(
-                        r'data-at="job-item-company-name"[^>]*>(.*?)</(?:span|div|p|a)>', block, re.S
+        for query, city in stepstone_searches:
+            # `&page=` is the board's own paging and each page carries 26 cards,
+            # so depth 1 sees a twentieth of a metro search. The city is quoted:
+            # `where=Frankfurt am Main` is rejected as a control character and
+            # the search was silently skipped until 2026-11-26e.
+            for depth in range(1, stepstone_depth + 1):
+                try:
+                    page = fetch(
+                        f"https://www.stepstone.de/jobs/{query}"
+                        f"?radius=30&where={quote(city)}&page={depth}",
+                        referer="https://www.stepstone.de/",
+                    ).decode("utf-8", "replace")
+                except Exception as exc:
+                    print(
+                        f"jobsearch-sweep: stepstone {query}/{city} p{depth}: {exc}",
+                        file=sys.stderr,
                     )
-                    if found:
-                        company = clean(found.group(1))
-                if not company:
-                    slug = re.search(r"stellenangebote--(.+?)--\d+-inline", link.group(1))
-                    company = company_from_slug(slug.group(1)) if slug else ""
-                company = strip_place_prefix(company)
-                add("stepstone", company, link.group(2),
-                    clean(loc.group(1)) if loc else "", link.group(1),
-                    clean(when.group(1)) if when else "")
-            time.sleep(0.8)
+                    break
+                cards = page.split('data-at="job-item"')[1:]
+                if not cards:
+                    break
+                fresh_cards = 0
+                for block in cards:
+                    block = block[:24000]
+                    link = re.search(
+                        r'data-at="job-item-title"[^>]*href="([^"]+)"[^>]*>(.*?)</a>', block, re.S
+                    )
+                    if not link or link.group(1) in seen:
+                        continue
+                    seen.add(link.group(1))
+                    fresh_cards += 1
+                    loc = re.search(r'data-at="job-item-location"[^>]*>(.*?)</', block, re.S)
+                    when = re.search(r'data-at="job-item-timeago"[^>]*>(.*?)</', block, re.S)
+                    company = ""
+                    for pattern in (
+                        r'data-at="company-logo"[^>]*alt="([^"]+)"',
+                        r'data-at="company-logo"[^>]*title="([^"]+)"',
+                    ):
+                        found = re.search(pattern, block)
+                        if found:
+                            company = clean(found.group(1))
+                            break
+                    if not company:
+                        found = re.search(
+                            r'data-at="job-item-company-name"[^>]*>(.*?)</(?:span|div|p|a)>', block, re.S
+                        )
+                        if found:
+                            company = clean(found.group(1))
+                    if not company:
+                        slug = re.search(r"stellenangebote--(.+?)--\d+-inline", link.group(1))
+                        company = company_from_slug(slug.group(1)) if slug else ""
+                    company = strip_place_prefix(company)
+                    add("stepstone", company, link.group(2),
+                        clean(loc.group(1)) if loc else "", link.group(1),
+                        clean(when.group(1)) if when else "")
+                if not fresh_cards:
+                    break
+                time.sleep(0.8)
     return rows, unnameable
 
 
@@ -417,6 +570,8 @@ def self_test() -> int:
     check("umlauts: Kältemaschinen folds onto Kaeltemaschinen",
           norm("Kältemaschinen"), norm("Kaeltemaschinen"))
     check("umlauts: für and fuer agree", norm("für"), norm("fuer"))
+    check("age: a date-only stamp parses (LinkedIn emits this)", recency("2026-11-19") is not None, True)
+    check("age: last week counts as seven days", recency("Last week"), 7)
     print(f"{total - failures}/{total} passed")
     return 1 if failures else 0
 
@@ -428,9 +583,14 @@ def main() -> int:
     ap.add_argument("--out", help="write the ranked JSON here instead of stdout")
     ap.add_argument("--max-age", type=int, default=7, help="days a posting may be old")
     ap.add_argument("--limit", type=int, default=25, help="employers to report")
-    ap.add_argument("--boards", default="germantechjobs,weworkremotely,remoteok,berlinstartupjobs,stepstone")
+    ap.add_argument("--boards", default="germantechjobs,weworkremotely,remoteok,berlinstartupjobs,stepstone,arbeitnow,jobsch")
     ap.add_argument("--stepstone-queries", default="devops,platform,sre,cloud,infrastructure,kubernetes")
     ap.add_argument("--stepstone-cities", default="Berlin,Muenchen,Hamburg,Koeln")
+    ap.add_argument("--stepstone-depth", type=int, default=1, help="pages per query/city (26 cards each)")
+    ap.add_argument("--jobsch-depth", type=int, default=2, help="pages per jobs.ch query (22 cards each)")
+    ap.add_argument("--linkedin-queries", default="devops,sre,platform engineer,infrastructure engineer")
+    ap.add_argument("--linkedin-locations", default="Germany,Switzerland,Austria,Netherlands")
+    ap.add_argument("--linkedin-depth", type=int, default=1, help="pages per query/location (25 cards each)")
     ap.add_argument("--gh", action="store_true", help="attribute GitHub activity (bounded gh api calls)")
     args = ap.parse_args()
     if args.self_test:
@@ -445,7 +605,15 @@ def main() -> int:
         for c in args.stepstone_cities.split(",")
     ] if "stepstone" in boards else []
 
-    rows, unnameable = parse_boards(boards, pages)
+    linkedin_searches = [
+        (q.strip(), l.strip())
+        for q in args.linkedin_queries.split(",")
+        for l in args.linkedin_locations.split(",")
+    ] if "linkedin" in boards else []
+    rows, unnameable = parse_boards(
+        boards, pages, args.stepstone_depth, args.jobsch_depth,
+        linkedin_searches, args.linkedin_depth,
+    )
     held = {norm(line.strip()) for line in open(args.held, encoding="utf-8") if line.strip()}
 
     def in_lane(row: dict) -> bool:
@@ -488,6 +656,9 @@ def main() -> int:
         if activity and activity["days"] is not None:
             gh_weight = 3 if activity["days"] <= 30 else 2 if activity["days"] <= 90 else 1 if activity["days"] <= 365 else 0
         newest = min(ages) if ages else None
+        # A lead without an advert URL cannot be applied to, so it is ranked
+        # below every lead that carries one: the lane files actionable rows.
+        link = any(row["url"] for row in rows_for)
         ranked.append(
             dict(
                 company=rows_for[0]["company"],
@@ -495,16 +666,18 @@ def main() -> int:
                 fresh=newest,
                 gh=activity,
                 agency=bool(AGENCY.search(rows_for[0]["company"])),
+                has_link=link,
                 score=round(len(rows_for) * 2 + gh_weight * 2, 1),
             )
         )
-    ranked.sort(key=lambda o: (-o["score"], -len(o["postings"]), o["company"]))
+    ranked.sort(key=lambda o: (not o["has_link"], -o["score"], -len(o["postings"]), o["company"]))
 
     payload = dict(
         parsed=len(rows),
         fresh_in_lane=len(fresh),
         held=len(held),
         new=sum(len(v) for v in candidates.values()),
+        linked=sum(1 for o in ranked if o["has_link"]),
         boards=dict(Counter(r["board"] for v in candidates.values() for r in v)),
         ranked=ranked[: args.limit],
         rejected=rejected[:40],

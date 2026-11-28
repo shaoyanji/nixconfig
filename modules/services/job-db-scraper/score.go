@@ -1,3 +1,5 @@
+//go:build ignore
+
 // Deterministic role-match scoring, ported from scripts/task/jobsearch-sweep.py:
 // the same lane/out/agency/location patterns, so a row scored here reads the
 // same as a row the sweep files. No model, no network — the same input always

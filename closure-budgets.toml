@@ -51,8 +51,12 @@ headroom_pct = 1.0
 # bytes = 33000000000
 
 # >>> baseline (managed by `task dev:closure:budget:adopt` — do not edit)
+[hosts.delphi.baseline]
+bytes = 18463767344
+measured_on = "2026-11-27"
+
 [hosts.frieren.baseline]
-bytes = 31873529880
-measured_on = "2026-10-21"
+bytes = 23143196592
+measured_on = "2026-11-27"
 
 # <<< baseline

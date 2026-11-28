@@ -9,7 +9,7 @@ title = "Fleet Modular Control Knob Registry"
 description = "Declarative control knobs for optional profiles, services, and system roles across the fleet."
 version = "1.0.0"
 canonical_repo = "https://github.com/shaoyanji/nixconfig"
-total_knobs = 20
+total_knobs = 22
 
 # ------------------------------------------------------------------------------
 # 1. OPTIONAL PROFILES
@@ -193,35 +193,57 @@ port = 8454
 default = false
 hosts = ["delphi"]
 
+[knobs.clanker-runner]
+name = "Clanker Runner"
+type = "service"
+category = "infrastructure"
+option = "services.clankerRunner.enable"
+path = "modules/services/clanker-runner.nix"
+description = "InstaBox VM state, wake/exec triggers, Nix and agent-browser jobs with SQLite FTS5 history (:8467)"
+port = 8467
+default = false
+hosts = ["delphi"]
+
+[knobs.job-db-scraper]
+name = "Job Database Scraper"
+type = "service"
+category = "jobs"
+option = "services.jobDbScraper.enable"
+path = "modules/services/job-db-scraper.nix"
+description = "Job posting scraper and deduplicating SQLite FTS5 search surface (:8464)"
+port = 8464
+default = false
+hosts = ["delphi"]
+
 [knobs.private-deals]
 name = "Private Deals"
 type = "service"
-category = "knowledge"
-option = "services.private-deals.enable"
+category = "commerce"
+option = "services.privateDeals.enable"
 path = "modules/services/private-deals.nix"
-description = "Deals, watchlists and price history in SQLite/FTS5 (:8464): RSS ingestion, JSON API and a one-page tailnet UI"
-port = 8464
+description = "Private deals, tracked products, watchlists and price history in SQLite FTS5 (:8465)"
+port = 8465
 default = false
 hosts = ["delphi"]
 
 [knobs.inventory-site]
 name = "Inventory Site"
 type = "service"
-category = "knowledge"
-option = "services.inventory-site.enable"
+category = "inventory"
+option = "services.inventorySite.enable"
 path = "modules/services/inventory-site.nix"
-description = "Asset inventory in SQLite/FTS5 (:8465): locations, categories, tags, serials, warranties, value, JSON/CSV import-export, fleet-host seed"
-port = 8465
+description = "Fleet hardware and personal asset inventory in SQLite FTS5 (:8466)"
+port = 8466
 default = false
 hosts = ["delphi"]
 
-[knobs.job-db-scraper]
-name = "Job DB Scraper"
+[knobs.link-vault]
+name = "Link Vault"
 type = "service"
 category = "knowledge"
-option = "services.job-db-scraper.enable"
-path = "modules/services/job-db-scraper.nix"
-description = "Job postings in SQLite/FTS5 (:8466): deterministic lane scoring, batch upsert, deduped score-sorted surface"
-port = 8466
+option = "services.linkVault.enable"
+path = "modules/services/link-vault.nix"
+description = "Bookmark and research link archive with extraction, collections and SQLite FTS5 (:8468)"
+port = 8468
 default = false
 hosts = ["delphi"]

@@ -283,9 +283,13 @@ budget_line() { # host actual-bytes
   local h="$1" actual="$2" spec budget basis delta pct
   spec="$(budget_spec "$h")"
   if [ -z "$spec" ]; then
+    # An unbudgeted host FAILS the gate: a check that passes on "no ceiling
+    # declared" is a ceiling that never has to be declared, which is how the
+    # fleet sat unmeasured behind one frieren baseline. Adopt the host
+    # (task dev:closure:budget:adopt HOST=$h) or pin its bytes deliberately.
     printf '%-14s %12s %12s  %-12s  %s\n' \
       "$h" "-" "$(human "$actual")" "-" "NOT BUDGETED (task dev:closure:budget:adopt HOST=$h)"
-    return 0
+    return 1
   fi
   IFS=$'\t' read -r budget basis <<<"$spec"
   delta=$((actual - budget))

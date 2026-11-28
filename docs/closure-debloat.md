@@ -298,7 +298,7 @@ A group is a candidate until a human confirms which copy is redundant.
 
 **6 · Tier 3, the Home Manager cohort — up to 4.3 GiB for the top 15.**
 Unblocked in principle: `flake/cli.nix` carries the families and
-`meta.mainProgram` on `packages.<system>.cli` makes each one a `nix run` target, so
+`meta.mainProgram` on `legacyPackages.<system>.cli` makes each one a `nix run` target, so
 a tool no longer has to be installed to be reachable. Move the cohort out of
 `home.packages` on hosts that do not run them continuously.
 Start with `qmd` (904.2 MiB) — investigate *why* a markdown search tool is nearly

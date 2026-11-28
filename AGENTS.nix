@@ -901,13 +901,13 @@
     dormant-host-gates = {
       title = "Dormant host gates — minyx and cassini";
       kind = "open";
-      status = "IN FLIGHT";
+      status = "DELIVERED";
       priority = "P0";
-      date = "2026-11-19";
-      summary = "`minyx`'s `boot.kernelPackages` collision is fixed (`mkOverride 1200`). `cassini`'s darwin chain is being repaired: the module-shape and Linux-option faults are landed and a Linux host still gates, the third fault is an infinite recursion in the home role.";
+      date = "2026-11-27";
+      summary = "`minyx`'s `boot.kernelPackages` collision is fixed (`mkOverride 1200`). `cassini`'s darwin chain is repaired: the last fault was tailscale-policy testing only `services.tailscale`, not its Linux-only `extraSetFlags` leaf; both dormant hosts now pass eval.";
       refs = {
         hosts = ["minyx" "cassini"];
-        modules = ["modules/global/macos.nix" "modules/global/linux-systemd.nix" "modules/global/global.nix" "flake/module-sets.nix" "modules/roles/home.nix" "modules/profiles/base-node.nix" "modules/user/ai/freebuff-remote.nix"];
+        modules = ["modules/global/macos.nix" "modules/global/linux-systemd.nix" "modules/global/global.nix" "modules/global/tailscale-policy.nix" "flake/module-sets.nix" "modules/roles/home.nix" "modules/profiles/base-node.nix" "modules/user/ai/freebuff-remote.nix"];
         tasks = ["checks:host"];
       };
       body = ''
@@ -928,18 +928,19 @@
            the missing-option check runs with the condition false. Measured twice,
            both gating attempts reverted.
 
-        Third fault, now the head: infinite recursion while evaluating
-        `modules/roles/home.nix`, module argument `dankShell` — the darwin chain
-        provides no such argument, and the role's `fleet.hmUserFeatures` default
-        includes `desktop`. Hypothesis to test next: darwin's feature list must not
-        include `desktop`, or `dankShell` needs a darwin default.
+        Final fault, 2026-11-27: nix-darwin has `services.tailscale` but not the
+        Linux module's `extraSetFlags` suboption. `tailscale-policy.nix` now tests
+        that leaf before emitting the definition. `optionalAttrs` is required:
+        `mkIf` is pushed down before the missing-option check, so it cannot hide a
+        definition from the module system.
 
-        Gates so far: `checks:host HOST=netbook` green in 10.2 s after the split, so
-        the move did not change a Linux host. cassini is still red at fault 3.
+        Gates: `checks:host HOST=netbook` green in 10.2 s after the Linux-option
+        split; `ALLOW_PRESERVED=1 task checks:host HOST=cassini MODE=eval` green
+        with 585 assertions after the tailscale leaf fix. `zeno`, `mtfuji`,
+        `deckstation` and `applevalley` also pass the same eval gate.
 
-        Exit: a green (or explicitly expected-red) `checks:host HOST=<one>
-        MODE=eval`, run by the owner when the hardware is powered on. Verification
-        of a dormant host is the owner's call, never an agent's drive-by eval.
+        Exit: delivered — both named dormant hosts have a green module-system eval;
+        re-open only if the owner revives the hardware and the real switch fails.
       '';
     };
     kernel-collision-gate = {
@@ -1098,33 +1099,28 @@
         tasks = ["ytcast"];
       };
       body = ''
-        **The TV.** Philips 65OLED759/12 at 192.168.3.26, Titan OS (`titanos.local`). It advertises
-        `_philipstv_s_rpc._tcp`:1926, jointSPACE:1925 and `_secure-mqtt._tcp`:8883 — no `_googlecast._tcp`,
-        no `_dial._tcp`, nothing on 8008/8009 — no Cast receiver. Port **49152** is the way in.
+        **The TV.** Philips 65OLED759/12 at 192.168.3.26, Titan OS: jointSPACE 1925, `_philipstv_s_rpc._tcp` 1926,
+        secure-mqtt 8883 — no Cast receiver, no DIAL, nothing on 8008/8009, and SSDP M-SEARCH gets zero replies,
+        so discovery tools conclude there is no renderer. Port **49152** is the way in.
 
-        **Any local file, via DLNA.** A direct GET is the only way to find it: `curl http://192.168.3.26:49152/description.xml`
-        returns `urn:schemas-upnp-org:device:MediaRenderer:1` (DMR-1.50) with AVTransport at `/avt_control`, while an SSDP
-        M-SEARCH to the set gets zero replies, so every discovery tool concludes there is no renderer. Verified 2026-11-11:
-        browse Jellyfin's ContentDirectory (`/dlna/<uuid>/contentdirectory/control`, library `arr`), take the item's `res`
-        URL, then SOAP `SetAVTransportURI` + `Play` on `http://192.168.3.26:49152/avt_control` — transport went PLAYING with
-        `dur=1:38:40`. Serving from frieren on a new port does not work: the firewall drops it and the set retries to STOPPED.
+        **Any local file, via DLNA.** `curl http://192.168.3.26:49152/description.xml` returns MediaRenderer:1
+        (DMR-1.50) with AVTransport at `/avt_control`. Verified 2026-11-11: browse Jellyfin's ContentDirectory
+        (library `arr`), take the item's `res` URL, SOAP SetAVTransportURI + Play — transport PLAYING, dur=1:38:40.
+        Serving from frieren on a new port fails: the firewall drops it, the set retries to STOPPED.
 
-        **Why casting still works.** `ytcast -pair <code>` redeems the app's TV code through
-        `https://www.youtube.com/api/lounge/pairing/get_screen` and caches a screen id; playback is then
-        cloud-relayed via `POST /api/lounge/bc/bind`. Port 8009 is never touched.
+        **Casting.** `ytcast -pair <code>` redeems the TV code through the lounge pairing API and caches a screen
+        id; playback is cloud-relayed via bind, port 8009 never touched.
 
-        **What wedges it.** A live stream (2026-11-11, `jfKfPfyJRdk`): the app dropped to ambient mode and
-        answered nothing afterwards, and a VOD cast from the same session vanished too — exit 0 both times,
-        because Lounge accepts what the TV never hears. Recovery needs a physical key press: `/6/input/key`,
-        `/6/powerstate` and `/6/pair/request` all return 403 on this set, and the Steam Link's `cecmanager`
-        has no CLI and is not running.
+        **What wedges it.** A live stream (2026-11-11, jfKfPfyJRdk): the app dropped to ambient mode and answered
+        nothing afterwards — even VOD vanished with exit 0, because Lounge accepts what the TV never hears.
+        Recovery needs a physical key press: `/6/input/key`, `/6/powerstate`, `/6/pair/request` all return 403,
+        and the Steam Link's cecmanager has no CLI and is not running.
 
-        **Rule.** VOD only, one cast at a time, and opening the YouTube app is the last step: a cast is
-        queued, not raised — 2026-11-11, `ytcast` returned 0 while Bloomberg TV was on screen and the video
-        played the moment the app was opened by hand, so nothing on the network opens it. Stopping the DMR
-        hands the set back to the previous input, which makes `media:stop` restore the channel that was on. The `ytcast` task allows only
-        `not_live`/`was_live` and refuses anything it cannot classify — the first guard failed open on
-        `jfKfPfyJRdk`, where yt-dlp errors instead of reporting `is_live`. Pair again when a cast goes silent.
+        **Rule.** VOD only, one cast at a time, opening the YouTube app is the last step — a cast is queued, not
+        raised (Bloomberg TV stayed on screen; the video played when the app was opened by hand). Stopping the DMR
+        restores the previous input, which is what makes `media:stop` bring the channel back. The `ytcast` task
+        allows only not_live/was_live and refuses what it cannot classify — the first guard failed open on
+        jfKfPfyJRdk, where yt-dlp errors instead of reporting is_live. Pair again when a cast goes silent.
       '';
     };
     resolver-independence = {
@@ -2014,63 +2010,26 @@
       date = "2026-10-19";
       summary = "Mode: dynamic remote inference bridge pairing local host agents (Hermes, crush) with ephemeral cloud accelerators (Kaggle TPU VM v3-8 / RunPod / Colab) over an ephemeral Tailscale mesh node (tailscale0), with automatic fallback to hosted APIs. Status: design study. Motivated by the analysis of cloud inference economics and agent prefill limits (see…";
       body = ''
-        **Mode:** dynamic remote inference bridge pairing local host agents (Hermes, crush) with ephemeral cloud
-        accelerators (Kaggle TPU VM v3-8 / RunPod / Colab) over an ephemeral Tailscale mesh node (`tailscale0`),
-        with automatic fallback to hosted APIs.
-        **Status:** design study. Motivated by the analysis of cloud inference economics and agent prefill limits
-        (see [Investigation: Kaggle 32GB VRAM vs TPU vs Hosted](#investigation-kaggle-32gb-vram-vs-tpu-vs-hosted)).
+        Frieren (4c/8t, UHD 620, 11 GiB) cannot run Qwen 27B/32B at usable precision, so burst inference comes
+        from free cloud accelerator hours over an ephemeral tailnet node, with fallback to hosted APIs.
 
-        **Use case.** Running strong reasoning and coding models (e.g. Qwen 2.5/3 27B/32B) locally on frieren (4c/8t,
-        Intel UHD 620, 11 GiB RAM) is impossible without quantization down to unusable precision and single-digit
-        token speeds. Offloading inference to ephemeral cloud notebook accelerators (e.g. Kaggle's 30 free GPU/TPU
-        hours/week) provides burst compute for heavy agent planning sessions.
+        **Why tutorial implementations break (measured):**
+        1. Layer split: Qwen 27B 4-bit (~17 GB) exceeds one T4's 15.3 GiB usable VRAM; Ollama splits layers
+           across both cards and generation relay-races at 320 GB/s — 16-18 tok/s.
+        2. Prefill stall vs Cloudflare's unconfigurable 100 s free-tier timeout: a 30k-token agent prompt
+           prefills in 92 s at T4's ~325 tok/s — requests die as HTTP 524.
+        3. Kaggle notebooks die on 20 min idle / 12 h runtime, reissue random URLs per restart, and
+           unauthenticated Ollama on public quick tunnels violates Kaggle ToS.
 
-        **The engineering analysis — what breaks in tutorial implementations:**
-        Tutorials frequently promote pairing Kaggle's dual Nvidia Tesla T4 GPUs (2× 16GB = 32GB VRAM) with Ollama
-        and a Cloudflare quick tunnel (`trycloudflare.com`). Ground-truth measurement reveals three fatal defects:
-        1. **Layer split penalty:** Qwen 27B at 4-bit (~17 GB) exceeds one T4's 15.3 GiB usable VRAM. Ollama splits
-           layers across both cards. Generation becomes an alternating relay race rather than parallel execution:
-           memory bandwidth is capped at 320 GB/s, yielding only 16–18 tokens/sec.
-        2. **Prefill stall vs Cloudflare 100s timeout:** Agent harnesses (Hermes, Claude Code) send massive system
-           prompts and context history (15,000–30,000 tokens). On T4 compute (65 TFLOPS), prefill runs at ~325
-           tokens/sec. A 30k token prompt takes **92 seconds of prefill silence**. Cloudflare Quick Tunnels enforce
-           an unconfigurable **100-second request timeout** on the free tier, killing agent requests with HTTP 524.
-        3. **Ephemeral URL drift & ToS:** Kaggle notebooks die on 20 min idle or 12h runtime; each restart takes
-           15–30 min and issues a new random URL. Furthermore, unauthenticated Ollama over public quick tunnels
-           violates Kaggle ToS and exposes an open endpoint to internet scanning.
+        **The alternative: Kaggle TPU VM v3-8 + Tailscale.** 8 chips x 16 GB HBM = 128 GB at 800 GB/s per
+        chip; vLLM (>= 0.28.0, Kaggle TPU Lab) runs Qwen 27B at full FP16/BF16 (55.6 GB, 262k context):
+        ~130 tok/s generation (8x), ~10,300 tok/s prefill (30x — 30k prompt in 3 s). An ephemeral Tailscale
+        auth key replaces tunnels entirely: zero public exposure, no timeout, stable tailnet hostname.
 
-        **The architectural alternative: Kaggle TPU VM v3-8 + Tailscale:**
-        - **Accelerator:** Kaggle's free tier includes `TPU VM v3-8` (8 TPU chips, 16GB HBM each = **128 GB HBM**,
-          800 GB/s per chip). With vLLM (>= 0.28.0) supporting Qwen attention via `Kaggle TPU Lab`, Qwen 27B runs
-          at full FP16/BF16 (55.6 GB, 262k context):
-          - Generation: ~130 tokens/sec (8× faster than dual T4).
-          - Prefill: ~10,300 tokens/sec (30× faster); a 30k prompt prefills in 3s instead of 92s.
-        - **Networking:** Ephemeral Tailscale auth key (`tailscale up --authkey=... --hostname=kaggle-vllm`).
-          Eliminates Cloudflare tunnels entirely: zero public exposure, no 100-second timeout, and a stable
-          tailnet hostname (`http://kaggle-vllm:8000/v1`).
-
-        **Module shape.** A profile that configures Hermes and local CLI agents to probe the tailnet endpoint with
-        instant fallback to commercial hosted APIs (OpenRouter / Nous) when the notebook is offline:
-
-        ```nix
-        profiles.ai.remoteInference = {
-          enable = true;
-          endpoint = "http://kaggle-vllm.frieren.lan:8000/v1"; # or tailnet IP/hostname
-          model = "Qwen/Qwen2.5-Coder-32B-Instruct";
-          apiKeyFile = config.sops.secrets.remote_llm_key.path;
-          timeout = 300;
-          fallbackProviders = [
-            { provider = "openrouter"; model = "qwen/qwen-2.5-coder-32b-instruct"; }
-            { provider = "nous"; model = "inclusionai/ling-3.0-flash-sante:free"; }
-          ];
-        };
-        ```
-
-        **Why it is not prod.** Running headless daemon tunnels on free-tier Kaggle accounts is a gray area under
-        Kaggle's June 2025 Acceptable Use Policy; notebook lifecycle is fundamentally non-durable; and at $1.49 / 1M
-        tokens on commercial endpoints (Cerebras/OpenRouter), a full week of Kaggle quota is worth ~$4.31. Exit
-        criteria: an automated notebook launch script verified over Tailscale, a validated Hermes failover event
-        when the notebook terminates, and authenticated endpoint tokens.
+        **Why not prod.** Headless daemon tunnels on free-tier Kaggle are gray-area under the June 2025 AUP;
+        the notebook lifecycle is non-durable; a week of Kaggle quota is worth ~$4.31 at $1.49/1M tokens on
+        commercial endpoints. Exit: automated notebook launch verified over Tailscale, a validated Hermes
+        failover event on notebook termination, authenticated endpoint tokens.
       '';
     };
     exp-021 = {
@@ -2222,36 +2181,20 @@
       date = "2026-10-19";
       summary = "Mode: automated agent-to-agent WebSocket JSON-RPC coordination bridge across the NixOS fleet. Status: design study. Motivated by enabling autonomous peer-to-peer task dispatching between frieren, eisen, stark, and mobile nodes.";
       body = ''
-        **Mode:** automated agent-to-agent WebSocket JSON-RPC coordination bridge across the NixOS fleet.
-        **Status:** design study. Motivated by enabling autonomous peer-to-peer task dispatching between frieren, eisen, stark, and mobile nodes.
+        SimpleX is already the fleet's encrypted bus: SMP on frieren `:5223`, the client daemon on `:5225`.
+        What is missing is a declarative way for agents to dispatch work between hosts —
+        frieren handing a compile to `eisen`, or pulling telemetry from `schneeeule` — without a central relay.
 
-        **Use case.** frieren runs the fleet SimpleX SMP relay server (`:5223`) and client daemon (`:5225`). Currently, operator agents communicate
-        with human operators in `#Fleet`, but cannot autonomously negotiate workloads between hosts (e.g. frieren dispatching a heavy compile job
-        to `eisen` or pulling sensor telemetry from `schneeeule`). A declarative agent mesh profile standardizes the WebSocket JSON-RPC protocol
-        interface across all fleet nodes: agents exchange signed, end-to-end encrypted dispatch messages over SimpleX, automatically authenticating
-        peer agent identities via pre-shared public signing keys without centralized API relays or external internet dependency.
+        **Shape.** A profile standardising the WebSocket JSON-RPC dispatch protocol across nodes: a peer list
+        with roles, an allowed-command set (`ping`, `build-closure`, `query-telemetry`) and an audit log, with
+        peers authenticated by pre-shared signing keys and messages carried end-to-end encrypted over SimpleX.
 
-        **Module shape.**
+        **Evidence.** `simplex-chat.service` runs on frieren and `simplex-rpc.py` already exists in the
+        `simplex-admin` skill, so only the profile and its policy are missing.
 
-        ```nix
-        profiles.interAgentMesh = {
-          enable = true;
-          localDaemonPort = 5225;
-          peerAgents = [
-            { host = "eisen"; role = "build-accelerator"; }
-            { host = "stark"; role = "gpu-inference-worker"; }
-          ];
-          allowedCommands = [ "ping" "build-closure" "query-telemetry" ];
-          auditLog = "/var/log/agents/mesh-dispatch.log";
-        };
-        ```
-
-        **Evidence.** `simplex-chat.service` is active on frieren. Inter-agent coordination skill `simplex-admin` (`simplex-rpc.py`) is already
-        deployed and operational in `~/.agents/skills/simplex-admin/`.
-
-        **Why it is not prod.** Unrestricted command dispatching between autonomous agents introduces privilege escalation risks if an edge
-        node is compromised. Requires cryptographic command whitelisting and strict argument sandboxing. Exit criteria: successful automated
-        ping and telemetry dispatch between frieren and a secondary node over SimpleX with 0 human intervention and full signature verification.
+        **Why not prod.** Unrestricted dispatch between autonomous agents is privilege escalation if one edge
+        node is compromised. Exit: a ping and a telemetry dispatch between frieren and a second node with no
+        human intervention and full signature verification.
       '';
     };
     exp-058 = {
@@ -2276,31 +2219,18 @@
       date = "2026-10-19";
       summary = "Mode: Julia-1 message triage and routing integrated into the local SimpleX SMP WebSocket bridge (simplex-chat). Status: design study & architectural specification. Motivated by managing inter-agent fleet coordination (frieren, poseidon, guckloch, eisen) without human notification spam.";
       body = ''
-        **Mode:** Julia-1 message triage and routing integrated into the local SimpleX SMP WebSocket bridge (`simplex-chat`).
-        **Status:** design study & architectural specification. Motivated by managing inter-agent fleet coordination (`frieren`, `poseidon`, `guckloch`, `eisen`) without human notification spam.
+        SimpleX Chat is the encrypted inter-agent bus; autonomous hosts exchange dozens of `#Fleet` messages
+        daily, and without semantic classification the operator gets push notifications for every routine
+        heartbeat. `services.simplexMessageClassifier` is an inline gateway between the WebSocket RPC daemon
+        (:5225) and the agent ingestion runtime: Julia-1 classifies each decrypted message in its 8k context
+        into FLEET_HEARTBEAT_STATUS (silent log), BACKGROUND_CLOSURE_WARMED (daily digest), or
+        CRITICAL_SECURITY_INCIDENT / HARDWARE_FAULT (immediate push with severity, host, runbook).
 
-        **Use case.** SimpleX Chat is deployed fleet-wide as the encrypted inter-agent bus. As autonomous hosts collaborate (e.g. frieren warming binary caches for poseidon, nightly backup notifications, task triage updates), agents exchange dozens of messages daily in `#Fleet`. Without semantic classification, human operators receive push notifications for every routine heartbeat and backup status line. `services.simplexMessageClassifier` acts as an inline message gateway between the local WebSocket RPC daemon (`:5225`) and the agent ingestion runtime. Julia-1 processes each incoming decrypted message across its 8k token context window, outputting structured classification tags:
-        1. `FLEET_HEARTBEAT_STATUS`: silent logging in `/var/log/simplex/agent-mesh.log`.
-        2. `BACKGROUND_CLOSURE_WARMED`: appended to daily summary digest.
-        3. `CRITICAL_SECURITY_INCIDENT` / `HARDWARE_FAULT`: immediate high-priority push alert formatted with severity header, targeted host, and suggested remediation runbook.
+        **Module shape.** `services.simplexMessageClassifier` = { enable; model = "julia-1"; listenPort = 5225;
+        monitoredGroups = [ "#Fleet" ]; priorityThresholds = { silent = 0.40; digest = 0.70; immediateAlert = 0.85; }; }
 
-        **Module shape.**
-
-        ```nix
-        services.simplexMessageClassifier = {
-          enable = true;
-          model = "julia-1";
-          listenPort = 5225;
-          monitoredGroups = [ "#Fleet" ];
-          priorityThresholds = {
-            silent = 0.40;
-            digest = 0.70;
-            immediateAlert = 0.85;
-          };
-        };
-        ```
-
-        **Evidence.** SimpleX SMP server is active on `*:5223` and client daemon is running on port 5225. `#Fleet` group currently connects frieren, devji, and guckloch. Python WebSocket client `simplex-rpc.py` communicates cleanly with the daemon in sub-millisecond roundtrips.
+        **Evidence.** SMP server on *:5223, client daemon on 5225, `#Fleet` connects frieren/devji/guckloch, and
+        `simplex-rpc.py` talks to the daemon in sub-millisecond roundtrips.
 
         **Why it is not prod.** Requires end-to-end testing with simulated agent messages from poseidon and frieren to verify zero message loss or classification stalls. Exit criteria: 100 test messages across varied fleet scenarios categorized with 100% precision and < 5ms processing latency per message.
       '';
@@ -2407,27 +2337,18 @@
       date = "2026-10-19";
       summary = "Mode: Julia-1 DNS resolution latency & ARP table triage triggering Nemotron-3-Ultra to arbitrate VRRP VIP failover and prevent split-brain states. Status: proposed design study. Motivated by resolving HC-3 (DNS failover resolver gap between frieren and secondary resolver).";
       body = ''
-        **Mode:** Julia-1 DNS resolution latency & ARP table triage triggering Nemotron-3-Ultra to arbitrate VRRP VIP failover and prevent split-brain states.
-        **Status:** proposed design study. Motivated by resolving HC-3 (DNS failover resolver gap between frieren and secondary resolver).
+        frieren runs the fleet resolver, and a VRRP VIP can go split-brain — two hosts answering the same
+        address — during interface transitions or when a secondary resolver returns (`hc3-check`).
 
-        **Use case.** Frieren runs Pi-hole and Unbound as primary fleet DNS. When network interface transitions occur or when a secondary resolver comes online, keepalived VRRP VIPs can enter split-brain where two hosts answer for the same IP (`hc3-check`). `services.dnsHealthArbiter`:
-        * Julia-1 runs microsecond ARP and DNS resolution probes across `enp1s0` and `wlp2s0`.
-        * If two answering MACs are detected for the VIP, Nemotron-3-Ultra analyzes interface states, decides the authoritative primary node based on upstream latency, and synthesizes `arping` gratuitous ARP announcements to force clean convergence.
+        **Shape.** Microsecond ARP and DNS probes across both interfaces, a decision on which node is primary
+        from upstream latency, and gratuitous ARP to force convergence, driven by the resolver's own state
+        rather than by a human.
 
-        **Module shape.**
+        **Evidence.** `task checks:dns:failover` (HC-3) already probes the VIP for two answering MACs, so the
+        detector exists; the arbiter and its action do not.
 
-        ```nix
-        services.dnsHealthArbiter = {
-          enable = true;
-          vrrpVip = "192.168.3.10";
-          resolvers = [ "127.0.0.1" "192.168.3.25" ];
-          splitBrainAction = "assert-primary";
-        };
-        ```
-
-        **Evidence.** `task checks:dns:failover` (HC-3) actively probes VRRP VIP for two answering MACs.
-
-        **Why it is not prod.** Requires testing under simulated Ethernet cable disconnections and WiFi roaming. Exit criteria: simulated dual-master VRRP conflict resolved to a single authoritative resolver in < 2 seconds.
+        **Why not prod.** Untested under cable disconnection and WiFi roaming. Exit: a simulated dual-master
+        conflict resolves to one authoritative resolver in under 2 seconds.
       '';
     };
     exp-081 = {
@@ -2487,30 +2408,18 @@
       date = "2026-10-19";
       summary = "Mode: Julia-1 snapshot tree and differential extent size triage triggering Nemotron-3-Ultra to calculate stream chunking, compression (zstd), and rate-limited wireguard transfer manifests. Status: proposed design study. Motivated by off-site disaster recovery between frieren's 2TB HDD pool (/Volumes/data) and remote fleet storage (poseidon).";
       body = ''
-        **Mode:** Julia-1 snapshot tree and differential extent size triage triggering Nemotron-3-Ultra to calculate stream chunking, compression (zstd), and rate-limited wireguard transfer manifests.
-        **Status:** proposed design study. Motivated by off-site disaster recovery between frieren's 2TB HDD pool (`/Volumes/data`) and remote fleet storage (`poseidon`).
+        Restic keeps file-level state, but bare-metal recovery from frieren's Btrfs subvolumes (`data`,
+        `private`, `transmission`) wants `btrfs send -p | btrfs receive` over the tailnet, which moves extents
+        rather than rereading millions of files.
 
-        **Use case.** While nightly Restic backups preserve file-level state, Btrfs subvolumes (`data`, `private`, `transmission`) have extensive subvolume metadata and immutability flags. Streaming raw differential snapshots (`btrfs send -p ... | btrfs receive ...`) over Tailscale provides byte-for-byte bare-metal recovery without re-reading millions of files. `services.tailscaleBackupReplicator`:
-        * Julia-1 identifies parent-child subvolume generation deltas in < 0.2 ms.
-        * Nemotron-3-Ultra drafts a piped streaming manifest (`btrfs send -p @snap_prev @snap_curr | zstd -3 | pv -L 15m | ssh poseidon btrfs receive /srv/backup/frieren`), enforcing bandwidth limits during active user hours.
+        **Shape.** A service that walks the subvolume parent-child generations, streams a differential to a
+        remote peer (`btrfs send -p @prev @curr | zstd -3 | pv -L 15m | ssh poseidon btrfs receive ...`) and
+        rate-limits the wire during user hours, with a schedule confined to the backup window.
 
-        **Module shape.**
+        **Evidence.** `btrfs send`/`receive` are on the system path and `poseidon` is a connected tailnet peer.
 
-        ```nix
-        services.tailscaleBackupReplicator = {
-          enable = true;
-          sourceSubvolumes = [ "/Volumes/data" "/srv/private" ];
-          remotePeer = "poseidon";
-          remoteMount = "/srv/backup/frieren";
-          maxBandwidthMbps = 50;
-          compression = "zstd";
-          schedule = "03:45:00"; # strictly within backup window
-        };
-        ```
-
-        **Evidence.** Btrfs send/receive tools are in system path. Tailscale peer `poseidon` is connected.
-
-        **Why it is not prod.** Requires testing incremental snapshot re-anchoring when a middle snapshot is pruned. Exit criteria: 50 GB differential snapshot successfully transmitted and mounted on remote peer with 0 stream checksum errors.
+        **Why not prod.** Re-anchoring when a middle snapshot is pruned is untested. Exit: a 50 GB
+        differential transmitted and mounted on the peer with zero checksum errors.
       '';
     };
     exp-095 = {
@@ -2894,6 +2803,98 @@
         queried from the sandbox microVM, which needs no home bytes at all.
       '';
     };
+    egress-lanes-research = {
+      title = "Three egress lanes: delphi for bulk, frieren for identity, lumi for US geo";
+      kind = "proposal";
+      status = "IN FLIGHT";
+      date = "2026-11-27";
+      summary = "Route each research fetch by what its link is good at — delphi's own line for bulk, frieren's residential IP for hostile sources, lumi's US address for geography — through one fetch broker, so a crawl is charged to the tailnet once and the home line spends trust rather than bytes.";
+      from = ["gigabit-seams"];
+      refs = {
+        hosts = ["delphi" "frieren" "lumi"];
+        modules = [
+          "modules/services/fetchcache/fetchcache.go"
+          "modules/services/fetch-broker.nix"
+          "modules/services/tailnet-forward-proxy.nix"
+          "modules/services/link-vault.nix"
+          "modules/services/job-db-scraper.nix"
+          "modules/services/private-deals.nix"
+          "hosts/delphi/configuration.nix"
+          "hosts/lumi.nix"
+          "modules/net/dns/tailnet-address.nix"
+        ];
+        tasks = ["checks:ports" "checks:host" "ops:notes"];
+        docs = ["docs/media-relay.md" "docs/storage-taxonomy.md"];
+      };
+      body = ''
+        **Seen live.** delphi 92.5.115.103 AS31898, frieren 79.215.107.59 AS3320
+        direct, lumi DERP-only (dfw), so 93.127.139.146 stays a lookup.
+
+        **Built, ranked (Jev 1.14.0).** Cache then broker: a page comes from
+        `fetchcache`, only a miss spends a lane — cache 57%, broker 30%, sink 7%,
+        both 61% at 0.52.
+
+        **Measured (2026-11-28, delphi, 20 URLs, twice).** Cold p50 154 then 152 ms,
+        p95 823 then 726, 1.40 MB upstream; warm p50 46 then 41 ms, 0.085 MB — 94%
+        fewer bytes, 3.3-3.7x faster; direct p50 165 then 256 ms.
+
+        **Throughput (2026-11-28, 4-6 MiB, cache off, p50).** Mbps: bulk 52 then
+        51, `us` 34 then 38, `local` 18.3 then 18.6; four streams give 51, 41, 18,
+        so the lane is the ceiling. Two mirrors from delphi's own NIC hold 43-52
+        at one and at four streams: bulk is a ~50 Mbps line, not gigabit.
+      '';
+    };
+    egress-architecture = {
+      title = "Egress is one broker on delphi, three lane exits, a validator before any lane";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-11-28";
+      summary = "A scrape enters at delphi:8469, a stored validator answers before a lane is spent, and a miss leaves by bulk (delphi direct), us (lumi) or local (frieren) — so trust and geography belong to the exit, never to the caller.";
+      from = ["egress-lanes-research"];
+      refs = {
+        hosts = ["delphi" "frieren" "lumi"];
+        modules = [
+          "modules/services/fetch-broker.nix"
+          "modules/services/fetchcache/fetchcache.go"
+          "modules/services/tailnet-forward-proxy.nix"
+          "hosts/delphi/configuration.nix"
+          "hosts/lumi.nix"
+        ];
+        tasks = ["checks:ports" "checks:host"];
+        docs = ["docs/media-relay.md"];
+      };
+      body = ''
+        **Placement.** One door: `fetch-broker` on delphi, loopback 8107, published
+        tailnet-only at :8469 by the servicePortal mount — no firewall port, so a
+        crawl is charged to the tailnet once. Delphi owns it: its bytes are cheapest
+        and its datacenter address may be spent; the lanes are peers, not tunnels.
+
+        **Lanes.** `bulk` is delphi's own NIC with no proxy hop; `us` is lumi's
+        tinyproxy at :8470 (four clients), `local` is frieren's at :8471 (sixteen).
+        Each binds `tailscale ip -4` and allows only 100.64.0.0/10, so a lane is a
+        tailnet address that can be retired. MagicDNS is off here, so the broker
+        resolves them from `inventory.toml` and delphi asserts both keys exist.
+
+        **Policy.** Identity before bandwidth. `bulk` for sources that answer a
+        datacenter (RSS, sitemaps, HF, GitHub, corpora), `us` for US geography,
+        `local` for sources that trust only a residential IP and for the render door
+        at 127.0.0.1:3002. The one retry is `us` -> `bulk`, reported as
+        `fallback: true`; nothing retries `local`, because a blocklist hit is a fact
+        about the exit and repeating it spends the one address the fleet cannot
+        replace.
+
+        **Order.** Validator, then lane. `fetchcache` keys by SHA-256 of the
+        normalized URL, stores body, status, headers, ETag, Last-Modified and
+        fetched-at per lane, and revalidates with `If-None-Match` — a 304 is the only
+        zero-upstream-byte hit, and there is no TTL. The broker consults it before a
+        lane is touched; `cache: false` is the one bypass. A repeat therefore costs
+        no lane bytes and no blocklist budget.
+
+        **Latency (2026-11-28, delphi:8469, five probes, cache off).** Warm p50:
+        `bulk` 138 ms, `us` 194, `local` 159 — and each exit IP is its own lane:
+        92.5.115.103 delphi, 93.127.139.146 lumi:8470, 79.215.107.59 frieren:8471.
+      '';
+    };
     exp-120 = {
       title = "EXP-120 — a tailnet gateway for System One decisions";
       kind = "experiment";
@@ -3192,33 +3193,32 @@
         tasks = ["checks:host"];
       };
       body = ''
-        **The rule.** Move what has no library and no shared logins, and keep the name and the copy
-        behind. stirling-pdf went 2026-10-21; paperless, vaultwarden and anki on 2026-11-02, over an
-        earlier "paperless stays": that rule protected the archive and the family's habits, not the laptop.
-        `docs.`, `vault.` and `anki.frieren.lan` are still frieren's vhosts, and `services.offloadBridge`
-        mirrors every tree to `/srv/backup/offload` at 03:10, inside the window that already carries those
-        copies to BurgerNAS.
+        **The rule.** Move what has no library and no shared logins, and keep the
+        name and the copy behind. stirling-pdf went 2026-10-21; paperless,
+        vaultwarden and anki 2026-11-02. `docs.`, `vault.` and `anki.frieren.lan`
+        stay frieren's vhosts, and `services.offloadBridge` mirrors every tree to
+        `/srv/backup/offload` at 03:10, inside the restic window. The tunnel file
+        was deleted only after all three names answered with frieren holding no
+        loopback listeners.
 
-        **What is left is a decision.** hermes stays resident on both hosts: each gateway polls its own bot
-        token, so the 226 MiB in `~/.hermes` buys two agents, not a conflict. The monitor pair moved
-        2026-11-04: frieren's gatus and its empty uptime-kuma are gone, the checks run in delphi's
-        `services.fleetMonitors` over the tailnet, alerts post back to frieren's SimpleX bridge — the only
-        host with an identity to deliver them. A name that lives on frieren still needs frieren's nginx.
+        **What is left is a decision.** hermes stays resident on both hosts (each
+        gateway polls its own bot token). The monitor pair moved 2026-11-04: gatus
+        and the empty uptime-kuma left frieren, the checks run in delphi's
+        `services.fleetMonitors` over the tailnet, alerts post back to frieren's
+        SimpleX bridge. A name that lives on frieren still needs frieren's nginx.
 
-        **The tunnel is gone.** Frieren was deployed 2026-11-02 with vhosts naming delphi's tailnet
-        address; `offload-tunnel` was stopped first and all three names still answered, so the cutover was
-        proved before the file and its import were deleted.
+        **Exit — met.** Each moved unit is gone from frieren's system.slice and
+        serves from delphi; the shelter copy sits under `/srv/backup/offload` in a
+        restic snapshot. Verified 2026-11-20 (devin): delphi answers on the tailnet
+        (stirling :8445 → 200, gatus :8181 → 200) while the three `*.frieren.lan`
+        names stay frieren vhosts, and snapshot d2228859 (03:30) carries the four
+        offload trees. Memory shed ~1.4 GiB (stirling 633, paperless ~480,
+        uptime-kuma 137, vaultwarden 58, gatus 42, anki 6 MiB).
 
-        **Exit, met.** No stirling/paperless/vaultwarden/anki/gatus/uptime-kuma unit in frieren's
-        system.slice; delphi answers on the tailnet (stirling :8445 200, uptime-kuma :8448 302, gatus :8181
-        200); the 03:10 mirror refreshed `/srv/backup/offload/{anki,paperless,vaultwarden,vaultwarden-backup}`
-        and snapshot d2228859 (03:30, `restic-frieren-local`) carries the tree; memory shed on delphi ~1.4
-        GiB (stirling 633, paperless ~480, uptime-kuma 137, vaultwarden 58, gatus 42, anki 6 MiB). Nothing
-        movable remains: the rest is library, the SimpleX identity, or hermes by decision.
-
-        **Finished 2026-11-26.** delphi's own uptime-kuma was still enabled on :8448 with zero monitors; the
-        service, its :8448 portal card and its `fleetSentinel` watch entry are gone, and
-        `services.fleetMonitors` now asserts that no host runs gatus and uptime-kuma together.
+        **Finished 2026-11-26.** Delphi's own uptime-kuma — enabled, listening on
+        :8448, zero monitors — was the last duplicate. Service, portal card and
+        `fleetSentinel` watch entry are gone, and `services.fleetMonitors` asserts
+        no host runs gatus and uptime-kuma together.
       '';
     };
     exp-114 = {
@@ -4061,36 +4061,20 @@
       };
       summary = "harmonia stays the LAN cache and cachix the 5 GB WAN cache; delphi adds a 10 GiB R2 bucket behind a GET-only Worker, registered after cachix. A push asks every non-LAN substituter in the registry first and uploads only what none of them has, then refuses the run if it would cross the budget — a buffer for the fleet's delta, not a mirror of nixpkgs and not a store for system closures.";
       body = ''
-        **Why a third tier.** CI refuses the LAN cache by design, so a runner cannot substitute what
-        frieren or delphi built. R2 charges no egress; 10 GiB is the free tier.
-        **The edge never signs.** narinfo is signed by the pusher (`secret-key=`), so a Worker key would
-        reimplement Nix's fingerprint; `CACHE_AUTH_TOKEN` was refused because `nix copy` has no `--header`.
-        **A buffer, not a mirror.** Each path is HEADed against every non-LAN cache in the registry
-        (cachix, the bucket, cache.nixos.org, numtide, nix-community, nix-gaming, determinate); only
-        misses upload, and a push crossing 10 GiB is refused before writing, naming its five largest
-        paths — hence the entry sits immediately after `cachix` in every order.
-        **A closure is never stored; a delta is.** Delphi's closure is 2728 paths / 18.48 GiB; of the 570
-        cache.nixos.org lacks, 167 are on cachix, 11 on nix-community, and 27 — 1.40 GiB, the llm-agents
-        tools (`dsh` 685 MiB, `antigravity-cli`, `hermes-agent`, `freebuff`) — on `cache.numtide.com`,
-        leaving 365 paths / 771 MiB unique: 10 GiB holds ~13 systems where a hardcoded three-cache dedupe
-        would have uploaded 2.39 GiB of the same closure. So the edge is not self-contained — a client
-        substituting a system needs the rest of the registry (`lib/cache-registry.nix`).
-        **Evidence.** Live at `https://nix-cache-edge.jisifu.workers.dev` (key `delphi.edge-1`), where a
-        `hello.drv` closure reported `2/342 unique` and `nix path-info --store <edge>` accepts the signature.
-        **Traps, measured.** `nix copy` is recursive by default; `--no-recursive` needs valid references
-        (stubs fix that and are never uploaded); `nix copy --to s3://` wrote nothing against a fresh bucket
-        and exited 0; `rclone purge` deletes the bucket; a 404 seen before a push needs `--refresh`.
-        **Retention.** `dev:nixcache:gc` collects in cachix's shape (oldest first until under 75 %, 50 paths
-        a run, never a narinfo without its nar); the R2 lifecycle rule is a backstop at **365 days**, not
-        cachix's 90 — age-on-upload is a proxy, since the Worker never sees a cached request.
-        **Scheduled, routed by arch.** `dev:nixcache:sync` builds **active** hosts only, natively where the
-        arch owns the official caches (delphi compiles aarch64, itself and minyx), else `--max-jobs 0`
-        against `/etc/nix/machines`, printing SKIPPED rather than compiling x86_64 on 2 OCPU;
-        `nixcache-sync.timer` (user unit: keys decrypt with the operator's age key) then syncs
-        `delphi,minyx`, and `checks:nixcache:fleet` holds the enablement line.
-        **A microfix has a price.** `checks:invalidation` scopes a diff to the hosts it can reach and counts
-        what `nix build --dry-run --builders ""` would compile (1–3 a fix, hundreds an overlay change),
-        failing over `MAX_BUILDS` and naming the derivations.
+        **Shape.** CI refuses the LAN cache by design, so a runner cannot substitute what
+        frieren or delphi built: R2 charges no egress and 10 GiB is the free tier. Each
+        path is HEADed against every non-LAN cache in the registry (cachix, the bucket,
+        cache.nixos.org, numtide, nix-community, nix-gaming, determinate); only misses
+        upload, and a push crossing the budget is refused before writing — hence the
+        entry sits immediately after `cachix` in every order.
+
+        **The edge never signs.** narinfo is signed by the pusher (`secret-key=`), so a
+        Worker key would reimplement Nix's fingerprint; `CACHE_AUTH_TOKEN` was refused
+        because `nix copy` has no `--header`.
+
+        **Numbers live in the doc.** `docs/nix-cache-edge.md` carries the closure table
+        (2728 paths / 18.48 GiB, 771 MiB unique per system, ~13 systems per 10 GiB), the
+        retention shape, the arch-routed sync and the traps measured on a live push.
       '';
     };
 
@@ -5303,6 +5287,42 @@
         tarball fetcher rejects submodules=1. Vaultwarden has no prelogin port
         — crab-hole answers its name with frieren's tailnet IP. Retirements:
         dsh-web, agy-daemon-web → shadow files, one-uncomment revival.
+      '';
+    };
+
+    delphi-host-clone-not-authority = {
+      title = "The checkout on delphi is not the tree that is deployed";
+      kind = "open";
+      status = "OPEN";
+      priority = "P2";
+      date = "2026-11-26";
+      summary = "Delphi keeps a clean, never-fetched clone of an October history that no unit builds from; the running generation comes from an archived flake source, so a rebuild there would run last month's config. Decide: delete it, or re-point it at the authoritative remote.";
+      refs = {
+        hosts = ["delphi"];
+        modules = ["hosts/delphi/infra-stack.nix"];
+        tasks = ["infra:deploy:host:delphi"];
+        docs = [".agents/deploy/hosts/delphi.md"];
+      };
+      body = ''
+        Measured 2026-11-26 with `sudo git -C /root/Documents/nixconfig log -1`:
+        `main` at e1216fa2 (2026-10-26), clean, no FETCH_HEAD, `modules/secrets`
+        uninitialised. The subject exists here as 57679c54, so the host holds a
+        different history rather than an older copy — it cannot fast-forward to
+        what runs. No systemd unit, `/etc/nixos` file or keeper path names it.
+
+        Inert but not harmless: it is the only git tree on a host people ssh
+        into, and a `nixos-rebuild --flake` against it rebuilds October. Delphi
+        switches from an archived source (`nix flake archive`, then
+        `/nix/store/<src>#delphi`), which the runbook now says.
+
+        The other half: local `main` holds the commits delphi runs and
+        `git branch -r --contains` names no remote for them, while `origin/main`
+        is a different commit. Until one is pushed, the deployed tree exists in a
+        single working copy.
+
+        Exit: `ssh delphi 'sudo rm -rf /root/Documents/nixconfig'` — or the tree
+        tracks the authoritative remote and fast-forwards; re-measure either way
+        before trusting a rebuild from it.
       '';
     };
 
@@ -6520,29 +6540,27 @@
         docs = ["docs/delphi-runtime.md" ".agents/deploy/hosts/netbook.md" "docs/appflow-board.md"];
       };
       body = ''
-        Lane close-out 2026-11-25 (devin, nixconfig refactoring): both threads CLOSED, the tail CLOSED 2026-11-26.
+        Lane close-out 2026-11-25 (devin, nixconfig refactoring): both threads CLOSED.
 
         image-daily Go port — CLOSED. Every external-process boundary lives in
-        tools/os/internal/image behind .#cli.image.daily; engine.sh is retired (deleted with its budget
-        line — the family's last curl). Verified end-to-end the same day: go build/vet/test,
-        checks:image-daily, the 9-assert publish fixture, ship 4/4, images-check 771/771,
+        tools/os/internal/image behind .#cli.image.daily; engine.sh retired with
+        its budget line. Green end-to-end: go build/vet/test, checks:image-daily,
+        the 9-assert publish fixture, ship 4/4, images-check 771/771,
         checks:host frieren rc=0.
 
-        nix-comment-audit — CLOSED. Every Story:/Trap:/Fact: pointer in the heaviest .nix files resolves;
-        the tail sweep (netbook, outputs.nix, hermes-user) found one dangling cite, fixed at its doc home.
-        Census at close: 7259 comment lines, 519 pointers, all 54 task cites resolving; docs/ and
-        .agents/deploy/ sit outside the prose budget.
+        nix-comment-audit — CLOSED. Every Story:/Trap:/Fact: pointer resolves;
+        the tail sweep (netbook, outputs.nix, hermes-user) found one dangling
+        cite, fixed at its doc home. Census: 7259 comment lines, 519 pointers,
+        54/54 task cites; prose budget untouched.
 
-        Appflow tail — CLOSED. The first 404 was a dirty-checkout build: the board's allowlist named
-        `/api/applications` and `/api/applications-discovered` and the deployed npgsqlrest lacked both
-        .sql files, committed since 86bdb73b. `appflow-board.nix` now asserts at eval that every proxied
-        route has a `sql/<name>.sql` — fails checks:host, proven firing. The persistent 404 was the param
-        contract, not a missing deployment: re-verified live after delphi's 04:30 autoUpgrade, all five
-        read routes answer 200, `?lim=5` serves rows while bare `/api/applications` 404s because
-        NpgsqlRest refuses an unparametrized endpoint. docs/appflow-board.md now names the bare-route trap.
-
-        Tail gates green twice: comments 54/54, policies, images 772/772, hosts delphi+frieren+netbook,
-        06:49 image-daily + drv-equality 30/30.
+        Appflow tail — CLOSED 2026-11-26 on the live host. The Nov-25 404 was a
+        dirty-tree generation whose npgsqlrest lacked two committed .sql files
+        (a487f3d4 asserts every proxied route has one). The *persistent* 404 was
+        the param contract: NpgsqlRest answers "not found" for a parametrized
+        endpoint called bare, so `/api/applications` 404s while `?lim=5` serves.
+        All five read routes answer 200 with params; docs/appflow-board.md names
+        the bare-route trap. Gates green twice: comments 54/54, policies, images
+        772/772, hosts delphi+frieren+netbook, drv-equality 30/30.
       '';
     };
     shared-worktree-commit-race = {
@@ -8650,6 +8668,48 @@
       '';
     };
 
+    classification-gate-placement = {
+      title = "Move the systemd classification gate out of host eval, or keep paying 314 MiB for its guarantee";
+      kind = "proposal";
+      status = "PROPOSED";
+      priority = "P2";
+      date = "2026-11-27";
+      summary = "systemd-policy costs ~314 MiB of every host eval because its assertion force-reads the full unit set; moving it beside checks:units drops the desktop gate under 1 GiB, but enforcement then depends on wiring the new gate into CI and the deploy chain, which is why this is an operator safety call.";
+      from = ["eval-cost-ladder"];
+      refs = {
+        modules = ["modules/systemd-policy.nix" "scripts/task/chain-profile.sh" "scripts/task/unit-gate.sh" "flake/host-check.nix"];
+        tasks = ["checks:units" "checks:host"];
+        docs = ["docs/control-plane-vision.md" "docs/nix-patterns.md"];
+      };
+      body = ''
+        Reproduce the costs: `bash scripts/task/chain-profile.sh base nixos dms` with
+        and without `systemd-policy` in EXTRA_NIX's hmUserFeatures force. Measured
+        2026-11-27: systemd-policy is ~314 MiB of the 1176 MiB desktop gate — the
+        only feature whose cost is a full-config force, because its assertion
+        reads every user unit plus osConfig.systemd.services, and that read IS
+        the check.
+
+        Options:
+        A. Status quo — assertion stays in the host eval. Every checks:host, CI
+           hostChecks build and deploy re-gate pays the 314 MiB; a violating
+           config cannot reach a switch, because every path to one forces
+           assertions.
+        B. Move beside checks:units — one force, two verdicts; desktop gate drops
+           under 1 GiB. Safety then depends entirely on wiring, and checks:units
+           is today wired NOWHERE — not CI, not the deploy chain. Moving without
+           wiring is a silent enforcement regression. Wiring means the CI
+           per-host job, the warm-host/activate re-gate, and a checks:quick
+           smoke that keeps both honest.
+        C. Enforcement flag (off local, on CI) — rejected: dev/CI drift trains
+           bypassing, and the failure surfaces where it is hardest to fix.
+        D. Shrink the force — rejected: the force is the check, not overhead.
+
+        Operator decision: is 314 MiB per host eval the price of a guarantee, or
+        does the fleet wire B properly? Exit if B: checks:host on a desktop under
+        1 GiB AND the classification gate green in CI per host — both, never one.
+        No gate change without sign-off.
+      '';
+    };
     workerbase-devops-submitted-2026-11-27 = {
       title = "Workerbase Senior DevOps Engineer submitted via Arbeitnow";
       kind = "handoff";

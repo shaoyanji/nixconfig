@@ -10,6 +10,8 @@
   imports = [
     ./hardware-configuration.nix
     ./amd-rx-5700.nix
+    self.modules."services.fleet-sentinel"
+    self.modules."profiles.sentinel-push"
     # Gamescope-only kiosk: greetd auto-logs devji into `steam-gamescope`, so
     # Steam Big Picture is the entire UI — the same shape as ares and
     # deckstation. profiles.steamos brings profiles.steam with it. The desktop
@@ -218,6 +220,14 @@
     model = "qwen-talker-1.7b-customvoice-Q4_K_M.gguf";
     codec = "qwen-tokenizer-12hz-Q8_0.gguf";
     voice = "vivian";
+  };
+
+  services.fleetSentinel = {
+    enable = true;
+    watchUnits = [
+      {unit = "nixos-upgrade.service";}
+      {unit = "tailscaled.service";}
+    ];
   };
 
   services.openssh.enable = true;

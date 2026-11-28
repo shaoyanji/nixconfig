@@ -19,10 +19,9 @@
 
   services.emailArchive = {
     enable = true;
-    # The timer runs from the first boot; the sync unit is skipped until the
-    # operator writes the rclone remote (docs/email-archive.md). Same rule as the
-    # calendar's token: `ConditionPathExists` on state, never a sops key.
-    gdrive.enable = true;
+    # Off: a Drive token only a browser consent mints, so the mirror ran 55 hourly
+    # no-ops reporting success; the bridge carries the tree (docs/email-archive.md).
+    gdrive.enable = false;
     # The importer walks the live inbox every hour and hands each new message to
     # the endpoint; 200 new messages a run is a backfill pace, not a limit on the
     # archive (successive runs continue where the previous one stopped).

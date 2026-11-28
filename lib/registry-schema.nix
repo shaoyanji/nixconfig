@@ -7,6 +7,11 @@
     "profiles.dwlDesktop.enable"
     "services.zettelGraph.enable"
     "services.mataroaConsole.enable"
+    "services.jobDbScraper.enable"
+    "services.privateDeals.enable"
+    "services.inventorySite.enable"
+    "services.clankerRunner.enable"
+    "services.linkVault.enable"
   ];
   umbrellaFamilies = ["checks:appflow"];
   sopsAnchorExceptions = ["garnix"];

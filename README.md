@@ -384,7 +384,7 @@ Per-host quirks and exceptions: `.agents/deploy/hosts/*.md`
 
 ## Flake outputs
 
-`nixosConfigurations`, `darwinConfigurations`, `homeConfigurations`, `packages`,
+`nixosConfigurations`, `darwinConfigurations`, `homeConfigurations`, `legacyPackages`,
 `checks` and `devShells`, assembled from [`flake/outputs.nix`](flake/outputs.nix)
 via [`lib/mk-nixos-host.nix`](lib/mk-nixos-host.nix). The full assembly diagram and
 how inventory entries project into each output live in

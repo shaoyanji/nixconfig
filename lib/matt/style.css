@@ -120,10 +120,10 @@ ol.work li[hidden] { display: none; }
   font-size: .9rem;
   color: var(--ink);
   background: none;
-  /* `--rule` is a separator, not a control edge: at 1.2:1 on the paper it left
-     the field with no visible boundary (3:1 is the floor for a control), so the
-     border takes the muted ink the label beside it already uses — 5.3:1 light,
-     6.2:1 dark. */
+  /* `--rule` is a separator, not a control edge: at 1.4:1 on the paper (1.3:1 in
+     the dark scheme) it left the field with no visible boundary (3:1 is the
+     floor for a control), so the border takes the muted ink the label beside it
+     already uses — 5.3:1 light, 6.2:1 dark. */
   border: 1px solid var(--muted);
   padding: .4rem .6rem;
 }

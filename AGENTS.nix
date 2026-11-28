@@ -2838,10 +2838,6 @@
         p95 823 then 726, 1.40 MB upstream; warm p50 46 then 41 ms, 0.085 MB — 94%
         fewer bytes, 3.3-3.7x faster; direct p50 165 then 256 ms.
 
-        **Lanes live (2026-11-28, by IP).** Both run: `local` (frieren:8471)
-        answers 200 in 0.24 s as 79.215.107.59, `us` (lumi:8470) 200 in 1.13 s as
-        93.127.139.146, `bulk` holds at 0.48 s.
-
         **Open.** Per-lane throughput on the same 20 URLs; the shape it measures is
         `egress-architecture`.
       '';
@@ -2868,16 +2864,14 @@
       body = ''
         **Placement.** One door: `fetch-broker` on delphi, loopback 8107, published
         tailnet-only at :8469 by the servicePortal mount — no firewall port, so a
-        crawl is charged to the tailnet once. Delphi owns it because its bytes are
-        the cheapest on the fleet and its datacenter address may be spent; the
-        lanes are peers, not tunnels.
+        crawl is charged to the tailnet once. Delphi owns it: its bytes are cheapest
+        and its datacenter address may be spent; the lanes are peers, not tunnels.
 
         **Lanes.** `bulk` is delphi's own NIC with no proxy hop; `us` is lumi's
-        tinyproxy on the tailnet address at :8470 (four clients), `local` is
-        frieren's at :8471 (sixteen). Each binds `tailscale ip -4` and allows only
-        100.64.0.0/10, so a lane is a tailnet address that can be retired. The
-        broker resolves them from `inventory.toml` `tailscale_ip`, because MagicDNS
-        is off here, and delphi asserts both keys exist.
+        tinyproxy at :8470 (four clients), `local` is frieren's at :8471 (sixteen).
+        Each binds `tailscale ip -4` and allows only 100.64.0.0/10, so a lane is a
+        tailnet address that can be retired. MagicDNS is off here, so the broker
+        resolves them from `inventory.toml` and delphi asserts both keys exist.
 
         **Policy.** Identity before bandwidth. `bulk` for sources that answer a
         datacenter (RSS, sitemaps, HF, GitHub, corpora), `us` for US geography,
@@ -2893,6 +2887,10 @@
         zero-upstream-byte hit, and there is no TTL. The broker consults it before a
         lane is touched; `cache: false` is the one bypass. A repeat therefore costs
         no lane bytes and no blocklist budget.
+
+        **Latency (2026-11-28, delphi:8469, five probes, cache off).** Warm p50:
+        `bulk` 138 ms, `us` 194, `local` 159 — and each exit IP is its own lane:
+        92.5.115.103 delphi, 93.127.139.146 lumi:8470, 79.215.107.59 frieren:8471.
       '';
     };
     exp-120 = {

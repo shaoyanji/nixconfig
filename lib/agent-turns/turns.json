@@ -1,8 +1,69 @@
 {
-  "generated": "2026-11-28T01:47:53Z",
+  "generated": "2026-11-28T01:57:22Z",
   "count": 200,
-  "pin": "5ce6b50c38adff1fb95ee8d39bee340f7894a848daacb68340f5abc452a50037",
+  "pin": "14c44f662f1d24bc390178771e7c2546cdeaed6ed34f0e6ca01c060c4b4028bd",
   "turns": [
+    {
+      "id": "e45cfb72-903e-4615-8089-d914442b4517",
+      "ts": "2026-11-28T01:57:15Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-drift-gate-2026-11-28",
+      "action": "gate-change 1.0: add cv-ats drift gate, prove fires, push",
+      "outcome": "in_progress",
+      "claims": [
+        "scripts/task/cv-ats-check.sh"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbevk66ghydhd9g5ox75y0s"
+    },
+    {
+      "id": "7ac4b649-034a-448a-91a3-131130158e5d",
+      "ts": "2026-11-28T01:56:05Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-egress-lane-latency-2026-11-28",
+      "action": "claim: taking the 01:54 dispatched row (steward has 0 commits in 86 turns); measuring lanes through delphi:8469, writing numbers into egress-architecture, paying the byte ceiling",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "9263460a89267e7a3d6985502ecd1006be6be933",
+      "branch": "main",
+      "frame": "03hbevbwtjnu7u35j1kai4kiy"
+    },
+    {
+      "id": "ccb3e16a-0748-49b1-b431-f31987479a7c",
+      "ts": "2026-11-28T01:54:47Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-egress-lane-latency-2026-11-28",
+      "action": "note-change 0.84: measure egress lanes, update note, push",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbev2txpvz7q501iwtl26oh"
+    },
+    {
+      "id": "80511d32-5204-4ac4-8ee4-4873770bce0a",
+      "ts": "2026-11-28T01:48:46Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-cv-gate-battery-2026-11-28",
+      "action": "landed: resume projection restored at the tip (e3da97f5->27b33207): thirteen->25 hosts, DevOps AWS/Azure/Google Cloud at Master -> Linux/systemd, Container, GitHub Actions, Monitoring & Alerting at Advanced. Duel: origin/main@9263460a red (6 unbacked claims + drift), patched tree green. | gate: matt:cv:evidence PASS, matt:gist:drift PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/matt/resume.json",
+        "lib/matt/lebenslauf.json"
+      ],
+      "files": [],
+      "base_commit": "9263460a",
+      "branch": "main",
+      "frame": "03hbetwh0zzj5uzaviutpn2li"
+    },
     {
       "id": "5fd11299-5444-4849-8160-1643a5813ce3",
       "ts": "2026-11-28T01:44:47Z",
@@ -2937,61 +2998,6 @@
       "base_commit": "257e96b649d2ec2632a6624b109cd644f75fd336",
       "branch": "main",
       "frame": "03hbb78nnigrm6snyfbta879b"
-    },
-    {
-      "id": "a837c393-42f7-4781-acd4-9936e92aea98",
-      "ts": "2026-11-27T14:39:07Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin",
-      "action": "stale duplicate row — drive is pane-1-devin-flake-change",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbb737j3typ5a3rlu8phqms"
-    },
-    {
-      "id": "ee4a56b4-ebb1-47f1-82bb-fed86b709e80",
-      "ts": "2026-11-27T14:38:49Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin-flake-change",
-      "action": "drove agents:1.1 devin (flake-change 0.84|0.75)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbb711wuwpf6n3v4x5r3tv2"
-    },
-    {
-      "id": "7db0949e-8d37-4227-9a46-f817938c3c66",
-      "ts": "2026-11-27T14:38:21Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin",
-      "action": "drove agents:1.1 devin (flake-change 0.84|0.75)",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbb6xusvtej943zetriwy2f"
-    },
-    {
-      "id": "4cb83342-9e06-498a-aa42-c9788bc030b7",
-      "ts": "2026-11-27T14:38:07Z",
-      "source": "devin",
-      "subject": "nixconfig:gemini-api-packaging-turn",
-      "action": "start: finish the prepared gemini-api v0.5.0 packaging lane; verify flake and repo gates, then push only a verified diff or close as no-change",
-      "outcome": "in_progress",
-      "claims": [
-        "flake/cli.nix",
-        "modules/env.nix"
-      ],
-      "files": [],
-      "base_commit": "ee2c4637f309a68ad9ec742050a8050c8454e4ed",
-      "branch": "main",
-      "frame": "03hbb6w89daqnpujzzn0rggp8"
     }
   ]
 }

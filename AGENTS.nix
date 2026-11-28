@@ -2827,24 +2827,12 @@
         docs = ["docs/media-relay.md" "docs/storage-taxonomy.md"];
       };
       body = ''
-        **The rule.** Pick the lane by identity before bandwidth: delphi 1.38 Gbps and
-        10 TB/month on a datacenter IP, frieren 50/20 on the only residential, lumi
-        ~50 Mbps behind a shared US NAT — home is trust, not bytes. Seen live: delphi
-        92.5.115.103 AS31898, frieren 79.215.107.59 AS3320 direct, lumi DERP-only
-        (dfw), so 93.127.139.146 stays a lookup.
-
-        **Lanes.** `bulk` (delphi): RSS, sitemaps, HF, GitHub, corpora, many-connection
-        pulls. `us` (lumi): US-only pricing, retail, APIs — four connections, no
-        Chrome. `local` (frieren): sources that trust only a residential IP, plus the
-        JS door at :3002. Fallback is `us -> bulk`, never `local -> bulk`: a datacenter
-        retry blocklists the OCI range.
+        **Seen live.** delphi 92.5.115.103 AS31898, frieren 79.215.107.59 AS3320
+        direct, lumi DERP-only (dfw), so 93.127.139.146 stays a lookup.
 
         **Built, ranked (Jev 1.14.0).** Cache then broker: a page comes from
-        `fetchcache`, only a miss spends a lane — cache 57%, broker 30%, sink 7%, both
-        61% at 0.52. `fetchcache` keys by SHA-256 of the URL, stores body, ETag,
-        Last-Modified and fetched-at, revalidating with `If-None-Match` on a 304 at no
-        upstream bytes. `fetch-broker` answers `POST /v1/fetch` cache-first and owns
-        the lanes via `tailnet-forward-proxy`.
+        `fetchcache`, only a miss spends a lane — cache 57%, broker 30%, sink 7%,
+        both 61% at 0.52.
 
         **Measured (2026-11-28, delphi, 20 URLs, twice).** Cold p50 154 then 152 ms,
         p95 823 then 726, 1.40 MB upstream; warm p50 46 then 41 ms, 0.085 MB — 94%
@@ -2852,9 +2840,59 @@
 
         **Lanes live (2026-11-28, by IP).** Both run: `local` (frieren:8471)
         answers 200 in 0.24 s as 79.215.107.59, `us` (lumi:8470) 200 in 1.13 s as
-        93.127.139.146, `bulk` holds at 0.48 s. The names resolve nowhere here
-        (`--accept-dns=false`), so the broker uses their inventory IP: live
-        since the 2026-11-28 switch. Open: per-lane throughput on 20 URLs.
+        93.127.139.146, `bulk` holds at 0.48 s.
+
+        **Open.** Per-lane throughput on the same 20 URLs; the shape it measures is
+        `egress-architecture`.
+      '';
+    };
+    egress-architecture = {
+      title = "Egress is one broker on delphi, three lane exits, a validator before any lane";
+      kind = "reference";
+      status = "DELIVERED";
+      date = "2026-11-28";
+      summary = "A scrape enters at delphi:8469, a stored validator answers before a lane is spent, and a miss leaves by bulk (delphi direct), us (lumi) or local (frieren) — so trust and geography belong to the exit, never to the caller.";
+      from = ["egress-lanes-research"];
+      refs = {
+        hosts = ["delphi" "frieren" "lumi"];
+        modules = [
+          "modules/services/fetch-broker.nix"
+          "modules/services/fetchcache/fetchcache.go"
+          "modules/services/tailnet-forward-proxy.nix"
+          "hosts/delphi/configuration.nix"
+          "hosts/lumi.nix"
+        ];
+        tasks = ["checks:ports" "checks:host"];
+        docs = ["docs/media-relay.md"];
+      };
+      body = ''
+        **Placement.** One door: `fetch-broker` on delphi, loopback 8107, published
+        tailnet-only at :8469 by the servicePortal mount — no firewall port, so a
+        crawl is charged to the tailnet once. Delphi owns it because its bytes are
+        the cheapest on the fleet and its datacenter address may be spent; the
+        lanes are peers, not tunnels.
+
+        **Lanes.** `bulk` is delphi's own NIC with no proxy hop; `us` is lumi's
+        tinyproxy on the tailnet address at :8470 (four clients), `local` is
+        frieren's at :8471 (sixteen). Each binds `tailscale ip -4` and allows only
+        100.64.0.0/10, so a lane is a tailnet address that can be retired. The
+        broker resolves them from `inventory.toml` `tailscale_ip`, because MagicDNS
+        is off here, and delphi asserts both keys exist.
+
+        **Policy.** Identity before bandwidth. `bulk` for sources that answer a
+        datacenter (RSS, sitemaps, HF, GitHub, corpora), `us` for US geography,
+        `local` for sources that trust only a residential IP and for the render door
+        at 127.0.0.1:3002. The one retry is `us` -> `bulk`, reported as
+        `fallback: true`; nothing retries `local`, because a blocklist hit is a fact
+        about the exit and repeating it spends the one address the fleet cannot
+        replace.
+
+        **Order.** Validator, then lane. `fetchcache` keys by SHA-256 of the
+        normalized URL, stores body, status, headers, ETag, Last-Modified and
+        fetched-at per lane, and revalidates with `If-None-Match` — a 304 is the only
+        zero-upstream-byte hit, and there is no TTL. The broker consults it before a
+        lane is touched; `cache: false` is the one bypass. A repeat therefore costs
+        no lane bytes and no blocklist budget.
       '';
     };
     exp-120 = {
@@ -4023,36 +4061,20 @@
       };
       summary = "harmonia stays the LAN cache and cachix the 5 GB WAN cache; delphi adds a 10 GiB R2 bucket behind a GET-only Worker, registered after cachix. A push asks every non-LAN substituter in the registry first and uploads only what none of them has, then refuses the run if it would cross the budget — a buffer for the fleet's delta, not a mirror of nixpkgs and not a store for system closures.";
       body = ''
-        **Why a third tier.** CI refuses the LAN cache by design, so a runner cannot substitute what
-        frieren or delphi built. R2 charges no egress; 10 GiB is the free tier.
-        **The edge never signs.** narinfo is signed by the pusher (`secret-key=`), so a Worker key would
-        reimplement Nix's fingerprint; `CACHE_AUTH_TOKEN` was refused because `nix copy` has no `--header`.
-        **A buffer, not a mirror.** Each path is HEADed against every non-LAN cache in the registry
-        (cachix, the bucket, cache.nixos.org, numtide, nix-community, nix-gaming, determinate); only
-        misses upload, and a push crossing 10 GiB is refused before writing, naming its five largest
-        paths — hence the entry sits immediately after `cachix` in every order.
-        **A closure is never stored; a delta is.** Delphi's closure is 2728 paths / 18.48 GiB; of the 570
-        cache.nixos.org lacks, 167 are on cachix, 11 on nix-community, and 27 — 1.40 GiB, the llm-agents
-        tools (`dsh` 685 MiB, `antigravity-cli`, `hermes-agent`, `freebuff`) — on `cache.numtide.com`,
-        leaving 365 paths / 771 MiB unique: 10 GiB holds ~13 systems where a hardcoded three-cache dedupe
-        would have uploaded 2.39 GiB of the same closure. So the edge is not self-contained — a client
-        substituting a system needs the rest of the registry (`lib/cache-registry.nix`).
-        **Evidence.** Live at `https://nix-cache-edge.jisifu.workers.dev` (key `delphi.edge-1`), where a
-        `hello.drv` closure reported `2/342 unique` and `nix path-info --store <edge>` accepts the signature.
-        **Traps, measured.** `nix copy` is recursive by default; `--no-recursive` needs valid references
-        (stubs fix that and are never uploaded); `nix copy --to s3://` wrote nothing against a fresh bucket
-        and exited 0; `rclone purge` deletes the bucket; a 404 seen before a push needs `--refresh`.
-        **Retention.** `dev:nixcache:gc` collects in cachix's shape (oldest first until under 75 %, 50 paths
-        a run, never a narinfo without its nar); the R2 lifecycle rule is a backstop at **365 days**, not
-        cachix's 90 — age-on-upload is a proxy, since the Worker never sees a cached request.
-        **Scheduled, routed by arch.** `dev:nixcache:sync` builds **active** hosts only, natively where the
-        arch owns the official caches (delphi compiles aarch64, itself and minyx), else `--max-jobs 0`
-        against `/etc/nix/machines`, printing SKIPPED rather than compiling x86_64 on 2 OCPU;
-        `nixcache-sync.timer` (user unit: keys decrypt with the operator's age key) then syncs
-        `delphi,minyx`, and `checks:nixcache:fleet` holds the enablement line.
-        **A microfix has a price.** `checks:invalidation` scopes a diff to the hosts it can reach and counts
-        what `nix build --dry-run --builders ""` would compile (1–3 a fix, hundreds an overlay change),
-        failing over `MAX_BUILDS` and naming the derivations.
+        **Shape.** CI refuses the LAN cache by design, so a runner cannot substitute what
+        frieren or delphi built: R2 charges no egress and 10 GiB is the free tier. Each
+        path is HEADed against every non-LAN cache in the registry (cachix, the bucket,
+        cache.nixos.org, numtide, nix-community, nix-gaming, determinate); only misses
+        upload, and a push crossing the budget is refused before writing — hence the
+        entry sits immediately after `cachix` in every order.
+
+        **The edge never signs.** narinfo is signed by the pusher (`secret-key=`), so a
+        Worker key would reimplement Nix's fingerprint; `CACHE_AUTH_TOKEN` was refused
+        because `nix copy` has no `--header`.
+
+        **Numbers live in the doc.** `docs/nix-cache-edge.md` carries the closure table
+        (2728 paths / 18.48 GiB, 771 MiB unique per system, ~13 systems per 10 GiB), the
+        retention shape, the arch-routed sync and the traps measured on a live push.
       '';
     };
 

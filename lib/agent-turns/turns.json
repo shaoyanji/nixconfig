@@ -1,8 +1,84 @@
 {
-  "generated": "2026-11-28T01:05:01Z",
+  "generated": "2026-11-28T01:24:20Z",
   "count": 200,
-  "pin": "42da769101732d796b6426f14cddcdc2c74fee000840b3e981262f0bde0d1ff3",
+  "pin": "4173e022974879d825271b48b29367aa1431ecc55ed40298d0401c278dd3c164",
   "turns": [
+    {
+      "id": "58b92d1a-f8a8-436a-b552-a7009000dbbf",
+      "ts": "2026-11-28T01:23:52Z",
+      "source": "buffy",
+      "subject": "nixconfig:egress-architecture-note-2026-11-28",
+      "action": "claim: land the egress architecture as an AGENTS.nix reference note (broker placement, lane policy, caching order)",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix scripts/task/repo-blobs.sh"
+      ],
+      "files": [],
+      "base_commit": "3da73b6c6c6c9162d7eec546a049d2ed2ba746a8",
+      "branch": "main",
+      "frame": "03hbep1coi6uac9crkiwk428k"
+    },
+    {
+      "id": "307dd3bf-1832-4918-b226-d5e2a47dd536",
+      "ts": "2026-11-28T01:22:50Z",
+      "source": "micro-turn",
+      "subject": "nixconfig:freebuff-cv-verify-2026-11-28",
+      "action": "publish 0.54/0.08 duel: verify CVs vs origin/main, gate, push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/resume.json",
+        "sites/cv-ats"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbeou226ktg86cvk794otaj"
+    },
+    {
+      "id": "0ee98cc0-d8b2-46ec-a6e7-0d0f47d15f11",
+      "ts": "2026-11-28T01:22:49Z",
+      "source": "micro-turn",
+      "subject": "nixconfig:delphi-egress-arch-note-2026-11-28",
+      "action": "note-change 1.00: land egress arch note, schema gate, push",
+      "outcome": "in_progress",
+      "claims": [
+        "AGENTS.nix"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbeou0ua7c8ikcmriw4u0ds"
+    },
+    {
+      "id": "3c5b2b77-25f1-47f8-a345-010cd947fa82",
+      "ts": "2026-11-28T01:10:46Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-cv-gist-publish-2026-11-28",
+      "action": "landed: published corrected CV gist b7b8447 — canonical resume had lost its contact block, so email/image/signature/location were restored before writing; live raw equals canonical minus phone (DevOps Advanced, six backed keywords, 25 hosts, 5 roles/10 projects). German gist 541b117a untouched: its fix sits in lib/matt/lebenslauf.json, claimed live by freebuff-cv-publish | gate: matt:gist:drift PASS",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbemh9h91zxujpue22ecpre"
+    },
+    {
+      "id": "dcd69c8c-9ae9-4b68-be8f-1f2def2be143",
+      "ts": "2026-11-28T01:08:28Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-tailnet-policy-deploy-2026-11-28",
+      "action": "landed: policy in sync (no host imports the hujson, so nothing to ship); activated delphi's broker from a clean worktree, found frieren's missing tailscale_ip (local lane was http://:8471), added it + assertions; lanes verified by exit IP through the broker and the tailnet 8469 mount | gate: infra:switch:nixos PASS, ops:tailnet:policy PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/config/tailnet-policy.hujson",
+        "hosts/delphi/configuration.nix",
+        "inventory.toml"
+      ],
+      "files": [],
+      "base_commit": "3da73b6c6c6c9162d7eec546a049d2ed2ba746a8",
+      "branch": "main",
+      "frame": "03hbem10ru9147u92lp258l0n"
+    },
     {
       "id": "2285ef38-459f-4998-a2f7-7dcf7996e3e1",
       "ts": "2026-11-28T01:04:03Z",
@@ -2920,71 +2996,6 @@
       "base_commit": "4422d5e9f94cce3c9a33df1a2ce1a709dbe2e7af",
       "branch": "HEAD",
       "frame": "03hbb1msjkde989x64ptxsxwk"
-    },
-    {
-      "id": "423c9f9a-66e6-4e4c-8389-74c64b9b12a9",
-      "ts": "2026-11-27T14:11:06Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin",
-      "action": "re-drove agents:1.1 devin (prev 4422d5e9 landed): flake-change p=0.83 m=0.69; Thinking 3s confirmed",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
-      "branch": "HEAD",
-      "frame": "03hbb1m6hdx199ydcm495gjdc"
-    },
-    {
-      "id": "feee6bd9-3444-4386-93e9-745761ce282a",
-      "ts": "2026-11-27T14:09:33Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-freebuff",
-      "action": "drove agents:2.1 freebuff: publish p=0.86 m=0.76; working... 49s confirmed",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
-      "branch": "HEAD",
-      "frame": "03hbb1b9sqtq2j2g58et59ez1"
-    },
-    {
-      "id": "e6b49f86-aaf7-4213-ba12-929b9335a60c",
-      "ts": "2026-11-27T14:09:33Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin",
-      "action": "drove agents:1.1 devin: chain-change p=1.0 m=1.0; fresh Thinking 4s spinner confirmed",
-      "outcome": "in_progress",
-      "claims": [],
-      "files": [],
-      "base_commit": "97489aa04dd3b610a19306d148940f7a4fd04a40",
-      "branch": "HEAD",
-      "frame": "03hbb1b8qrpwuq8s0juk1zlys"
-    },
-    {
-      "id": "fcccf40b-68c8-4d7c-bcf3-5e1cbcbfdf91",
-      "ts": "2026-11-27T13:54:33Z",
-      "source": "devin",
-      "subject": "nixconfig:feature-chain-refactor-audit",
-      "action": "landed: named the shared desktop-HM base/suite and the microvm input feature; corrected stale chain comments | gate: drv-equality poseidon/fern/cassini 3/3 identical and testvm/frieren-canary 2/2 identical; checks:hosts poseidon+cassini+testvm PASS; checks:nix:lint PASS; docs:build PASS",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "4422d5e9f94cce3c9a33df1a2ce1a709dbe2e7af",
-      "branch": "HEAD",
-      "frame": "03hbaydt5y1a56v41pi423o8a"
-    },
-    {
-      "id": "cfce21b0-5667-4cee-b825-2d187c26dca0",
-      "ts": "2026-11-27T13:48:29Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-1-freebuff-cv-jobscout",
-      "action": "republish: CV site re-deployed from bd6522c (Pages run 46010120022 success); no source drift, build byte-identical; 8 routes + 8 pdfs 200 | gate: live route sweep",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbax7623wv434mj0sg5c30j"
     }
   ]
 }

@@ -1,8 +1,38 @@
 {
-  "generated": "2026-11-28T13:37:48Z",
+  "generated": "2026-11-28T13:57:03Z",
   "count": 200,
-  "pin": "a2c2f750d5a6ebf5d5e0cbd3e33ce10bbb3f34bbcb375123bf8add330c9eb1ff",
+  "pin": "69e1d3f280e7d538bc4cc193f948d5bbb912ab98af9904eb2dbc054644935c1b",
   "turns": [
+    {
+      "id": "df5d2df1-061d-4c99-beb4-706ec70403d4",
+      "ts": "2026-11-28T13:55:29Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:manual-audit-20261128-1445",
+      "action": "jev prose-change 0.93: audit MANUAL.md vs inventory; fix stale facts",
+      "outcome": "in_progress",
+      "claims": [
+        "MANUAL.md"
+      ],
+      "files": [],
+      "base_commit": "69288a7cfd6f8f77502d633f30837dddf35a090d",
+      "branch": "main",
+      "frame": "03hbirv4cdg6lnwas9iwcg5m8"
+    },
+    {
+      "id": "cea08168-1034-45f1-9efa-45fd8ccd8a77",
+      "ts": "2026-11-28T13:49:35Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:cv-ats-doc-audit-20261128-1440",
+      "action": "jev prose-change 0.84: audit CV compliance claims vs current templates; fix proven drift",
+      "outcome": "in_progress",
+      "claims": [
+        "docs/cv-ats-compliance.md"
+      ],
+      "files": [],
+      "base_commit": "69288a7cfd6f8f77502d633f30837dddf35a090d",
+      "branch": "main",
+      "frame": "03hbiqpmown6ul9181lcrqt60"
+    },
     {
       "id": "30774148-b19f-4983-b38e-4881e34952d5",
       "ts": "2026-11-28T13:35:36Z",
@@ -2983,37 +3013,6 @@
       "base_commit": "9742d29133f7804d4c6b4438d8d7e1d03865e85b",
       "branch": "HEAD",
       "frame": "03hbf6vv9cm6yg75gg4ph4xbi"
-    },
-    {
-      "id": "7ad0a951-e366-47a6-9767-553bf9518358",
-      "ts": "2026-11-28T02:52:08Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-gigabit-close-2026-11-28",
-      "action": "task-change 0.77/0.54 duel-top: land done on gigabit-claims, clear gate",
-      "outcome": "in_progress",
-      "claims": [
-        "xs:nixconfig:delphi-gigabit-claims-2026-11-28"
-      ],
-      "files": [],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbf6a23wv66p5otcqldf5zx"
-    },
-    {
-      "id": "597759df-b534-419e-b1ab-f1d1744b505c",
-      "ts": "2026-11-28T02:52:07Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-ats-2026-11-28",
-      "action": "publish 0.64/0.28: cv-ats verify+redeploy vs origin main, post done",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/cv-ats-site.nix",
-        "lib/cv-ats-report.py"
-      ],
-      "files": [],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbf6a109lv4gc9h7srg05mn"
     }
   ]
 }

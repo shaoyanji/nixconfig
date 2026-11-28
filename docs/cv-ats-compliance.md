@@ -15,7 +15,7 @@ shaped that way, and the measurement that says the change kept the page budgets
 
 | It reads | So the document |
 | :--- | :--- |
-| text in one column, top to bottom | stacks the header; puts a date on the line it dates instead of in a right-hand column |
+| text in one column, top to bottom | stacks the header, and keeps each entry's period on that entry's own row — read after its title and before its prose, never in a column of its own |
 | the standard section words | says `Experience`, `Projects`, `Education`, `Skills`, `Languages` (and the German equivalents) in the record's language |
 | contact details as body text | keeps name, email, town and URLs in the first block of the page |
 | the keywords as text | writes every technology as text, never as an image, a table cell or a link label |
@@ -44,14 +44,24 @@ and the fonts (New Computer Modern, Libertinus Serif) ship with Typst.
 | `lib/matt-site.nix` | `cvLabels` now carries the standard words: `Projects`, `Skills`, `Languages` / `Projekte`, `Kenntnisse`, `Sprachen`; the key `tools` became `skills` |
 | `lib/matt/cv-energy.json`, `cv-energy.de.json` | the tailored CV overrides `projects` with `Projects` / `Projekte` instead of `Relevant projects` / `Relevante Projekte` |
 
-The templates' own comments name this page, so a later edit that reintroduces a
-grid column meets the reason it was removed.
+`lebenslauf.typ` and `lib/matt-site.nix` name this page in their comments, so a
+later edit that puts the contact block back into a second column meets the reason
+it was removed.
+
+`cv.typ` was rebuilt on the appflow packet's centred layout after this change, and
+that layout puts each period back at the right edge of its entry — a title/period
+grid on the full CV, a title/role/period row on the one-page variants. It is the
+shape finding 5 recorded but not the defect it named: the period stays on its
+entry's own row, so reading order gives the title, then the period, then the prose
+it dates (`Bountystash — Founder and engineer`, `2020 — 2025`, then the role).
+What fails is a period in a column of its own, outside the entry, or after prose it
+does not date.
 
 ## Measurement
 
-Compiled with the pinned typst, from the six `cv.json` payloads the site build
-produces, and from the resume corpora for the Lebenslauf. `last` is how far down
-its last page the content reached, in millimetres.
+Compiled at that change with the pinned typst, from the six `cv.json` payloads the
+site build produces, and from the resume corpora for the Lebenslauf. `last` is how
+far down its last page the content reached, in millimetres.
 
 | Document | Budget | Before | After |
 | :--- | ---: | :--- | :--- |
@@ -69,6 +79,12 @@ no measurement above is near it. The Lebenslauf rows are unchanged because the
 template edit is height-neutral: an inline date occupies the line the grid row
 already used. Its packet budget is met by `select.py`, which narrows the corpus to
 one page of material, not by the template.
+
+Re-measured on the template as it stands (typst 0.15.1, from the six records
+`.#sites.cv-ats-site` publishes, which are the payloads the build compiles): `cv.pdf`
+2 pages, 113 mm; `cv-de.pdf` 2, 117; `cv-energy.pdf` 1, 260; `cv-energy-de.pdf` 1,
+267; `cv-software.pdf` 1, 240; `cv-software-de.pdf` 1, 234. Every budget in the
+table still holds, and no two-page document is near the 40 mm floor.
 
 The same numbers are what `lib/typeset.nix` reads back from each build's
 `<typeset>` report, so a budget that stops fitting is a build error rather than a
@@ -106,8 +122,9 @@ nor `packet.nix` moved.
   `<typeset>` report.
 - `pdftotext` order: name, role, contact, summary, `Experience`, roles, `Projects`,
   `Education`, `Skills`, `Languages` — the name at line 1 of the extracted text and
-  the headings at lines 12, 42, 69, 73 and 79.
-- Built through `nix build .#sites.matt-site`, the five CVs the site ships extract
+  every heading alone on its own line; the current full CV reads them at 15, 50, 92
+  and 101, with `Education` the first line of page 2.
+- Built through `nix build .#sites.matt-site`, the six CVs the site ships extract
   their headings as standard words, and no heading ends a page: page 1 of the full
   CV closes on an entry, and page 2 opens on `Education`.
 - A link annotation is allowed only over its own visible address: every project
@@ -127,12 +144,14 @@ Both templates now emit real `heading` elements, at level 1 because each section
 is a top-level division of the document (and PDF/UA-1 rejects a first heading at
 any other level), with a `show heading` rule that keeps the previous rendering
 minus one gap: a heading element ends its paragraph, so typst adds the paragraph
-space after it that a plain block did not. Measured at 5.1pt per heading, that
-gap pushed `cv-energy-de.pdf` onto a second page, so `cv.typ` cancels it with
-`below: -2.1pt`; the Lebenslauf keeps it (208 → 219mm on the example corpus,
-105 → 109mm on the full one) because no page count moves there. Page budgets are
-unchanged at 2/2/1/1 with 64/68/272/276mm on the last page, against
-64/68/270/274 before.
+space after it that a plain block did not. Measured at 5.1pt per heading, that gap
+pushed `cv-energy-de.pdf` onto a second page, so `cv.typ` cancelled it at the time
+with `below: -2.1pt`; the Lebenslauf keeps it (208 → 219mm on the example corpus,
+105 → 109mm on the full one) because no page count moves there. Page budgets were
+unchanged at 2/2/1/1 with 64/68/272/276mm on the last page, against 64/68/270/274
+before. The packet rewrite replaced that correction: the heading show rule states
+its own `#v` gaps and carries `sticky`, and the page budget is what the build checks
+either way.
 
 Each template compiles with `--pdf-standard ua-1`, so the files are tagged and
 PDF/UA-1 conformant and the five section words reach the tree as `/H1`. The
@@ -140,8 +159,9 @@ build fails if that regresses: `cv-ats-check.sh` reads `pdfinfo` and refuses a P
 whose `Tagged` flag is absent (proved with `--no-pdf-tags`), so dropping the flag
 in a refactor is a defect rather than a silent downgrade.
 
-`cv.typ` also states `hyphenate: false` explicitly, matching `lebenslauf.typ`:
-it was relying on ragged setting being hyphenated rarely rather than never.
+`cv.typ` also states `hyphenate: false` explicitly, matching `lebenslauf.typ`;
+both justify, so the guard rather than a ragged edge is what keeps a compound
+whole at a line end.
 
 ## The link gate: a CV the site ships is a CV the site links
 
@@ -225,14 +245,14 @@ site-routing: 1 defect(s)
 The `_headers` cache rule is generated from `cvFiles` for the same reason: one
 list names the PDFs, and the installs, the cache rule and both gates read it.
 
-`--check` is not a flag on this Nix (`2.35.3`): it errors before building, and
+`--check` is not a flag on this Nix (`2.35.6`): it errors before building, and
 `--rebuild` only re-runs a derivation whose output is already in the store. To
 verify a change to the gate, perturb the input and build plainly — the failing
 derivation has no old output to re-check.
 
 ## The ATS parity gate: the PDF must still say what the record says
 
-The link gate keeps the five PDFs reachable; this one keeps them the document
+The link gate keeps the six PDFs reachable; this one keeps them the document
 they claim to be. The template reads `cv.json`, and nothing proved the finished
 PDF still said what that record says: a heading that becomes a house word, a role
 the loop drops, a project URL that exists only as a link target or a word
@@ -328,8 +348,9 @@ folders, 110 documents, 0 audit violations; the two resumes above now extract
 ## Limits of this check
 
 No commercial ATS was run; the evidence is the extracted text and the layout rules
-above. `anschreiben.typ` sits in the same directory and is not
-covered: it justifies without the no-hyphenation guard, which matters less for a
-letter no parser hunts keywords in. The packet target was compiled from the corpus
-and from a selection over a synthetic description, because the production selection
-depends on the job ad it is built for.
+above. `anschreiben.typ` sits in the same directory and is not read back by
+`cv-ats-check.sh`: it is a letter rather than a CV a parser files, and the packet
+checks it against its own record instead (`letter-pdf-check.sh`). It sets the same
+`hyphenate: false` guard the two CV templates do. The packet target was compiled
+from the corpus and from a selection over a synthetic description, because the
+production selection depends on the job ad it is built for.

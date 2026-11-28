@@ -429,6 +429,14 @@ in {
       assertion = hostMeta.network.tailscale_ip != "";
       message = "inventory.toml [hosts.delphi.network]: `tailscale_ip` is required for the console and the monitor card.";
     }
+    {
+      assertion = config.fleet.inventory.hosts.frieren.network.tailscale_ip != "";
+      message = "inventory.toml [hosts.frieren.network]: `tailscale_ip` is required — services.fetchBroker.localProxy addresses frieren by IP.";
+    }
+    {
+      assertion = config.fleet.inventory.hosts.lumi.network.tailscale_ip != "";
+      message = "inventory.toml [hosts.lumi.network]: `tailscale_ip` is required — services.fetchBroker.usProxy addresses lumi by IP.";
+    }
   ];
 
   # --- The gate toolchain -----------------------------------------------------

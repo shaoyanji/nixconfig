@@ -2853,9 +2853,8 @@
         **Lanes live (2026-11-28, by IP).** Both run: `local` (frieren:8471)
         answers 200 in 0.24 s as 79.215.107.59, `us` (lumi:8470) 200 in 1.13 s as
         93.127.139.146, `bulk` holds at 0.48 s. The names resolve nowhere here
-        (`--accept-dns=false`), so the broker addresses them by inventory IP; that
-        pointer waits on delphi's switch (dirty tree). Open: per-lane throughput
-        on 20 URLs.
+        (`--accept-dns=false`), so the broker uses their inventory IP: live
+        since the 2026-11-28 switch. Open: per-lane throughput on 20 URLs.
       '';
     };
     exp-120 = {

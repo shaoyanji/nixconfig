@@ -60,6 +60,8 @@ storage_layout = "/dev/sdb3 (1TB SSD: 923GB btrfs @root, @home, @nix, @snapshots
 lan_ip = "192.168.3.25"
 tailscale = true
 tailscale_hostname = "frieren"
+tailnet_domain = "cloudforest-kardashev.ts.net"
+tailscale_ip = "100.97.61.65"
 ssh_alias = "frieren"
 
 [[hosts.frieren.network.links]]

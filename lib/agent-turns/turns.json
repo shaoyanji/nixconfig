@@ -1,8 +1,87 @@
 {
-  "generated": "2026-11-28T00:55:31Z",
+  "generated": "2026-11-28T01:05:01Z",
   "count": 200,
-  "pin": "aef79187a89574a9e534528031f26b9c094a74b3c1342ccfb5ca679140c3cc1d",
+  "pin": "42da769101732d796b6426f14cddcdc2c74fee000840b3e981262f0bde0d1ff3",
   "turns": [
+    {
+      "id": "2285ef38-459f-4998-a2f7-7dcf7996e3e1",
+      "ts": "2026-11-28T01:04:03Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:freebuff-cv-gist-publish-2026-11-28",
+      "action": "publish 0.90/0.86: publish corrected CV gist, verify live, push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbel5zg6ejhvq973um697hl"
+    },
+    {
+      "id": "6b4a0635-f3d3-4f65-8766-c7432c4177e5",
+      "ts": "2026-11-28T01:02:19Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-tailnet-policy-deploy-2026-11-28",
+      "action": "claim: deploy from buffy — policy in sync, no host imports the hujson; activating delphi's broker IP pointer from a clean worktree",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/config/tailnet-policy.hujson",
+        "hosts/delphi/configuration.nix"
+      ],
+      "files": [],
+      "base_commit": "cf3dba4ead22862a039482740e16d85e81524c79",
+      "branch": "main",
+      "frame": "03hbektsi85fjg35aof0d0pce"
+    },
+    {
+      "id": "ad2e7894-cf54-44e9-afee-d65aacefb32f",
+      "ts": "2026-11-28T01:00:37Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:delphi-tailnet-policy-deploy-2026-11-28",
+      "action": "deploy 1.0: ship tailnet policy to hosts, verify egress by IP, push",
+      "outcome": "in_progress",
+      "claims": [
+        "modules/config/tailnet-policy.hujson"
+      ],
+      "files": [],
+      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
+      "branch": "main",
+      "frame": "03hbekhtmo6yf01f3bz0i8n63"
+    },
+    {
+      "id": "999f309c-a8a3-41fe-a254-0d1c1abd1cad",
+      "ts": "2026-11-28T00:58:49Z",
+      "source": "buffy",
+      "subject": "nixconfig:freebuff-cv-ats-republish-2026-11-28",
+      "action": "publish: cv-ats rebuilt at 58f10fd5, 9/9 live files byte-identical so no deploy; restored lib/matt/resume.json after 0ba5f976 re-added unbacked AWS/Azure/Google Cloud claims; pushed | gate: matt:cv:evidence PASS",
+      "outcome": "done",
+      "claims": [
+        "lib/matt",
+        "scripts/task/cv-evidence-check.sh"
+      ],
+      "files": [
+        "lib/matt/resume.json"
+      ],
+      "base_commit": "0ba5f976",
+      "branch": "main",
+      "frame": "03hbek5645yu6u0ry7tubm7t1"
+    },
+    {
+      "id": "98534cbc-be16-4012-aa40-95fb7fd080d6",
+      "ts": "2026-11-28T00:55:48Z",
+      "source": "buffy",
+      "subject": "nixconfig:delphi-tailnet-policy-land-2026-11-28",
+      "action": "landed: repo mirror now holds the whole live document — tagOwners (ci, extagent, Experimental -> shaoyanji@github) and the two accept-mode ssh grants to tag:Experimental the console had and the file never did. No host imports it (script-only), routes still offer=approve on delphi+frieren. | gate: ops:tailnet:policy PASS",
+      "outcome": "done",
+      "claims": [
+        "modules/config/tailnet-policy.hujson"
+      ],
+      "files": [],
+      "base_commit": "cf3dba4ead22862a039482740e16d85e81524c79",
+      "branch": "main",
+      "frame": "03hbejk0a2me5jfhlmvlugruj"
+    },
     {
       "id": "b004b422-7083-43cc-b2ae-b2b5fc165b3a",
       "ts": "2026-11-28T00:53:49Z",
@@ -2906,82 +2985,6 @@
       "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
       "branch": "main",
       "frame": "03hbax7623wv434mj0sg5c30j"
-    },
-    {
-      "id": "51a136a9-cb6a-46ac-b5bf-1241a3a41a30",
-      "ts": "2026-11-27T13:43:50Z",
-      "source": "buffy",
-      "subject": "nixconfig:pane-3-lumi-harness-steer",
-      "action": "steer: handed pane 3 the merge probe (main<-zeno-stage1 conflicts in inventory.toml and turns.json only) plus the push-order question; origin/zeno-stage1 stale at 0ff194a3 vs local ca3172dc; no push without its ok | gate: checks:host HOST=lumi PASS (pane 3's 247-assertion run)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "257e96b649d2ec2632a6624b109cd644f75fd336",
-      "branch": "main",
-      "frame": "03hbawagilyfjub3c4onxu47l"
-    },
-    {
-      "id": "c0093994-a6e1-4187-b972-80091ddafdf2",
-      "ts": "2026-11-27T13:42:11Z",
-      "source": "freebuff",
-      "subject": "nixconfig:pane-1-freebuff-cv-jobscout",
-      "action": "publish: Gautzsch + SSI Solutions leads added to CV job-search table and live; Pages run 46009180862 success; 8 routes + 8 pdfs 200 | gate: live route sweep",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbavyu6xr60qdg9a619v50c"
-    },
-    {
-      "id": "962d3559-a635-4235-b9cc-260fc4da4c4d",
-      "ts": "2026-11-27T13:39:37Z",
-      "source": "devin",
-      "subject": "nixconfig:feature-chain-refactor-audit",
-      "action": "start: audit shared feature-chain duplication and remaining host module-check failures in the isolated chainref worktree",
-      "outcome": "in_progress",
-      "claims": [
-        "flake/module-sets.nix",
-        "flake/host-inventory.nix",
-        "modules",
-        "hosts"
-      ],
-      "files": [],
-      "base_commit": "89f19a89b2dd0f6e491ce49a70692e5f92eecb5a",
-      "branch": "HEAD",
-      "frame": "03hbavgub5mxfp629jy14c30l"
-    },
-    {
-      "id": "45cdbe65-5f68-434f-9829-fa26291683d2",
-      "ts": "2026-11-27T13:38:29Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-2-freebuff-cv-publish",
-      "action": "publish CV site to GitHub Pages",
-      "outcome": "in_progress",
-      "claims": [
-        "sites.matt-site",
-        "public"
-      ],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbav8v41t8lk430jrtg5bx7"
-    },
-    {
-      "id": "cffde1dc-8a66-43e8-a354-32cf6195c81a",
-      "ts": "2026-11-27T13:38:25Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:pane-1-devin-chain-refactor",
-      "action": "chain-change refactor feature-chain modules",
-      "outcome": "in_progress",
-      "claims": [
-        "modules",
-        "flake.nix"
-      ],
-      "files": [],
-      "base_commit": "2ce0e313929047c2fcf355053849fe056a0338c4",
-      "branch": "main",
-      "frame": "03hbav8ej3381xw2mt15g4imi"
     }
   ]
 }

@@ -1,8 +1,24 @@
 {
-  "generated": "2026-11-28T14:04:49Z",
+  "generated": "2026-11-28T14:17:29Z",
   "count": 200,
-  "pin": "5783a21e5ad73bfa508fd93aa7e13a817c2d59be2cd0533a06199b913926e3dd",
+  "pin": "56e4e267b1714bc7670d3547740b3c2496252e85bae5843d81c670396da4d4f5",
   "turns": [
+    {
+      "id": "4ee678b9-0308-4078-8f49-b9ad381c284e",
+      "ts": "2026-11-28T14:15:57Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:cv-ats-a11y-20261128-1600",
+      "action": "bug-fix 0.96: inspect rendered CV for proven a11y defect",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/cv-ats-site.nix",
+        "docs/cv-ats-compliance.md"
+      ],
+      "files": [],
+      "base_commit": "cc8471cbe4216a35f12c4b134e0f9aa7f4737dfe",
+      "branch": "main",
+      "frame": "03hbivuyroqsms0bu19hg1tli"
+    },
     {
       "id": "f608c9bc-8c9e-4d46-bfa7-b2f419b3ee07",
       "ts": "2026-11-28T14:04:09Z",
@@ -2991,21 +3007,6 @@
       "base_commit": "9742d291",
       "branch": "main",
       "frame": "03hbf7k404eb7tws8h7izrfo4"
-    },
-    {
-      "id": "666cd4e1-e35e-479f-b446-89a2f3e6bc54",
-      "ts": "2026-11-28T02:57:23Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-gigabit-close-2026-11-28",
-      "action": "task-change: landed done on gigabit-claims, gate cleared — both subjects closed",
-      "outcome": "done",
-      "claims": [
-        "xs:nixconfig:delphi-gigabit-claims-2026-11-28"
-      ],
-      "files": [],
-      "base_commit": "e01eb48f66f03ab95d86e202afd1e33d40cc178a",
-      "branch": "main",
-      "frame": "03hbf7b35huvw3vu48e8bq1i7"
     }
   ]
 }

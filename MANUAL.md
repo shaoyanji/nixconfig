@@ -1,7 +1,7 @@
 # frieren — operator manual
 
 > The service map for the live fleet mainframe, and the pointer for everything else.
-> Design rationale is `ARCHITECTURE.md`; what happened is the turn log
+> Design rationale is the note record (`task ops:notes`); what happened is the turn log
 > (`task agents:xs:list`); agent routing is `AGENTS.md`; the sentinel runbook is the
 > `fleet-sentinel` skill. Live truth is `ss -tlnp`, `systemctl status <unit>` and
 > `task ops:health` — never this page.
@@ -23,7 +23,7 @@ What the registry does not hold, and this page therefore keeps:
 The tailnet address is the only dual-homed identity. `*` below marks a service reached
 through nginx on port 80/443.
 
-## 2. Service inventory (live, 2026-10-19)
+## 2. Service inventory (audited 2026-11-28)
 
 ### Core platform
 
@@ -36,7 +36,7 @@ through nginx on port 80/443.
 | NFS | `nfs-mountd`, `rpc-statd`, `nfs-idmapd` | 2049 (+ pinned 20048/32765/32766, 111 accepted) | fleet mounts |
 | Samba | `samba-smbd`, `samba-nmbd`, `samba-winbindd`, `samba-wsdd` | 139, 445 | Finder/Explorer |
 | Avahi | `avahi-daemon` | 5353/udp | zero-conf discovery |
-| PostgreSQL | `postgresql` | 5432 | Immich, Paperless |
+| PostgreSQL | `postgresql` | 5432 | Immich; the fleet turn/note projection |
 | Docker | `docker` | — | container workloads |
 | Nix daemon | `nix-daemon` | — | builds/store |
 
@@ -60,7 +60,7 @@ through nginx on port 80/443.
 | Service | Unit | Listen | Reach |
 | :--- | :--- | :--- | :--- |
 | Jellyfin | `jellyfin` | 8096 | `media.frieren.lan`* |
-| Plex | `plex` | 32400 | `plex.frieren.lan`* |
+| Plex | `plex` | 32400 | direct LAN/tailnet port |
 | Audiobookshelf | `audiobookshelf` | 13378 | `audiobooks.frieren.lan`* |
 | Immich | `immich-server`, `immich-machine-learning`, `redis-immich` | 2283 | `photos.frieren.lan`* |
 | Paperless-ngx | `paperless-web`, `-consumer`, `-scheduler`, `-task-queue` on **delphi** | 28981 tailnet | `docs.frieren.lan`* (moved off frieren 2026-11-02; frieren keeps the vhost and the shelter copy) |
@@ -68,7 +68,7 @@ through nginx on port 80/443.
 | Stirling PDF | `stirling-pdf` on **delphi** | 7351 loopback / 8445 tailnet | `https://delphi.cloudforest-kardashev.ts.net:8445` (moved off frieren 2026-10-21; `pdf.frieren.lan` no longer serves it) |
 | *arr stack | `sonarr`, `radarr`, `lidarr`, `readarr`, `prowlarr` | 8989/7878/8686/8787/9696 | LAN, library hygiene |
 | Transmission | `transmission` | 9091 loopback | `torrent.frieren.lan`* (leech-only) |
-| aria2 | `aria2` | 6800/6801 loopback | `aria.frieren.lan`* |
+| aria2 | `aria2` | 6800 loopback, 6801 LAN/tailnet | `aria.frieren.lan`* |
 | Anki sync | `anki-sync-server` on **delphi** | 27701 tailnet | `anki.frieren.lan`* (moved 2026-11-02; was `anki.frieren.lan:27701`) |
 
 ### Knowledge, automation, fleet
@@ -77,26 +77,23 @@ through nginx on port 80/443.
 | :--- | :--- | :--- | :--- |
 | Kiwix (Wikipedia/ArchWiki) | `kiwix-serve` | 8088 | `wiki.frieren.lan`* |
 | Home Assistant | `home-assistant` | 8123 | `ha.frieren.lan`* |
-| Mosquitto | `mosquitto` | 1883 loopback | no authenticated subscriber yet (HC-5) |
-| Uptime Kuma | `uptime-kuma` | 3001 | `status.frieren.lan`* (dashboard only, 0 monitors) |
-| Gatus | `gatus` | 8181 loopback | `monitors.frieren.lan`* |
+| Gatus | `gatus` on **delphi** | 8181 tailnet | `http://delphi.cloudforest-kardashev.ts.net:8181` |
 | Fleet sentinel | `fleet-sentinel.timer` | via nginx | `sentinel.frieren.lan`* → `/sentinel/` |
 | Pastebin | `nginx` + `/var/lib/paste` | 80 | `paste.frieren.lan`* |
-| iVentoy (PXE/ISO) | `iventoy` | 26000, 10809 | `pxe.frieren.lan`* |
+| iVentoy (PXE/ISO) | `iventoy` | 26000, 16000, 10809 | `http://frieren.lan:26000` |
 | Vaultwarden | `vaultwarden` on **delphi** | 8222 tailnet | `vault.frieren.lan`* (moved 2026-11-02; DOMAIN unchanged so passkeys survive) |
-| SimpleX SMP relay | `smp-server` | 5223/5225/5226 | inter-agent messaging |
+| SimpleX SMP relay | `smp-server` | 5223 | inter-agent messaging |
 | Atuin history sync | `atuin` | 8888 loopback | `atuin.frieren.lan`*; one account, sign-ups closed [[flake/policies.nix#history-sync-is-one-server]] |
-| Miniflux | `miniflux` on **delphi** | 8093 loopback / 8455 tailnet | `https://delphi.cloudforest-kardashev.ts.net:8455` — feeds, not mail (added 2026-11-06) |
-| Umami | `umami` on **delphi** | 8094 loopback / 8456 tailnet | `https://delphi.cloudforest-kardashev.ts.net:8456` — first-party analytics, tailnet-only by decision: it cannot collect from public pages |
+| Miniflux | `miniflux` on **delphi** | 8098 loopback / 8455 tailnet | `https://delphi.cloudforest-kardashev.ts.net:8455` — feeds, not mail (added 2026-11-06) |
+| Umami | `umami` on **delphi** | 8061 loopback / 8456 tailnet | `https://delphi.cloudforest-kardashev.ts.net:8456` — first-party analytics, tailnet-only by decision: it cannot collect from public pages |
 | Radicale | `radicale` on **delphi** | 5232 loopback / 8457 tailnet | `https://delphi.cloudforest-kardashev.ts.net:8457` — CalDAV/CardDAV; `htpasswd` rendered at start from sops, rights `owner_only`, a `personal` collection seeded by the unit so the principal is never empty; client is `accounts.calendar.accounts.radicale`, phone is DAVx5, gate is `checks:caldav` |
 | ntfy | `ntfy` on **delphi** | 8096 loopback / 8458 tailnet | `https://delphi.cloudforest-kardashev.ts.net:8458` — push to the phone: one user `fleet` (sops) with rights on topic `fleet`, anonymous denied. Publishers: the appflow sync (a parked question), `fleet-sentinel` (a state change, hashed so a repeated verdict posts once) and `checks:ntfy`. gatus pages through the SimpleX bridge, not here |
 | Vikunja | `vikunja` on **delphi** | 8097 loopback / 8459 tailnet | `https://delphi.cloudforest-kardashev.ts.net:8459` — tasks, CalDAV and a REST API; JWT secret from sops |
 | Ollama | `ollama` | 11434 | local inference (if enabled) |
-| LLM decision router | `llm-decision-router` | 8080-ish | `eisen` upstream, not on frieren |
-| Antigravity remote control | `antigravity-cli-daemon` (user) | — | 24/7 remote operator |
+| LLM decision router | `llm-decision-router` on **eisen** | 8000 loopback | `eisen` upstream, not on frieren |
 
 > Orientation only. `ss -tlnp` and `systemctl status <unit>` are the live truth, and
-> `SCHEMA.md` §1 forbids a second fleet table — this is the service map, not a copy of
+> `.agents/SCHEMA.md` §1 forbids a second fleet table — this is the service map, not a copy of
 > `inventory.toml`. The service map is compiled: `docs/generated/fleet-services.md` lists
 > every registry port with the hosts that enable it, every endpoint a host declares in
 > `network.links`, and every service a host declares in `software.services`. Unit names
@@ -138,10 +135,9 @@ git -C /Volumes/data/projects/nixconfig rev-parse HEAD
 
 ## 5. Desktop integration (DMS / Niri)
 
-A DMS widget reads `http://127.0.0.1:80/sentinel/status.json` — state, generation age, the
+The proposed DMS widget would read `http://127.0.0.1:80/sentinel/status.json` — state, generation age, the
 first two reasons — with palette `ok #a6e3a1`, `degraded #f38ba8`, accent `#89b4fa`, one
-notification on transition and one on resolution, never per poll. It is P5 in
-`ARCHITECTURE.md`; until then `task ops:health` is the desktop-agnostic path.
+notification on transition and one on resolution, never per poll. It is the `p5-dms-widget` proposal in the note record; until then `task ops:health` is the desktop-agnostic path.
 
 ## 6. Runbooks
 
@@ -160,13 +156,12 @@ skill plus `.agents/deploy/hosts/*.md`.
 
 ## 7. Known limits
 
-- Sentinel is frieren-local; fleet push is P1 in `ARCHITECTURE.md`.
+- Sentinel collectors run on frieren, delphi and poseidon and push into frieren's ingest; fleet-wide coverage remains `p1-sentinel-push` (IN FLIGHT).
 - DNS has two members (HC-3): frieren primary, minyx backup behind `192.168.3.50`.
   `checks:dns:failover` probes the VIP, so it names a real owner only from the LAN's L2.
-- MQTT has no authenticated subscriber (HC-5); Home Assistant needs one config-entry action.
-- `cassini` fails its per-host gate and is dormant; `minyx` passes but shows continuous
-  under-voltage in `dmesg` (`.agents/deploy/hosts/minyx.md`).
-- Uptime Kuma still has zero monitors; gatus is the declarative monitor.
+- Mosquitto is off since 2026-11-09 after a zero-client week; re-enable it with the ESP32/Zigbee layer rather than treating HC-5 as a live broker.
+- `cassini` is preserved/dormant and its darwin projection passes eval; `minyx` is active as DNS failover, with under-voltage/throttling recorded in its inventory notes.
+- Uptime Kuma is retired; gatus on delphi is the declarative monitor.
 
 ## 8. Where to go next
 
@@ -174,7 +169,7 @@ skill plus `.agents/deploy/hosts/*.md`.
 | :--- | :--- |
 | Is anything degraded? | `task ops:health` |
 | What happened recently? | `task agents:xs:list LIMIT=20`, `task ops:ledger` |
-| What is being proposed? | `ARCHITECTURE.md` |
-| What is open? | `TODO.md`, `HANDOFF.md` |
+| What is being proposed? | `task ops:notes KIND=proposal` |
+| What is open? | `task ops:notes KIND=open`, `task ops:notes KIND=handoff` |
 | What can an agent do? | `task ops:skills`, `.agents/README.md` |
 | Why does this host exist? | `nix eval --json .#inventory.hosts.frieren \| toon -e` |

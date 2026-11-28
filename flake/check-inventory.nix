@@ -97,6 +97,7 @@
     "checks:nix:comments:test" = "leaf";
     "checks:nix:fix" = "leaf";
     "checks:nix:format" = "leaf";
+    "checks:nix:format:test" = "leaf";
     "checks:nix:lint" = "leaf";
     "checks:nix:lint:test" = "leaf";
     "checks:nix:shell" = "leaf";

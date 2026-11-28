@@ -1,8 +1,130 @@
 {
-  "generated": "2026-11-28T11:10:37Z",
+  "generated": "2026-11-28T11:35:22Z",
   "count": 200,
-  "pin": "20b7ba9cc6e0c83f25ff0849b45e950125cdd1d5e45687158c7916f6fa760c9c",
+  "pin": "6c259188879a4a0ca004e62d6dbff684a6c1652bfdcd3c262ed48138d305608e",
   "turns": [
+    {
+      "id": "5c8773b8-cc47-40fc-bae2-b72c1054f185",
+      "ts": "2026-11-28T11:35:07Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-3-delphi-idle-20261128",
+      "action": "delphi agy quota exhausted both routes, resets ~120h — left idle per back-off rule",
+      "outcome": "blocked: agy quota exhausted on free and Pro routes",
+      "claims": [],
+      "files": [],
+      "base_commit": "00339187d4b72be429b4f1cd86ca2370a6008b00",
+      "branch": "main",
+      "frame": "03hbi0fwhi3w6g1i2cugs250w"
+    },
+    {
+      "id": "99eb3e0b-cd0f-4e2c-9b51-41a516ce69c4",
+      "ts": "2026-11-28T11:35:06Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff-idle-20261128",
+      "action": "jev classify needs_review publish 0.59/m=0.31 — freebuff left idle, no route selected",
+      "outcome": "blocked: jev classify below gate (p=0.59 < 0.8)",
+      "claims": [],
+      "files": [],
+      "base_commit": "00339187d4b72be429b4f1cd86ca2370a6008b00",
+      "branch": "main",
+      "frame": "03hbi0fv1pdiytrw211iucxbc"
+    },
+    {
+      "id": "31e4af42-1076-4525-bc5c-37866c51d3f9",
+      "ts": "2026-11-28T11:29:22Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-nix-format-gate-2026-11-28",
+      "action": "claim: prove the missing nix format regression gate across representative NixOS/darwin/home host files",
+      "outcome": "in_progress",
+      "claims": [
+        "taskfiles/checks.yml",
+        "scripts/task",
+        "flake/check-inventory.nix",
+        "tests/"
+      ],
+      "files": [],
+      "base_commit": "00339187d4b72be429b4f1cd86ca2370a6008b00",
+      "branch": "main",
+      "frame": "03hbhzbj1d67f0bk96m5m3b81"
+    },
+    {
+      "id": "99d2ebaf-30f2-4a30-82bc-1d4d0423e7b9",
+      "ts": "2026-11-28T11:29:01Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-2-freebuff-publish-20261128",
+      "action": "landed: /cv/ surface is already this tree's build — .#sites.matt-site bhaxz3qp at 00339187, six CV PDFs sha256-equal to the blog assets/files (copy was a no-op), blog stayed c629d10; no tree change, so nothing to push (both repos clean, HEAD == origin/main). Gates PASS: checks:site:published 28/28, agents:cv:publish-check 6/6 CVs + blog-published 117/117.",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "00339187d4b72be429b4f1cd86ca2370a6008b00",
+      "branch": "main",
+      "frame": "03hbhz917zxqucooysd8oill8"
+    },
+    {
+      "id": "765abf50-baf1-4549-984e-314a04db08a5",
+      "ts": "2026-11-28T11:27:50Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-2-freebuff-next-publish-20261128",
+      "action": "jev publish p=0.99/m=0.98: publish /cv/ static surface, prove site gate, push",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "00339187d4b72be429b4f1cd86ca2370a6008b00",
+      "branch": "main",
+      "frame": "03hbhz0ojhfeolwsaii4vx9vq"
+    },
+    {
+      "id": "7ea7dce3-ff57-4062-bbbc-0b75f5d68ae1",
+      "ts": "2026-11-28T11:27:48Z",
+      "source": "freebuff",
+      "subject": "nixconfig:pane-2-freebuff-publish-20261128",
+      "action": "claim: publish /cv/ surface from this tree — build .#sites.matt-site at 00339187, copy PDFs into the blog checkout, prove checks:site:published + :blog, push",
+      "outcome": "in_progress",
+      "claims": [
+        "lib/matt/cv-*.json"
+      ],
+      "files": [],
+      "base_commit": "00339187d4b72be429b4f1cd86ca2370a6008b00",
+      "branch": "main",
+      "frame": "03hbhz0i58ssm88fiyc74rxt6"
+    },
+    {
+      "id": "e8e008ab-861e-4ff3-929e-e5868ef4aeaf",
+      "ts": "2026-11-28T11:27:47Z",
+      "source": "tmux-pane-steward",
+      "subject": "nixconfig:pane-1-devin-next-gate-20261128",
+      "action": "jev gate-change p=0.68/m=0.39: next missing check on flake-projected hosts, commit and push",
+      "outcome": "in_progress",
+      "claims": [],
+      "files": [],
+      "base_commit": "00339187d4b72be429b4f1cd86ca2370a6008b00",
+      "branch": "main",
+      "frame": "03hbhz0cruori9ne2q9nyfeoj"
+    },
+    {
+      "id": "9de372ba-9187-4dc2-86ae-f23c8f38dc83",
+      "ts": "2026-11-28T11:11:16Z",
+      "source": "devin",
+      "subject": "nixconfig:devin-flake-projection-gate-2026-11-28",
+      "action": "landed: checks:drv-equality MODE=projection evaluates every inventory-projected NixOS/darwin/home config one process at a time; fixture proves seeded assertion refusal | gate: checks:drv-equality MODE=projection PASS",
+      "outcome": "done",
+      "claims": [
+        "taskfiles/checks.yml",
+        "scripts/task",
+        "flake/check-inventory.nix",
+        "tests/"
+      ],
+      "files": [
+        "scripts/task/drv-equality.py",
+        "taskfiles/checks.yml",
+        "flake/check-inventory.nix",
+        "tests/drv-equality/run.sh",
+        "lib/agent-turns/turns.json"
+      ],
+      "base_commit": "00339187d4b72be429b4f1cd86ca2370a6008b00",
+      "branch": "main",
+      "frame": "03hbhvs9v7ai2zdyogq4qtwuq"
+    },
     {
       "id": "a8544e7b-5231-4142-b988-0df90e14b750",
       "ts": "2026-11-28T11:08:56Z",
@@ -2859,146 +2981,6 @@
       "base_commit": "494c8a1798a8bfff303412f5f431978c60f118f6",
       "branch": "main",
       "frame": "03hbe4tg04jfgoffs1zuigo26"
-    },
-    {
-      "id": "570e7c8b-ae69-4116-a160-76eafa980327",
-      "ts": "2026-11-27T23:36:29Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-egress-ips-2026-11-28",
-      "action": "landed: lane identities verified from delphi — bulk reflects 92.5.115.103 (AS31898 Frankfurt; ifconfig.co disagrees, AS13285/GB), frieren answers tailscale ping direct at 79.215.107.59 (AS3320 Telekom, Waldkirch), lumi has no direct path (DERP dfw only) so 93.127.139.146 (AS401479 Database Mart, Kansas City) stays a lookup not an observation; note records both and why the US lane is untestable | gate: agents-notes-schema PASS + repo-blobs --index clean",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "494c8a1798a8bfff303412f5f431978c60f118f6",
-      "branch": "main",
-      "frame": "03hbe4289h6li7zz2divi0wuo"
-    },
-    {
-      "id": "efdab6cb-6402-4dcc-8f97-55fbb9bc533c",
-      "ts": "2026-11-27T23:35:11Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-cv-ats-land-2026-11-28",
-      "action": "landed: cherry-picked db40d4fa onto origin/main b69b233f as 2ca9a316 and pushed (b69b233f..2ca9a316); .#sites.cv-ats-site builds 6/6 on the upstream tree and its artifact is byte-identical to live cv-ats-8lh.pages.dev; shared checkout's 23 dirty files untouched, local main not rebased (would disturb other lanes) — still 4 ahead/132 behind. | gate: nix build .#sites.cv-ats-site + pins --check PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/matt",
-        "lib/matt-site.nix",
-        "flake/packages.nix"
-      ],
-      "files": [
-        "lib/cv-ats-site.nix",
-        "lib/cv-ats-report.py",
-        "lib/matt-site.nix",
-        "flake/packages.nix",
-        "taskfiles/site-manifest.json",
-        "scripts/task/site-target.sh",
-        "docs/cv-ats-compliance.md"
-      ],
-      "base_commit": "db40d4fa3519d1e1ca48af45b302d9fa0f62f85f",
-      "branch": "main",
-      "frame": "03hbe3t2l6lbzy595ybe7lr78"
-    },
-    {
-      "id": "7ae621ba-333b-4c52-8812-bebe5173cb24",
-      "ts": "2026-11-27T23:34:38Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-egress-ips-2026-11-28",
-      "action": "claim: verify per-lane egress identity, record in the egress note, push",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "b69b233f6620bd68172efdc96d9bd4b47caf1435",
-      "branch": "main",
-      "frame": "03hbe3p89729v571p9x7rtseb"
-    },
-    {
-      "id": "01f41f7f-1b07-4787-8ad1-0c3728b5db24",
-      "ts": "2026-11-27T23:34:12Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:delphi-egress-ips-2026-11-28",
-      "action": "verify lane egress IPs, record in egress note, push",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "db40d4fa3519d1e1ca48af45b302d9fa0f62f85f",
-      "branch": "main",
-      "frame": "03hbe3m5vfkkd3etv54ij2ri4"
-    },
-    {
-      "id": "8844da8e-789c-462a-9c5b-2e556e6f38e7",
-      "ts": "2026-11-27T23:34:09Z",
-      "source": "tmux-pane-steward",
-      "subject": "nixconfig:freebuff-cv-ats-land-2026-11-28",
-      "action": "rebase local main onto origin/main, push cv-ats commit db40d4fa",
-      "outcome": "in_progress",
-      "claims": [
-        "lib/matt",
-        "lib/matt-site.nix",
-        "flake/packages.nix"
-      ],
-      "files": [],
-      "base_commit": "db40d4fa3519d1e1ca48af45b302d9fa0f62f85f",
-      "branch": "main",
-      "frame": "03hbe3lsrxn6lvw2ncfh9an0o"
-    },
-    {
-      "id": "c4437e4a-04a6-49f7-95dd-66d0b29e0e44",
-      "ts": "2026-11-27T23:29:19Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-cv-ats-surface-2026-11-28",
-      "action": "publish 0.9: .#sites.cv-ats-site — six CVs re-read against their records, page + report.json; manifest target cv-ats + new pages deploy method; live cv-ats-8lh.pages.dev serves index sha == build, report ok 6/6, matt-site output unchanged; commit db40d4fa is local (main 4 ahead/126 behind, no push). | gate: nix build .#sites.cv-ats-site PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/matt",
-        "lib/matt-site.nix",
-        "flake/packages.nix",
-        "taskfiles/site-manifest.json",
-        "scripts/task/site-target.sh"
-      ],
-      "files": [
-        "lib/cv-ats-site.nix",
-        "lib/cv-ats-report.py",
-        "lib/matt-site.nix",
-        "flake/packages.nix",
-        "taskfiles/site-manifest.json",
-        "scripts/task/site-target.sh",
-        "docs/cv-ats-compliance.md"
-      ],
-      "base_commit": "db40d4fa3519d1e1ca48af45b302d9fa0f62f85f",
-      "branch": "main",
-      "frame": "03hbe2ntm7taf5ihn270nq36x"
-    },
-    {
-      "id": "8f3d80d1-57cb-42c1-85b1-1b65a58bc1ff",
-      "ts": "2026-11-27T23:28:29Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-egress-perf-2026-11-28",
-      "action": "landed: second 20-URL pass reproduces the first (cold p50 154->152 ms at 1.40 MB, warm 46->41 ms at 0.085 MB, direct 165->256 ms); live endpoints verified — :8470/:8471/:8469 all closed and lumi/frieren NXDOMAIN to crab-hole, so us falls back on DNS not CONNECT and local never reaches a proxy; note carries both runs | gate: agents-notes-schema PASS + repo-blobs --index clean (510 KiB/522082)",
-      "outcome": "done",
-      "claims": [],
-      "files": [],
-      "base_commit": "b69b233f6620bd68172efdc96d9bd4b47caf1435",
-      "branch": "main",
-      "frame": "03hbe2hzw01pvmqbst6ro88c0"
-    },
-    {
-      "id": "8b225c82-02f0-4a19-a1a6-5f42fc9ba3be",
-      "ts": "2026-11-27T23:25:47Z",
-      "source": "buffy",
-      "subject": "nixconfig:delphi-egress-perf-2026-11-28",
-      "action": "claim: record egress lane timings in the note, verify against live lane endpoints, push",
-      "outcome": "in_progress",
-      "claims": [
-        "AGENTS.nix"
-      ],
-      "files": [],
-      "base_commit": "734a4f4364ef482cb45829594fce7dfda73d384a",
-      "branch": "main",
-      "frame": "03hbe1z0ekdlrzzuf3s06u8xh"
     }
   ]
 }

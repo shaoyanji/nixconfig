@@ -91,6 +91,8 @@ tasks:
       - task: checks:registry:compiled:test
       - task: checks:nix:lint
       - task: checks:nix:lint:test
+      - task: checks:nix:format
+      - task: checks:nix:format:test
       - task: checks:nix:style
       - task: checks:nix:style:test
       - task: checks:hosts:args:test
@@ -1883,6 +1885,16 @@ tasks:
       nothing; exits 1 listing every file that is not alejandra-formatted.
     cmds:
       - bash scripts/task/nix-fmt.sh --check --all --tools alejandra
+
+  checks:nix:format:test:
+    desc: "Regression fixture for checks:nix:format (seeded alejandra damage in NixOS, darwin and home host files)"
+    summary: >
+      The format gate is repo-wide rather than a host eval; its projected-host
+      coverage is the host files it scans. A worktree damages whitespace in
+      aceofspades (nixos), cassini (darwin) and alarm (home); alejandra must
+      exit 1 and name all three. HEAD stays clean.
+    cmds:
+      - bash tests/nix-format/run.sh
 
   checks:nix:watch:
     desc: "watch: auto-format Nix files on save (deadnix + alejandra) — no manual tool calls"

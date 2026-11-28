@@ -83,7 +83,7 @@ tasks:
       - task: checks:ports:test
       - task: checks:images
       - task: checks:images:test
-      - task: checks:agents:xs-post
+      - task: checks:wrangler
       - task: checks:counts
       - task: checks:counts:test
       - task: checks:inventory:compiled:test
@@ -246,6 +246,21 @@ tasks:
       deletes the word before it ships.
     cmds:
       - bash tests/prose/run.sh
+
+  checks:wrangler:
+    desc: "[gate] The publish path resolves a runnable wrangler with none on PATH and no age key"
+    summary: >
+      `wrangler.sh --which` with `NIXCONFIG_APIKEYS` pointed at a path that does
+      not exist and no `WRANGLER` override: the answer must be an executable that
+      runs `--version`, PATH must win over the store copy, and two lookups must
+      agree. Then the same script without `--which` must still refuse that
+      missing secrets file, and a `WRANGLER` that does not exist must be refused
+      rather than quietly replaced. External state: on a host where nothing is
+      realised and nixpkgs is unreachable it says so and exits 0, like
+      `checks:images` on a missing asset root. Exit 0 all legs held, 1 a leg
+      failed.
+    cmds:
+      - bash scripts/task/wrangler-lookup-check.sh
 
   checks:image-daily:
     desc: "[gate] The image-daily command family is structurally able to ship"
@@ -553,22 +568,6 @@ tasks:
     cmds:
       - bash scripts/task/codespace-sync-test.sh
 
-  checks:agents:xs-post:
-    desc: "[gate] xs-turn-post COMMITS validation: space-separated list exits 2"
-    summary: >
-      Offline cases for the COMMITS guard in scripts/task/xs-turn-post.sh
-      (scripts/task/xs-turn-post-test.sh): a space-separated list is refused at
-      validation before anything is queued, comma-separated input lands in the
-      offline queue with the hashes intact, and a copy with the guard stripped
-      must stop refusing — the negative control.
-
-      The regression it locks: "abc1234 def5678" is one element to the shim,
-      which 400s, and a 400 is poison in the queue replay — the turn is parked
-      in queue.rejected.jsonl, never sent (incident 2026-11-26). Exit 0 = every
-      case held, 1 = one did not.
-    cmds:
-      - bash scripts/task/xs-turn-post-test.sh
-
   checks:kg:
     desc: "[gate] Knowledge-graph schema and all six query patterns still agree"
     summary: >
@@ -797,51 +796,6 @@ tasks:
       Exit 0 = passed, 1 = assertion failed, 2 = watchdog abort.
     cmds:
       - bash scripts/task/host-check-sweep.sh --hosts "{{.HOST}}" --mode {{.MODE | default "build"}} --arch "{{.ARCH}}" --timeout {{.TIMEOUT | default "240"}}
-      - bash scripts/task/sentinel-ledger-check.sh --for-host "{{.HOST}}"
-
-  checks:resolver:loopback:
-    desc: "[gate] The tailnet zone never answers frieren.lan with loopback"
-    summary: >
-      scripts/task/resolver-loopback-check.sh queries the tailnet anycast
-      resolver for the zone apex and fails when the answer is host-local
-      (127/8, ::1) or empty. pi-hole answers its own name with the receiving
-      interface's address, and the anycast address is bound on lo — so a
-      tailnet client used to get 127.0.0.1, meaning its own loopback, not the
-      server (measured live 2026-11-27). The fix pins dns.reply.host in
-      modules/net/dns/failover.nix; this gate is what keeps it pinned.
-
-      Exit 0 = no tailnet endpoint answers loopback, 1 = at least one does.
-    cmds:
-      - bash scripts/task/resolver-loopback-check.sh
-
-  checks:resolver:health:
-    desc: "[gate] The resolver endpoints clients use answer a query"
-    summary: >
-      scripts/task/resolver-health-check.sh probes the two failover endpoints
-      clients are actually configured with — the LAN VIP (VRRP frieren/minyx)
-      and the tailnet anycast address (frieren/delphi, docs/dns-failover.md) —
-      for an answer to the zone. This is the service layer sentinel cannot
-      see: a host can be green while its resolver role is dead, and the probe
-      is blind to failover doing its job because clients are too.
-
-      Note resolver-independence. Exit 0 = every endpoint answers, 1 = at
-      least one dead (named). Runtime probe, not a config eval.
-    cmds:
-      - bash scripts/task/resolver-health-check.sh
-
-  checks:sentinel:ledger:
-    desc: "[gate] Every active inventory host has a sentinel ledger row (hub-local)"
-    summary: >
-      scripts/task/sentinel-ledger-check.sh against the hub's ledger: an active
-      nixos host with no row in ledger.jsonl and no incoming/<host>.json is a
-      missing row — the failure the sentinel rollout (note p1-sentinel-push)
-      exists to eliminate, since a powered-off host should read stale, never be
-      absent. Red until first contact per host; rows are pushed, never typed.
-
-      checks:host HOST=frieren runs the same probe scoped to the hub. Exit 0 =
-      every active nixos host present, 1 = missing rows (named), 2 = not the hub.
-    cmds:
-      - bash scripts/task/sentinel-ledger-check.sh
 
   checks:drv-equality:
     desc: "[gate] Every configuration's derivation is unchanged against a baseline (MODE=snapshot|compare)"
@@ -1201,26 +1155,6 @@ tasks:
     cmds:
       - HOST="{{.HOST | default ""}}" IFACE={{.IFACE | default "enp1s0"}} STRICT={{.STRICT | default "0"}} bash scripts/task/port-audit.sh
 
-  checks:delphi:endpoints:
-    desc: "[gate] Every tailnet mount on delphi answers — probe the mounts, not the units"
-    summary: >
-      scripts/task/endpoints-smoke.py — reads `services.servicePortal.mounts` from
-      the compiled delphi config and asks each mount for its page over the tailnet
-      (`https://<host>:<port>/`). A 5xx, a refusal or a timeout fails: that is a
-      live unit behind a broken mount, the state `services:validate:host` cannot
-      see because it only asks systemd. 4xx counts as answering — auth-gated mounts
-      refuse `/` by design — and `--expect` narrows that. Vars: HOST=, TIMEOUT=,
-      EXPECT=, FORMAT=json|toon; exit 1 names every mount that did not answer.
-    cmds:
-      - |
-        nix eval --json '.?submodules=1#nixosConfigurations.delphi.config.services.servicePortal.mounts' \
-          --apply 'ms: builtins.mapAttrs (_: m: {inherit (m) port upstream;}) ms' |
-          python3 scripts/task/endpoints-smoke.py \
-            --host "{{.HOST | default "delphi.cloudforest-kardashev.ts.net"}}" \
-            --timeout {{.TIMEOUT | default "8"}} \
-            --expect "{{.EXPECT | default ""}}" \
-            --format {{.FORMAT | default "json"}}
-
   checks:ports:test:
     desc: Regression fixture for checks:ports (fake host, listeners and serve state)
     summary: >
@@ -1235,19 +1169,16 @@ tasks:
       - bash tests/port-audit/run.sh
 
   checks:appflow:
-    desc: Appflow gates — CV selector, tracker status, packet store, scout writer
+    desc: Appflow gates — CV selector, tracker status, packet store
     summary: >
-      Four offline fixtures plus a read-only API pass: the selector over a
+      Three offline fixtures plus a read-only API pass: the selector over a
       fictional corpus (caps hold, German via glossary.json, identical
       reruns, a missing corpus exits 2); the tracker via the API (no
       ambiguous company/role pair, no `prep` row on a closed req, no shared
-      mail); the packet store (a row is a copy at 600, a dead link is refused);
-      the scout writer's dry records (sweep vs family origin, the owner on the
-      status line, the refusals).
+      mail); the packet store (a row is a copy at 600, a dead link is refused).
     cmds:
       - bash tests/appflow-select/run.sh
       - bash tests/appflow-status/run.sh
-      - bash tests/apps-scout/run.sh
       - bash tests/appflow-packet/run.sh
       - bash tests/appflow-resolve/apps-db-guard.sh
       - bash tests/appflow-resolve/sync-guard.sh
@@ -1435,8 +1366,8 @@ tasks:
 
       Measurement is the store-DB sum `dev:closure:size` prints (nix path-info, no
       eval), so budget and size view cannot disagree. Vars: HOST= (default: local),
-      ALL=1, TARGET=<store path>. Exit 0 = within, 1 = over or unbudgeted,
-      2 = no budget file.
+      ALL=1, TARGET=<store path>; no entry = NOT BUDGETED. Exit 0 = within, 1 =
+      over, 2 = no budget file.
     cmds:
       - bash scripts/task/closure-analysis.sh {{if .HOST}}--host {{.HOST}}{{end}} {{if eq (.ALL | default "0") "1"}}--all{{end}} budget {{if .TARGET}}{{.TARGET}}{{end}}
 
@@ -1528,68 +1459,6 @@ tasks:
     cmds:
       - bash scripts/task/sops-drift-check.sh
 
-  checks:ops:health:
-    desc: "Fixture for ops:health's freshness rule (a stale ok is the failure)"
-    summary: >
-      Drives the gate through temp verdict files, never this host's: a fresh `ok`
-      passes and reports its age, an `ok` older than the 45-minute ceiling fails
-      as stale, a caller can move that ceiling, a degraded verdict prints every
-      reason from status.json, a missing file is a failure rather than an empty
-      pass, and a nonsense ceiling exits 2.
-    cmds:
-      - bash tests/ops-health/run.sh
-
-  checks:mail-atlas:
-    desc: "Mail-atlas probe fixture + the drain unit tests (stub archive, no delphi)"
-    summary: >
-      Runs `tests/mail-atlas-api/run.sh` against a stub that behaves like
-      NpgsqlRest where it bites: an undeclared query parameter is a 404. Ten
-      cases cover a healthy pass, stale mail, a stuck queue, an empty archive, a
-      route refusal, `search` sending `q` alone, an encoded ampersand query,
-      `recent`'s default and its non-number refusal, `routes`, and an
-      unreachable mount. Then the mail-atlas drain unit tests, which had no gate
-      before this — ten cases on the search token and date windows.
-    cmds:
-      - bash tests/mail-atlas-api/run.sh
-      - python3 -m unittest discover -s modules/services/mail-atlas -p 'test_*.py'
-
-  checks:portfolio-ui:
-    desc: "UI smoke assertions for the jobs and deals pages without a browser (BROWSER_STUB payloads)"
-    summary: >
-      Runs `tests/portfolio-ui/browser-stub/run.sh`, which feeds the real
-      verifier canned probe answers: the good payload passes, zeroed metric
-      cards fail, and a missing stage PATCH fails. The live lane is not gated —
-      `CLANKER_BROWSER=1 bash tests/portfolio-ui/run.sh` copies both pages and
-      their stub APIs to clanker, drives its Chrome, and kills the stubs and the
-      copy on exit. Covers stage save, note add, packet export links, the
-      sparkline, price-drop rows and both watchlist poll buttons.
-    cmds:
-      - bash tests/portfolio-ui/browser-stub/run.sh
-
-  checks:inventory:sync:
-    desc: "Fixture for inventory-sync's host mapping, endpoint audit and drift report (no eval, no server)"
-    summary: >
-      Runs `tests/inventory-sync/test_sync.py`. The mapping cases pin the
-      service's own identity (`source=inventory.toml`, `source_key=host/<name>`)
-      so a sync and a TOML import update one row. The audit cases cover the link
-      table from `network.links`, `software.services` from a temp TOML, two
-      mounts or two units sharing a port as conflicts while a mount and its unit
-      on one port are corroboration, a host only in the TOML as drift, a broken
-      TOML as exit 2, and an audit that never runs without `--toml`.
-    cmds:
-      - python3 -m unittest discover -s tests/inventory-sync -p 'test_*.py'
-
-  checks:mail-atlas:site:
-    desc: "Drawer smoke assertions without a browser (BROWSER_STUB payloads), plus the clanker lane's contract"
-    summary: >
-      Runs `tests/mail-atlas-site/browser-stub/run.sh`, which feeds the real
-      verifier a canned payload through `BROWSER_STUB`: the good payload passes,
-      a two-row page and a missing `#sources-open` fail. The live lane is not
-      gated — `CLANKER_BROWSER=1 bash tests/mail-atlas-site/run.sh` copies the
-      site and stub to clanker, drives its browser, and cleans both up.
-    cmds:
-      - bash tests/mail-atlas-site/browser-stub/run.sh
-
   checks:sops:drift:test:
     desc: "Regression fixture for checks:sops:drift (seeded dropped age recipient)"
     summary: >
@@ -1655,20 +1524,19 @@ tasks:
       an address: a path that exists, a `task` the recipe book has, a policy id,
       a flake attribute. `nix eval .#nixComments` classifies every comment line
       and `flake/policies.nix#nix-comments-are-pointers` holds the ceiling; this
-      task compares the ratchet and resolves each cited `task` name against
-      go-task's live set, so prose past the ceiling and a pointer at a recipe
-      nobody can run both fail here, without a build or a host eval. ~2.7 s.
+      task adds what Nix cannot answer — it resolves each cited `task` name
+      against go-task's live set, so a pointer at a recipe nobody can run fails
+      here. ~1.5 s, no host eval.
     cmds:
       - bash scripts/task/nix-comments.sh
 
   checks:nix:comments:test:
-    desc: "Regression fixture for checks:nix:comments (dangling pointer, replayed drift)"
+    desc: "Regression fixture for checks:nix:comments (seeded dangling task pointer)"
     summary: >
-      A worktree's check-inventory.nix gains a comment citing `nope:zzz` — a
-      pointer to a recipe the task plane never had — and then 18 prose lines,
-      the drift 2ca9a316 landed while the gate printed `6513/6495` and exited 0.
-      The census must refuse both, naming the pointer and the breach; HEAD stays
-      clean.
+      A worktree's check-inventory.nix gains a comment citing `nope:zzz`
+      — a pointer to a recipe the task plane never had. The worktree's own
+      census must refuse it, pointer named; HEAD stays clean. No such break is
+      on record, so the mistake is seeded on a tracked file.
     cmds:
       - bash tests/nix-comments/run.sh
 

@@ -8609,7 +8609,7 @@
       status = "OPEN";
       priority = "P2";
       date = "2026-11-28";
-      summary = "HiSolutions AG packet: the letter is corpus-backed and can ship, but its CV still declares thirteen NixOS hosts and carries the pre-review Bountystash wording, and the 07:51 build read a state working copy the task path never reads. Three prose fixes and one source-of-truth fix, then gate and hand-submit after 2026-12-07.";
+      summary = "HiSolutions AG packet: the 07:52 CV came from a working copy that predated the prose review, so only the letter could ship. The polish has since landed from one current source and the 09:23 packet is send-ready; only the operator hand-submission after 2026-12-07 remains.";
       from = ["hisolutions-cv-prose-review-2026-11-27"];
       refs = {
         modules = [
@@ -8623,36 +8623,45 @@
         docs = [".agents/skills/apps/SKILL.md"];
       };
       body = ''
-        Reviewed the 07:52 packet against both corpora and the letter record: anschreiben.pdf 1 p
-        25,738 B `b146f361`, lebenslauf.pdf 2 p 42,381 B `dd038a58`, selection.json JD mode (12
-        terms, kubernetes 15.4 / cloud 12.5) keeping 2/4 projects and 2/4 Bountystash highlights.
-        Decided: the letter ships as written, the CV does not — it was projected from a working copy
-        that predates the 2026-11-27 prose fixes. Nothing sends before 2026-12-07.
+        Reviewed the 07:52 packet against both corpora and the letter record: selection.json JD mode
+        (12 terms, kubernetes 15.4 / cloud 12.5) keeping 2/4 projects and 2/4 Bountystash highlights,
+        both document gates green. Decided then: the letter ships as written; the CV was projected
+        from a working copy that predates the 2026-11-27 prose fixes, so it did not.
 
-        Checked rather than assumed: every letter claim is corpus-backed (EWE Trading as the
-        risk-manager mandate, 2020-2025 as five founder years, 2023-today as three nixconfig years,
-        72,000 EUR, availability 07.12.2026 = the row's hold); the honesty lines survive (no CKA, no
-        enterprise Helm/GitOps cluster, Terraform unused, Kubernetes as a foundation); both document
-        gates passed on the shipped bytes.
+        Delivered since, from one current source (09:23): lebenslauf.pdf 2 p 42,258 B `54ee5a43`,
+        "über zwanzig NixOS-Hosts" in place of "dreizehn", the bullets on the corpora's "CI aus der
+        Inventardatei", one SOPS spelling in both languages (`c992e792`, `a3657451`), and the
+        container/Kubernetes limit stated rather than softened.
 
-        Prose still to polish, in order:
-        1. The CV says "dreizehn NixOS-Hosts" in the nixconfig blurb while the letter beside it says
-           "über zwanzig" and both corpora already do: the row's status corrects the letter only.
-        2. Its two Bountystash bullets are the pre-review dialect ("inventargetriebener CI", "Secrets
-           mit sops ... hinter der eigenen CA") against the corpora's "CI aus der Inventardatei".
-        3. `sops` in the bullets against `SOPS` in the skills line: pick one, and a corpus change moves
-           lib/matt/cv-software.de.json in lockstep or the build fails on the variant.
-        4. No container/Kubernetes bullet survives the projection while the letter leans on the layer
-           below as its substitute — state that limit harder, or accept the fit as it stands.
+        Remaining, operator only: hand-submit both PDFs after 2026-12-07 at
+        karriere.hisolutions.com/jobs/68820855 and record `task apps:update -- <id> --status applied`.
+      '';
+    };
 
-        Remaining: rebuild from one current source. The 07:51 build read
-        ~/.local/state/appflow/letters/<id>/{letter,resume}.json, but appflow-packet.sh defaults to
-        $CONFIG/lebenslauf.json and $CONFIG/letters/<id>.json — and that letter (27 Nov 20:58) still
-        says "25 NixOS-Hosts" in five paragraphs, so a task-path rebuild silently restores it. Then
-        letter-pdf-check, cv-ats-check and checks:appflow on the new bytes (1 p / 2 p, dir 700, files
-        600); if the corpus moves, matt:build, matt:cv:check and agents:cv:publish-check too.
-        Next for this lane: fix 1-3, rebuild, gate, leave the PDFs ready; the operator hand-submits on
-        2026-12-07 at karriere.hisolutions.com/jobs/68820855 and records apps:update --status applied.
+    lebrel-secret-rename-rejected-2026-11-28 = {
+      title = "A lebrel secret rename is dropped: it deleted a bound token and nothing reads the new key";
+      kind = "decision";
+      status = "REJECTED";
+      priority = "P3";
+      date = "2026-11-28";
+      summary = "An uncommitted change renamed morrow-telegram to lebrel and exported LEBREL_API_KEY into hermes' env template on a pre-rekey base without lumi; it deletes a token hosts/lumi.nix binds and nothing reads the new key.";
+      refs = {
+        modules = ["modules/secrets.yaml" "modules/profiles/hermes.nix" "hosts/lumi.nix"];
+        tasks = ["checks:sops:drift" "checks:host"];
+        docs = ["docs/sops-rekey.md"];
+      };
+      body = ''
+        The change in the 2026-11-28 pre-merge stash deletes `morrow-telegram`, adds `lebrel`, and
+        exports `LEBREL_API_KEY` into the hermes env template. `hosts/lumi.nix` binds
+        `morrow-telegram` into zeroclaw-lumi.env, so the deletion breaks a live host, and the
+        ciphertext predates the rekey (40 recipients, no lumi).
+
+        Dropped. The ciphertext is archived out of the repo at
+        `~/.local/state/nixconfig/secrets-lebrel-uncommitted-20261128.yaml` (mode 600, sha256
+        `af0c9d60...`), still decryptable with this host's key, so a revival starts from the value:
+        keep `morrow-telegram`, add `lebrel` beside it with `sops set` on current HEAD so the lumi
+        recipient carries, name the consumer in the same commit, gate `checks:sops:drift` and its
+        `checks:host`.
       '';
     };
     classification-gate-placement = {

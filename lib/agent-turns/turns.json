@@ -1,8 +1,21 @@
 {
-  "generated": "2026-11-28T10:36:41Z",
+  "generated": "2026-11-28T10:37:13Z",
   "count": 200,
-  "pin": "0ba86590c482cd8de08d1aa3616847d7c60cc1981747ee422ab638ebba334381",
+  "pin": "8d725192cd4c88a158e71b1f10f0a39255e586804f71b29796e38f0fbe2367af",
   "turns": [
+    {
+      "id": "1e5f0bd6-0cbf-4bf1-846c-5eace64efb08",
+      "ts": "2026-11-28T10:36:45Z",
+      "source": "freebuff",
+      "subject": "nixconfig:freebuff-cv-publish",
+      "action": "landed: visual check on docs + matt EN/DE + DE PDF; lebrel closed as REJECTED note (no note existed; the item was the dead stash change) with AGENTS_CEILING ratcheted to 520560; packet note distilled to what landed | gate: nixcachix hygiene PASS on eb1a24d3, checks:nix:comments PASS in a clean worktree, pages deployed 447 notes",
+      "outcome": "done",
+      "claims": [],
+      "files": [],
+      "base_commit": "10a2712f87f536ab3930fb318e9e7764772db7af",
+      "branch": "main",
+      "frame": "03hbhp1i5zi58ukypvzewmwni"
+    },
     {
       "id": "3f5a8386-5dce-41de-be32-e5159d153c81",
       "ts": "2026-11-28T10:33:26Z",
@@ -2980,25 +2993,6 @@
       "base_commit": "1e649efd0792dc9dac6b8b2ec4e2d99fc6bf2b9a",
       "branch": "main",
       "frame": "03hbdz5lzdvgpg05l2bs1qijo"
-    },
-    {
-      "id": "a529fe98-660a-4296-97af-6b4d5bf41404",
-      "ts": "2026-11-27T23:09:00Z",
-      "source": "freebuff",
-      "subject": "nixconfig:freebuff-cv-republish-2026-11-28",
-      "action": "verify vs origin/main 19a19fd6: CV surface blob-identical (lib/matt, modules/sites, lib/matt-site.nix); .#sites.matt-site builds 6 PDFs byte-equal to live matt.bountystash.com; cv-evidence 4 legs PASS, cv-blog-check PASS, pins --check all fresh. Zero drift: no commit, nothing to push. | gate: agents:cv:publish-check PASS",
-      "outcome": "done",
-      "claims": [
-        "lib/matt",
-        ".#sites.matt-site"
-      ],
-      "files": [
-        "lib/matt",
-        ".#sites.matt-site"
-      ],
-      "base_commit": "a2f2932d0bd31a082f491dbc5361e7a08099b5e3",
-      "branch": "main",
-      "frame": "03hbdyowmrykxcxj23gjwepk6"
     }
   ]
 }

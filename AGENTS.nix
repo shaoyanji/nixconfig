@@ -2,6 +2,39 @@
 {
   schemaVersion = 1;
   notes = {
+    flake-projection-audit-2026-11-28 = {
+      title = "All 32 projected host configurations evaluate; the monolithic check stays refused";
+      kind = "open";
+      status = "CLOSED";
+      priority = "P3";
+      date = "2026-11-28";
+      summary = "The 2026-11-28 projection audit evaluated all 32 flake-projected hosts (26 nixos, 1 darwin, 5 home) cleanly, so the failing-host list is empty. `task checks:flake` correctly refused a one-process `nix flake check` on frieren's 11.7 GiB; `checks:nix:eval` does not exist by design.";
+      refs = {
+        modules = ["flake/outputs.nix" "flake/host-inventory.nix" "scripts/task/host-check-sweep.sh"];
+        tasks = ["checks:hosts" "checks:inventory:compiled" "checks:flake"];
+        docs = ["docs/inventory-schema.md" "docs/agent-contract.md"];
+      };
+      body = ''
+        Audit on frieren at 10a2712f, one configuration per evaluator under
+        scripts/task/oom-guard.sh: 32/32 passed, 257.16 s of summed evaluator
+        time, worst peak 1698.9 MiB (ancientace). The eight external inventory
+        devices have no module projection by design, so the audited set is the
+        32 outputs in nixosConfigurations, darwinConfigurations and
+        homeConfigurations.
+
+        Command evidence: `task checks:flake` printed its 16 GiB refusal at
+        11740 MiB rather than running the one-process check; no raw
+        `nix flake check` was run on this host. `checks:nix:eval` is absent
+        because docs/agent-contract.md refuses a catch-all eval task; the
+        bounded substitute was `task checks:hosts HOSTS="<all 32>" MODE=eval`,
+        plus `task checks:inventory:compiled` for coverage. Failing hosts: none.
+
+        Exit: rerun the named sweep after flake/host-inventory.nix or
+        flake/outputs.nix changes; any host leaving the sweep nonzero is a
+        projection regression and becomes a host-change turn, not a widening of
+        this note.
+      '';
+    };
     kg-zeck-cache = {
       title = "Measure an epoch-scoped incremental graph cache";
       kind = "experiment";
@@ -275,36 +308,20 @@
         docs = ["README.md" "docs/nix-patterns.md"];
       };
       body = ''
-        Problem: `flake/outputs.nix` was assembled by hand, hosts listed modules in
-        `flake/host-inventory.nix`, chains in `flake/module-sets.nix`, and a module
-        reached a sibling by relative path — so "who uses this file" was a grep.
+        Problem: outputs, hosts, chains and sibling imports were hand-maintained,
+        so module consumers were found by grep.
 
-        Shape: `flake-parts` owns the outputs; every file under `modules/` gains a
-        name imported through `self`; `flake/host-inventory.nix` keeps `kind`,
-        `system` and the host path. Gate: the same toplevel `drvPath` per
-        representative chain, `checks:host` green.
+        Delivered shape: flake-parts owns the outputs; `lib/nix-files.nix` walks
+        the module tree; `.#modules` names every file; hosts and chains import
+        `self.modules."<name>"`, never a sibling path. `flake/host-inventory.nix`
+        keeps only kind/system/host path. Representative toplevels were unchanged
+        while the projection moved, and `checks.<system>.nix-registry` now fails
+        a duplicate or missing name.
 
-        DELIVERED in four commits (2026-11-05/06): flake-parts owns the outputs
-        (32 names, three chain toplevels unchanged at one git state); then
-        `lib/nix-files.nix` walks the tree and dev shells move to `perSystem`;
-        then `.#modules` names every file under `modules/`, with chains, 33 host
-        files and 43 host sub-modules naming 136 imports; then 21 files name their
-        own 66 imports, so no sibling is reached by path from anywhere and the
-        graph reads name edges on both sides.
-
-        Exit: met. `flake/outputs.nix` projects from `inventory.toml` and the walk
-        (`project = kind: fn:`), so neither a file list nor a host list is
-        hand-maintained, and `checks.<system>.nix-registry` fails a duplicate name
-        or one that resolves to no file. Line counts did not fall — `flake.nix` +31
-        for the flake-parts body, `checks.nix` +28 for the gate — the lists did.
-
-        Finished 2026-11-08: the "loads with arguments" exception is gone too —
-        the 13 such loads name their file, so `grep 'import \.\./' modules/`
-        answers nothing and what remains is `builtins.readFile` of data. Two dead
-        files removed (`services/go-backend.nix`, `scripts/examples.nix`); the
-        go-backend gate stays in `flake/host-check.nix` as "no host declares that
-        unit". The rule the tree keeps is `self.modules."<name>"`, never a sibling
-        path (`docs/nix-patterns.md`); the commit log is the rest.
+        Finished 2026-11-08: argument loads name their file, `grep 'import \.\./'
+        modules/` is empty, dead `services/go-backend.nix` and
+        `scripts/examples.nix` are gone, and `docs/nix-patterns.md` carries the
+        rule. Line counts did not fall; the hand-maintained lists did.
       '';
     };
     d1-compiled-context = {
@@ -891,36 +908,20 @@
         tasks = ["checks:host"];
       };
       body = ''
-        `cassini`'s stated blocker was stale: `modules/user/ai/freebuff-remote.nix`
-        already gates `xdg` on `isLinux`.
+        `cassini`'s stated blocker was stale; `freebuff-remote.nix` already gates
+        `xdg` on Linux. The real darwin faults were module shape, Linux-only
+        options and one tailscale leaf.
 
-        2026-11-19, `ALLOW_PRESERVED=1 task checks:host HOST=cassini MODE=eval`
-        (1.9 s to reach the head of the chain). Two faults are cleared and landed:
+        Landed fixes: `macos.nix` moves home-manager/nix-homebrew/users under
+        `config`; `linux-systemd.nix` owns systemd.oomd/timers/journald and is
+        imported only by nixos/container/demo features; `tailscale-policy.nix`
+        emits `extraSetFlags` only when that leaf exists. `mkIf` could not hide
+        either missing option because `pushDownProperties` evaluates the leaf
+        before the missing-option check; the second case needs `optionalAttrs`.
 
-        1. `modules/global/macos.nix` moved `home-manager`, `nix-homebrew` and
-           `users` under an explicit `config`; nix-darwin's checker rejects them at
-           module top level.
-        2. `modules/global/linux-systemd.nix` carries `systemd.oomd`,
-           `systemd.timers` and `services.journald`, imported by the `nixos`,
-           `containers` and `demo` features only — never by `base` or `macos`.
-           `lib.mkIf` could not do this: `pushDownProperties` rewrites
-           `services = mkIf c { journald… }` into `services.journald = mkIf c`, so
-           the missing-option check runs with the condition false. Measured twice,
-           both gating attempts reverted.
-
-        Final fault, 2026-11-27: nix-darwin has `services.tailscale` but not the
-        Linux module's `extraSetFlags` suboption. `tailscale-policy.nix` now tests
-        that leaf before emitting the definition. `optionalAttrs` is required:
-        `mkIf` is pushed down before the missing-option check, so it cannot hide a
-        definition from the module system.
-
-        Gates: `checks:host HOST=netbook` green in 10.2 s after the Linux-option
-        split; `ALLOW_PRESERVED=1 task checks:host HOST=cassini MODE=eval` green
-        with 585 assertions after the tailscale leaf fix. `zeno`, `mtfuji`,
-        `deckstation` and `applevalley` also pass the same eval gate.
-
-        Exit: delivered — both named dormant hosts have a green module-system eval;
-        re-open only if the owner revives the hardware and the real switch fails.
+        Gates: netbook eval green after the split; cassini eval green with 585
+        assertions after the leaf fix; zeno, mtfuji, deckstation and applevalley
+        also eval. Re-open only if revived hardware fails the real switch.
       '';
     };
     kernel-collision-gate = {
@@ -976,36 +977,22 @@
         tasks = ["checks:quick" "check:verify" "checks:shell-inputs:test" "checks:sops:drift:test"];
       };
       body = ''
-        The audit split the uncovered gates in two. Replayable past
-        mistakes got worktree fixtures: repo:paths at 7059c0a2^ (five
-        files spelled checkout paths), shell-inputs at 0e46552e (the
-        xs-notify awk 127, checker copied into the old tree), and
-        images against a synthesized IMAGES_ROOT carrying the real
-        2026-11-26 session-gated URL row. The rest seed the class on a
-        HEAD worktree: a dangling `task` cite, a path-edge import, a
-        prose tell (`delve`), three desc-restating skill rows (the
-        >=3 hard-verdict threshold, a lone row is WARN by design), a
-        malformed workflow yaml, a deadnix unused formal, a
-        shell-expansion-in-indented-string interpolation, a dropped
-        check-inventory row, and a dropped sops age recipient.
+        Replayable past mistakes became worktree fixtures: repo-paths at
+        7059c0a2^, shell-inputs at 0e46552e, and images with the 2026-11-26
+        session-gated URL row. The rest seed their class on HEAD: dangling task
+        cite, path-edge import, prose tell, three desc-restating rows, malformed
+        workflow yaml, deadnix unused formal, indented-string interpolation,
+        dropped check-inventory row, dropped sops age recipient.
 
-        Two traps: check:verify:test must not carry an inventory row —
-        the gate only sees checks:* names (check:verify is rowless
-        itself), and a taskfile summary may not spell
-        modules/secrets*.yaml on a `sops` line — the secrets-path
-        policy grep counts summary text as code. checks:entry stays
-        unfixtured: a timing budget has no mistake to seed.
+        Round 2 closed the toon plane: toon:tasks seeds a bare `toon -e` and a
+        hand-cased FORMAT; toon:surfaces crafts a bare `nix eval --json`; toon,
+        infron, kg and tasks self-fixture each run. checks:entry stays
+        unfixtured because a timing budget has no mistake to seed.
 
-        Round 2 closed the toon plane: toon:tasks:test seeds a bare
-        `toon -e` cmd and a hand-cased FORMAT in a worktree;
-        toon:surfaces:test crafts a bare `nix eval --json` line (the
-        script's file-args exist for negative control); checks:toon
-        needs no fixture — it self-seeds under/over-count and refusal
-        cases every run, and infron/kg/tasks self-fixture the same
-        way. The sweep is complete.
-
-        Exit: checks:quick green (~82 s), check:verify 151/151,
-        checks:tasks clean, every fixture refuses then passes HEAD.
+        Traps preserved in the fixtures: check:verify:test carries no inventory
+        row, and a taskfile summary must not spell modules/secrets*.yaml on a
+        sops line. Exit met: checks:quick green, check:verify 151/151 at the
+        time, and every fixture refuses its seeded tree then passes HEAD.
       '';
     };
     dns-second-resolver = {
